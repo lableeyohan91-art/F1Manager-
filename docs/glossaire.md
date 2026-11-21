@@ -84,3 +84,13 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Diagnostic** | Interface de consultation du monde (entités, relations, souvenirs, raisons des décisions), destinée à l'équipe de conception. |
 | **Bac à sable** | Outil pour déclencher à la main une interaction (négociation, promesse…) et observer la réaction. |
 | **Migration** | Conversion d'une ancienne sauvegarde au format actuel. |
+
+## Données initiales
+
+| Terme | Définition |
+| --- | --- |
+| **Jeu de données initial** | Ensemble des fichiers CSV qui décrivent le monde au départ de la partie (écuries, personnes, contrats, carrières, palmarès). Entièrement modifiable. |
+| **Grille 2026** | Jeu de données initial inspiré de la grille réelle de F1 2026, avec des noms altérés (D-042). |
+| **Nom altéré** | Nom réel modifié d'une seule lettre, en gardant si possible la prononciation (Ferrari → Ferrary). |
+| **Histoire ancrée** | Préparation du passé où les faits viennent des données, et seule la couche humaine (souvenirs, relations) est simulée. Elle ne modifie pas la grille de départ. |
+| **Simulation historique libre** | Préparation du passé où tout est simulé. Réservée aux mondes entièrement fictifs. |

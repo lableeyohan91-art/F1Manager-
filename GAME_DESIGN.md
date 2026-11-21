@@ -66,6 +66,8 @@ Le départ d'une personne influente peut entraîner plusieurs collaborateurs. Un
 
 ## 6. Un paddock qui a déjà une histoire
 
+**Départ par défaut : grille inspirée de la F1 2026** (11 écuries, noms altérés d'une lettre, données réalistes). Les faits passés (palmarès, carrières) viennent des données. La couche humaine (souvenirs, relations, groupes) est simulée par-dessus ce passé, sans modifier la grille de 2027 : c'est l'**histoire ancrée** ([donnees-initiales.md](docs/systemes/donnees-initiales.md)). Pour un monde entièrement fictif : 
+
 Le joueur ne débarque pas dans un monde vierge. Une **simulation historique préalable**, de durée configurable, génère les anciens champions, palmarès, transferts, rivalités, collaborations passées, souvenirs et réputations. Au départ de la partie, des personnages se connaissent déjà et partagent une histoire.
 
 ## 7. Philosophie d'équilibrage

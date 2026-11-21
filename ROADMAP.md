@@ -11,14 +11,14 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | --- | --- | --- |
 | 0 | Cadrage | Documentation complète, décisions tracées |
 | 1 | Noyau | Un moteur vide qui tourne 50 saisons, reproductible |
-| 2 | Monde + diagnostic v0 | Un paddock fictif généré, consultable dans une page de diagnostic |
+| 2 | Monde + diagnostic v0 | Grille inspirée de 2026 chargée depuis des CSV modifiables, générateur procédural, page de diagnostic |
 | 3 | Saison abstraite | Classements, points et primes sur 10 saisons |
 | 4 | Contrats + mémoire v1 + bac à sable | Négocier, promettre, se souvenir ; premières interactions testables à la main |
 | 5 | Économie | Sponsors, conseil d'administration, plafond budgétaire, installations |
 | 6 | Cycle de vie | Vieillissement, progression, retraites, nouvelles générations |
 | 7 | Marché du travail + IA des écuries + agents | Recrutement actif, débauchage, décisions de l'IA |
 | 8 | Mémoire v2 + groupes sociaux + politique | Circulation de l'information, réputation, groupes émergents, votes du règlement |
-| 9 | Simulation historique | Démarrage dans un paddock qui a N années d'histoire |
+| 9 | Histoire ancrée (+ simulation libre pour les mondes fictifs) | Démarrage en 2027 avec la grille voulue, et des personnages qui partagent déjà un passé |
 | **A** | **Jalon A** | **10 saisons observées après un historique, chronique lisible, rapport de diagnostic** |
 | 10 | Le joueur | Prendre la tête d'une écurie, premiers écrans mobiles |
 | 11 | Médias et archives | Actualités, rumeurs, records, chronologie |

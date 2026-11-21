@@ -1,8 +1,8 @@
 # F1Manager- (nom de travail)
 
-Simulation de management d'écurie de course automobile, sur mobile. L'univers est fictif. L'objectif : des carrières de 20 à 50 saisons dans un paddock vivant, qui a une mémoire.
+Simulation de management d'écurie de course automobile, sur mobile. Le départ s'inspire de la grille réelle 2026 (noms altérés), puis le monde évolue librement. L'objectif : des carrières de 20 à 50 saisons dans un paddock vivant, qui a une mémoire.
 
-> Nom définitif à choisir. Le jeu ne doit utiliser ni « F1 », ni « Formula 1 », ni aucun nom réel d'écurie ou de pilote : ce sont des marques déposées.
+> Nom définitif à choisir. Le jeu ne doit utiliser ni « F1 », ni « Formula 1 », ni aucun nom réel exact d'écurie ou de pilote. Voir [docs/systemes/donnees-initiales.md](docs/systemes/donnees-initiales.md).
 
 ## État du projet
 

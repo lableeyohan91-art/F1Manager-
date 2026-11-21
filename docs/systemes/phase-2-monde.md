@@ -1,6 +1,7 @@
 # Phase 2 — Génération du monde et diagnostic v0
 
 > Statut : **PROPOSÉ**. À valider avant le début de la phase 2.
+> **Révisé le 22/11/2026** : le départ par défaut est la grille inspirée de la F1 2026 (voir [donnees-initiales.md](donnees-initiales.md)). Le générateur ci-dessous reste nécessaire : pour le jeu de données fictif, le réservoir de juniors et les nouvelles générations. Le chargement des CSV de la grille 2026 et ses contrôles s'ajoutent au contenu de la phase.
 > Objectif : un paddock fictif de 10 écuries, crédible et varié, généré à partir d'une graine ou chargé depuis des fichiers modifiables dans Excel, et consultable dans une page de diagnostic.
 
 ## Contenu

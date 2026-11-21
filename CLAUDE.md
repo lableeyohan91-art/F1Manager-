@@ -40,7 +40,7 @@ Ce fichier est relu au début de chaque session de Claude Code. Il prime sur les
 - Un attribut qui n'est lu par aucune formule n'existe pas. Chaque attribut est référencé dans sa fiche système, avec la liste des systèmes qui le lisent.
 - Les volumes sont bornés : souvenirs par personne, événements détaillés conservés, etc. (voir `docs/systemes/memoire.md`).
 - Les sauvegardes portent un numéro de version. Toute évolution de format s'accompagne d'une migration et d'un test.
-- Univers entièrement fictif : aucun nom réel d'écurie, de pilote, de circuit ni de marque.
+- Aucun nom réel **exact** d'écurie, de pilote, de circuit ni de marque. La grille de départ s'inspire de la F1 2026 avec des noms altérés (D-042), qui ne figurent que dans les fichiers de données, jamais dans le code. Personnalités et relations des personnages inspirés de personnes réelles : toujours fictives. Publication du jeu de données réel : voir D-043.
 
 ## Git
 

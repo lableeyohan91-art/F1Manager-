@@ -21,7 +21,6 @@ Une décision qui en remplace une autre le dit (« remplace D-xxx »).
 | D-005 | 21/11/2026 | Simulation déterministe, hasard à graine, un flux par système | Reproductibilité, débogage, tests contrefactuels. |
 | D-006 | 21/11/2026 | Sauvegardes locales versionnées, avec migrations | Les vieilles parties restent lisibles quand le jeu évolue. |
 | D-007 | 21/11/2026 | Modèle de résultat de course abstrait avant le vrai moteur de course | Sans résultats, le paddock ne peut pas vivre (primes, sponsors, moral). |
-| D-008 | 21/11/2026 | 10 écuries au départ, grille extensible plus tard | Équilibrage plus simple. Le nombre d'écuries n'est figé nulle part dans le code. |
 | D-009 | 21/11/2026 | 9 postes individualisés par écurie au départ, puis enrichissement progressif | Les autres employés sont regroupés en départements, dégroupés plus tard. Liste exacte : D-029. |
 | D-010 | 21/11/2026 | Simulation autonome sur plusieurs décennies, mode observateur | Le monde ne dépend pas du joueur. Le mode observateur sert aussi d'outil de test. |
 | D-011 | 21/11/2026 | Agents de pilotes individualisés | Négociations plus riches, relations durables. |
@@ -49,6 +48,10 @@ Une décision qui en remplace une autre le dit (« remplace D-xxx »).
 | D-035 | 22/11/2026 | Le dépôt reste public pour l'instant | Nécessaire pour GitHub Pages gratuit ; rien de sensible. À revoir si besoin. |
 | D-037 | 22/11/2026 | Jeu en français d'abord ; textes rangés dans des fichiers séparés pour une traduction future | |
 | D-038 | 22/11/2026 | Mode « sauvegarde unique » (ironman) proposé en option | Donne du poids aux décisions, sans l'imposer. |
+| D-041 | 22/11/2026 | **Remplace D-008.** Le nombre d'écuries est celui du jeu de données initial (11 avec la grille 2026). Il n'est figé nulle part dans le code et peut changer en cours de partie | Demande du porteur : partir de la grille réelle 2026. |
+| D-042 | 22/11/2026 | **Modifie D-017.** Départ en 2027 avec une grille inspirée de la F1 2026 (11 écuries, 22 pilotes), noms altérés d'une lettre. Données réalistes : nationalités, âges, niveaux, potentiels, hiérarchie, moyens, motoristes, identité, palmarès. Personnalités et relations privées fictives. Évolution libre ensuite, nouvelles générations procédurales | Décision du porteur. Mise en garde juridique de Claude Code consignée dans [donnees-initiales.md](systemes/donnees-initiales.md) §2. |
+| D-047 | 22/11/2026 | Base de données initiale entièrement modifiable (CSV, un fichier par table, aucun nom dans le code) | Demande du porteur. |
+| D-048 | 22/11/2026 | La préparation historique ne doit pas modifier la grille voulue au lancement de la carrière en 2027 | Demande du porteur. Mise en œuvre proposée : D-046 (histoire ancrée). |
 
 ---
 
@@ -63,3 +66,15 @@ Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · 
 | D-036 | AVANT P2 | Nom du championnat fictif et de l'instance dirigeante | ChatGPT propose 10 noms, le porteur choisit |
 | D-040 | AVANT P3 | Fourchettes cibles de la phase 3 | Voir [phase-3-saison.md](systemes/phase-3-saison.md), à relire par ChatGPT |
 | D-039 | PLUS TARD | Option Carrera : importer les résultats réels de Paddock comme résultats de Grand Prix | Idée à garder, non prioritaire |
+| D-043 | BLOQUANT P2 | Publication du jeu de données « grille 2026 » | **Séparé et non publié** : le jeu public contient un jeu de données fictif ; le porteur importe la grille 2026 chez lui. Raison : risque juridique (marques, droit à l'image) si c'est publié, voir [donnees-initiales.md](systemes/donnees-initiales.md) §2 |
+| D-044 | BLOQUANT P2 | Postes non pilotes (team principal, directeurs, ingénieurs) : réels altérés ou fictifs ? | Fictifs : leurs noms sont peu connus du public et le risque d'image est plus fort (personnes moins publiques) |
+| D-045 | AVANT P3 | Circuits : réels altérés ou fictifs ? | Réels altérés, par cohérence avec la grille (lieux géographiques, peu de risque) |
+| D-046 | BLOQUANT P2 | Remplacer la simulation historique libre par l'**histoire ancrée** pour le départ « grille 2026 » (faits passés lus dans les données, couche humaine simulée par-dessus, marché désactivé) | Oui : seule façon de garantir la grille de 2027 tout en créant souvenirs et relations. La simulation libre reste pour les mondes fictifs. Profondeur : depuis 2010 (début de carrière des plus anciens pilotes actuels concernés) |
+
+---
+
+## Décisions abandonnées ou remplacées
+
+| ID | Date | Décision d'origine | Raison |
+| --- | --- | --- | --- |
+| D-008 | 22/11/2026 | 10 écuries au départ (21/11/2026) | Remplacée par D-041 : grille réelle 2026 à 11 écuries. |

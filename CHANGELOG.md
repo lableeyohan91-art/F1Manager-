@@ -15,3 +15,11 @@ Aucun code à ce stade.
 ### Modifié
 - Décisions validées par le porteur : D-024, D-027 à D-035, D-037, D-038. Les 4 décisions bloquantes pour la phase 1 sont tranchées.
 - Restent à discuter : D-025 et D-026 (traits et valeurs, à finaliser avec ChatGPT), D-036 (noms), D-039 (option Carrera), D-040 (fourchettes cibles de la phase 3).
+
+## [Phase 0] — 22/11/2026 (2)
+
+### Modifié
+- Départ inspiré de la grille F1 2026 (D-041, D-042, D-047, D-048) ; D-008 remplacée.
+- Nouvelle fiche `docs/systemes/donnees-initiales.md` : altération des noms, base CSV modifiable, histoire ancrée, mise en garde juridique.
+- Mise à jour de CLAUDE.md, README, GAME_DESIGN, ROADMAP, glossaire, fiche phase 2.
+- Nouvelles questions : D-043 à D-046.

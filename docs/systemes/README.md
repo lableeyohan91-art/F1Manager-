@@ -7,6 +7,7 @@ Une fiche par système ou par phase, 2 à 4 pages maximum. Chaque fiche indique 
 | [entites.md](entites.md) | Entités principales du monde et leurs champs | Proposé |
 | [personnalite.md](personnalite.md) | Personnages en 5 couches, traits, valeurs, compétences | Structure validée, listes proposées |
 | [memoire.md](memoire.md) | Faits, souvenirs, relations, résidu, promesses, réputation, groupes sociaux | Principes validés, formules proposées |
+| [donnees-initiales.md](donnees-initiales.md) | Grille inspirée de 2026, altération des noms, base modifiable, histoire ancrée | Principe validé, modalités proposées |
 | [phase-1-noyau.md](phase-1-noyau.md) | Détail et critères de la phase 1 | Proposé |
 | [phase-2-monde.md](phase-2-monde.md) | Détail et critères de la phase 2 | Proposé |
 | [phase-3-saison.md](phase-3-saison.md) | Détail et critères de la phase 3 | Proposé |
