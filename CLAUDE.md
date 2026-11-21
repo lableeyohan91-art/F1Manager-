@@ -1,0 +1,48 @@
+# Règles du projet
+
+Ce fichier est relu au début de chaque session de Claude Code. Il prime sur les habitudes par défaut.
+
+## Langue et communication
+
+- Tout est rédigé en français : documentation, messages de commit, commentaires du code, textes du jeu.
+- Le porteur du projet n'est pas développeur. Il faut des explications claires et concrètes, et lui dire franchement quand une idée pose problème.
+- Avant de répondre, poser des questions s'il manque des éléments, plutôt que de deviner.
+
+## Rôles
+
+- Claude Code est le seul à écrire le code du dépôt. ChatGPT peut proposer du code dans `docs/echanges/` : Claude Code l'intègre ou le critique.
+- Le porteur du projet tranche. Aucune décision structurante n'est prise sans lui.
+
+## Processus pour chaque système
+
+1. Fiche d'intention (porteur + ChatGPT).
+2. Conception technique dans `docs/systemes/` (Claude Code), avec critique.
+3. Validation par le porteur, inscrite dans `docs/decisions.md`.
+4. Implémentation + tests + simulation de contrôle + rapport dans `docs/rapports/`.
+5. Relecture (porteur + ChatGPT), puis corrections.
+
+**Jamais de code pour un système dont la conception n'est pas validée.**
+
+## Mémoire du projet
+
+- Toute décision importante est inscrite dans `docs/decisions.md` : date, décision, raison, statut (VALIDÉE / À DISCUTER / ABANDONNÉE).
+- Ne jamais rouvrir une décision VALIDÉE sans le signaler explicitement comme une remise en cause.
+- Mettre à jour `CHANGELOG.md` à chaque livraison.
+- Un terme du glossaire (`docs/glossaire.md`) a un seul sens. Un terme nouveau doit y être ajouté.
+
+## Règles techniques non négociables (dès la phase 1)
+
+- Le moteur (`src/engine/`) n'importe jamais rien de l'interface, ni du navigateur (pas de `window`, pas de `document`).
+- Le moteur n'utilise jamais `Math.random`, `Date.now`, `new Date()` ni d'autre source non déterministe. Le hasard passe par le générateur à graine, avec un flux séparé par système.
+- Toute modification de l'état passe par une commande ou par un système du moteur. Toute modification significative produit un événement, avec ses causes.
+- Le joueur et l'IA utilisent les mêmes commandes, validées par les mêmes règles.
+- Tous les coefficients d'équilibrage sont rangés dans `src/engine/balance/` : nommés, commentés, avec leur unité. Pas de nombre « magique » dans le code.
+- Un attribut qui n'est lu par aucune formule n'existe pas. Chaque attribut est référencé dans sa fiche système, avec la liste des systèmes qui le lisent.
+- Les volumes sont bornés : souvenirs par personne, événements détaillés conservés, etc. (voir `docs/systemes/memoire.md`).
+- Les sauvegardes portent un numéro de version. Toute évolution de format s'accompagne d'une migration et d'un test.
+- Univers entièrement fictif : aucun nom réel d'écurie, de pilote, de circuit ni de marque.
+
+## Git
+
+- Messages de commit en français, à l'impératif, avec un résumé court (« Ajoute le glossaire »).
+- Ne pas pousser de secrets. Pas de dépendance ajoutée sans la justifier dans `docs/decisions.md`.
