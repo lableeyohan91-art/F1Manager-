@@ -9,3 +9,8 @@ export * from './core/monde';
 export * from './core/moteur';
 export * from './core/sauvegarde';
 export * from './scenarios';
+export * from './model/types';
+export * from './generation/csv';
+export * from './generation/chargement';
+export * from './generation/construction';
+export * from './generation/coherence';

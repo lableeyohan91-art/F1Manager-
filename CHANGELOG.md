@@ -44,3 +44,16 @@ Aucun code à ce stade.
 - Lanceur sans écran (`npm run simuler`, `npm run rejouer`), vérification de pureté du moteur, 20 tests automatiques.
 - Page web minimale (Preact) et intégration continue GitHub Actions avec publication GitHub Pages.
 - Rapport `docs/rapports/2026-11-22-p1-noyau.md`.
+
+## [Phase 2, en cours] — 22/11/2026
+
+### Ajouté
+- Chargement et validation des fichiers CSV (messages par fichier, ligne et colonne).
+- Construction du monde 2027 : données de la grille 2026 + génération des couches cachées, des postes vacants, des départements, des installations et d'un réservoir de 110 personnes libres.
+- Contrôles de cohérence automatiques.
+- Liste de noms fictifs par nationalité (`data/commun/`).
+- Interface de diagnostic v0 (écuries, personnes et leurs 5 couches, contrats, palmarès, circuits, cohérence, export JSON).
+- 11 tests de plus (31 au total). Rapport `docs/rapports/2026-11-22-p2-monde.md`.
+
+### Corrigé
+- Données de la grille 2026 : points-virgules dans les colonnes de vérification, nationalités MON et THA ajoutées, potentiel d'Alonzo.

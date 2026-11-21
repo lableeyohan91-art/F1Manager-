@@ -1,5 +1,5 @@
 id;nom;ville;pays;type;altitudeM;climatPluie;verification
-cir_albert;Albert Parc;Melbourne;AUS;mixte;10;faible;nom altéré ; type et climat estimés
+cir_albert;Albert Parc;Melbourne;AUS;mixte;10;faible;nom altéré / type et climat estimés
 cir_shanghai;Shangai;Shanghai;CHN;mixte;5;moyen;idem
 cir_suzuka;Suzuca;Suzuka;JPN;rapide;45;moyen;idem
 cir_sakhir;Sakir;Sakhir;BHR;mixte;10;très faible;idem

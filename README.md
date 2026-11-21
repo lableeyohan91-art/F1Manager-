@@ -6,7 +6,7 @@ Simulation de management d'écurie de course automobile, sur mobile. Le départ 
 
 ## État du projet
 
-**Phase 0 — Cadrage (en cours).** Il n'y a encore aucun code. Le dépôt contient uniquement la conception.
+**Phase 1 (noyau) : réalisée. Phase 2 (monde et diagnostic) : en cours.** Voir `docs/rapports/`.
 
 ## Par où commencer
 

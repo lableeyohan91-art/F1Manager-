@@ -77,7 +77,7 @@ Propres à chaque métier, plus quelques compétences **transversales** communes
 | Team principal | Gestion humaine, négociation, relation avec le conseil, politique, communication |
 | Agent | Négociation, réseau, ténacité |
 
-Chaque compétence a un **potentiel** caché et suit une **courbe d'âge** propre au métier (un pilote culmine vers 27–32 ans, un directeur technique vers 45–55 ans). Ces courbes sont des paramètres d'équilibrage.
+Chaque personne a un **potentiel** caché, unique (interprétation de la phase 2, à valider) : le niveau moyen maximal qu'elle peut atteindre sur les compétences de son métier. Chaque compétence et suit une **courbe d'âge** propre au métier (un pilote culmine vers 27–32 ans, un directeur technique vers 45–55 ans). Ces courbes sont des paramètres d'équilibrage.
 
 ## Couche 4 — Aspirations
 

@@ -4,7 +4,8 @@
  */
 
 import { performance } from 'node:perf_hooks';
-import { empreinte, formaterDate, scenario, SEMAINES_PAR_AN_EXPORT } from './_moteur';
+import { creerScenarioGrille2026, empreinte, enregistrerScenario, formaterDate, scenario, SEMAINES_PAR_AN_EXPORT, verifierCoherence } from './_moteur';
+import { lireDonneesGrille2026 } from '../platform/node/donnees';
 import { ecrireSauvegarde } from '../platform/node/stockage';
 import { lireArguments } from './arguments';
 
@@ -19,6 +20,7 @@ if (!Number.isInteger(graine) || !Number.isInteger(saisons) || saisons < 0) {
   process.exit(1);
 }
 
+if (nomScenario === 'grille-2026') enregistrerScenario(creerScenarioGrille2026(lireDonneesGrille2026()));
 const sc = scenario(nomScenario);
 const monde = sc.creerMonde(graine);
 const moteur = sc.creerMoteur();
@@ -28,6 +30,7 @@ moteur.avancer(monde, saisons * SEMAINES_PAR_AN_EXPORT);
 const duree = performance.now() - debut;
 
 const taille = ecrireSauvegarde(sortie, monde);
+const problemes = verifierCoherence(monde);
 
 console.log(`Scénario      : ${sc.nom} (graine ${graine})`);
 console.log(`Simulé        : ${saisons} saisons, jusqu'à ${formaterDate(monde.date)}`);
@@ -35,3 +38,5 @@ console.log(`Durée         : ${(duree / 1000).toFixed(2)} s`);
 console.log(`Événements    : ${Object.keys(monde.evenements).length} au journal, ${monde.chronique.length} dans la Chronique`);
 console.log(`Sauvegarde    : ${sortie} (${(taille / 1024).toFixed(1)} Ko compressés)`);
 console.log(`Empreinte     : ${empreinte(monde)}`);
+console.log(`Personnes     : ${Object.keys(monde.tables['personnes'] ?? {}).length}, écuries : ${Object.keys(monde.tables['ecuries'] ?? {}).length}`);
+console.log(problemes.length === 0 ? 'Cohérence     : OK' : `Cohérence     : ${problemes.length} problème(s)\n- ${problemes.slice(0, 20).join('\n- ')}`);

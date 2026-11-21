@@ -6,6 +6,8 @@
 import { creerMondeVide, table, type Monde } from './core/monde';
 import { Moteur } from './core/moteur';
 import { installerDemo } from './systems/demo';
+import { chargerDonnees, type FichiersDonnees } from './generation/chargement';
+import { construireMonde } from './generation/construction';
 
 export interface Scenario {
   nom: string;
@@ -42,4 +44,18 @@ export function enregistrerScenario(s: Scenario): void {
 
 export function nomsScenarios(): string[] {
   return Object.keys(SCENARIOS);
+}
+
+/**
+ * Phase 2 : départ inspiré de la grille 2026 (D-042). Les fichiers de données sont fournis
+ * par la plateforme (lus sur le disque, ou embarqués dans le site).
+ */
+export function creerScenarioGrille2026(fichiers: FichiersDonnees): Scenario {
+  const donnees = chargerDonnees(fichiers);
+  return {
+    nom: 'grille-2026',
+    description: 'Départ en 2027 avec la grille inspirée de 2026 (data/grille-2026).',
+    creerMonde: (graine) => construireMonde(graine, donnees, 'grille-2026'),
+    creerMoteur: () => new Moteur(),
+  };
 }
