@@ -1,7 +1,7 @@
 # Feuille de route
 
 > Mise à jour le 21/11/2026 pour intégrer les demandes de la validation : mémoire plus tôt, groupes sociaux, valeurs, simulation historique, interface de diagnostic et bac à sable.
-> Statut : ordre des phases **PROPOSÉ**, à valider (décision D-024).
+> Statut : ordre des phases **VALIDÉ** (D-024, 22/11/2026).
 
 Règle : une phase est terminée quand **tous** ses critères de validation sont atteints et que le porteur du projet l'a validée. Pas de durée fixée, car elle dépend du temps disponible.
 
@@ -46,7 +46,7 @@ Contenu : structure documentaire, glossaire, principes, architecture, entités, 
 Critères de validation :
 - [ ] Tous les documents listés dans le README existent et sont relus par le porteur.
 - [ ] Chaque décision est classée VALIDÉE ou À DISCUTER dans `docs/decisions.md`.
-- [ ] Les décisions bloquantes pour la phase 1 sont tranchées (voir le rapport de phase 0).
+- [x] Les décisions bloquantes pour la phase 1 sont tranchées (22/11/2026).
 - [ ] Le rapport de phase 0 a été relu par ChatGPT et ses remarques ont été traitées.
 
 ### Phase 1 — Noyau

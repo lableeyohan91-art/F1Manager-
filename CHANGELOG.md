@@ -9,3 +9,9 @@
 - Rapport de phase 0 pour relecture : `docs/echanges/2026-11-21-claude-rapport-phase-0.md`.
 
 Aucun code à ce stade.
+
+## [Phase 0] — 22/11/2026
+
+### Modifié
+- Décisions validées par le porteur : D-024, D-027 à D-035, D-037, D-038. Les 4 décisions bloquantes pour la phase 1 sont tranchées.
+- Restent à discuter : D-025 et D-026 (traits et valeurs, à finaliser avec ChatGPT), D-036 (noms), D-039 (option Carrera), D-040 (fourchettes cibles de la phase 3).

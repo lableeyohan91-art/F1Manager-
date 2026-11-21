@@ -37,28 +37,29 @@ Une décision qui en remplace une autre le dit (« remplace D-xxx »).
 | D-021 | 21/11/2026 | Le joueur démarre dans un monde déjà historique (simulation préalable, durée configurable) | Des personnages qui se connaissent et partagent un passé dès la première partie. |
 | D-022 | 21/11/2026 | Interface de diagnostic tôt (phase 2) et bac à sable d'interactions (phase 4) | Un monde statistiquement crédible n'est pas forcément intéressant : il faut l'éprouver vite. |
 | D-023 | 21/11/2026 | Claude Code est le développeur principal. ChatGPT intervient en conception, contenu, équilibrage, direction artistique et relecture. Le porteur arbitre | Un seul auteur du code, pour éviter les contradictions. Modalités d'accès de ChatGPT : D-034. |
+| D-024 | 22/11/2026 | Ordre des phases de ROADMAP.md (0 → 14, jalon A après la phase 9) | Chaque système arrive après ceux dont il dépend ; mémoire v1 avancée en phase 4. |
+| D-027 | 22/11/2026 | Attributs notés en entiers de 1 à 20 ; calculs internes en décimal | Lisible (comme Football Manager) et assez fin. |
+| D-028 | 22/11/2026 | 1 pas de simulation = 1 semaine (52 par saison) | Assez fin pour les négociations, assez léger pour le téléphone. |
+| D-029 | 22/11/2026 | 9 postes individualisés : team principal, directeurs technique, sportif et financier, responsables aérodynamique et conception, 2 pilotes titulaires, 1 pilote de réserve | Couvre direction, technique et sportif. |
+| D-030 | 22/11/2026 | 20 Grands Prix par saison, circuits fictifs de 5 types | Ordre de grandeur réaliste. |
+| D-031 | 22/11/2026 | Points aux 10 premiers ; barème = paramètre du règlement, modifiable par vote | Permet la politique du règlement. |
+| D-032 | 22/11/2026 | Monnaie : euros, en millions (M€) | Simple et parlant. |
+| D-033 | 22/11/2026 | Simulation historique : 20 ans par défaut (2007 → 2026), configurable de 0 à 50 | Assez pour des légendes et des rivalités. |
+| D-034 | 22/11/2026 | ChatGPT lit tout le dépôt ; il n'écrit que dans `docs/echanges/` (par le porteur ou par pull request relue par Claude Code), jamais dans `src/` | Un seul auteur du code. |
+| D-035 | 22/11/2026 | Le dépôt reste public pour l'instant | Nécessaire pour GitHub Pages gratuit ; rien de sensible. À revoir si besoin. |
+| D-037 | 22/11/2026 | Jeu en français d'abord ; textes rangés dans des fichiers séparés pour une traduction future | |
+| D-038 | 22/11/2026 | Mode « sauvegarde unique » (ironman) proposé en option | Donne du poids aux décisions, sans l'imposer. |
 
 ---
 
 ## Décisions à discuter
 
-Urgence : **BLOQUANT P1** = à trancher avant la phase 1 · **AVANT P2** = avant la phase 2 · **PLUS TARD**.
+Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · **PLUS TARD**.
 
 | ID | Urgence | Question | Proposition de Claude Code |
 | --- | --- | --- | --- |
-| D-024 | BLOQUANT P1 | Ordre révisé des phases (voir ROADMAP.md) | Adopter l'ordre 0 → 14 avec le jalon A après la phase 9 |
-| D-028 | BLOQUANT P1 | Pas de temps de la simulation | 1 pas = 1 semaine (52 par saison). Les négociations se règlent en quelques semaines de jeu. |
-| D-035 | BLOQUANT P1 | Dépôt public ou privé ? Il est **actuellement public** : tout le monde peut lire la conception. | Rester public tant qu'il n'y a rien de sensible : GitHub Pages gratuit l'exige pour un compte gratuit. Sinon passer en privé et héberger ailleurs. |
-| D-034 | BLOQUANT P1 | Comment ChatGPT intervient-il sur le dépôt ? | Lecture de tout le dépôt. Écriture uniquement dans `docs/echanges/`, par le porteur ou par demande de fusion (pull request) relue par Claude Code. Jamais dans `src/`. |
-| D-025 | AVANT P2 | Liste définitive des traits de personnalité | 9 traits, voir [personnalite.md](systemes/personnalite.md) |
-| D-026 | AVANT P2 | Liste définitive des valeurs et convictions | 7 valeurs, voir [personnalite.md](systemes/personnalite.md) |
-| D-027 | AVANT P2 | Échelle des attributs | Entiers de 1 à 20, comme Football Manager. Lisible, et assez fin. Les calculs internes passent en décimal. |
-| D-029 | AVANT P2 | Les 9 postes individualisés | Team principal, directeur technique, directeur sportif, directeur financier, responsable aérodynamique, responsable conception, pilote titulaire ×2, pilote de réserve. |
-| D-036 | AVANT P2 | Nom du championnat fictif et de l'instance dirigeante | À proposer par ChatGPT (une liste de 10 noms), choix du porteur |
-| D-032 | AVANT P2 | Monnaie | Euros, en millions (M€). Simple et parlant, aucune marque en jeu. |
-| D-037 | AVANT P2 | Langue du jeu | Français d'abord. Tous les textes sont rangés dans des fichiers séparés, pour pouvoir traduire plus tard. |
-| D-030 | AVANT P3 | Nombre de Grands Prix par saison | 20, avec des circuits fictifs de 5 types (rapide, lent et sinueux, mixte, urbain, altitude) |
-| D-031 | AVANT P3 | Barème de points | Points aux 10 premiers. Le barème est un paramètre du règlement, qui pourra changer par vote. |
-| D-033 | AVANT P9 | Durée par défaut de la simulation historique | 20 ans (de 2007 à 2026), configurable de 0 à 50 |
-| D-038 | PLUS TARD | Faut-il un mode « sauvegarde unique » (ironman) ? | Oui, en option |
+| D-025 | AVANT P2 | Liste définitive des traits de personnalité | 9 traits, voir [personnalite.md](systemes/personnalite.md). Accord de principe du porteur le 22/11/2026 ; à finaliser avec ChatGPT, comme prévu |
+| D-026 | AVANT P2 | Liste définitive des valeurs et convictions | 7 valeurs, voir [personnalite.md](systemes/personnalite.md). Même statut que D-025 |
+| D-036 | AVANT P2 | Nom du championnat fictif et de l'instance dirigeante | ChatGPT propose 10 noms, le porteur choisit |
+| D-040 | AVANT P3 | Fourchettes cibles de la phase 3 | Voir [phase-3-saison.md](systemes/phase-3-saison.md), à relire par ChatGPT |
 | D-039 | PLUS TARD | Option Carrera : importer les résultats réels de Paddock comme résultats de Grand Prix | Idée à garder, non prioritaire |
