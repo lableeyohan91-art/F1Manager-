@@ -36,3 +36,11 @@ Aucun code à ce stade.
 
 ### Modifié
 - D-043 révisée (données dans le dépôt public). Nouvelles décisions à confirmer : D-049, D-030b, D-050.
+
+## [Phase 1] — 22/11/2026
+
+### Ajouté
+- Noyau du moteur : hasard à graine par flux, calendrier, boucle hebdomadaire, événements avec causes et conservation bornée, Chronique, commandes, agenda, sauvegarde versionnée avec migration, empreinte.
+- Lanceur sans écran (`npm run simuler`, `npm run rejouer`), vérification de pureté du moteur, 20 tests automatiques.
+- Page web minimale (Preact) et intégration continue GitHub Actions avec publication GitHub Pages.
+- Rapport `docs/rapports/2026-11-22-p1-noyau.md`.

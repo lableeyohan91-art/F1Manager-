@@ -81,3 +81,19 @@ Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · 
 | ID | Date | Décision d'origine | Raison |
 | --- | --- | --- | --- |
 | D-008 | 22/11/2026 | 10 écuries au départ (21/11/2026) | Remplacée par D-041 : grille réelle 2026 à 11 écuries. |
+
+---
+
+## Dépendances logicielles (règle de CLAUDE.md : toute dépendance est justifiée)
+
+| Dépendance | Rôle | Pourquoi | Ajoutée le |
+| --- | --- | --- | --- |
+| typescript | Langage | D-001 | 21/11/2026 |
+| vite, @preact/preset-vite | Construction du site, serveur de développement | D-001 | 21/11/2026 |
+| preact | Interface | D-001. Seule dépendance livrée aux joueurs | 21/11/2026 |
+| vitest | Tests automatiques | Outil de test intégré à Vite | 21/11/2026 |
+| tsx | Lancer les outils en ligne de commande écrits en TypeScript | Évite une étape de compilation pour le lanceur sans écran | 21/11/2026 |
+| @types/node | Types de Node pour les outils et les tests | — | 21/11/2026 |
+
+Aucune dépendance dans le moteur. La compression utilise ce que fournissent Node (zlib) et les navigateurs (CompressionStream).
+Versions : vite 7 et vitest 4, choisies pour ne garder aucune alerte de sécurité connue (`npm audit` : 0). Option `legacy-peer-deps` (fichier `.npmrc`) : contourne un défaut de résolution de npm 10 avec ces versions.
