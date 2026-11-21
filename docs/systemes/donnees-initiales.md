@@ -1,6 +1,6 @@
 # Données initiales et histoire ancrée
 
-> Statut : décision du porteur **VALIDÉE** le 22/11/2026 (D-041, D-042). Modalités techniques **PROPOSÉES** (D-043 à D-046).
+> Statut : **VALIDÉ** le 22/11/2026 (D-041 à D-048). Points du §6 tranchés : fichier réel non publié, postes non pilotes réels altérés, circuits réels altérés, histoire ancrée depuis 2010.
 > Remplace la partie « génération aléatoire des écuries » de [phase-2-monde.md](phase-2-monde.md), et modifie la simulation historique (D-021, D-033).
 
 ## 1. Principe
@@ -68,7 +68,8 @@ La **simulation historique libre** (D-021) reste disponible pour les mondes enti
 
 ## 5. Le reste du monde
 
-- **Pilotes de réserve, juniors, ingénieurs, agents, dirigeants** : réels altérés ou fictifs selon D-044.
+- **Team principals, directeurs (dont le directeur sportif), responsables techniques** : réels altérés quand ils sont publiquement connus, fictifs sinon (D-044).
+- **Juniors, ingénieurs secondaires, agents** : fictifs, générés.
 - **Nouvelles générations** : générées procéduralement, avec les mêmes règles que tout le monde.
 - **Jeu de données fictif par défaut** : généré à partir d'une graine (ancienne phase 2), et utilisé pour les tests et la version publique.
 

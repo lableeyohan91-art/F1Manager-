@@ -23,3 +23,8 @@ Aucun code à ce stade.
 - Nouvelle fiche `docs/systemes/donnees-initiales.md` : altération des noms, base CSV modifiable, histoire ancrée, mise en garde juridique.
 - Mise à jour de CLAUDE.md, README, GAME_DESIGN, ROADMAP, glossaire, fiche phase 2.
 - Nouvelles questions : D-043 à D-046.
+
+## [Phase 0] — 22/11/2026 (3)
+
+### Modifié
+- Validées : D-043 (grille 2026 en fichier non publié), D-044 (postes non pilotes réels altérés), D-045 (circuits réels altérés), D-046 (histoire ancrée depuis 2010).
