@@ -1,0 +1,23 @@
+id;personne;ecurie;poste;debut;fin;salaireMEUR;clauses;verification
+ctr_001;per_verstapen;eq_redbull;pilote_titulaire;2016;2028;55;pilote n°1;échéance et salaire estimés
+ctr_002;per_hadjard;eq_redbull;pilote_titulaire;2026;2027;3;;estimation
+ctr_003;per_antoneli;eq_mercedes;pilote_titulaire;2025;2028;12;;estimation
+ctr_004;per_russel;eq_mercedes;pilote_titulaire;2022;2027;25;;estimation
+ctr_005;per_leclerq;eq_ferrari;pilote_titulaire;2019;2029;32;;estimation
+ctr_006;per_hammilton;eq_ferrari;pilote_titulaire;2025;2027;55;;estimation
+ctr_007;per_noris;eq_mclaren;pilote_titulaire;2019;2027;35;;estimation
+ctr_008;per_piastry;eq_mclaren;pilote_titulaire;2023;2028;25;;estimation
+ctr_009;per_alonzo;eq_aston;pilote_titulaire;2023;2027;20;;estimation
+ctr_010;per_strol;eq_aston;pilote_titulaire;2019;2028;8;fils du propriétaire;estimation
+ctr_011;per_gasli;eq_alpine;pilote_titulaire;2023;2028;8;;estimation
+ctr_012;per_kolapinto;eq_alpine;pilote_titulaire;2025;2027;2;;estimation
+ctr_013;per_albonn;eq_williams;pilote_titulaire;2022;2028;10;;estimation
+ctr_014;per_saintz;eq_williams;pilote_titulaire;2025;2028;12;;estimation
+ctr_015;per_lauson;eq_racingbulls;pilote_titulaire;2025;2027;2;;estimation
+ctr_016;per_linblad;eq_racingbulls;pilote_titulaire;2026;2027;1;;estimation
+ctr_017;per_hulkenbergh;eq_audi;pilote_titulaire;2025;2027;6;;estimation
+ctr_018;per_bortoletto;eq_audi;pilote_titulaire;2025;2028;2;;estimation
+ctr_019;per_okon;eq_haas;pilote_titulaire;2025;2027;6;;estimation (contrat réel non reconduit, ignoré)
+ctr_020;per_bearmann;eq_haas;pilote_titulaire;2025;2027;2;;estimation
+ctr_021;per_peres;eq_cadillac;pilote_titulaire;2026;2027;8;;estimation
+ctr_022;per_botas;eq_cadillac;pilote_titulaire;2026;2027;6;;estimation

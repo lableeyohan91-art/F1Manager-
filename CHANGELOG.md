@@ -28,3 +28,11 @@ Aucun code à ce stade.
 
 ### Modifié
 - Validées : D-043 (grille 2026 en fichier non publié), D-044 (postes non pilotes réels altérés), D-045 (circuits réels altérés), D-046 (histoire ancrée depuis 2010).
+
+## [Phase 0] — 22/11/2026 (4)
+
+### Ajouté
+- Jeu de données `data/grille-2026/` : 11 écuries, 5 motoristes, 22 pilotes, team principals, quelques directeurs, contrats, carrières depuis 2010, palmarès 2010–2026, 24 circuits. Estimations signalées ligne par ligne.
+
+### Modifié
+- D-043 révisée (données dans le dépôt public). Nouvelles décisions à confirmer : D-049, D-030b, D-050.

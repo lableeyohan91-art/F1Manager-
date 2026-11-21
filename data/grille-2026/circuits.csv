@@ -1,0 +1,25 @@
+id;nom;ville;pays;type;altitudeM;climatPluie;verification
+cir_albert;Albert Parc;Melbourne;AUS;mixte;10;faible;nom altéré ; type et climat estimés
+cir_shanghai;Shangai;Shanghai;CHN;mixte;5;moyen;idem
+cir_suzuka;Suzuca;Suzuka;JPN;rapide;45;moyen;idem
+cir_sakhir;Sakir;Sakhir;BHR;mixte;10;très faible;idem
+cir_jeddah;Jedda;Djeddah;KSA;urbain;10;très faible;idem
+cir_miami;Miamy;Miami;USA;urbain;3;moyen;idem
+cir_montreal;Gilles-Villeneuves;Montréal;CAN;urbain;15;moyen;idem
+cir_monaco;Monacco;Monaco;MON;urbain;10;faible;idem
+cir_barcelone;Catalunia;Barcelone;ESP;mixte;110;faible;idem
+cir_spielberg;Spielbergh;Spielberg;AUT;rapide;680;moyen;idem
+cir_silverstone;Silverston;Silverstone;GBR;rapide;150;élevé;idem
+cir_spa;Spa-Francorchamp;Stavelot;BEL;rapide;400;élevé;idem
+cir_hungaroring;Hungarorring;Budapest;HUN;lent et sinueux;250;faible;idem
+cir_zandvoort;Zandvort;Zandvoort;NED;lent et sinueux;5;moyen;idem
+cir_monza;Monzza;Monza;ITA;rapide;160;faible;idem
+cir_madrid;Madrit;Madrid;ESP;urbain;650;faible;idem
+cir_bakou;Bakou;Bakou;AZE;urbain;-25;très faible;idem
+cir_singapour;Marinna Bay;Singapour;SGP;urbain;10;élevé;idem
+cir_austin;Austen;Austin;USA;mixte;150;faible;idem
+cir_mexico;Hermanos Rodrigues;Mexico;MEX;altitude;2240;faible;idem
+cir_interlagos;Interlagoss;São Paulo;BRA;mixte;800;élevé;idem
+cir_lasvegas;Las Vegaz;Las Vegas;USA;urbain;620;très faible;idem
+cir_lusail;Lussail;Lusail;QAT;rapide;10;très faible;idem
+cir_yasmarina;Yas Marinna;Abou Dabi;UAE;mixte;5;très faible;idem

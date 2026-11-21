@@ -28,7 +28,7 @@ La partie démarre en **2027** avec une grille **inspirée de la grille réelle 
 - **Pour un usage privé**, le risque est très faible. **Publié** (dépôt public, site GitHub Pages ouvert à tous), il devient réel.
 - C'est la méthode utilisée par certains jeux de sport non licenciés. Elle n'est tolérée qu'en pratique, sans être sûre en droit.
 
-**Solution recommandée** (comme les « fichiers d'options » des jeux de football) : le jeu ne contient qu'un jeu de données **fictif** par défaut. Le jeu de données « grille 2026 » est un **fichier séparé**, qui n'est pas publié, importé par le porteur dans son propre jeu. Voir D-043.
+**Décision finale du porteur (D-043 révisée) : les données sont dans le dépôt public.** Ancienne recommandation de Claude Code, conservée pour mémoire (comme les « fichiers d'options » des jeux de football) : le jeu ne contient qu'un jeu de données **fictif** par défaut. Le jeu de données « grille 2026 » est un **fichier séparé**, qui n'est pas publié, importé par le porteur dans son propre jeu. Voir D-043.
 
 ## 3. La base de données initiale — entièrement modifiable
 
@@ -43,7 +43,9 @@ Fichiers CSV (ouvrables dans Excel), un par table, avec identifiants stables :
 | `carrieres.csv` | Historique : personne, écurie, poste, de (année), à (année) |
 | `palmares.csv` | Par saison passée : champion pilotes, champion constructeurs, victoires par pilote et par écurie |
 | `installations.csv` | Niveau de départ des installations par écurie |
-| `circuits.csv` | Circuits (fictifs ou altérés, selon D-045) |
+| `circuits.csv` | Circuits réels altérés (D-045) |
+
+Première version saisie : [`data/grille-2026/`](../../data/grille-2026/).
 
 - Les personnalités, valeurs et aspirations ne figurent **pas** dans ces fichiers par défaut : elles sont tirées à partir de la graine. Une colonne facultative permet de les imposer pour un personnage précis.
 - Tout fichier est vérifié au chargement, avec des messages clairs (fichier, ligne, colonne).

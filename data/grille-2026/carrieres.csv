@@ -1,0 +1,66 @@
+personne;ecurieLignee;nomHistorique;poste;de;a;note
+per_noris;eq_mclaren;McLarren;pilote_titulaire;2019;2026;
+per_piastry;eq_mclaren;McLarren;pilote_titulaire;2023;2026;
+per_leclerq;eq_audi;Sauberr;pilote_titulaire;2018;2018;
+per_leclerq;eq_ferrari;Ferrary;pilote_titulaire;2019;2026;
+per_hammilton;eq_mclaren;McLarren;pilote_titulaire;2010;2012;carrière commencée en 2007 (avant la période reprise)
+per_hammilton;eq_mercedes;Mercédes;pilote_titulaire;2013;2024;
+per_hammilton;eq_ferrari;Ferrary;pilote_titulaire;2025;2026;
+per_verstapen;eq_racingbulls;Toro Roso;pilote_titulaire;2015;2016;jusqu'en cours de saison 2016
+per_verstapen;eq_redbull;Red Bul;pilote_titulaire;2016;2026;
+per_hadjard;eq_racingbulls;Racing Buls;pilote_titulaire;2025;2025;
+per_hadjard;eq_redbull;Red Bul;pilote_titulaire;2026;2026;
+per_russel;eq_williams;Wiliams;pilote_titulaire;2019;2021;
+per_russel;eq_mercedes;Mercédes;pilote_titulaire;2022;2026;
+per_antoneli;eq_mercedes;Mercédes;pilote_titulaire;2025;2026;
+per_alonzo;eq_ferrari;Ferrary;pilote_titulaire;2010;2014;carrière commencée en 2001
+per_alonzo;eq_mclaren;McLarren;pilote_titulaire;2015;2018;
+per_alonzo;eq_alpine;Alpyne;pilote_titulaire;2021;2022;
+per_alonzo;eq_aston;Aston Martyn;pilote_titulaire;2023;2026;
+per_strol;eq_williams;Wiliams;pilote_titulaire;2017;2018;
+per_strol;eq_aston;Racing Pointe;pilote_titulaire;2019;2020;
+per_strol;eq_aston;Aston Martyn;pilote_titulaire;2021;2026;
+per_gasli;eq_racingbulls;Toro Roso;pilote_titulaire;2017;2018;
+per_gasli;eq_redbull;Red Bul;pilote_titulaire;2019;2019;première moitié de saison
+per_gasli;eq_racingbulls;Toro Roso / AlphaTaury;pilote_titulaire;2019;2022;
+per_gasli;eq_alpine;Alpyne;pilote_titulaire;2023;2026;
+per_kolapinto;eq_williams;Wiliams;pilote_titulaire;2024;2024;fin de saison
+per_kolapinto;eq_alpine;Alpyne;pilote_titulaire;2025;2026;
+per_albonn;eq_racingbulls;Toro Roso;pilote_titulaire;2019;2019;première moitié de saison
+per_albonn;eq_redbull;Red Bul;pilote_titulaire;2019;2020;
+per_albonn;eq_williams;Wiliams;pilote_titulaire;2022;2026;
+per_saintz;eq_racingbulls;Toro Roso;pilote_titulaire;2015;2017;
+per_saintz;eq_alpine;Renaul;pilote_titulaire;2017;2018;
+per_saintz;eq_mclaren;McLarren;pilote_titulaire;2019;2020;
+per_saintz;eq_ferrari;Ferrary;pilote_titulaire;2021;2024;
+per_saintz;eq_williams;Wiliams;pilote_titulaire;2025;2026;
+per_lauson;eq_racingbulls;AlphaTaury / RBe;pilote_titulaire;2023;2024;remplacements puis fin de saison 2024
+per_lauson;eq_redbull;Red Bul;pilote_titulaire;2025;2025;deux courses
+per_lauson;eq_racingbulls;Racing Buls;pilote_titulaire;2025;2026;
+per_linblad;eq_racingbulls;Racing Buls;pilote_titulaire;2026;2026;
+per_hulkenbergh;eq_williams;Wiliams;pilote_titulaire;2010;2010;
+per_hulkenbergh;eq_aston;Force Indya;pilote_titulaire;2012;2012;
+per_hulkenbergh;eq_audi;Sauberr;pilote_titulaire;2013;2013;
+per_hulkenbergh;eq_aston;Force Indya;pilote_titulaire;2014;2016;
+per_hulkenbergh;eq_alpine;Renaul;pilote_titulaire;2017;2019;
+per_hulkenbergh;eq_haas;Haass;pilote_titulaire;2023;2024;
+per_hulkenbergh;eq_audi;Sauberr / Audy;pilote_titulaire;2025;2026;
+per_bortoletto;eq_audi;Sauberr / Audy;pilote_titulaire;2025;2026;
+per_okon;eq_aston;Force Indya;pilote_titulaire;2017;2018;débuts en 2016 chez Manorr (écurie disparue)
+per_okon;eq_alpine;Renaul / Alpyne;pilote_titulaire;2020;2024;
+per_okon;eq_haas;Haass;pilote_titulaire;2025;2026;
+per_bearmann;eq_haas;Haass;pilote_titulaire;2025;2026;remplacements en 2024
+per_peres;eq_audi;Sauberr;pilote_titulaire;2011;2012;
+per_peres;eq_mclaren;McLarren;pilote_titulaire;2013;2013;
+per_peres;eq_aston;Force Indya / Racing Pointe;pilote_titulaire;2014;2020;
+per_peres;eq_redbull;Red Bul;pilote_titulaire;2021;2024;
+per_peres;eq_cadillac;Cadilac;pilote_titulaire;2026;2026;
+per_botas;eq_williams;Wiliams;pilote_titulaire;2013;2016;
+per_botas;eq_mercedes;Mercédes;pilote_titulaire;2017;2021;
+per_botas;eq_audi;Alfa Roméo / Sauberr;pilote_titulaire;2022;2024;
+per_botas;eq_mercedes;Mercédes;pilote_reserve;2025;2025;
+per_botas;eq_cadillac;Cadilac;pilote_titulaire;2026;2026;
+per_vetel;eq_redbull;Red Bul;pilote_titulaire;2010;2014;
+per_vetel;eq_ferrari;Ferrary;pilote_titulaire;2015;2020;
+per_vetel;eq_aston;Aston Martyn;pilote_titulaire;2021;2022;
+per_rossberg;eq_mercedes;Mercédes;pilote_titulaire;2010;2016;
