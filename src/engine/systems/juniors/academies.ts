@@ -344,7 +344,8 @@ function reputationAcademies(monde: Monde, annee: number): void {
     let promus = 0, titres = 0;
     for (const id of anciens) {
       const p = table(monde, TABLES.personnes)[id] as unknown as Personne | undefined;
-      if (p && ((p.carriere?.saisonsF1 ?? 0) > 0 || (p.statut === 'actif' && p.poste === 'pilote_titulaire'))) promus++;
+      const archive = table(monde, TABLES.archives)[id] as unknown as { saisonsF1: number } | undefined; // D-121
+      if ((p && ((p.carriere?.saisonsF1 ?? 0) > 0 || (p.statut === 'actif' && p.poste === 'pilote_titulaire'))) || (archive && archive.saisonsF1 > 0)) promus++;
       titres += pal.filter((x) => x.championPilote === id).length;
     }
     const cible = borner((REPUTATION_ACADEMIE.parPromu * promus) / anciens.size + REPUTATION_ACADEMIE.parTitre * titres, 0, 100);

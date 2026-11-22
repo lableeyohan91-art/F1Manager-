@@ -198,6 +198,12 @@ const MIGRATIONS: Record<number, Migration> = {
     for (const s of Object.values(t)) delete s['intensitePic'];
     return { ...m, versionFormat: 14 };
   },
+  // v14 → v15 (D-121) : table des personnes archivées (vide ; l'archivage se fait à la première intersaison).
+  14: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['archives'] ??= {};
+    return { ...m, versionFormat: 15 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

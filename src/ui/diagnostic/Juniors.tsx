@@ -2,14 +2,14 @@
 import { useState } from 'preact/hooks';
 import { ecuriesJuniors, saisonJunior, type Monde, type Personne } from '../../engine';
 import { CATEGORIES_JUNIORS, type CategorieJunior } from '../../engine/balance/juniors';
-import { Carte, Lien, nomComplet, personnes } from './outils';
+import { annuaire, Carte, Lien, nomComplet, personnes } from './outils';
 import type { Selection } from './Vues';
 
 export function VueJuniors({ monde, ouvrir }: { monde: Monde; ouvrir: (s: Selection) => void }) {
   const [cat, setCat] = useState<CategorieJunior>('apex2');
   const annees = [monde.date.annee, monde.date.annee - 1];
   const sj = annees.map((a) => saisonJunior(monde, cat, a)).find((s) => s && s.classement.length);
-  const per = new Map(personnes(monde).map((p) => [p.id, p as Personne]));
+  const per = annuaire(monde);
   const eqs = new Map(ecuriesJuniors(monde).map((e) => [e.id, e]));
   return (
     <>

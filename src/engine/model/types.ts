@@ -28,6 +28,7 @@ export const TABLES = {
   missionsReperage: 'missionsReperage',
   connaissances: 'connaissances',
   offres: 'offres',
+  archives: 'archives',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -630,5 +631,21 @@ export interface OffreMarche {
   statut: 'en_attente' | 'contre_offre' | 'acceptee' | 'refusee' | 'retiree' | 'expiree';
   salaireDemande?: number;
   raisons?: string[];
+}
+
+/**
+ * D-121 : fiche légère d'une personne retirée depuis plusieurs années (même identifiant). On garde ce que l'histoire du monde
+ * cite (nom, dates, poste, palmarès, saisons en F1) ; relations, souvenirs, contrats et détails sont effacés.
+ */
+export interface PersonneArchivee {
+  id: string;
+  prenom: string;
+  nom: string;
+  nationalite: string;
+  anneeNaissance: number;
+  poste: Poste;
+  retraiteDepuis: number;
+  saisonsF1: number;
+  titres: number;
 }
 

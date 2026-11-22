@@ -167,3 +167,9 @@ export const ADAPTABILITE_REFERENCE = 1.3;
 /** Expérience historique des pilotes des données (provisoire avant la phase 9) : par saison de titulaire. */
 export const EXPERIENCE_HISTORIQUE = { gpParSaison: 22, pluieParSaison: 2 };
 
+
+/**
+ * D-121 — archivage : une personne retirée depuis au moins `anneesApresRetraite` saisons (au-delà de la fenêtre de retour)
+ * devient une fiche légère ; ses relations, souvenirs, contrats terminés et repérages sont effacés (volumes bornés).
+ */
+export const ARCHIVAGE = { anneesApresRetraite: 5 };

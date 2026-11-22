@@ -4,7 +4,7 @@ import { MemoirePersonne } from './Humain';
 import { potentielEstime } from '../../engine';
 import type { Carriere, Circuit, Departement, Installation, Monde, Palmares, Personne } from '../../engine';
 import {
-  age, Barre, Carte, contrats, ecuries, LIBELLES_POSTES, Lien, liste, nomComplet, Note, ORDRE_POSTES, personnes, texteClauses,
+  age, annuaire, Barre, Carte, contrats, ecuries, LIBELLES_POSTES, Lien, liste, nomComplet, Note, ORDRE_POSTES, personnes, texteClauses,
 } from './outils';
 
 export type Selection = { type: 'ecurie' | 'personne'; id: string } | null;
@@ -234,7 +234,7 @@ export function FichePersonne({ monde, id, ouvrir }: { monde: Monde; id: string;
 /* ---------------- Contrats, palmarès, circuits ---------------- */
 
 export function ListeContrats({ monde, ouvrir }: { monde: Monde; ouvrir: Ouvrir }) {
-  const per = new Map(personnes(monde).map((p) => [p.id, p]));
+  const per = annuaire(monde);
   const nomsEq = new Map(ecuries(monde).map((e) => [e.id, e.nom]));
   const cs = contrats(monde).sort((a, b) => a.fin - b.fin || (nomsEq.get(a.organisation) ?? '').localeCompare(nomsEq.get(b.organisation) ?? ''));
   return (
@@ -258,7 +258,7 @@ export function ListeContrats({ monde, ouvrir }: { monde: Monde; ouvrir: Ouvrir 
 }
 
 export function ListePalmares({ monde, ouvrir }: { monde: Monde; ouvrir: Ouvrir }) {
-  const per = new Map(personnes(monde).map((p) => [p.id, p]));
+  const per = annuaire(monde);
   const nomsEq = new Map(ecuries(monde).map((e) => [e.id, e.nom]));
   const pal = liste<Palmares>(monde, 'palmares').sort((a, b) => b.saison - a.saison);
   return (

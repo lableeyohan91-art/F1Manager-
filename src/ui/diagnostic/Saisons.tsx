@@ -5,7 +5,7 @@ import {
   indicateursSaison, indicateursSerie, motorisation,
   type Circuit, type GrandPrix, type Monde, type Saison, type Voiture,
 } from '../../engine';
-import { Carte, ecuries, Lien, liste, nomComplet, Note, personnes } from './outils';
+import { annuaire, Carte, ecuries, Lien, liste, nomComplet, Note, personnes } from './outils';
 import type { Selection } from './Vues';
 
 type Ouvrir = (s: Selection) => void;
@@ -30,7 +30,7 @@ export function VueSaisons({ monde, ouvrir }: { monde: Monde; ouvrir: Ouvrir }) 
   if (!choisie) return <p class="muted">Aucune saison simulée pour l'instant. Utilise les boutons « Simuler » ci-dessus.</p>;
   if (gp) return <FicheGrandPrix monde={monde} id={gp} retour={() => setGp(null)} ouvrir={ouvrir} />;
 
-  const per = new Map(personnes(monde).map((p) => [p.id, p]));
+  const per = annuaire(monde);
   const eqs = new Map(ecuries(monde).map((e) => [e.id, e]));
   const ind = choisie.termine ? indicateursSaison(monde, choisie) : null;
   return (
@@ -125,7 +125,7 @@ export function VueSaisons({ monde, ouvrir }: { monde: Monde; ouvrir: Ouvrir }) 
 function FicheGrandPrix({ monde, id, retour, ouvrir }: { monde: Monde; id: string; retour: () => void; ouvrir: Ouvrir }) {
   const g = monde.tables['grandsprix']![id] as unknown as GrandPrix;
   const c = monde.tables['circuits']![g.circuit] as unknown as Circuit;
-  const per = new Map(personnes(monde).map((p) => [p.id, p]));
+  const per = annuaire(monde);
   const eqs = new Map(ecuries(monde).map((e) => [e.id, e]));
   return (
     <>
@@ -192,7 +192,7 @@ export function VueBilan({ monde }: { monde: Monde }) {
   const s = indicateursSerie(monde);
   if (s.saisons.length === 0) return <p class="muted">Aucune saison terminée.</p>;
   const pal = saisonsDe(monde).filter((x) => x.termine).reverse();
-  const per = new Map(personnes(monde).map((p) => [p.id, p]));
+  const per = annuaire(monde);
   const eqs = new Map(ecuries(monde).map((e) => [e.id, e]));
   return (
     <>

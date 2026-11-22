@@ -11,15 +11,15 @@
 import {
   ABANDON_AGE_QUASI_CERTAIN, ABANDON_JEUNES, ABANDON_PROBABILITE_MAX, ALEA_PROGRESSION, ARCHETYPES, DECLIC, DECLIN, ENCADREMENT,
   MENTOR, MOTIVATION_PROGRESSION, NATURE_COMPETENCE, NATURES, PROGRESSION_PLATEAU, RECONVERSION, RETOUR, RETRAITE, STAGNATION, TAUX_PROGRESSION,
-  TEMPS_DE_JEU, TRAVAIL,
+  TEMPS_DE_JEU, TRAVAIL, ARCHIVAGE,
 } from '../../balance/carriere';
 import { COMPETENCES_TRANSVERSALES } from '../../balance/personnages';
 import { TEMPS_DE_JEU_BAQUET_JUNIOR } from '../../balance/juniors';
 import { ajouterEvenement } from '../../core/evenements';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
-import { idsTries, table, type Monde } from '../../core/monde';
+import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { genererCohorte } from '../../generation/construction';
-import { TABLES, type Contrat, type EcurieJunior, type Installation, type Palmares, type Personne, type Poste } from '../../model/types';
+import { TABLES, type Contrat, type EcurieJunior, type Installation, type Palmares, type Personne, type PersonneArchivee, type Poste } from '../../model/types';
 import { relation } from '../memoire';
 import { liberer } from '../humain/contrats';
 import { niveauEffectif } from '../economie/infrastructures';
@@ -281,10 +281,46 @@ export const systemeCohorte: Systeme = {
   nom: 'carriere.cohorte',
   executer({ monde, date }) {
     if (date.semaine !== SEMAINE_COHORTE) return;
+    archiverRetraites(monde); // D-121 : volumes bornés
     const ids = genererCohorte(monde);
     ajouterEvenement(monde, { type: 'generation.cohorte', acteurs: [], importance: 1, contexte: { annee: date.annee, nouveaux: ids.length } });
   },
 };
+
+/**
+ * D-121 : archive les personnes retirées depuis longtemps. Fiche légère conservée (nom, dates, poste, palmarès) ;
+ * relations, souvenirs, contrats terminés, repérages et promesses closes les concernant sont effacés.
+ */
+export function archiverRetraites(monde: Monde): number {
+  const annee = monde.date.annee;
+  const tp = table(monde, TABLES.personnes);
+  const aArchiver = new Set<string>();
+  for (const p of Object.values(tp) as unknown as Personne[]) {
+    if (p.statut === 'retraite' && p.retraiteDepuis !== undefined && annee - p.retraiteDepuis >= ARCHIVAGE.anneesApresRetraite) aArchiver.add(p.id);
+  }
+  if (!aArchiver.size) return 0;
+  const pal = Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[];
+  const ta = table(monde, TABLES.archives);
+  for (const id of [...aArchiver].sort()) {
+    const p = tp[id] as unknown as Personne;
+    const fiche: PersonneArchivee = {
+      id, prenom: p.prenom, nom: p.nom, nationalite: p.nationalite, anneeNaissance: p.anneeNaissance, poste: p.poste,
+      retraiteDepuis: p.retraiteDepuis as number, saisonsF1: p.carriere?.saisonsF1 ?? 0, titres: pal.filter((x) => x.championPilote === id).length,
+    };
+    ta[id] = fiche as unknown as Entite;
+    delete tp[id];
+  }
+  const effacerSi = (nom: string, test: (x: Record<string, unknown>) => boolean) => {
+    const t = table(monde, nom);
+    for (const [k, v] of Object.entries(t)) if (test(v as Record<string, unknown>)) delete t[k];
+  };
+  effacerSi('souvenirs', (x) => aArchiver.has(String(x['porteur'])) || aArchiver.has(String(x['cible'])));
+  effacerSi('relations', (x) => aArchiver.has(String(x['de'])) || aArchiver.has(String(x['vers'])));
+  effacerSi(TABLES.contrats, (x) => aArchiver.has(String(x['personne'])) && x['statut'] !== 'actif' && x['statut'] !== 'signe');
+  effacerSi(TABLES.connaissances, (x) => aArchiver.has(String(x['personne'])));
+  effacerSi('promesses', (x) => (aArchiver.has(String(x['beneficiaire'])) || aArchiver.has(String(x['auteur']))) && x['statut'] !== 'en_cours');
+  return aArchiver.size;
+}
 
 /** À installer après les systèmes humains (contrats) : la retraite libère les postes avant les fins de contrat. */
 export function installerCarriere(moteur: Moteur): Moteur {

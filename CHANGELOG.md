@@ -296,3 +296,10 @@ Aucun code à ce stade.
 ### Corrigé (D-122)
 - Mémoire résiduelle formée progressivement pendant l'oubli ; effacement continu ; réconciliation sans aggravation (format de sauvegarde 14, migration et test).
 - Idempotence : Grand Prix et manches juniors jamais rejoués ; prise d'effet des contrats limitée à la semaine 50 ; tests d'idempotence de la fin de saison et de la clôture du marché (`tests/audit-5.test.ts`). 128 tests.
+
+## [Archivage des retraités] — 22/11/2026
+
+### Ajouté (D-121)
+- Les personnes retirées depuis 5 saisons deviennent des fiches légères (table `archives` : nom, dates, poste, saisons en F1, titres). Leurs relations, souvenirs, contrats terminés, repérages et promesses closes sont effacés. Format de sauvegarde 15 (migration et test).
+- Interface de diagnostic : les noms des personnes archivées restent affichés dans l'historique.
+- Performances : coût par saison stable (≈ 0,75 s) ; 50 saisons en 36 s (57 s avant, 97 s avant l'audit n°4) ; population stable (≈ 490 personnes).

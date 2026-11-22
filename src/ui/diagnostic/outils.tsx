@@ -25,7 +25,9 @@ export const personnes = (m: Monde) => liste<Personne>(m, 'personnes');
 export const ecuries = (m: Monde) => liste<Ecurie>(m, 'ecuries');
 export const contrats = (m: Monde) => liste<Contrat>(m, 'contrats');
 
-export const nomComplet = (p: Personne) => `${p.prenom} ${p.nom}`;
+export const nomComplet = (p: { prenom: string; nom: string }) => `${p.prenom} ${p.nom}`;
+/** Personnes actives et archivées (D-121), pour afficher les noms dans l'historique. */
+export const annuaire = (m: Monde) => new Map<string, Personne>([...liste<Personne>(m, 'archives'), ...personnes(m)].map((p) => [p.id, p]));
 export const age = (m: Monde, p: Personne) => m.date.annee - p.anneeNaissance;
 
 /** Couleur indicative d'une note de 1 à 20. */
