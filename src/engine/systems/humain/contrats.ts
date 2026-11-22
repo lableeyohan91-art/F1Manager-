@@ -8,6 +8,7 @@ import {
 } from '../../balance/contrats';
 import { assezAgePourLaF1, changerMetier } from '../carriere/profil';
 import { engageablePar } from '../juniors/academies';
+import { TABLE_PROMESSES, type Promesse } from './promesses';
 import { POSTES_INDIVIDUALISES } from '../../balance/monde';
 import { courbeAge } from '../../balance/personnages';
 import type { Commande, DefinitionCommande } from '../../core/commandes';
@@ -287,6 +288,17 @@ export function pourvoirPostes(monde: Monde): void {
       const dejaVise = new Set<string>();
       for (const poste of postesVacants(monde, e)) {
         vacants++;
+        // Promesse d'académie à tenir (6b-2) : le jeune promis prend le baquet libéré pour lui, s'il est toujours disponible.
+        if (poste === 'pilote_titulaire') {
+          const promis = (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[])
+            .filter((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.organisation === e.id)
+            .map((x) => personneDe(monde, x.beneficiaire))
+            .find((p): p is Personne => !!p && p.statut === 'libre' && assezAgePourLaF1(monde, p) && engageablePar(monde, p, e));
+          if (promis) {
+            recruter(monde, promis, e, 'pilote_titulaire', valeurMarche(monde, promis), debut, decideur);
+            continue;
+          }
+        }
         // Promotion interne d'abord : le pilote de réserve devient titulaire.
         if (poste === 'pilote_titulaire') {
           const reserve = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'pilote_reserve');

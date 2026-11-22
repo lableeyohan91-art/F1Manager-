@@ -64,3 +64,19 @@ describe('Audit indépendant 6b (ChatGPT, commit f3120105) — non-régression',
     expect(taux(jeunes.filter((p) => (p.budgetFamilleMEUR ?? 0) < 0.3))).toBeLessThan(taux(jeunes.filter((p) => (p.budgetFamilleMEUR ?? 0) >= 1)));
   });
 });
+
+describe('Cohérence des promesses d’académie (rapport 6b-2)', () => {
+  it('les promesses de titularisation sont le plus souvent tenues (le baquet promis est réellement libéré)', () => {
+    let tenues = 0, rompues = 0;
+    for (const g of [1, 2, 3]) {
+      const m = sc.creerMonde(g);
+      sc.creerMoteur().avancer(m, 10 * 52);
+      for (const p of Object.values(m.tables['promesses'] ?? {}) as unknown as { type: string; statut: string }[]) {
+        if (p.type !== 'titularisation') continue;
+        if (p.statut === 'tenue') tenues++;
+        if (p.statut === 'rompue') rompues++;
+      }
+    }
+    expect(tenues).toBeGreaterThan(2 * rompues);
+  }, 120_000);
+});

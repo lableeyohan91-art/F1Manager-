@@ -60,7 +60,7 @@ for (let g = 1; g <= N; g++) {
     debutants.push(nouveaux);
     (niveauGrille[s] ??= []).push(moy(tit.map((p) => eng.niveauPilote(p, false))));
     (ageGrille[s] ??= []).push(moy(tit.map((p) => m.date.annee - p.anneeNaissance)));
-    for (const p of Object.values(m.tables['personnes']) as any[]) if (p.junior?.annee === m.date.annee) { baquetsJuniors++; if (p.junior.subventionne) baquetsSubventionnes++; if (typeof p.junior.prixMEUR === 'number') prixPayes.push(p.junior.prixMEUR); }
+    for (const p of Object.values(m.tables['personnes']) as any[]) if (p.junior && p.junior.annee >= m.date.annee - 1) { baquetsJuniors++; if (p.junior.subventionne) baquetsSubventionnes++; if (typeof p.junior.prixMEUR === 'number') prixPayes.push(p.junior.prixMEUR); }
     (population[s] ??= []).push(Object.values(m.tables['personnes']).filter((p: any) => p.statut !== 'retraite').length);
     if (s === S - 1 && g === 1) {
       const rep: Record<string, number> = {};

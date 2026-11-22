@@ -21,6 +21,7 @@ import { lireEvenement } from '../memoire';
 import { potentielEstime } from '../carriere/estimation';
 import { faireUnePromesse, TABLE_PROMESSES, type Promesse } from '../humain/promesses';
 import { teamPrincipal } from '../humain/decision';
+import { nePasProlonger } from '../humain/contrats';
 import { ecuriesActives } from '../saison/performance';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
@@ -129,9 +130,14 @@ function affilier(monde: Monde, e: Ecurie, p: Personne, centre: number, annee: n
   // Une écurie ne promet que ce qu'elle peut tenir : un baquet de titulaire doit se libérer avant l'échéance
   // (contrat qui se termine), et elle ne promet pas plus de baquets qu'elle n'en attend (cohérence, rapport 6b-2).
   const echeance = annee + PROMESSE_ACADEMIE.delaiAnnees;
-  const baquetsAttendus = contrats(monde).filter((x) => x.type === 'emploi' && x.statut === 'actif' && x.organisation === e.id && x.poste === 'pilote_titulaire' && x.fin < echeance).length;
+  // Le baquet promis est celui d'un titulaire dont le contrat finit avant l'échéance et qui n'est pas déjà réservé.
+  const sortant = contrats(monde)
+    .filter((x) => x.type === 'emploi' && x.statut === 'actif' && x.organisation === e.id && x.poste === 'pilote_titulaire' && x.fin < echeance && !x.nonProlonge)
+    .sort((a, b) => a.fin - b.fin || (a.id < b.id ? -1 : 1))[0];
   const dejaPromis = (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[]).filter((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.organisation === e.id).length;
-  if (tp && baquetsAttendus > dejaPromis && centre >= PROMESSE_ACADEMIE.potentielMin && annee - p.anneeNaissance >= PROMESSE_ACADEMIE.ageMin && f.chance(PROMESSE_ACADEMIE.probabilite)) {
+  if (tp && sortant && dejaPromis === 0 && centre >= PROMESSE_ACADEMIE.potentielMin && annee - p.anneeNaissance >= PROMESSE_ACADEMIE.ageMin && f.chance(PROMESSE_ACADEMIE.probabilite)) {
+    // Engagement réel : l'écurie décide de ne pas prolonger le titulaire sortant pour libérer le baquet promis.
+    nePasProlonger(monde, sortant, tp.id, 'baquet promis à un jeune de l’académie', [ev.id]);
     faireUnePromesse(monde, {
       auteur: tp.id, organisation: e.id, beneficiaire: p.id, type: 'titularisation', parametres: {},
       echeance: { annee: echeance, semaine: 49 }, publique: false,
