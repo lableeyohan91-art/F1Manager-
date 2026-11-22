@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
 import { SEUIL_CONVICTION, TRAITS, VALEURS, ASPIRATIONS } from '../../engine/balance/personnages';
+import { MemoirePersonne } from './Humain';
 import type { Carriere, Circuit, Departement, Installation, Monde, Palmares, Personne } from '../../engine';
 import {
   age, Barre, Carte, contrats, ecuries, LIBELLES_POSTES, Lien, liste, nomComplet, Note, ORDRE_POSTES, personnes, texteClauses,
@@ -203,6 +204,7 @@ export function FichePersonne({ monde, id, ouvrir }: { monde: Monde; id: string;
           <Barre libelle="Confiance en soi" v={p.etat.confiance} max={100} />
         </Carte>
       </div>
+      <MemoirePersonne monde={monde} id={p.id} ouvrir={ouvrir} />
       {carriere.length > 0 && (
         <Carte titre="Carrière (depuis 2010)">
           <table>

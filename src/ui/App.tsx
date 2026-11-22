@@ -1,15 +1,16 @@
 import { useRef, useState } from 'preact/hooks';
 import { creerScenarioGrille2026, ErreurDonnees, formaterDate, verifierCoherence, type Monde, type Moteur } from '../engine';
 import { VueBilan, VueSaisons, VueVoitures } from './diagnostic/Saisons';
+import { BacASable } from './diagnostic/Humain';
 import { fichiersGrille2026 } from './donnees';
 import { personnes } from './diagnostic/outils';
 import {
   FicheEcurie, FichePersonne, ListeCircuits, ListeContrats, ListeEcuries, ListePalmares, ListePersonnes, type Selection,
 } from './diagnostic/Vues';
 
-type Onglet = 'saisons' | 'bilan' | 'ecuries' | 'voitures' | 'personnes' | 'contrats' | 'palmares' | 'circuits' | 'coherence';
+type Onglet = 'bacasable' | 'saisons' | 'bilan' | 'ecuries' | 'voitures' | 'personnes' | 'contrats' | 'palmares' | 'circuits' | 'coherence';
 const ONGLETS: [Onglet, string][] = [
-  ['saisons', 'Saisons'], ['bilan', 'Bilan'], ['ecuries', 'Écuries'], ['voitures', 'Voitures'], ['personnes', 'Personnes'],
+  ['bacasable', 'Bac à sable'], ['saisons', 'Saisons'], ['bilan', 'Bilan'], ['ecuries', 'Écuries'], ['voitures', 'Voitures'], ['personnes', 'Personnes'],
   ['contrats', 'Contrats'], ['palmares', 'Palmarès'], ['circuits', 'Circuits'], ['coherence', 'Cohérence'],
 ];
 
@@ -75,7 +76,7 @@ export function App() {
       <header class="topbar">
         <span class="marque" />
         <span class="titre">DIAGNOSTIC</span>
-        <span class="muted">nom de travail · phase 3</span>
+        <span class="muted">nom de travail · phase 4</span>
       </header>
       <main class="page">
         <div class="carte" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -107,6 +108,7 @@ export function App() {
                 ))}
               </nav>
               <div class="carte">
+                {onglet === 'bacasable' && moteur && <BacASable monde={monde} moteur={moteur} rafraichir={() => setVersion((v) => v + 1)} ouvrir={ouvrir} />}
                 {onglet === 'saisons' && <VueSaisons monde={monde} ouvrir={ouvrir} />}
                 {onglet === 'bilan' && <VueBilan monde={monde} />}
                 {onglet === 'voitures' && <VueVoitures monde={monde} />}

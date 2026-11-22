@@ -69,7 +69,7 @@ export interface DefinitionEtiquette {
 }
 
 export const ETIQUETTES: Record<string, DefinitionEtiquette> = {
-  manque_reconnaissance: { libelle: 'Manque de reconnaissance', ressenti: -0.6, intensite: 0.45, axes: { confiance: 0.5, respect: 0.1, affinite: 0.4 }, oubli: 0.05, amplificateurs: { 't:besoinReconnaissance': 0.8, 'v:argent': 0.5, 't:ambition': 0.4 } },
+  manque_reconnaissance: { libelle: 'Manque de reconnaissance', ressenti: -0.6, intensite: 0.55, axes: { confiance: 0.5, respect: 0.1, affinite: 0.4 }, oubli: 0.035, amplificateurs: { 't:besoinReconnaissance': 0.8, 'v:argent': 0.5, 't:ambition': 0.4 } },
   reconnaissance: { libelle: 'Reconnaissance', ressenti: 0.6, intensite: 0.4, axes: { confiance: 0.4, respect: 0.2, affinite: 0.4 }, oubli: 0.05, amplificateurs: { 't:besoinReconnaissance': 0.8, 't:ambition': 0.3 } },
   gratitude: { libelle: 'Gratitude (opportunité offerte)', ressenti: 0.8, intensite: 0.55, axes: { confiance: 0.4, respect: 0.2, affinite: 0.4 }, oubli: 0.03, amplificateurs: { 't:ambition': 0.5, 'v:fidelite': 0.5 } },
   promesse_tenue: { libelle: 'Promesse tenue', ressenti: 0.7, intensite: 0.5, axes: { confiance: 0.7, respect: 0.2, affinite: 0.1 }, oubli: 0.04, amplificateurs: { 'v:fidelite': 0.4, 'v:equite': 0.5 } },

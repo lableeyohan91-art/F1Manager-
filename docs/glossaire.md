@@ -109,3 +109,18 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Capacité de développement** | Aptitude d'une écurie à améliorer sa voiture : personnel technique, installations, budget. |
 | **Rendements décroissants** | Plus une caractéristique est proche du plafond technique, plus elle progresse lentement. |
 | **Dynastie** | Série d'au moins 5 titres constructeurs consécutifs. |
+
+## Contrats et relations (phase 4)
+
+| Terme | Définition |
+| --- | --- |
+| **Valeur de marché** | Salaire annuel qu'une personne peut espérer : niveau métier, âge et courbe du métier, potentiel restant, palmarès. |
+| **Utilité d'une offre** | Score d'une offre pour la personne : ses valeurs, ses relations (seul canal des souvenirs), ses aspirations, les promesses (pondérées par leur crédibilité). |
+| **Conviction forte** | Valeur ≥ 17 : pèse double dans les décisions (D-052). |
+| **Ligne rouge** | Valeur ≥ 19 chez une personne qui se remet peu en question, attachée à une situation concrète (D-067). Refus ou acceptation absolus. |
+| **Prime de continuité** | Valeur attribuée par une écurie au fait de garder quelqu'un qui connaît ses méthodes. |
+| **Remplacement provisoire** | Recrutement dans le réservoir des personnes libres, en tours d'offres simultanées, en attendant le marché de la phase 7 (D-066). |
+| **Saturation** | Un même geste répété à moins de 12 semaines d'intervalle compte beaucoup moins (D-070). |
+| **Réconciliation** | Excuses, reconnaissance d'une erreur, discussion privée : réduisent les souvenirs négatifs, freinées par la rancune. |
+| **Écurie pilotée** | Écurie dont le joueur prend les décisions de personnel dans le bac à sable. |
+| **Score de réussite** | 40 % sport, 25 % personnel, 20 % finances, 15 % confiance et réputation (D-069). |

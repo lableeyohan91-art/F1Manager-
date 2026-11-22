@@ -14,7 +14,8 @@
     "verifier": "npm run typecheck && npm run purete && npm run test",
     "simuler": "tsx src/cli/simuler.ts",
     "rejouer": "tsx src/cli/rejouer.ts",
-    "equilibrage": "tsx src/cli/equilibrage.ts"
+    "equilibrage": "tsx src/cli/equilibrage.ts",
+    "dilemmes": "tsx src/cli/dilemmes.ts"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",

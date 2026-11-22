@@ -19,6 +19,12 @@ export const SALAIRE_REFERENCE_MEUR: Record<string, number> = {
 /** Croissance du salaire par point de niveau métier au-dessus (ou en dessous) de 15. */
 export const CROISSANCE_SALAIRE_PAR_POINT = 1.32;
 
+/** Prime de palmarès sur la valeur de marché : + par titre de champion, plafonnée. */
+export const PRIME_PALMARES = { parTitre: 0.15, plafond: 1.0 };
+
+/** Baisse de salaire : pénalité d'utilité par fraction de baisse par rapport au salaire actuel (au-delà de 10 %). */
+export const PENALITE_BAISSE_SALAIRE = 0.6;
+
 /** Bornes de la valeur de marché, en M€/an. */
 export const VALEUR_MARCHE = { min: 0.1, max: 70 };
 
@@ -42,8 +48,8 @@ export const UTILITE = {
   seuilLigneRouge: 19,
   remiseEnQuestionMaxLigneRouge: 10,
   /** Relations (les souvenirs n'agissent qu'à travers elles : pas de double comptage). */
-  confianceDecideur: 0.6,
-  affiniteDecideur: 0.3,
+  confianceDecideur: 1.0,
+  affiniteDecideur: 0.4,
   confianceOrganisation: 0.5,
   /** Aspirations servies par l'offre. */
   aspiration: 0.3,

@@ -99,3 +99,16 @@ Aucun code à ce stade.
 ### Modifié
 - Réglage B appliqué (D-059) : pilote 0,20 % par point, aléa 0,22. Réglages A, B, C archivés dans `docs/rapports/archives/`.
 - Réponse de ChatGPT retranscrite (`docs/echanges/2026-11-22-chatgpt-reponse-phases-4-6.md`) ; décisions D-066 à D-073.
+
+## [Phase 4] — 22/11/2026
+
+### Ajouté
+- Contrats génériques, 11 traits, format de sauvegarde 4 (migration testée).
+- Mémoire v1 : souvenirs, relations, oubli selon les traits, résidu, saturation, réconciliation ; promesses ; réputation publique.
+- Décisions par utilité (valeurs, convictions, lignes rouges situationnelles, relations, aspirations), négociations, IA des team principals, remplacement multi-écuries, réservoir.
+- Interactions publiques et privées ; état émotionnel ; motivation du personnel technique → développement.
+- Bac à sable mobile ; souvenirs et relations sur la fiche de chaque personne.
+- Outil des dilemmes contrefactuels (`npm run dilemmes`), rapports P4 (équilibrage comparé à la référence, dilemmes).
+
+### Constat
+- Le réglage B (D-059) fait tomber « la dernière écurie marque un point » à 17 % : proposition de revenir au réglage A (D-074).

@@ -6,7 +6,7 @@ Simulation de management d'écurie de course automobile, sur mobile. Le départ 
 
 ## État du projet
 
-**Phases 1 (noyau) et 3 (saisons simulées) : réalisées. Phase 2 (monde et diagnostic) : en grande partie réalisée.** Voir `docs/rapports/`.
+**Phases 1 à 4 réalisées** (noyau, monde 2026, saisons simulées, contrats et mémoire). Prochaine : phase 5 (économie). Voir `docs/rapports/`.
 
 ## Par où commencer
 

@@ -94,6 +94,8 @@ Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · 
 | ID | Urgence | Question | Proposition de Claude Code |
 | --- | --- | --- | --- |
 | D-036 | AVANT P4 | Nom du championnat, des catégories juniors et de l'instance dirigeante | Propositions de ChatGPT (préférence : gamme **Apex** — Apex World Championship, Apex 2/3/4, World Racing Federation). **Choix du porteur** ; disponibilité juridique à vérifier avant publication |
+| D-074 | MAINTENANT | Revenir du réglage B au **réglage A** (pilote 0,20 · aléa 0,30) ? Le réglage B fait tomber « la dernière écurie marque un point » de 45 % à 17 % et monter les dominations de 4 % à 17 % (lignes absentes du tableau soumis à ChatGPT) | Oui : A donne 38 % et 14 %, avec 30 % de part des compétences entre coéquipiers |
+| D-075 | AVANT P6a | Brancher `sangFroid` (aujourd'hui seulement lu par le stress, lui-même inutilisé) sur la performance sous pression | Oui, en phase 6a ou 13 |
 | D-039 | PLUS TARD | Option Carrera : importer les résultats réels de Paddock comme résultats de Grand Prix | Idée à garder, non prioritaire |
 
 ---

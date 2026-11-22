@@ -233,7 +233,7 @@ export function capaciteDeveloppement(monde: Monde, e: Ecurie): number {
   // La motivation du personnel technique module son efficacité (phase 4 : cascade « DT démotivé → développement plus lent »).
   const c = (poste: string, comp: string) => {
     const p = equipe.find((x) => x.poste === poste);
-    return p ? (p.competences[comp] ?? 10) * (0.85 + 0.3 * (p.etat.motivation / 100)) : 10;
+    return p ? (p.competences[comp] ?? 10) * (0.7 + 0.6 * (p.etat.motivation / 100)) : 10;
   };
   const competences = moyenne([
     c('directeur_technique', 'visionTechnique'), c('directeur_technique', 'gestionProjet'),

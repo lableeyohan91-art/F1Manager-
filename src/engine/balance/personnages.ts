@@ -107,6 +107,13 @@ export function courbeAge(poste: string) {
   return COURBES_AGE[poste.startsWith('pilote') ? 'pilote' : poste] ?? COURBES_AGE['ingenieur']!;
 }
 
+/**
+ * Niveau moyen et dispersion des pilotes titulaires GÉNÉRÉS (réservoir et remplacements, D-066).
+ * Provisoire avant les filières juniors (phase 6b) : un pilote qui arrive en F1 a le niveau d'un bon pilote
+ * de catégorie inférieure, pas celui d'un ingénieur générique.
+ */
+export const NIVEAU_PILOTE_TITULAIRE_GENERE = { moyenne: 14.2, ecartType: 1.1 };
+
 /** Âges tirés pour les personnes générées, par poste (années). */
 export const AGES_PAR_POSTE: Record<string, { min: number; max: number }> = {
   team_principal: { min: 42, max: 64 },
@@ -115,6 +122,7 @@ export const AGES_PAR_POSTE: Record<string, { min: number; max: number }> = {
   directeur_financier: { min: 38, max: 60 },
   responsable_aero: { min: 34, max: 55 },
   responsable_conception: { min: 34, max: 55 },
+  pilote_titulaire: { min: 21, max: 29 },
   pilote_reserve: { min: 20, max: 28 },
   pilote_junior: { min: 16, max: 22 },
   ingenieur: { min: 26, max: 55 },

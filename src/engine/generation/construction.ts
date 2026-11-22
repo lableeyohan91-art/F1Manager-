@@ -21,6 +21,7 @@ import {
   ETAT_DEPART,
   courbeAge,
   NIVEAU_PERSONNEL_GENERE,
+  NIVEAU_PILOTE_TITULAIRE_GENERE,
   TIRAGE_TRAITS,
   TIRAGE_VALEURS,
   TRAITS,
@@ -202,7 +203,10 @@ function personneGeneree(ctx: Contexte, poste: Poste, ecurie: Ecurie | null, sta
   const anneeNaissance = ctx.monde.date.annee - age;
   let competences: Record<string, number>;
   let potentiel: number;
-  if (poste === 'pilote_junior' || poste === 'pilote_reserve') {
+  if (poste === 'pilote_titulaire') {
+    competences = tirerCompetences(f, poste, f.normale(NIVEAU_PILOTE_TITULAIRE_GENERE.moyenne, NIVEAU_PILOTE_TITULAIRE_GENERE.ecartType));
+    potentiel = note(moyenneMetier(competences) + margePotentiel(age, poste) + Math.abs(f.normale(0, 1)));
+  } else if (poste === 'pilote_junior' || poste === 'pilote_reserve') {
     const niveau = poste === 'pilote_reserve' ? 13 : f.normale(10.5, 1.5);
     competences = tirerCompetences(f, poste, niveau);
     // Quelques pépites : le potentiel des jeunes varie beaucoup.

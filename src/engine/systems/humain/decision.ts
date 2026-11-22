@@ -6,10 +6,10 @@
  */
 
 import { COMPETENCES_TRANSVERSALES, courbeAge } from '../../balance/personnages';
-import { CROISSANCE_SALAIRE_PAR_POINT, PENALITE_AGE_RECRUTEMENT, SALAIRE_REFERENCE_MEUR, UTILITE, VALEUR_MARCHE } from '../../balance/contrats';
+import { CROISSANCE_SALAIRE_PAR_POINT, PENALITE_AGE_RECRUTEMENT, PENALITE_BAISSE_SALAIRE, PRIME_PALMARES, SALAIRE_REFERENCE_MEUR, UTILITE, VALEUR_MARCHE } from '../../balance/contrats';
 import { idsTries, table, type Monde } from '../../core/monde';
 import { tirageLocal } from '../../core/moteur';
-import { TABLES, type Carriere, type Contrat, type Ecurie, type Personne, type Saison } from '../../model/types';
+import { TABLES, type Carriere, type Contrat, type Ecurie, type Palmares, type Personne, type Saison } from '../../model/types';
 import { relation, souvenirsDe } from '../memoire';
 import { ecuriesActives, indiceMoyen, niveauPilote } from '../saison/performance';
 import { reputation, type TypePromesse } from './promesses';
@@ -54,7 +54,9 @@ export function valeurMarche(monde: Monde, p: Personne): number {
   let facteurAge = 1;
   if (a > courbe.declinApres) facteurAge = Math.max(0.4, 1 - 0.08 * (a - courbe.declinApres));
   else if (a < courbe.progressionJusqua) facteurAge = 1 + 0.03 * Math.max(0, p.potentiel - niveau);
-  return borner(ref * Math.pow(CROISSANCE_SALAIRE_PAR_POINT, niveau - 15) * facteurAge, VALEUR_MARCHE.min, VALEUR_MARCHE.max);
+  const titres = (Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[]).filter((x) => x.championPilote === p.id).length;
+  const palmares = 1 + Math.min(PRIME_PALMARES.plafond, PRIME_PALMARES.parTitre * titres);
+  return borner(ref * Math.pow(CROISSANCE_SALAIRE_PAR_POINT, niveau - 15) * facteurAge * palmares, VALEUR_MARCHE.min, VALEUR_MARCHE.max);
 }
 
 export function ecurie(monde: Monde, id: string): Ecurie | undefined {
@@ -142,6 +144,9 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
   u += ajouter('projet à construire', (poidsValeur(p, 'defi') * ((1 - force) * 0.6 - 0.2)) / norme);
   if (ratio < 0.8) u += ajouter('offre jugée injuste', (poidsValeur(p, 'equite') * -0.6) / norme);
   if (ratio < UTILITE.seuilOffreInsultante) u += ajouter('offre insultante', UTILITE.penaliteOffreInsultante);
+  // Une forte baisse par rapport au salaire actuel se vit mal, même si l'offre correspond à la valeur de marché.
+  const actuel = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((c) => c.personne === p.id && c.statut === 'actif' && c.type === 'emploi')?.salaireMEUR;
+  if (actuel && o.salaireMEUR < 0.9 * actuel) u += ajouter('baisse de salaire', -PENALITE_BAISSE_SALAIRE * (1 - o.salaireMEUR / actuel) * poidsValeur(p, 'argent'));
   if (eq && (eq.nationalite === p.nationalite || ecurieFormatrice(monde, p) === o.organisation)) u += ajouter('attachement à ses racines', poidsValeur(p, 'racines') / norme);
 
   // Relations (seul canal des souvenirs) ; réputation si l'on ne se connaît pas.
