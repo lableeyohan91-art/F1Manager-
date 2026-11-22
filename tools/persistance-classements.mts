@@ -1,5 +1,6 @@
 /** Critères 4 et 5 de la fiche de la phase 5 — mesure du « cercle vertueux » : persistance des classements et trajectoires des petites écuries. Usage : tsx ecart.ts <racine du dépôt> <graines> <saisons> */
-const racine = process.argv[2]!;
+import { resolve } from 'node:path';
+const racine = resolve(process.argv[2] ?? '.');
 const N = Number(process.argv[3] ?? 30), S = Number(process.argv[4] ?? 20);
 const eng = await import(`${racine}/src/engine/index.ts`);
 const { lireDonneesGrille2026 } = await import(`${racine}/src/platform/node/donnees.ts`);
