@@ -18,7 +18,8 @@
     "dilemmes": "tsx src/cli/dilemmes.ts",
     "campagne": "tsx src/cli/campagne.ts",
     "finances": "tsx tools/inspecter-finances.ts",
-    "statistiques-finances": "tsx tools/statistiques-finances.ts"
+    "statistiques-finances": "tsx tools/statistiques-finances.ts",
+    "persistance": "tsx tools/persistance-classements.mts ."
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",

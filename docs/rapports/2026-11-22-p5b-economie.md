@@ -138,3 +138,22 @@ Phase 5 terminée (5a + 5b). Comme tu l'as demandé, on ajuste maintenant. Je pr
    - phase 8 : grands changements de règlement (D-090).
 
    Je recommande de **ne pas** forcer l'équilibre par l'économie avant ces deux phases.
+
+## 8. Complément : les sponsors creusent-ils un écart qui ne se rattrape jamais ?
+
+Question du porteur, mesurée sur 30 graines × 20 saisons, mêmes graines, code P5a (sans sponsors) contre P5b (avec sponsors). Outil : `npm run persistance -- 30 20`.
+
+| Indicateur (critères 4 et 5 de la fiche) | P5a | P5b | Lecture |
+| --- | --- | --- | --- |
+| Corrélation classement N ↔ N+3 (plus bas = hiérarchie moins figée) | 0,758 | 0,744 | légèrement moins figée |
+| Écuries du dernier tiers en 2027 qui atteignent un jour le top 3 | 31 % | 36 % | un peu plus de remontées (90 trajectoires : ± 5 pts de bruit) |
+| … qui atteignent un jour le top 5 | 66 % | 72 % | idem |
+| Écuries du top 3 en 2027 qui tombent un jour dans le dernier tiers | 26 % | 27 % | ≈ |
+| Années sous le plafond — 8e / 9e / 10e / 11e | 16 / 19 / 21 / 27 % | 21 / 21 / 28 / 31 % | **la pression d'argent sur les derniers augmente** |
+
+**Réponse franche** : le cercle vicieux existe **en bas de grille**. Les derniers ont moins de sponsors, donc passent plus souvent sous le plafond, et développent un peu moins. Mais il **ne verrouille pas** la hiérarchie. Ni la persistance des classements ni les remontées ne se dégradent ; elles s'améliorent même légèrement. Trois raisons :
+- au sommet, l'argent en plus bute sur le plafond et ne sert qu'aux installations, dans une enveloppe égale pour tous ;
+- les restrictions aéro et les rendements décroissants aident ceux qui sont derrière ;
+- les objectifs des sponsors sont fixés selon le rang de l'écurie : un petit n'est pas puni s'il reste petit.
+
+À surveiller pendant l'équilibrage, sans rien changer sans décision.
