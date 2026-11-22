@@ -4,8 +4,9 @@
  */
 
 import {
-  OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SAISONS_LIBRE_AVANT_RETRAITE, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
+  OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
 } from '../../balance/contrats';
+import { assezAgePourLaF1, changerMetier } from '../carriere/profil';
 import { POSTES_INDIVIDUALISES } from '../../balance/monde';
 import { courbeAge } from '../../balance/personnages';
 import type { Commande, DefinitionCommande } from '../../core/commandes';
@@ -145,6 +146,8 @@ export function candidatPour(p: Personne, poste: Poste): boolean {
   if (poste === 'pilote_reserve') return p.poste === 'pilote_junior' || p.poste === 'pilote_titulaire';
   if (poste === 'responsable_aero' || poste === 'responsable_conception') return p.poste === 'ingenieur';
   if (poste === 'directeur_technique') return p.poste === 'responsable_aero' || p.poste === 'responsable_conception';
+  // Passerelles entre métiers (phase 6a §5) : les directeurs technique et sportif peuvent prendre la tête d'une écurie.
+  if (poste === 'team_principal') return p.poste === 'directeur_technique' || p.poste === 'directeur_sportif';
   return false;
 }
 
@@ -294,7 +297,7 @@ export function pourvoirPostes(monde: Monde): void {
         const cle = `${e.id}:${poste}`;
         const refus = refusesPar.get(cle) ?? new Set<string>();
         const candidats = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[])
-          .filter((p) => p.statut === 'libre' && candidatPour(p, poste) && !refus.has(p.id) && !dejaVise.has(p.id))
+          .filter((p) => p.statut === 'libre' && candidatPour(p, poste) && assezAgePourLaF1(monde, p) && !refus.has(p.id) && !dejaVise.has(p.id))
           .sort((a, b) => (a.id < b.id ? -1 : 1));
         if (candidats.length === 0) continue;
         const f = tirageLocal(monde, 'recrutement', e.id, poste, monde.date.annee, tour);
@@ -351,7 +354,8 @@ export function recruter(monde: Monde, c: Personne, e: Ecurie, poste: Poste, sal
   const ancienPoste = c.poste;
   c.statut = 'actif';
   c.ecurie = e.id;
-  c.poste = poste;
+  // Phase 6a : un changement de métier (promotion) recrée les compétences du nouveau métier.
+  changerMetier(c, poste, tirageLocal(monde, 'carriere.metier', c.id, monde.date.annee), monde.date.annee - c.anneeNaissance);
   delete c.libreDepuis;
   const evt = ajouterEvenement(monde, {
     type: 'recrutement', acteurs: [{ id: c.id, role: 'personne' }, { id: decideur, role: 'auteur' }, { id: e.id, role: 'organisation' }],
@@ -393,20 +397,15 @@ export const systemeFinsDeContrat: Systeme = {
   },
 };
 
-/** Réservoir (provisoire avant la phase 6a, D-066) : minimum de personnes libres par poste ; départ en retraite des libres de longue date. */
+/** Réservoir (D-066) : filet de sécurité, minimum de personnes libres par poste pour le personnel (les pilotes viennent des cohortes, phase 6a). */
 export const systemeReservoir: Systeme = {
   nom: 'humain.reservoir',
   phases: ['intersaison'],
   executer({ monde, date }) {
     if (date.semaine !== 2) return;
+    // Phase 6a : les retraites sont des décisions des personnes (systems/carriere) ; il ne reste ici qu'un filet de sécurité
+    // pour le personnel (les pilotes viennent des cohortes).
     const tp = table(monde, TABLES.personnes);
-    for (const id of idsTries(tp)) {
-      const p = tp[id] as unknown as Personne;
-      if (p.statut === 'libre' && p.libreDepuis !== undefined && date.annee - p.libreDepuis >= SAISONS_LIBRE_AVANT_RETRAITE) {
-        p.statut = 'retraite';
-        ajouterEvenement(monde, { type: 'personne.retraite', acteurs: [{ id: p.id, role: 'personne' }], importance: 2, contexte: { motif: 'sans contrat depuis plusieurs saisons' } });
-      }
-    }
     for (const [poste, minimum] of Object.entries(RESERVOIR_MINIMUM)) {
       const libres = (Object.values(tp) as unknown as Personne[]).filter((p) => p.statut === 'libre' && p.poste === poste).length;
       for (let i = libres; i < minimum; i++) {

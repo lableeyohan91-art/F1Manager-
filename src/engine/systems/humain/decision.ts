@@ -13,6 +13,7 @@ import { TABLES, type Carriere, type Contrat, type Ecurie, type Palmares, type P
 import { relation, souvenirsDe } from '../memoire';
 import { ecuriesActives, indiceMoyen, niveauPilote } from '../saison/performance';
 import { reputation, type TypePromesse } from './promesses';
+import { potentielEstime } from '../carriere/estimation';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
 
@@ -53,7 +54,8 @@ export function valeurMarche(monde: Monde, p: Personne): number {
   const courbe = courbeAge(p.poste);
   let facteurAge = 1;
   if (a > courbe.declinApres) facteurAge = Math.max(0.4, 1 - 0.08 * (a - courbe.declinApres));
-  else if (a < courbe.progressionJusqua) facteurAge = 1 + 0.03 * Math.max(0, p.potentiel - niveau);
+  // Phase 6a : l'opinion du paddock sur le potentiel, jamais le vrai potentiel caché.
+  else if (a < courbe.progressionJusqua) facteurAge = 1 + 0.03 * Math.max(0, potentielEstime(monde, null, p).centre - niveau);
   const titres = (Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[]).filter((x) => x.championPilote === p.id).length;
   const palmares = 1 + Math.min(PRIME_PALMARES.plafond, PRIME_PALMARES.parTitre * titres);
   return borner(ref * Math.pow(CROISSANCE_SALAIRE_PAR_POINT, niveau - 15) * facteurAge * palmares, VALEUR_MARCHE.min, VALEUR_MARCHE.max);
@@ -210,7 +212,8 @@ export function scoreCandidat(monde: Monde, e: Ecurie, decideur: string, c: Pers
   const jeunesse = /jeune|junior|filière/i.test(e.politiqueRecrutement) ? 1 : 0;
   let s = 0;
   s += ajouter('niveau', niveauMetier(c) / 20);
-  s += ajouter('potentiel', ((c.potentiel - niveauMetier(c)) / 20) * (0.3 + 0.4 * jeunesse));
+  // Phase 6a : l'écurie juge sur SON estimation du potentiel (département recrutement), pas sur le vrai potentiel.
+  s += ajouter('potentiel estimé', ((potentielEstime(monde, e.id, c).centre - niveauMetier(c)) / 20) * (0.3 + 0.4 * jeunesse));
   const declin = Math.max(0, age(monde, c) - courbeAge(c.poste).declinApres);
   if (declin > 0) s += ajouter('âge', -PENALITE_AGE_RECRUTEMENT * declin);
   const budgetPoste = e.budgetMEUR * (c.poste.startsWith('pilote') ? 0.05 : 0.015);

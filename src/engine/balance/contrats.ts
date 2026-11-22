@@ -94,9 +94,10 @@ export const REACTION_TEAM_PRINCIPAL = { probabiliteMensuelle: 0.15 };
 
 /** Réservoir : nombre minimal de personnes libres par poste, renouvelé chaque intersaison (D-066, provisoire avant la phase 6a). */
 export const RESERVOIR_MINIMUM: Record<string, number> = {
-  pilote_titulaire: 6,
+  // Phase 6a : les pilotes viennent des cohortes annuelles (balance/carriere.ts), plus de pilotes générés à la demande.
+  pilote_titulaire: 0,
   pilote_reserve: 0,
-  pilote_junior: 40,
+  pilote_junior: 0,
   team_principal: 4,
   directeur_technique: 5,
   directeur_sportif: 5,
@@ -106,8 +107,6 @@ export const RESERVOIR_MINIMUM: Record<string, number> = {
   ingenieur: 30,
 };
 
-/** Une personne libre depuis plus de N saisons se retire (provisoire avant la phase 6a). */
-export const SAISONS_LIBRE_AVANT_RETRAITE = 3;
 
 /** Nombre maximal de tours d'offres pour pourvoir les postes vacants. */
 export const TOURS_RECRUTEMENT = 8;

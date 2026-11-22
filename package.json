@@ -19,7 +19,8 @@
     "campagne": "tsx src/cli/campagne.ts",
     "finances": "tsx tools/inspecter-finances.ts",
     "statistiques-finances": "tsx tools/statistiques-finances.ts",
-    "persistance": "tsx tools/persistance-classements.mts ."
+    "persistance": "tsx tools/persistance-classements.mts .",
+    "demographie": "tsx tools/demographie.mts"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",

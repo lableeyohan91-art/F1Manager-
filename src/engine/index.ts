@@ -22,3 +22,4 @@ export * from './systems/humain';
 export * from './diagnostics/dilemmes';
 export * from './systems/economie';
 export * from './model/finances';
+export * from './systems/carriere';

@@ -4,9 +4,10 @@
  * aux migrations de sauvegarde et aux systèmes.
  */
 
-import { ARCHETYPES, ECART_COMPETENCES, PLATEAU_MINIMAL_DONNEES, RECONVERSION, VARIATION_AGES } from '../../balance/carriere';
+import { AGE_MINIMAL_F1, ARCHETYPES, ECART_COMPETENCES, PLATEAU_MINIMAL_DONNEES, RECONVERSION, VARIATION_AGES } from '../../balance/carriere';
 import { COMPETENCES_PAR_POSTE, COMPETENCES_PILOTE, COMPETENCES_TRANSVERSALES, courbeAge } from '../../balance/personnages';
 import type { Flux } from '../../core/hasard';
+import type { Monde } from '../../core/monde';
 import type { CarrierePersonne, Personne, Poste } from '../../model/types';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
@@ -83,4 +84,9 @@ export function changerMetier(p: Personne, poste: Poste, f: Flux, age: number): 
     p.carriere.finApogee = Math.max(p.carriere.debutApogee + 2, courbe.declinApres + f.normale(0, VARIATION_AGES.plateau));
     p.carriere.niveauMax = Math.round(niveauCarriere(p) * 10) / 10;
   }
+}
+
+/** Âge minimal pour un baquet de pilote (D-100, en attendant les filières de la 6b), lu par le recrutement. */
+export function assezAgePourLaF1(monde: Monde, p: Personne): boolean {
+  return !p.poste.startsWith('pilote') || monde.date.annee - p.anneeNaissance >= AGE_MINIMAL_F1;
 }

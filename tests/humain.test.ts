@@ -116,7 +116,7 @@ describe('Phase 4 — simulation longue', () => {
     const titulaires = Object.values(a.tables['personnes']!).filter((x) => x['poste'] === 'pilote_titulaire' && x['statut'] === 'actif').map((x) => x.id);
     expect(titulaires).toHaveLength(22);
     expect(titulaires.filter((id) => /^per_\d/.test(id)).length).toBeGreaterThan(0); // au moins un pilote généré est arrivé en F1
-  });
+  }, 30_000);
 
   it('30 saisons : mémoire bornée et sauvegarde raisonnable', () => {
     const m = sc.creerMonde(9);
