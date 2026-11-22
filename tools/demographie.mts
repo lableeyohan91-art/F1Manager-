@@ -21,6 +21,9 @@ const ageRetraitePersonnel: number[] = [];
 const population: number[][] = [];
 const championsPepites = { pepites: 0, championnes: 0, nesCohortes: 0 };
 const ageTitre: number[] = [];
+// Phase 6b : parcours vers la F1.
+const ageDebut: number[] = [];
+let debutantsTop5Apex2 = 0, debutantsTotal = 0, championsApex2 = 0, championsApex2Promus = 0, talentsBloques = 0, talents = 0, payantsMoyensF1 = 0, payantsMoyens = 0;
 
 for (let g = 1; g <= N; g++) {
   const m = sc.creerMonde(g);
@@ -44,7 +47,12 @@ for (let g = 1; g <= N; g++) {
     }
     const tit = Object.values(m.tables['personnes']).filter((p: any) => p.poste === 'pilote_titulaire' && p.statut === 'actif') as any[];
     let nouveaux = 0;
-    for (const p of tit) if (!dejaTitulaires.has(p.id)) { nouveaux++; dejaTitulaires.add(p.id); }
+    for (const p of tit) if (!dejaTitulaires.has(p.id)) {
+      nouveaux++; dejaTitulaires.add(p.id);
+      ageDebut.push(m.date.annee - p.anneeNaissance);
+      debutantsTotal++;
+      if ((p.carriere?.juniors ?? []).some((r: any) => r.categorie === 'apex2' && r.rang <= 5)) debutantsTop5Apex2++;
+    }
     debutants.push(nouveaux);
     (niveauGrille[s] ??= []).push(moy(tit.map((p) => eng.niveauPilote(p, false))));
     (ageGrille[s] ??= []).push(moy(tit.map((p) => m.date.annee - p.anneeNaissance)));
@@ -54,6 +62,16 @@ for (let g = 1; g <= N; g++) {
       for (const p of Object.values(m.tables['personnes']) as any[]) if (p.statut !== 'retraite') rep[`${p.poste}/${p.statut}`] = (rep[`${p.poste}/${p.statut}`] ?? 0) + 1;
       console.log('Répartition (graine 1, fin) : ' + Object.entries(rep).sort().map(([k, v]) => `${k} ${v}`).join(' · '));
     }
+  }
+  // Phase 6b : champions Apex 2 promus en F1 ; talents bloqués ; pilotes payants moyens qui atteignent la F1.
+  for (const p of Object.values(m.tables['personnes']) as any[]) {
+    if (!p.poste.startsWith('pilote') || p.origine !== 'generee') continue;
+    const auF1 = (p.carriere?.saisonsF1 ?? 0) > 0 || (p.poste === 'pilote_titulaire' && p.statut === 'actif');
+    if ((p.carriere?.juniors ?? []).some((r: any) => r.categorie === 'apex2' && r.titre)) { championsApex2++; if (auF1) championsApex2Promus++; }
+    const fini = p.statut === 'retraite' || auF1;
+    if (!fini) continue;
+    if (p.potentiel >= 17) { talents++; if (!auF1) talentsBloques++; }
+    if ((p.budgetFamilleMEUR ?? 0) >= 3 && p.potentiel <= 14) { payantsMoyens++; if (auF1) payantsMoyensF1++; }
   }
   // Pépites (potentiel ≥ 18) nées dans les cohortes générées, et titres.
   const pal = Object.values(m.tables['palmares']) as any[];
@@ -80,4 +98,9 @@ console.log('Niveau moyen des titulaires (dérive) : ' + points.map((s) => `${20
 console.log('Âge moyen des titulaires : ' + points.map((s) => `${2027 + s} ${moy(ageGrille[s]!).toFixed(1)}`).join(' · '));
 console.log('Population (hors retraités) : ' + points.map((s) => `${2027 + s} ${moy(population[s]!).toFixed(0)}`).join(' · '));
 for (const k of ['abandon', 'personne.retraite', 'personne.retour', 'personne.reconversion', 'personne.declic', 'personne.stagnation', 'recrutement.genere', 'pilote.titularisation']) console.log(`${k} : ${parSaison(k)} par saison`);
+console.log(`Âge des débutants en F1 : moyenne ${moy(ageDebut).toFixed(1)}, 10 % ${q(ageDebut, 0.1)}, 90 % ${q(ageDebut, 0.9)}`);
+console.log(`Débutants passés par le top 5 de l'Apex 2 : ${(100 * debutantsTop5Apex2 / Math.max(1, debutantsTotal)).toFixed(0)} %`);
+console.log(`Champions Apex 2 promus en F1 : ${championsApex2Promus}/${championsApex2} (${(100 * championsApex2Promus / Math.max(1, championsApex2)).toFixed(0)} %)`);
+console.log(`Talents (potentiel ≥ 17, carrière finie) jamais arrivés en F1 : ${talentsBloques}/${talents} (${(100 * talentsBloques / Math.max(1, talents)).toFixed(0)} %)`);
+console.log(`Pilotes payants moyens (budget ≥ 3 M€, potentiel ≤ 14) arrivés en F1 : ${payantsMoyensF1}/${payantsMoyens} (${(100 * payantsMoyensF1 / Math.max(1, payantsMoyens)).toFixed(0)} %)`);
 console.log(`Pépites générées (potentiel ≥ 18) : ${(championsPepites.pepites / N).toFixed(1)} par partie (dont ${((10 * championsPepites.nesCohortes) / N / S).toFixed(2)} par décennie issues des cohortes annuelles ; cible D-102 : ≈ 2), championnes : ${championsPepites.championnes}`);
