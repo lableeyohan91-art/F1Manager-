@@ -92,6 +92,21 @@ const MIGRATIONS: Record<number, Migration> = {
     }
     return { ...m, versionFormat: 5 };
   },
+  // v5 → v6 (phase 5b) : dette, état de crise, projets, nouvelles lignes de comptes. Les sponsors sont créés par le
+  // système économie au premier bilan (noms génériques si le référentiel ne contient pas les noms d'entreprises).
+  5: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, Record<string, unknown>>>;
+    const lignes = { sponsors: 0, interets: 0, investissements: 0, apportsExceptionnels: 0 };
+    for (const fi of Object.values(tables['finances'] ?? {})) {
+      fi['detteMEUR'] ??= 0;
+      fi['etatCrise'] ??= 'sain';
+      fi['periodesEnCrise'] ??= 0;
+      fi['projets'] ??= [];
+      fi['comptes'] = { ...lignes, ...(fi['comptes'] as object) };
+      fi['historique'] = ((fi['historique'] ?? []) as object[]).map((h) => ({ ...lignes, ...h }));
+    }
+    return { ...m, versionFormat: 6 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

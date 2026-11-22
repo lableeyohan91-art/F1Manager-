@@ -28,7 +28,7 @@ import {
   type Motoriste, type Palmares, type Personne, type ResultatPilote, type Saison, type Voiture,
 } from '../../model/types';
 import { genererChronique } from './chronique';
-import { facteurBudgetDeveloppement, financesDe, restrictionAero } from '../economie';
+import { facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero } from '../economie';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 
 /** Durée de conservation des explications détaillées des résultats, en saisons. */
@@ -242,7 +242,8 @@ export function capaciteDeveloppement(monde: Monde, e: Ecurie): number {
   ]) / 20;
   const inst = (Object.values(table(monde, TABLES.installations)) as unknown as Installation[])
     .filter((i) => i.ecurie === e.id && ['soufflerie', 'cfd', 'simulateur', 'bureau_etudes'].includes(i.type));
-  const installations = moyenne(inst.map((i) => i.niveau)) / 10;
+  // Phase 5b : niveau effectif (usure due à l'âge et à l'entretien).
+  const installations = moyenne(inst.map((i) => niveauEffectif(i))) / 10;
   // Phase 5a : le budget de développement réellement alloué (finances) remplace le budget indicatif de l'écurie.
   const budget = financesDe(monde, e.id) ? facteurBudgetDeveloppement(monde, e.id) : borner(e.budgetMEUR / BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET.min, FACTEUR_BUDGET.max);
   return POIDS_CAPACITE.competences * competences + POIDS_CAPACITE.installations * installations + POIDS_CAPACITE.budget * budget;

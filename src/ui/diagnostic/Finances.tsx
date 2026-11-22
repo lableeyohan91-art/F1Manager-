@@ -9,7 +9,7 @@ import { Carte, ecuries } from './outils';
 const m1 = (x: number) => `${x.toLocaleString('fr-FR', { maximumFractionDigits: 1, minimumFractionDigits: 1 })} M€`;
 const pc = (x: number) => `${Math.round(100 * x)} %`;
 const m0 = (x: number) => Math.round(x).toLocaleString('fr-FR');
-const LIB_STRATEGIE: Record<string, string> = { equilibre: 'équilibrée', prudent: 'prudente', offensif: 'offensive', a_definir: '—' };
+const LIB_STRATEGIE: Record<string, string> = { equilibre: 'équilibrée', prudent: 'prudente', offensif: 'offensive', endettement: 'endettement', a_definir: '—' };
 
 const LIB_TYPE: Record<string, string> = {
   constructeur: 'Constructeur', milliardaire: 'Milliardaire', fonds: "Fonds d'investissement", famille: 'Famille', consortium: 'Consortium',

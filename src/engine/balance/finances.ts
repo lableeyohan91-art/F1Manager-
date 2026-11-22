@@ -27,7 +27,7 @@ export const PROPRIETAIRES: Record<string, { stabilite: number; sensibiliteResul
  * le propriétaire retire une part de l'excédent, selon son type (un fonds encaisse, un milliardaire réinvestit).
  * Raison : sans ce mécanisme, les écuries riches accumulaient 1 000 à 1 500 M€ en 5 saisons (premier essai 5a).
  */
-export const DIVIDENDES = { seuilAnneesDepenses: 0.6 };
+export const DIVIDENDES = { seuilAnneesDepenses: 0.25 };
 export const PART_DIVIDENDES: Record<string, number> = { constructeur: 0.6, milliardaire: 0.3, fonds: 0.8, famille: 0.5, consortium: 0.6 };
 /** Variation aléatoire annuelle de l'apport (écart type, part de l'apport). */
 export const ALEA_APPORT = 0.08;
@@ -92,3 +92,97 @@ export const COUPE_EN_COURS = 0.2;
 
 /** Le conseil licencie le team principal si l'écart au classement attendu est trop grand, selon sa patience. */
 export const CONSEIL = { ecartGrave: 5, ecartRepete: 3, patienceMaxGrave: 8, patienceMaxRepete: 12, probabilite: 0.6 };
+
+/* =================================================================== Phase 5b */
+
+/* ---------------------------------------------------------------- Sponsors */
+
+/**
+ * Part des revenus commerciaux de base qui provient des droits commerciaux (télévision, organisateur), versés quoi qu'il arrive.
+ * Le reste de l'ancien « commercial » de la phase 5a est désormais apporté par les contrats de sponsoring (marché).
+ */
+export const PART_DROITS_COMMERCIAUX = 0.5;
+/** Vivier de sponsors : taille au départ, arrivées par an, taille maximale (volume borné). */
+export const VIVIER_SPONSORS = { initial: 75, arriveesParAn: 7, maximum: 95, anneesSansContratAvantDepart: 2, probabiliteDepart: 0.35 };
+/** Emplacements par écurie (titre, principaux, secondaires). */
+export const EMPLACEMENTS_SPONSORS: Record<string, number> = { titre: 1, principal: 3, secondaire: 6 };
+/** Montant au-delà duquel un contrat est de rang « titre » ou « principal » (M€ par an). */
+export const SEUILS_RANG_SPONSOR = { titre: 30, principal: 8 };
+/**
+ * Montant proposé = budget du sponsor × conjoncture × part engagée × (min + amplitude × attrait).
+ * Part engagée calibrée pour que le sponsoring total (≈ 850–950 M€ par an) remplace la moitié des anciens revenus commerciaux
+ * (premier essai à 0,7 : ≈ 1 830 M€, deux fois trop, aucune crise possible).
+ * Attrait de l'écurie entre 0 et 1.
+ */
+export const OFFRE_SPONSOR = { partEngagee: 0.35, min: 0.55, amplitude: 0.9, primeObjectif: 0.2 };
+/** Poids de l'attrait selon l'image recherchée par le sponsor (popularité, prestige, résultats, marketing, nationalité). */
+export const POIDS_ATTRAIT: Record<string, { popularite: number; prestige: number; resultats: number; marketing: number; nationalite: number }> = {
+  prestige: { popularite: 0.2, prestige: 0.45, resultats: 0.2, marketing: 0.1, nationalite: 0.05 },
+  popularite: { popularite: 0.5, prestige: 0.1, resultats: 0.2, marketing: 0.15, nationalite: 0.05 },
+  resultats: { popularite: 0.15, prestige: 0.1, resultats: 0.6, marketing: 0.1, nationalite: 0.05 },
+  nationalite: { popularite: 0.2, prestige: 0.1, resultats: 0.2, marketing: 0.1, nationalite: 0.4 },
+};
+/** Bruit de préférence d'un sponsor entre écuries (écart type, sur l'attrait). */
+export const ALEA_CHOIX_SPONSOR = 0.06;
+/** Durée des contrats (années) : de min à max, plus longue si le sponsor est fidèle. */
+export const DUREE_CONTRAT_SPONSOR = { min: 1, max: 4 };
+/** Satisfaction : gain si objectif atteint, perte de base et par place manquée ; seuil de rupture ; seuil de renouvellement. */
+export const SATISFACTION_SPONSOR = { initiale: 60, gainObjectif: 15, perteBase: 15, pertePlace: 6, seuilRupture: 25, seuilRenouvellement: 50 };
+/** Rancune d'un sponsor déçu ou parti fâché (années pendant lesquelles il évite l'écurie). */
+export const RANCUNE_SPONSOR_ANNEES = 3;
+/** Conjoncture économique mondiale : marche aléatoire annuelle bornée, multiplie les budgets des sponsors. */
+export const CONJONCTURE = { ecartType: 0.07, rappel: 0.3, min: 0.75, max: 1.2 };
+
+/* ---------------------------------------------------------------- Dette et crises */
+
+/** Réserve minimale (en périodes de dépenses) sous laquelle l'écurie emprunte. */
+export const RESERVE_MINIMALE_PERIODES = 1;
+/** Capacité d'emprunt (0,5 au premier essai : aucune crise en 600 saisons, les banques prêtaient trop) : part des recettes annuelles, modulée par le goût du risque du propriétaire (× (0,5 + risque/20)). */
+export const LIMITE_DETTE_RECETTES = 0.25;
+/** Taux annuel : base + prime de risque × (dette / recettes annuelles), plafonnée. */
+export const TAUX_DETTE = { base: 0.04, primeRisque: 0.1, max: 0.15 };
+/** Remboursement : au-delà de `seuilPeriodes` de trésorerie, la moitié de l'excédent rembourse la dette. */
+export const REMBOURSEMENT = { seuilPeriodes: 3, part: 0.5 };
+/** Crise : baisse de motivation du personnel quand les salaires sont menacés (points sur 100). */
+export const CRISE_MOTIVATION = 12;
+/** Sauvetage par le propriétaire : probabilité de base selon son type, + ambition ; périodes de crise avant administration. */
+export const SAUVETAGE: Record<string, number> = { constructeur: 0.7, milliardaire: 0.6, fonds: 0.25, famille: 0.4, consortium: 0.35 };
+export const PERIODES_CRISE_AVANT_ADMINISTRATION = 3;
+/** Lassitude : chaque année, un propriétaire impatient qui perd de l'argent et des places peut vendre. */
+export const LASSITUDE = { anneesDeficit: 3, probabilite: 0.12, patienceMax: 9 };
+/** Rachat : types de repreneurs (poids), apport annuel de base (M€, fourchette), part de la dette effacée, chance de changer de team principal. */
+export const REPRENEURS: Record<string, { poids: number; apportMin: number; apportMax: number }> = {
+  constructeur: { poids: 2, apportMin: 100, apportMax: 200 },
+  milliardaire: { poids: 3, apportMin: 60, apportMax: 220 },
+  fonds: { poids: 3, apportMin: 30, apportMax: 90 },
+  consortium: { poids: 2, apportMin: 40, apportMax: 120 },
+};
+export const RACHAT = { partDetteEffacee: 0.7, periodesReserveInjectees: 2, probabiliteChangementTP: 0.5 };
+
+/* ---------------------------------------------------------------- Infrastructures */
+
+/** Installations qui agissent sur le développement de la voiture (déjà lues par la capacité de développement). */
+export const INSTALLATIONS_TECHNIQUES = ['soufflerie', 'cfd', 'simulateur', 'bureau_etudes'] as const;
+/** Vieillissement : perte d'efficacité par année d'âge, plancher ; perte d'état par année de crise. */
+export const VIEILLISSEMENT = { perteParAn: 0.012, plancher: 0.7, perteEtatCrise: 15, recuperationEtat: 10 };
+/** Enveloppe réglementaire d'investissement en infrastructures (hors plafond), par an (M€). */
+export const INVESTISSEMENT_ANNUEL_MAX = 25;
+/** Coût d'une amélioration (niveau n → n+1) = base × (n+1) ; rénovation = base × niveau ; durées (semaines). */
+export const COUT_INFRASTRUCTURE = { ameliorationParNiveau: 4, renovationParNiveau: 1.5, ageMinRenovation: 12 };
+export const DUREE_INFRASTRUCTURE = { amelioration: { min: 40, max: 80 }, renovation: { min: 26, max: 52 } };
+/** Risques : probabilité et ampleur des retards et dépassements de coût, tirés au lancement. */
+export const RISQUES_INFRASTRUCTURE = { probabiliteRetard: 0.25, retardMax: 0.6, probabiliteSurcout: 0.3, surcoutMax: 0.4 };
+/** L'IA lance un projet si sa trésorerie dépasse la réserve visée d'au moins cette part du coût. */
+export const MARGE_LANCEMENT_PROJET = 0.5;
+
+/**
+ * Retrait du propriétaire en cours de saison (difficultés de sa maison mère, changement de stratégie) : probabilité annuelle
+ * selon son type, part de l'apport restante retirée, semaine de l'annonce. Source principale des crises (rapport P5b) :
+ * sans choc, l'IA ajuste son budget chaque année et ne tombe jamais en crise.
+ */
+export const RETRAIT_PROPRIETAIRE = {
+  probabiliteParAn: { constructeur: 0.02, milliardaire: 0.04, fonds: 0.04, famille: 0.03, consortium: 0.03 } as Record<string, number>,
+  reductionMin: 0.5, reductionMax: 1, semaineMin: 12, semaineMax: 40,
+};
+/** Emprunt offensif : un team principal joueur, soutenu par un propriétaire joueur, finance le développement par la dette. */
+export const EMPRUNT_OFFENSIF = { risqueTP: 13, risqueProprietaire: 12, partCapacite: 0.5 };

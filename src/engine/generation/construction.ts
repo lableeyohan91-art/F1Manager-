@@ -112,6 +112,9 @@ export interface Referentiel {
   id: 'referentiel';
   nationalites: DonneesInitiales['nationalites'];
   noms: DonneesInitiales['noms'];
+  /** Phase 5b (absents des sauvegardes plus anciennes : noms génériques en repli). */
+  secteurs?: DonneesInitiales['secteurs'];
+  racinesEntreprises?: string[];
 }
 export const TABLE_REFERENTIEL = 'referentiel';
 
@@ -268,7 +271,7 @@ function contratGenere(ctx: Contexte, p: Personne): Contrat {
 export function construireMonde(graine: number, d: DonneesInitiales, scenario: string): Monde {
   const monde = creerMondeVide(graine, scenario, DATE_DEPART);
   const ctx: Contexte = { monde, graine, d, nomsPris: new Set() };
-  table(monde, TABLE_REFERENTIEL)['referentiel'] = { id: 'referentiel', nationalites: d.nationalites, noms: d.noms } satisfies Referentiel as unknown as Entite;
+  table(monde, TABLE_REFERENTIEL)['referentiel'] = { id: 'referentiel', nationalites: d.nationalites, noms: d.noms, secteurs: d.secteurs, racinesEntreprises: d.racinesEntreprises } satisfies Referentiel as unknown as Entite;
 
   for (const m of d.motoristes) ajouter(monde, TABLES.motoristes, { ...m });
   const ecuries = new Map<string, Ecurie>();
@@ -282,7 +285,8 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
     ajouter(monde, TABLES.proprietaires, { id: `pro_${fi.ecurie.replace(/^eq_/, '')}`, ecurie: fi.ecurie, type: fi.typeProprietaire, apportBaseMEUR: fi.apportAnnuelMEUR, patience: trait(), ambition: trait(), risque: trait() } satisfies Proprietaire);
     ajouter(monde, TABLES.finances, {
       id: `fin_${fi.ecurie.replace(/^eq_/, '')}`, ecurie: fi.ecurie, tresorerieMEUR: fi.tresorerieMEUR, revenusCommerciauxBaseMEUR: fi.revenusCommerciauxMEUR,
-      budget: { annee: 0, developpementMEUR: 0, plafondVise: 0, strategie: 'a_definir' }, comptes: comptesVides(DATE_DEPART.annee), historique: [], sanctionAero: 0, verification: fi.verification,
+      budget: { annee: 0, developpementMEUR: 0, plafondVise: 0, strategie: 'a_definir' }, comptes: comptesVides(DATE_DEPART.annee), historique: [], sanctionAero: 0,
+      detteMEUR: 0, etatCrise: 'sain', periodesEnCrise: 0, projets: [], verification: fi.verification,
     } satisfies Finances);
   }
   d.palmares.forEach((p) => ajouter(monde, TABLES.palmares, { id: `pal_${p.saison}`, ...p }));

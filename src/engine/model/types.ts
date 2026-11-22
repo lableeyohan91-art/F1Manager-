@@ -19,6 +19,9 @@ export const TABLES = {
   voitures: 'voitures',
   finances: 'finances',
   proprietaires: 'proprietaires',
+  sponsors: 'sponsors',
+  contratsSponsoring: 'contratsSponsoring',
+  conjoncture: 'conjoncture',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -350,6 +353,67 @@ export interface Proprietaire {
   patience: number;
   ambition: number;
   risque: number;
+  /** Faux quand le propriétaire a vendu l'écurie (phase 5b) : il reste dans l'historique. */
+  actif?: boolean;
+  /** Année d'arrivée (rachats, phase 5b). */
+  depuis?: number;
+}
+
+/** Ce que recherche un sponsor chez une écurie (phase 5b). */
+export type ImageSponsor = 'prestige' | 'popularite' | 'resultats' | 'nationalite';
+/** Entreprise fictive générée (aucune vraie marque). */
+export interface Sponsor {
+  id: string;
+  nom: string;
+  secteur: string;
+  nationalite: string;
+  /** Budget marketing annuel que l'entreprise peut consacrer à la F1 (M€), avant conjoncture. */
+  budgetMEUR: number;
+  image: ImageSponsor;
+  /** Fidélité (1–20) : probabilité de renouveler un contrat satisfaisant. */
+  fidelite: number;
+  /** Exigence (1–20) : écart au classement attendu qu'il accepte avant d'être déçu. */
+  exigence: number;
+  /** Mémoire simple : écuries évitées jusqu'à une année (objectif raté, rupture). */
+  rancunes: { ecurie: string; jusqua: number }[];
+  actif: boolean;
+  /** Dernière année sous contrat (pour le renouvellement du vivier). */
+  derniereAnneeContrat: number;
+}
+export type RangSponsor = 'titre' | 'principal' | 'secondaire';
+export interface ContratSponsoring {
+  id: string;
+  sponsor: string;
+  ecurie: string;
+  rang: RangSponsor;
+  montantAnnuelMEUR: number;
+  /** Prime versée si l'objectif de classement est atteint (M€). */
+  primeObjectifMEUR: number;
+  /** Classement constructeurs minimal visé (1 = premier). */
+  objectifRang: number;
+  /** Clause de sortie : le sponsor peut partir avant la fin si l'objectif est manqué et sa satisfaction trop basse. */
+  clauseSortie: boolean;
+  debut: number;
+  fin: number;
+  statut: 'actif' | 'termine' | 'rompu';
+  /** 0 à 100. */
+  satisfaction: number;
+}
+/** Projet d'infrastructure en cours (phase 5b). */
+export interface ProjetInfrastructure {
+  id: string;
+  installation: string;
+  nature: 'amelioration' | 'renovation';
+  /** Coût et durée annoncés au lancement. */
+  coutPrevuMEUR: number;
+  dureePrevueSemaines: number;
+  /** Coût et durée réels (tirés au lancement, découverts au fil du projet). */
+  coutReelMEUR: number;
+  dureeReelleSemaines: number;
+  depenseMEUR: number;
+  avancementSemaines: number;
+  debut: { annee: number; semaine: number };
+  retardAnnonce?: boolean;
 }
 
 /** Comptes d'une année (M€). */
@@ -371,6 +435,12 @@ export interface ComptesAnnee {
   amendes: number;
   /** Retrait du propriétaire (hors plafond). */
   dividendes: number;
+  /** Phase 5b : contrats de sponsoring (recette), intérêts de la dette et investissements en infrastructures (hors plafond). */
+  sponsors: number;
+  interets: number;
+  investissements: number;
+  /** Apports exceptionnels du propriétaire (sauvetage, rachat) : recette hors exploitation. */
+  apportsExceptionnels: number;
 }
 
 export interface Finances {
@@ -386,5 +456,12 @@ export interface Finances {
   historique: (ComptesAnnee & { tresorerieFin: number; plafonnees: number; depassement: number })[];
   /** Réduction d'efficacité aérodynamique due à une sanction (0 à 1), pour l'année en cours. */
   sanctionAero: number;
+  /** Phase 5b : dette, état de santé, projets d'infrastructure. */
+  detteMEUR: number;
+  etatCrise: 'sain' | 'tension' | 'crise' | 'administration';
+  periodesEnCrise: number;
+  projets: ProjetInfrastructure[];
+  /** Retrait du propriétaire en cours d'année (tiré au bilan, annoncé à la semaine indiquée). */
+  chocApport?: { annee: number; semaine: number; facteur: number; annonce?: boolean };
   verification: string;
 }

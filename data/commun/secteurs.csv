@@ -1,0 +1,15 @@
+secteur;libelle;poids;budgetMinMEUR;budgetMaxMEUR;suffixes;verification
+banque;Banque et finance;9;10;80;Capital|Bank|Finance|Partners;Estimation de game design (fourchettes de budgets marketing F1)
+technologie;Technologie;10;10;100;Systems|Labs|Tech|Digital;Estimation de game design
+energie;Énergie;7;15;90;Energy|Power|Petroleum|Renewables;Estimation de game design
+telecom;Télécommunications;5;8;50;Telecom|Mobile|Networks;Estimation de game design
+luxe;Luxe et horlogerie;6;5;40;Horlogerie|Maison|Atelier;Estimation de game design
+boissons;Boissons;7;5;60;Drinks|Beverages|Brewing;Estimation de game design
+logistique;Logistique et transport;5;5;35;Logistics|Freight|Cargo;Estimation de game design
+numerique;Services numériques;6;5;70;Cloud|Data|Pay|Online;Estimation de game design
+equipement;Équipement automobile;6;2;20;Components|Lubricants|Parts|Tyres;Estimation de game design
+aeronautique;Aéronautique;3;5;40;Aerospace|Aviation|Air;Estimation de game design
+assurance;Assurance;4;5;40;Insurance|Assurances|Mutual;Estimation de game design
+mode;Mode;4;2;25;Fashion|Apparel|Wear;Estimation de game design
+jeux;Jeux vidéo;4;3;30;Games|Interactive|Studios;Estimation de game design
+sante;Santé et bien-être;3;3;25;Health|Care|Pharma;Estimation de game design

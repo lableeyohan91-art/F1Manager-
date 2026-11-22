@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   copierMonde, creerScenarioGrille2026, deserialiser, empreinte, facteurBudgetDeveloppement, financesDe, restrictionAero, serialiser,
-  table, TABLES, totalPlafonne, verifierCoherence, VERSION_FORMAT, type Ecurie, type Finances, type Monde,
+  contratsActifs, sponsors, table, TABLES, totalPlafonne, type Sponsor, verifierCoherence, VERSION_FORMAT, type Ecurie, type Finances, type Monde,
 } from '../src/engine';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 
@@ -84,6 +84,67 @@ describe('Phase 5a — économie', () => {
     expect(Object.keys(table(migre, TABLES.finances))).toHaveLength(ecuries(m).length);
     expect(Object.values(table(migre, TABLES.personnes)).every((p) => p['apparence'])).toBe(true);
     sc.creerMoteur().avancer(migre, S + 1); // le monde migré tourne
+    expect(financesDe(migre, 'eq_haas')!.historique).toHaveLength(1);
+  });
+});
+
+describe('Phase 5b — sponsors, dette, crises, infrastructures', () => {
+  it('sponsors : chaque écurie en a, emplacements et exclusivité de secteur respectés, noms uniques', () => {
+    const m = sc.creerMonde(2);
+    sc.creerMoteur().avancer(m, 2);
+    const parId = new Map(sponsors(m).map((s) => [s.id, s]));
+    expect(new Set(sponsors(m).map((s) => s.nom)).size).toBe(sponsors(m).length);
+    for (const e of ecuries(m)) {
+      const cs = contratsActifs(m, m.date.annee, e.id);
+      expect(cs.length).toBeGreaterThan(0);
+      expect(cs.filter((c) => c.rang === 'titre').length).toBeLessThanOrEqual(1);
+      expect(cs.filter((c) => c.rang === 'principal').length).toBeLessThanOrEqual(3);
+      const secteurs = cs.map((c) => (parId.get(c.sponsor) as Sponsor).secteur);
+      expect(new Set(secteurs).size).toBe(secteurs.length);
+    }
+  });
+
+  it('crise : trésorerie négative sans capacité d’emprunt → événement de crise, puis sauvetage ou rachat', () => {
+    const m = sc.creerMonde(1);
+    const moteur = sc.creerMoteur();
+    moteur.avancer(m, 2);
+    const fi = financesDe(m, 'eq_haas') as Finances;
+    fi.tresorerieMEUR = -300;
+    fi.detteMEUR = 2000; // plus aucune banque ne prête
+    const pro = Object.values(table(m, TABLES.proprietaires)).find((p) => p['ecurie'] === 'eq_haas' && p['actif'] !== false)!;
+    pro['type'] = 'fonds';
+    pro['ambition'] = 1; // propriétaire peu enclin à sauver l'écurie
+    moteur.avancer(m, 30);
+    const types = new Set(Object.values(m.evenements).filter((e) => e.acteurs.some((a) => a.id === 'eq_haas')).map((e) => e.type));
+    expect(types.has('finances.crise')).toBe(true);
+    expect(types.has('proprietaire.sauvetage') || types.has('proprietaire.rachat')).toBe(true);
+    expect(verifierCoherence(m, { ages: false })).toEqual([]);
+  });
+
+  it('infrastructures : des projets sont lancés et livrés, dans l’enveloppe annuelle', () => {
+    const m = sc.creerMonde(4);
+    sc.creerMoteur().avancer(m, 3 * S + 1);
+    const livres = Object.values(m.evenements).filter((e) => e.type === 'infrastructure.livraison');
+    expect(livres.length).toBeGreaterThan(0);
+    for (const e of ecuries(m)) for (const h of (financesDe(m, e.id) as Finances).historique) expect(h.investissements).toBeLessThanOrEqual(25 + 0.01);
+  });
+
+  it('une sauvegarde au format 5 est migrée au format 6 et tourne', () => {
+    const m = sc.creerMonde(1);
+    sc.creerMoteur().avancer(m, 2);
+    const ancien = copierMonde(m) as unknown as Record<string, unknown>;
+    const tables = ancien['tables'] as Record<string, Record<string, Record<string, unknown>>>;
+    delete tables['sponsors'];
+    delete tables['contratsSponsoring'];
+    for (const fi of Object.values(tables['finances']!)) {
+      for (const k of ['detteMEUR', 'etatCrise', 'periodesEnCrise', 'projets']) delete fi[k];
+      for (const k of ['sponsors', 'interets', 'investissements', 'apportsExceptionnels']) delete (fi['comptes'] as Record<string, unknown>)[k];
+    }
+    const texte = serialiser(ancien as unknown as Monde).replace(`"versionFormat":${VERSION_FORMAT}`, '"versionFormat":5');
+    const migre = deserialiser(texte);
+    expect((financesDe(migre, 'eq_haas') as Finances).projets).toEqual([]);
+    sc.creerMoteur().avancer(migre, S + 1);
+    expect(sponsors(migre).length).toBeGreaterThan(0);
     expect(financesDe(migre, 'eq_haas')!.historique).toHaveLength(1);
   });
 });
