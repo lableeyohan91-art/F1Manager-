@@ -30,8 +30,6 @@ export interface Souvenir {
   etiquette: string;
   ressenti: number;
   intensite: number;
-  /** Plus forte intensité atteinte (sert au résidu). */
-  intensitePic: number;
   creeLe: DateJeu;
   renforceLe: DateJeu;
 }
@@ -149,7 +147,6 @@ export function lireEvenement(monde: Monde, porteurId: string, cible: string, et
     } else {
       existant.intensite = Math.min(1, existant.intensite + intensite * (1 - existant.intensite) * 0.6);
     }
-    existant.intensitePic = Math.max(existant.intensitePic, existant.intensite);
     existant.renforceLe = { ...monde.date };
     existant.evenement = idEvenement;
     return existant;
@@ -163,7 +160,6 @@ export function lireEvenement(monde: Monde, porteurId: string, cible: string, et
     etiquette,
     ressenti: def.ressenti,
     intensite,
-    intensitePic: intensite,
     creeLe: { ...monde.date },
     renforceLe: { ...monde.date },
   };
@@ -179,19 +175,35 @@ export function lireEvenement(monde: Monde, porteurId: string, cible: string, et
   return s;
 }
 
-/** Efface un souvenir en versant son résidu dans la base durable de la relation (mémoire résiduelle). */
-export function effacer(monde: Monde, s: Souvenir): void {
+/**
+ * Audit n°5 : la mémoire résiduelle se forme PROGRESSIVEMENT pendant l'oubli naturel. À chaque baisse d'intensité due au temps,
+ * une part (selon le trait du porteur) de l'effet perdu est versée dans la base durable de la relation. La trace laissée reste
+ * proportionnelle à la force du souvenir, sans saut brutal à l'effacement.
+ */
+function verserResidu(monde: Monde, s: Souvenir, baisse: number): void {
   const p = personne(monde, s.porteur);
   const def = ETIQUETTES[s.etiquette];
-  if (p && def && s.cible !== s.porteur) {
-    const trait = s.ressenti < 0 ? TRAIT_OUBLI.negatifAutrui : TRAIT_OUBLI.positifAutrui;
-    const part = RESIDU.min + ((p.traits[trait] ?? 10) / 20) * (RESIDU.max - RESIDU.min);
-    const r = relationBrute(monde, s.porteur, s.cible, true) as Relation;
-    const effet = s.ressenti * s.intensitePic * part;
-    r.base.confiance = borner(r.base.confiance + effet * def.axes.confiance);
-    r.base.respect = borner(r.base.respect + effet * def.axes.respect);
-    r.base.affinite = borner(r.base.affinite + effet * def.axes.affinite);
-  }
+  if (!p || !def || s.cible === s.porteur || baisse <= 0) return;
+  const trait = s.ressenti < 0 ? TRAIT_OUBLI.negatifAutrui : TRAIT_OUBLI.positifAutrui;
+  const part = RESIDU.min + ((p.traits[trait] ?? 10) / 20) * (RESIDU.max - RESIDU.min);
+  ajouterABase(monde, s, s.ressenti * baisse * part);
+}
+
+function ajouterABase(monde: Monde, s: Souvenir, effet: number): void {
+  const def = ETIQUETTES[s.etiquette];
+  if (!def || s.cible === s.porteur) return;
+  const r = relationBrute(monde, s.porteur, s.cible, true) as Relation;
+  r.base.confiance = borner(r.base.confiance + effet * def.axes.confiance);
+  r.base.respect = borner(r.base.respect + effet * def.axes.respect);
+  r.base.affinite = borner(r.base.affinite + effet * def.axes.affinite);
+}
+
+/**
+ * Efface un souvenir. Audit n°5 : continuité de la relation — l'effet qu'il exerçait encore (intensité actuelle) passe dans la base
+ * durable, ni plus ni moins. Un effacement ne peut donc ni aggraver ni améliorer brutalement la relation.
+ */
+export function effacer(monde: Monde, s: Souvenir): void {
+  if (personne(monde, s.porteur)) ajouterABase(monde, s, s.ressenti * s.intensite);
   delete table(monde, TABLE_SOUVENIRS)[s.id];
 }
 
@@ -212,7 +224,9 @@ export function passerUnMois(monde: Monde): void {
       delete ts[id];
       continue;
     }
-    s.intensite *= 1 - def.oubli * multiplicateurOubli(p, s);
+    const baisse = s.intensite * def.oubli * multiplicateurOubli(p, s);
+    s.intensite -= baisse;
+    verserResidu(monde, s, baisse); // trace progressive de l'oubli naturel (audit n°5)
     if (s.intensite < SEUIL_EFFACEMENT_SOUVENIR) effacer(monde, s);
   }
   const tr = table(monde, TABLE_RELATIONS);
@@ -251,6 +265,7 @@ export function reconcilier(monde: Monde, destinataire: string, auteur: string, 
   let total = 0;
   for (const s of souvenirsDe(monde, destinataire)) {
     if (s.cible !== auteur || s.ressenti >= 0) continue;
+    // Ce que la réconciliation efface est pardonné : aucune part ne passe dans la mémoire résiduelle (audit n°5).
     const avant = s.intensite;
     s.intensite *= 1 - Math.min(0.9, reduction);
     total += avant - s.intensite;

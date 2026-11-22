@@ -290,3 +290,9 @@ Aucun code à ce stade.
 ### Performances
 - Outil `npm run performance`. 50 saisons : 97 s → 57 s, résultats identiques (empreintes vérifiées).
 - Délais des simulations longues adaptés aux machines d'intégration, avec durées de référence documentées.
+
+## [Audit n°5] — 22/11/2026
+
+### Corrigé (D-122)
+- Mémoire résiduelle formée progressivement pendant l'oubli ; effacement continu ; réconciliation sans aggravation (format de sauvegarde 14, migration et test).
+- Idempotence : Grand Prix et manches juniors jamais rejoués ; prise d'effet des contrats limitée à la semaine 50 ; tests d'idempotence de la fin de saison et de la clôture du marché (`tests/audit-5.test.ts`). 128 tests.

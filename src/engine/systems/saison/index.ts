@@ -86,6 +86,9 @@ export function creerSaison(monde: Monde, annee: number): Saison {
 
 export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const gp = grandPrix(monde, idGp);
+  // Audit n°5 : idempotence. Un Grand Prix déjà couru (reprise, rendez-vous en double) ne redistribue ni points,
+  // ni victoires, ni expérience, ni événements.
+  if (gp.termine) return gp;
   const saison = saisonDe(monde, gp.saison) as Saison;
   const circuit = table(monde, TABLES.circuits)[gp.circuit] as unknown as Circuit;
   const ecuries = new Map(ecuriesActives(monde).map((e) => [e.id, e]));

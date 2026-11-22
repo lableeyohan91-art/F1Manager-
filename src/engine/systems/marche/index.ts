@@ -12,7 +12,7 @@
  */
 
 import { AGE_MINIMAL_F1 } from '../../balance/carriere';
-import { PRIME_CONTINUITE } from '../../balance/contrats';
+import { PRIME_CONTINUITE, SEMAINE_FIN_CONTRATS } from '../../balance/contrats';
 import { RACHAT, CONTRE_ATTAQUE, FENETRE, HORIZON, INERTIE_CONTRAT, OFFRE_MARCHE, PLAN_MARCHE, PREDATEUR, TOURS_MARCHE } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement, type Evenement } from '../../core/evenements';
@@ -507,6 +507,8 @@ function prolongationsTitulaires(monde: Monde, liste: Personne[]): void {
 
 /** Contrats signés qui commencent l'an prochain : la personne quitte son employeur (fin ou rachat) et rejoint sa nouvelle écurie. */
 export function activerContratsSignes(monde: Monde): void {
+  // Audit n°5 : sans effet hors de la semaine de prise d'effet (appel en double ou à contretemps après une reprise).
+  if (monde.date.semaine < SEMAINE_FIN_CONTRATS) return;
   const annee = monde.date.annee;
   for (const c of contratsTries(monde)) {
     if (c.type !== 'emploi' || c.statut !== 'signe' || c.debut !== annee + 1) continue;

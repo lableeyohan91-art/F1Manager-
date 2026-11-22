@@ -192,6 +192,12 @@ const MIGRATIONS: Record<number, Migration> = {
   // v12 → v13 (audit n°4) : relevé des niveaux contemporains par saison et indemnité versée par contrat, tous deux optionnels.
   // Les saisons anciennes n'ont pas de relevé : leurs indicateurs historiques dépendant du niveau restent indéfinis (jamais recalculés).
   12: (m) => ({ ...m, versionFormat: 13 }),
+  // v13 → v14 (audit n°5) : la mémoire résiduelle se forme pendant l'oubli ; l'intensité maximale des souvenirs n'est plus lue.
+  13: (m) => {
+    const t = ((m['tables'] ?? {}) as Record<string, Record<string, Record<string, unknown>>>)['souvenirs'] ?? {};
+    for (const s of Object.values(t)) delete s['intensitePic'];
+    return { ...m, versionFormat: 14 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   copierMonde, creerScenarioGrille2026, deserialiser, ErreurDonnees, ErreurSauvegarde, financesDe, indicateursSaison, licencier, lireCsv, offresMarche,
-  serialiser, spearman, table, TABLES, teamPrincipal, verifierCoherence, type Contrat, type Finances, type Monde, type Personne, type Saison,
+  serialiser, spearman, table, TABLES, teamPrincipal, verifierCoherence, VERSION_FORMAT, type Contrat, type Finances, type Monde, type Personne, type Saison,
 } from '../src/engine';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 import { ecrireSauvegarde, lireSauvegardeAvecSecours } from '../src/platform/node/stockage';
@@ -138,8 +138,8 @@ describe('Audit n°4 — format 13', () => {
     sc.creerMoteur().avancer(m, 52);
     const s = table(m, TABLES.saisons)['ssn_2027'] as unknown as Saison;
     delete s.niveauxPilotes;
-    const migre = deserialiser(serialiser(m).replace(/"versionFormat":13/g, '"versionFormat":12'));
-    expect(migre.versionFormat).toBe(13);
+    const migre = deserialiser(serialiser(m).replace(`"versionFormat":${VERSION_FORMAT}`, `"versionFormat":12`));
+    expect(migre.versionFormat).toBe(VERSION_FORMAT);
     expect(indicateursSaison(migre, table(migre, TABLES.saisons)['ssn_2027'] as unknown as Saison).surperformanceMeilleursPilotes).toBeNull();
   }, 30_000);
 });

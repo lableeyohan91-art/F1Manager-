@@ -34,7 +34,7 @@ export const SEUIL_CREATION_SOUVENIR = 0.12;
 /** En dessous de cette intensité, un souvenir s'efface (et laisse un résidu). */
 export const SEUIL_EFFACEMENT_SOUVENIR = 0.06;
 
-/** Part de l'effet d'un souvenir effacé versée dans la base durable de la relation : min + (trait/20) × (max − min). */
+/** Part de l'effet perdu par l'oubli naturel versée progressivement dans la base durable de la relation : min + (trait/20) × (max − min) (audit n°5). */
 export const RESIDU = { min: 0.1, max: 0.3 };
 
 /** Retour mensuel de la base durable vers zéro (les erreurs restent réparables, lentement). */

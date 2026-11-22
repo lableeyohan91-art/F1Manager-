@@ -157,6 +157,7 @@ export function creerSaisonsJuniors(monde: Monde, annee: number): void {
 
 /** Une manche junior : même modèle que la F1 (niveau sur le circuit, affinité, nouveauté), voitures identiques, qualité d'équipe. */
 export function simulerMancheJunior(monde: Monde, sj: SaisonJunior, m: MancheJunior, pluie: boolean): void {
+  if (m.termine) return; // audit n°5 : idempotence (pas de double attribution de points ni d'expérience)
   const circuit = table(monde, TABLES.circuits)[m.circuit] as unknown as Circuit;
   const equipes = new Map(ecuriesJuniors(monde).map((e) => [e.id, e]));
   const partants = personnes(monde).filter((p) => p.junior?.categorie === sj.categorie && p.junior.annee === sj.annee && p.statut === 'libre');
