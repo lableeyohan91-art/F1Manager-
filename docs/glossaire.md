@@ -137,4 +137,6 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Forme du jour** | Écart ponctuel, cohérent sur un week-end, entre la performance d'un pilote et son niveau habituel (D-103, phase 13). |
 | **Forme à moyen terme** | Série de réussite ou de méforme sur plusieurs semaines, lue dans l'état émotionnel (confiance, motivation) (D-103, phase 13). |
 | **Budget de variance** | Répartition de l'écart total entre performance attendue et réelle entre des sources explicables (affinité, forme, stratégie, incidents) et un aléa résiduel (D-103). |
+| **Veille technologique** | Observation légale des voitures et des performances adverses pour en comprendre les concepts, jamais pour en obtenir les plans (D-109). |
+| **Délégation** | Confier un domaine (recherche, fabrication, stocks, recrutement…) au personnel ; la qualité dépend de ses compétences (D-109). |
 

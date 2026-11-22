@@ -80,4 +80,6 @@ Mesures : avec quelle écurie de départ, et en combien de saisons, chaque profi
 | Dominations (9 % → 23 % sur 10 saisons après la 6a) : **la meilleure voiture** écrase la saison (80 % des cas), le plateau des pilotes étant plus resserré | P6a §8 | 7 (débauchage des ingénieurs), 8 (règlements, D-090), 12 (conception), 13 (moteur de course, D-103) |
 | Âge moyen de la grille ≈ 30 ans | P6a | 6b (filières juniors) |
 | Hiérarchie plus figée après la 6a complémentaire (persistance 0,635 → 0,687, champions constructeurs 4,6 → 3,9 sur 20 saisons) : hypothèse, l'expérience favorise les pilotes établis | P6a+ | 6b (expérience acquise chez les juniors) ; facteur d'expérience des débutants à revoir lors de la grande campagne |
+| **Convergence des voitures vers le plafond** (moyenne 13,4 → ≈ 22,5 en 30 saisons ; ≈ 65 caractéristiques sur 66 à 19 ou plus après 20 saisons) | constat du 22/11/2026 | 8 (règlements : convergence partielle à chaque nouveau règlement), 12 (compromis, architectures, coûts marginaux, D-109) |
+| Champions trop âgés (31 ans en moyenne) | P6a+ | 6b, puis nouvelle mesure (D-111) |
 

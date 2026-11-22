@@ -24,7 +24,7 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | **A** | **Jalon A** | **10 saisons observées après un historique, chronique lisible, rapport de diagnostic** |
 | 10 | Le joueur | Prendre la tête d'une écurie, premiers écrans mobiles |
 | 11 | Médias et archives | Actualités, rumeurs, records, chronologie, **popularité et image publique qui font évoluer la valeur commerciale** |
-| 12 | Monoplaces | Recherche, conception, fabrication, expertise, erreurs de concept |
+| 12 | Monoplaces | **12a** architecture, pièces, philosophies · **12b** recherche, conception, coûts, délais, risques · **12c** fabrication, stocks, garage · **12d** innovations majeures, veille technologique légale · **12e** compatibilité pilote-monoplace ; pas de voiture parfaite ; délégation par domaine (D-109) |
 | 13 | Courses en 2D | Moteur de course qui remplace le modèle abstrait (reprise des modèles pneus/essence/météo de Paddock) ; **affinités avec les circuits, forme du jour, forme à moyen terme** qui remplacent une partie de l'aléa générique (D-103) ; sang-froid (D-075) |
 | 14 | Carrière du manager | Offres d'emploi, licenciement, changement d'écurie, héritage |
 | 15 | Direction artistique et immersion | Portraits, QG, infrastructures, monoplaces, circuits, illustrations d'événements, identités graphiques ; packs de ressources remplaçables ; optimisation mobile |
@@ -107,3 +107,5 @@ Elles seront détaillées une par une, avant leur démarrage, dans `docs/systeme
 - [ ] Taille de sauvegarde après 50 saisons : moins de 5 Mo compressés.
 
 **Équilibrage (D-095)** : mesure et documentation après chaque phase ; grandes campagnes d'équilibrage après les phases 8, 12 et 13.
+
+**Plateformes (D-110)** : Android, iPhone et PC avec un seul moteur ; interface mobile et interface PC ; Web Worker, page de mesure des performances et mises en page avant la première version jouable.
