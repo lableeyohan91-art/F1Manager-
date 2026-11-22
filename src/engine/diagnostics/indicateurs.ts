@@ -3,6 +3,7 @@
  * Ce sont des MESURES, jamais des contraintes (D-040) : rien dans le moteur ne les lit.
  */
 
+import { indicateursPositions, type IndicateursPositions } from './positions';
 import { ECART_VOITURE_PAR_POINT, POIDS_PILOTE, SEUIL_SURPRISE_PCT } from '../balance/course';
 import { table, type Monde } from '../core/monde';
 import { TABLES, type GrandPrix, type Saison } from '../model/types';
@@ -55,6 +56,8 @@ export interface IndicateursSaison {
   courseSousLaPluie: number;
   /** Décomposition de l'écart entre coéquipiers (courses où les deux finissent ; nécessite les explications). */
   coequipiers: DecompositionCoequipiers | null;
+  /** D-113 : compétitivité à toutes les positions (pilotes et constructeurs). */
+  positions: IndicateursPositions | null;
 }
 
 /**
@@ -237,6 +240,7 @@ export function indicateursSaison(monde: Monde, s: Saison): IndicateursSaison {
     lutteInterEcuries: !!s.titreOuvertDerniereManche && !!s.pilotes[1] && s.pilotes[0]?.ecurie !== s.pilotes[1].ecurie,
     courseSousLaPluie: gps.filter((g) => g.pluie).length,
     coequipiers: decompositionCoequipiers(gps),
+    positions: indicateursPositions(monde, s),
   };
 }
 

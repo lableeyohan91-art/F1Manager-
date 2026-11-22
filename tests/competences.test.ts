@@ -147,3 +147,22 @@ describe('Phase 6a complémentaire — compétences, circuits, mental, expérien
   }, 60_000);
 });
 
+
+describe('Laboratoire — compétitivité à toutes les positions (D-113)', () => {
+  it('les indicateurs de positions sont calculés pour les pilotes et les constructeurs, dans des bornes cohérentes', async () => {
+    const { indicateursPositions } = await import('../src/engine');
+    const m = sc.creerMonde(4);
+    sc.creerMoteur().avancer(m, 50);
+    const s = table(m, TABLES.saisons)['ssn_2027'] as unknown as Saison;
+    const ip = indicateursPositions(m, s)!;
+    for (const x of [ip.pilotes, ip.constructeurs]) {
+      expect(x.mobilite75).toBeGreaterThanOrEqual(x.mobilite25 - 0.3); // le classement se fige au fil de la saison
+      expect(x.mobilite75).toBeLessThanOrEqual(1);
+      for (const v of [x.partGainPerte2, x.disputeesMath.tout, x.disputeesRaisonnables.tout, x.acquisesPrematurement.tout, x.stablesDisputees, x.isolees]) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+      expect(x.disputeesRaisonnables.tout).toBeLessThanOrEqual(x.disputeesMath.tout);
+    }
+  });
+});

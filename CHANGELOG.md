@@ -205,3 +205,10 @@ Aucun code à ce stade.
 ### Constat
 - Dominations en recul sur 10 saisons (23 % → 19 %), mais hiérarchie plus figée (hypothèse : l'expérience favorise les pilotes établis) ; documenté, non recalibré (D-095).
 
+## [Laboratoire — toutes les positions] — 22/11/2026
+
+### Ajouté
+- Indicateurs de compétitivité à toutes les positions (D-113) pour les pilotes et les constructeurs : mobilité à 25, 50 et 75 % de la saison, écarts entre voisins par étage, changements de position, positions disputées et acquises à 3 manches de la fin, gains et pertes en seconde moitié, positions stables mais disputées et positions isolées.
+- Premières mesures et limite connue (égalités à 0 point en bas de classement) dans `docs/systemes/laboratoire-equilibrage.md` §7 ; référence `p6a-complement-reference-v2`.
+- Documentation de la phase 12 (D-109), du multiplateforme (D-110), de la règle sur l'âge des champions (D-111) ; fiche de la phase 6b proposée (D-112).
+

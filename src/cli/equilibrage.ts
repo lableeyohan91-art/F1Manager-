@@ -15,7 +15,7 @@ import { dirname } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import {
   creerScenarioGrille2026, indicateursSaison, indicateursSerie, saisonDe,
-  type IndicateursSaison, type IndicateursSerie, type Personne, type Saison,
+  type IndicateursSaison, type IndicateursSerie, type MesurePositions, type Personne, type Saison,
 } from '../engine';
 import { lireDonneesGrille2026 } from '../platform/node/donnees';
 import { lireArguments } from './arguments';
@@ -68,11 +68,38 @@ const pct = (x: number) => `${f(100 * x, 0)} %`;
 
 interface Ligne { cle: string; nom: string; valeurs: number[]; cible?: [number, number]; format: (x: number) => string }
 
-function lignes(c: Campagne): { saison: Ligne[]; serie: Ligne[]; proportions: Ligne[] } {
+function lignes(c: Campagne): { saison: Ligne[]; serie: Ligne[]; proportions: Ligne[]; positions: Ligne[] } {
   const ps = (k: keyof IndicateursSaison) => c.saisons.map((s) => Number(s[k]));
   const co = (k: keyof NonNullable<IndicateursSaison['coequipiers']>) => c.saisons.filter((s) => s.coequipiers).map((s) => s.coequipiers![k]);
   const oui = (k: keyof IndicateursSaison) => c.saisons.map((s) => (s[k] ? 1 : 0));
+  // D-113 : compétitivité à toutes les positions.
+  const pos = (qui: 'pilotes' | 'constructeurs', lire: (m: MesurePositions) => number) => c.saisons.filter((s) => s.positions).map((s) => lire(s.positions![qui]));
+  const lignesPositions: Ligne[] = [];
+  for (const [qui, lib, p] of [['pilotes', 'Pilotes', 'P'], ['constructeurs', 'Constructeurs', 'C']] as const) {
+    const L = (cle: string, nom: string, lire: (m: MesurePositions) => number, format: (x: number) => string) => lignesPositions.push({ cle: `pos${p}_${cle}`, nom: `${lib} : ${nom}`, valeurs: pos(qui, lire), format });
+    L('mob25', 'mobilité — corrélation classement à 25 % ↔ final', (m) => m.mobilite25, (x) => f(x, 2));
+    L('mob50', 'mobilité — corrélation classement à 50 % ↔ final', (m) => m.mobilite50, (x) => f(x, 2));
+    L('mob75', 'mobilité — corrélation classement à 75 % ↔ final', (m) => m.mobilite75, (x) => f(x, 2));
+    L('depl', 'déplacement moyen entre la mi-saison et la fin (places)', (m) => m.deplacementSecondeMoitie, (x) => f(x, 2));
+    L('gain2', 'part gagnant ou perdant ≥ 2 places en seconde moitié', (m) => m.partGainPerte2, pct);
+    L('chgt', 'changements de position par concurrent sur la saison', (m) => m.changementsParConcurrent, (x) => f(x, 1));
+    L('ecH', 'écart moyen entre voisins (points) — haut', (m) => m.ecartVoisins.haut, (x) => f(x, 1));
+    L('ecM', 'écart moyen entre voisins (points) — milieu', (m) => m.ecartVoisins.milieu, (x) => f(x, 1));
+    L('ecB', 'écart moyen entre voisins (points) — bas', (m) => m.ecartVoisins.bas, (x) => f(x, 1));
+    L('dispM', 'frontières mathématiquement disputées à 3 manches de la fin', (m) => m.disputeesMath.tout, pct);
+    L('dispR', 'frontières raisonnablement disputées à 3 manches — toutes', (m) => m.disputeesRaisonnables.tout, pct);
+    L('dispRH', 'frontières raisonnablement disputées — haut', (m) => m.disputeesRaisonnables.haut, pct);
+    L('dispRM', 'frontières raisonnablement disputées — milieu', (m) => m.disputeesRaisonnables.milieu, pct);
+    L('dispRB', 'frontières raisonnablement disputées — bas', (m) => m.disputeesRaisonnables.bas, pct);
+    L('acq', 'positions déjà acquises à 3 manches de la fin', (m) => m.acquisesPrematurement.tout, pct);
+    L('acqH', 'positions déjà acquises — haut', (m) => m.acquisesPrematurement.haut, pct);
+    L('acqM', 'positions déjà acquises — milieu', (m) => m.acquisesPrematurement.milieu, pct);
+    L('acqB', 'positions déjà acquises — bas', (m) => m.acquisesPrematurement.bas, pct);
+    L('stDisp', 'positions stables mais disputées (voisin à moins d’une victoire)', (m) => m.stablesDisputees, pct);
+    L('isol', 'positions isolées (voisins à plus de 3 victoires)', (m) => m.isolees, pct);
+  }
   return {
+    positions: lignesPositions,
     saison: [
       { cle: 'vainqueurs', nom: 'Vainqueurs de Grand Prix différents par saison', valeurs: ps('vainqueursDifferents'), cible: [3, 8], format: (x) => f(x, 1) },
       { cle: 'ecuriesVictorieuses', nom: 'Écuries victorieuses par saison', valeurs: ps('ecuriesVictorieuses'), cible: [2, 5], format: (x) => f(x, 1) },
@@ -121,7 +148,7 @@ function lignes(c: Campagne): { saison: Ligne[]; serie: Ligne[]; proportions: Li
 type Reference = Record<string, number>;
 function moyennes(c: Campagne): Reference {
   const l = lignes(c);
-  return Object.fromEntries([...l.saison, ...l.serie, ...l.proportions].map((x) => [x.cle, moy(x.valeurs)]));
+  return Object.fromEntries([...l.saison, ...l.serie, ...l.proportions, ...l.positions].map((x) => [x.cle, moy(x.valeurs)]));
 }
 
 function tableau(ls: Ligne[], ref?: Reference): string[] {
@@ -182,6 +209,7 @@ if (args['balayage-alea']) {
     '## Par saison', '', ...tableau(l.saison, ref), '',
     `## Par série de ${nSaisons} saisons`, '', ...tableau(l.serie, ref), '',
     '## Proportions, luttes pour le titre et coéquipiers', '', ...tableau(l.proportions, ref), '',
+    '## Compétitivité à toutes les positions (D-113)', '', ...tableau(l.positions, ref), '',
     '## Chronique d’exemple (graine 1)', '', ...c.chroniqueExemple,
   ];
 }

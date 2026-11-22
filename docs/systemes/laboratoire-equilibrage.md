@@ -83,3 +83,25 @@ Mesures : avec quelle écurie de départ, et en combien de saisons, chaque profi
 | **Convergence des voitures vers le plafond** (moyenne 13,4 → ≈ 22,5 en 30 saisons ; ≈ 65 caractéristiques sur 66 à 19 ou plus après 20 saisons) | constat du 22/11/2026 | 8 (règlements : convergence partielle à chaque nouveau règlement), 12 (compromis, architectures, coûts marginaux, D-109) |
 | Champions trop âgés (31 ans en moyenne) | P6a+ | 6b, puis nouvelle mesure (D-111) |
 
+## 7. Compétitivité à toutes les positions (D-113)
+
+Indicateurs ajoutés au rapport d'équilibrage (`npm run equilibrage`, section « Compétitivité à toutes les positions »), calculés dans `src/engine/diagnostics/positions.ts`. Étages : pilotes 1–5, 6–12 et 13 ou plus ; constructeurs 1–4, 5–8 et 9 ou plus. Une frontière est « raisonnablement disputée » si l'écart vaut au plus 25 % des points encore disponibles à 3 manches de la fin. Une position est « stable mais disputée » si elle a le même occupant à 75 % de la saison et à la fin, avec un voisin à moins d'une victoire ; elle est « isolée » si ses deux voisins sont à plus de 3 victoires.
+
+**Premières mesures** (100 graines × 10 saisons, code de la 6a complémentaire, référence `docs/rapports/reference/p6a-complement-reference-v2.*`) :
+
+| | Pilotes | Constructeurs |
+| --- | --- | --- |
+| Mobilité : corrélation du classement à 25 % / 50 % / 75 % avec le final | 0,92 / 0,96 / 0,98 | 0,93 / 0,97 / 0,98 |
+| Part gagnant ou perdant ≥ 2 places en seconde moitié | 29 % | 8 % |
+| Écart moyen entre voisins, haut / milieu / bas (points) | 49 / 24 / 3 | 153 / 30 / 11 |
+| Frontières raisonnablement disputées à 3 manches de la fin, haut / milieu / bas | 34 % / 64 % / 98 %* | 18 % / 72 % / 94 %* |
+| Positions déjà acquises à 3 manches de la fin, haut / milieu / bas | 9 % / 0 % / 0 % | 24 % / 0 % / 0 % |
+| Positions stables mais disputées / isolées | 43 % / 3 % | 49 % / 10 % |
+
+**Lecture** :
+- **Le milieu de classement est déjà bien disputé**, chez les pilotes comme chez les constructeurs.
+- **Le haut est souvent joué d'avance** : chez les constructeurs, 24 % des places du top 4 sont acquises à 3 manches de la fin, et l'écart moyen entre voisins y atteint 153 points.
+- **Les classements se figent tôt** : la corrélation dépasse 0,9 dès le quart de saison. Le développement en cours de saison bouge peu la hiérarchie.
+
+\* **Limite de mesure** : en bas de classement, beaucoup de concurrents sont à 0 ou à quelques points. Leur « dispute » mesurée en points est en partie artificielle, car l'égalité à 0 se départage au meilleur résultat. Amélioration prévue : ajouter le départage au meilleur résultat et un indicateur fondé sur la position moyenne à l'arrivée, plus parlant en dehors des points.
+
