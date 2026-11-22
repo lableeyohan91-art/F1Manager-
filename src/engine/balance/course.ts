@@ -10,8 +10,8 @@
  */
 export const ECART_VOITURE_PAR_POINT = 0.28;
 
-/** Écart de temps par point de niveau pilote (1–20), en % du temps au tour. */
-export const ECART_PILOTE_PAR_POINT = 0.1;
+/** Écart de temps par point de niveau pilote (1–20), en % du temps au tour. D-059 (réglage B) : 0,20 (avant : 0,10). */
+export const ECART_PILOTE_PAR_POINT = 0.2;
 
 /** Poids des compétences dans le niveau d'un pilote, sur le sec. Somme = 1. */
 export const POIDS_PILOTE: Record<string, number> = {
@@ -33,7 +33,8 @@ export const EFFET_FORME_MAX = 0.1;
 export const CONFIANCE_REFERENCE = 65;
 
 /** Aléa de course (écart type, en % du temps au tour), sur le sec ; multiplié sous la pluie. */
-export const ALEA_SIGMA = 0.3;
+/** D-059 (réglage B) : 0,22 (avant : 0,30). */
+export const ALEA_SIGMA = 0.22;
 export const MULTIPLICATEUR_ALEA_PLUIE = 1.7;
 
 /** Abandon mécanique : probabilité = base + (20 − fiabilité) × parPoint. */

@@ -93,3 +93,9 @@ Aucun code à ce stade.
 ### Modifié
 - Conception de la phase 4 validée par le porteur (D-065), sous réserve des points ouverts soumis à ChatGPT ; orientations de la phase 6 et découpage 6a / 6b validés (D-063).
 - Message de synthèse pour ChatGPT : `docs/echanges/2026-11-22-claude-message-chatgpt-phases-4-6.md`.
+
+## [Avant phase 4] — 22/11/2026
+
+### Modifié
+- Réglage B appliqué (D-059) : pilote 0,20 % par point, aléa 0,22. Réglages A, B, C archivés dans `docs/rapports/archives/`.
+- Réponse de ChatGPT retranscrite (`docs/echanges/2026-11-22-chatgpt-reponse-phases-4-6.md`) ; décisions D-066 à D-073.
