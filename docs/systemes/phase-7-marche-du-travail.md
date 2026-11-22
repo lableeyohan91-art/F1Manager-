@@ -193,3 +193,69 @@ Elles émergent des personnalités et des circonstances, avec des souvenirs et d
 4. **Agents** : tous les pilotes en ont un, le personnel n'en a pas. Ou les dirigeants et ingénieurs de haut niveau aussi ?
 5. **Réputation de prédateur** d'une écurie qui débauche beaucoup : d'accord pour ce garde-fou naturel ?
 6. **Commission des agents** : un pourcentage fixe (par exemple 10 %), ou négocié ?
+
+## 15. Réponses du porteur (22/11/2026) et compléments
+
+| Question | Réponse | Conséquence dans la conception |
+| --- | --- | --- |
+| 1. Découpage 7a / 7b / 7c | **En attente** | — |
+| 2. Non-concurrence | **6 mois** | Durée unique de 6 mois pour un ingénieur ou un dirigeant débauché. Elle est rangée dans `balance/`. |
+| 3. Pré-accords un an à l'avance | **Oui** | Contrats qui commencent l'année suivante, ou celle d'après, conservés tels quels (§4). |
+| 4. Agents pour tout le monde ? | **Question posée en retour** : est-ce beaucoup plus lourd ? Idée : les agents nous proposent les services de leurs clients | Voir §15.3 |
+| 5. Réputation de prédateur | **Elle ne doit pas empêcher tout débauchage** | Voir §15.4 |
+| 6. Commission des agents | **Négociée** | Voir §15.3 |
+
+### 15.1 Lassitude (nouvelle proposition du porteur)
+
+Un membre du personnel qui n'a plus de défi à relever **se lasse**. C'est un paradoxe réaliste : l'ingénieur qui gagne tout n'a plus rien à prouver chez lui.
+
+- **La lassitude monte** :
+  - avec les années passées au même poste ;
+  - avec le succès (titres, victoires) quand il n'y a plus de marge de progression ;
+  - quand le poste au-dessus est bloqué par quelqu'un d'autre.
+- **Elle baisse** :
+  - avec une promotion ou des responsabilités nouvelles ;
+  - avec un nouveau défi : un changement de réglementation (phase 8), un projet d'infrastructure, une écurie qui repart de zéro ;
+  - avec un changement d'employeur, qui remet le compteur à zéro.
+- **Ce qui la module** : les valeurs et traits déjà existants. Le goût du **Défi** et l'**ambition** l'accélèrent, la **loyauté** la freine.
+- **Ses effets restent modérés et bornés** :
+  - une légère baisse de motivation (phase 4) ;
+  - une plus grande **écoute des offres**, surtout celles d'un **poste plus élevé** ailleurs.
+
+  Elle ne provoque jamais de départ automatique.
+- **Elle concerne aussi les pilotes**, mais autrement : un pilote déjà champion plusieurs fois peut chercher un nouveau défi, comme changer d'écurie pour gagner ailleurs.
+
+### 15.2 L'ingénieur ambitieux qui démarche les autres écuries
+
+Oui. Une personne ambitieuse, lassée ou bloquée peut **proposer ses services** à une autre écurie, par une **candidature spontanée**.
+- C'est une **commande dont l'auteur est la personne elle-même**, validée par les règles ordinaires.
+- L'écurie du joueur en reçoit aussi. Elle peut l'ignorer, l'étudier ou négocier.
+- Son écurie actuelle peut l'apprendre : la confiance baisse, ou au contraire elle propose une promotion pour le garder.
+- Les candidatures sont **bornées** : une personne en envoie au plus quelques-unes par saison, et seulement vers un poste égal ou supérieur.
+
+**Avis franc** : c'est un excellent contrepoids naturel aux dynasties, parce que les meilleurs ingénieurs de l'écurie dominante auront envie de partir diriger ailleurs. Le risque inverse existe : une écurie dominante qui s'effondre trop vite. L'écurie aura des parades : promouvoir, augmenter, confier un nouveau projet. Le laboratoire mesurera la durée de vie des dominations avant et après.
+
+Lassitude et candidatures spontanées concernent surtout le personnel : elles vont en **7b**. Le volet pilotes de la lassitude va en **7a**.
+
+### 15.3 Agents : pour qui, et à quel prix
+
+**Réponse franche à « est-ce beaucoup plus lourd ? »** La difficulté n'est pas tant dans le code. Elle est dans le **volume** : des centaines de personnes avec agent, c'est des centaines de négociations à simuler, et une boîte de réception inondée pour le joueur.
+
+Proposition :
+- **Ont un agent** : tous les pilotes de F1 et de l'Apex 2, plus le **personnel de haut niveau**, c'est-à-dire les directeurs techniques et les responsables de département au-dessus d'un seuil de réputation.
+- **N'ont pas d'agent** : les ingénieurs ordinaires et les jeunes pilotes. Ils négocient seuls.
+- **Les agents démarchent** les écuries pour placer leurs clients : « mon client est disponible, il vous intéresse ? ». C'est le principal canal des offres spontanées. Un agent envoie un nombre de propositions **borné** par fenêtre, avec priorité aux écuries où le poste semble ouvert ou faible.
+- **Commission négociée** dans une fourchette (environ 5 à 20 %) :
+  - elle dépend de la compétence de négociation de l'agent et de la valeur du client ;
+  - un client vedette paie un pourcentage plus faible, un client modeste un plus fort.
+
+  L'intérêt de l'agent diverge parfois de celui du client : la commission est plus forte lors d'un transfert, donc l'agent pousse au mouvement.
+
+### 15.4 Réputation de prédateur : un coût, pas une interdiction
+
+La réputation ne bloque **jamais** un débauchage. Elle le rend plus **cher** et plus **risqué** :
+- les cibles demandent davantage, avec une majoration bornée ;
+- les employés de l'écurie lui font un peu moins confiance ;
+- les autres écuries sont moins enclines à lui céder quelqu'un à l'amiable.
+
+Elle **s'efface avec le temps**. Une écurie peut donc débaucher souvent si elle accepte d'en payer le prix. Le laboratoire vérifiera seulement que ce n'est pas la stratégie gagnante dans tous les cas.
