@@ -204,6 +204,12 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['archives'] ??= {};
     return { ...m, versionFormat: 15 };
   },
+  // v15 → v16 (phase 7b) : candidatures spontanées (vides) ; non-concurrence et remplacements optionnels.
+  15: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['candidatures'] ??= {};
+    return { ...m, versionFormat: 16 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

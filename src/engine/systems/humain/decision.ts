@@ -15,7 +15,7 @@ import { ecuriesActives, indiceMoyen, niveauPilote } from '../saison/performance
 import { reputation, TABLE_PROMESSES, type Promesse, type TypePromesse } from './promesses';
 import { PROMOTION_AFFILIE, REPUTATION_RECRUTEMENT_F1 } from '../../balance/juniors';
 import { potentielEstime } from '../carriere/estimation';
-import { LASSITUDE_PILOTE, PREDATEUR } from '../../balance/marche';
+import { ATTRAIT_POSTE_SUPERIEUR, LASSITUDE_PERSONNEL, LASSITUDE_PILOTE, PREDATEUR, RANG_POSTE } from '../../balance/marche';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
 
@@ -154,8 +154,10 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
   if (eq && (eq.nationalite === p.nationalite || ecurieFormatrice(monde, p) === o.organisation)) u += ajouter('attachement à ses racines', poidsValeur(p, 'racines') / norme);
 
   // Phase 7a : lassitude d'un pilote installé depuis longtemps (et titré) dans la même écurie : envie d'un nouveau défi.
-  const l = lassitudePilote(monde, p);
+  const l = lassitude(monde, p);
   if (l.niveau > 0) u += o.organisation === l.ecurie ? ajouter('lassitude après des années dans la même écurie', -l.niveau / 2) : ajouter('envie d’un nouveau défi', l.niveau);
+  // Phase 7b : un poste plus important attire les ambitieux.
+  if ((RANG_POSTE[o.poste] ?? 0) > (RANG_POSTE[p.poste] ?? 0)) u += ajouter('poste plus important', ATTRAIT_POSTE_SUPERIEUR * ((p.traits['ambition'] ?? 10) / 20));
   // Phase 7a : une écurie réputée prédatrice inspire de la méfiance (un coût, jamais une interdiction).
   if (!o.prolongation && eq?.reputationPredateur) u += ajouter('écurie réputée prédatrice', -Math.min(PREDATEUR.malusMax, PREDATEUR.malusParPoint * eq.reputationPredateur));
 
@@ -187,17 +189,36 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
 }
 
 /**
- * Lassitude d'un pilote (D-117 §15.1), calculée et non stockée : saisons passées dans son écurie actuelle au-delà d'un seuil,
- * titres remportés avec elle ; accélérée par le goût du défi et l'ambition, freinée par la loyauté ; plafonnée.
+ * Lassitude (D-117 §15.1), calculée et non stockée.
+ * - Pilote : saisons dans son écurie au-delà d'un seuil, titres pilotes avec elle.
+ * - Personnel (phase 7b) : saisons au même poste dans la même écurie au-delà d'un seuil, titres constructeurs de l'écurie pendant ce temps,
+ *   poste supérieur bloqué par quelqu'un de moins bon.
+ * Accélérée par le goût du défi et l'ambition, freinée par la loyauté ; plafonnée.
  */
-export function lassitudePilote(monde: Monde, p: Personne): { niveau: number; ecurie?: string } {
-  if (p.poste !== 'pilote_titulaire' || p.statut !== 'actif' || !p.ecurie) return { niveau: 0 };
+export function lassitude(monde: Monde, p: Personne): { niveau: number; ecurie?: string } {
+  if (p.statut !== 'actif' || !p.ecurie) return { niveau: 0 };
+  const pilote = p.poste === 'pilote_titulaire';
+  const reglage = pilote ? LASSITUDE_PILOTE : LASSITUDE_PERSONNEL;
+  if (!pilote && (RANG_POSTE[p.poste] ?? 0) === 0) return { niveau: 0 };
   const annees = anneesDans(monde, p, p.ecurie);
-  if (annees < LASSITUDE_PILOTE.anneesMin) return { niveau: 0, ecurie: p.ecurie };
-  const titres = (Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[]).filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie).length;
+  if (annees < reglage.anneesMin) return { niveau: 0, ecurie: p.ecurie };
+  const pal = Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[];
+  const titres = pilote
+    ? pal.filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie).length
+    : pal.filter((x) => x.championConstructeurs === p.ecurie && x.saison > monde.date.annee - annees).length;
+  let brut = reglage.parAnnee * (annees - reglage.anneesMin + 1) + reglage.parTitre * titres;
+  if (!pilote) {
+    const superieur = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[])
+      .find((x) => x.statut === 'actif' && x.ecurie === p.ecurie && (RANG_POSTE[x.poste] ?? 0) === (RANG_POSTE[p.poste] ?? 0) + 1);
+    if (superieur && niveauMetier(superieur) <= niveauMetier(p)) brut += LASSITUDE_PERSONNEL.blocage;
+  }
   const temperament = (((p.valeurs['defi'] ?? 10) + (p.traits['ambition'] ?? 10)) / 20) * (1.5 - (p.traits['loyaute'] ?? 10) / 20);
-  const brut = (LASSITUDE_PILOTE.parAnnee * (annees - LASSITUDE_PILOTE.anneesMin + 1) + LASSITUDE_PILOTE.parTitre * titres) * temperament;
-  return { niveau: Math.min(LASSITUDE_PILOTE.max, Math.max(0, brut)), ecurie: p.ecurie };
+  return { niveau: Math.min(reglage.max, Math.max(0, brut * temperament)), ecurie: p.ecurie };
+}
+
+/** Lassitude d'un pilote titulaire (phase 7a) ; nulle pour les autres postes. */
+export function lassitudePilote(monde: Monde, p: Personne): { niveau: number; ecurie?: string } {
+  return p.poste === 'pilote_titulaire' ? lassitude(monde, p) : { niveau: 0 };
 }
 
 /** Utilité de l'alternative (partir, chercher ailleurs) : la valeur de marché moins le coût de l'incertitude. */

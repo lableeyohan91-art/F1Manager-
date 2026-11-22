@@ -28,6 +28,7 @@ export const TABLES = {
   missionsReperage: 'missionsReperage',
   connaissances: 'connaissances',
   offres: 'offres',
+  candidatures: 'candidatures',
   archives: 'archives',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
@@ -110,6 +111,8 @@ export interface EtatEmotionnel {
 
 export interface Personne {
   id: string;
+  /** Phase 7b : en période de non-concurrence jusqu'à cette date (incluse) : ne contribue pas au développement de sa nouvelle écurie. */
+  nonConcurrenceJusqua?: { annee: number; semaine: number };
   prenom: string;
   nom: string;
   nationalite: string;
@@ -279,6 +282,10 @@ export interface Contrat {
   demandeAugmentation?: number;
   /** Audit n°4 : indemnité de rupture effectivement versée (M€), une seule fois. */
   indemniteVerseeMEUR?: number;
+  /** Phase 7b : personne que ce contrat signé remplace (son contrat sera rompu, avec indemnité, à la prise d'effet). */
+  remplace?: string;
+  /** Phase 7b : période de non-concurrence (semaines) à servir au début du contrat, après un débauchage de personnel technique. */
+  nonConcurrenceSemaines?: number;
   verification: string;
 }
 
@@ -631,6 +638,18 @@ export interface OffreMarche {
   statut: 'en_attente' | 'contre_offre' | 'acceptee' | 'refusee' | 'retiree' | 'expiree';
   salaireDemande?: number;
   raisons?: string[];
+  /** Phase 7b : titulaire actuel du poste que la recrue remplacerait (amélioration de l'effectif). */
+  remplace?: string;
+}
+
+/** Phase 7b : candidature spontanée d'une personne ambitieuse ou lassée (bornée ; effacée chaque fin de saison). */
+export interface Candidature {
+  id: string;
+  personne: string;
+  ecurie: string;
+  poste: Poste;
+  annee: number;
+  semaine: number;
 }
 
 /**

@@ -303,3 +303,10 @@ Aucun code à ce stade.
 - Les personnes retirées depuis 5 saisons deviennent des fiches légères (table `archives` : nom, dates, poste, saisons en F1, titres). Leurs relations, souvenirs, contrats terminés, repérages et promesses closes sont effacés. Format de sauvegarde 15 (migration et test).
 - Interface de diagnostic : les noms des personnes archivées restent affichés dans l'historique.
 - Performances : coût par saison stable (≈ 0,75 s) ; 50 saisons en 36 s (57 s avant, 97 s avant l'audit n°4) ; population stable (≈ 490 personnes).
+
+## [Phase 7b] — 22/11/2026
+
+### Ajouté (D-123)
+- Marché du personnel technique et dirigeant (`systems/marche/personnel.ts`) : offres, contre-offres, indemnités, contre-attaques ; remplacement d'un responsable en place (libéré avec indemnité) ; non-concurrence de 6 mois ; départs en groupe ; lassitude du personnel ; attrait d'un poste plus important ; candidatures spontanées (`marche.candidature`).
+- Règle commune des effectifs : une personne remplacée libère sa place à la prise d'effet du contrat qui la remplace.
+- Format de sauvegarde 16 (candidatures), migration et test. Tests `tests/personnel.test.ts`. 136 tests.

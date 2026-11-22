@@ -13,7 +13,7 @@
 
 import { AGE_MINIMAL_F1 } from '../../balance/carriere';
 import { PRIME_CONTINUITE, SEMAINE_FIN_CONTRATS } from '../../balance/contrats';
-import { RACHAT, CONTRE_ATTAQUE, FENETRE, HORIZON, INERTIE_CONTRAT, OFFRE_MARCHE, PLAN_MARCHE, PREDATEUR, TOURS_MARCHE } from '../../balance/marche';
+import { CANDIDATURES, DEPART_GROUPE, PERSONNEL_MARCHE, RACHAT, CONTRE_ATTAQUE, FENETRE, HORIZON, INERTIE_CONTRAT, OFFRE_MARCHE, PLAN_MARCHE, PREDATEUR, TOURS_MARCHE } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement, type Evenement } from '../../core/evenements';
 import { nouvelIdentifiant } from '../../core/identifiants';
@@ -29,12 +29,16 @@ import { TABLE_PROMESSES, type Promesse } from '../humain/promesses';
 import {
   age, ecurie, evaluerOffre, niveauMetier, repondre, scoreCandidat, teamPrincipal, texteRaisons, valeurMarche, type Offre,
 } from '../humain/decision';
-import { dureeMaxEffectif, lireConditions, motifRefusConseil, motifRefusEffectif, occupantsPour } from '../humain/effectifs';
-import { contratEmploi, deciderProlongation, dureeContrat, nePasProlonger, proposerProlongation } from '../humain/contrats';
+import { dureeMaxEffectif, lireConditions, motifRefusConseil, nombrePlaces, occupantsPour } from '../humain/effectifs';
+import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer, nePasProlonger, proposerProlongation } from '../humain/contrats';
+import { candidaturesSpontanees, commandeCandidature, planPersonnel } from './personnel';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 const POSTE_MARCHE: Poste = 'pilote_titulaire';
 const NOMBRE_TITULAIRES = 2;
+/** Phase 7b : postes ouverts au marché (pilotes titulaires et personnel technique et dirigeant). */
+export const POSTES_MARCHE: readonly Poste[] = [POSTE_MARCHE, ...PERSONNEL_MARCHE.postes];
+const estPilote = (poste: Poste) => poste === POSTE_MARCHE;
 
 const personnes = (m: Monde) => Object.values(table(m, TABLES.personnes)) as unknown as Personne[];
 // Performance (audit n°4) : tri par identifiant seulement là où l'ordre compte (prise d'effet), pas pour les recherches.
@@ -49,6 +53,11 @@ const nom = (m: Monde, id: string) => {
 /** Valeur de marché comme pilote titulaire (un jeune ou un réserviste vaut ce que vaut le poste qu'on lui offre). */
 export function valeurTitulaire(monde: Monde, p: Personne): number {
   return p.poste === POSTE_MARCHE ? valeurMarche(monde, p) : valeurMarche(monde, { ...p, poste: POSTE_MARCHE });
+}
+
+/** Phase 7b : valeur de marché au poste visé. */
+export function valeurAuPoste(monde: Monde, p: Personne, poste: Poste): number {
+  return p.poste === poste ? valeurMarche(monde, p) : valeurMarche(monde, { ...p, poste });
 }
 
 /** Années consécutives après `depuis` pour lesquelles l'écurie a encore une place de titulaire (pour borner une prolongation). */
@@ -91,7 +100,8 @@ export function indemniteExigee(monde: Monde, c: Contrat, acheteur: Ecurie, debu
   const restant = Math.max(1, c.fin - debut + 1);
   const coequipiers = contrats(monde).filter((x) => x.type === 'emploi' && x.statut === 'actif' && x.organisation === c.organisation && x.poste === POSTE_MARCHE && x.personne !== c.personne);
   const p = table(monde, TABLES.personnes)[c.personne] as unknown as Personne;
-  const meilleur = coequipiers.every((x) => niveauMetier(table(monde, TABLES.personnes)[x.personne] as unknown as Personne) <= niveauMetier(p));
+  // Majoration « meilleur pilote » pour les pilotes ; un responsable est toujours le seul à son poste : majoration appliquée.
+  const meilleur = c.poste !== POSTE_MARCHE || coequipiers.every((x) => niveauMetier(table(monde, TABLES.personnes)[x.personne] as unknown as Personne) <= niveauMetier(p));
   const majoration = 1 + (meilleur ? RACHAT.majorationMeilleur : 0) + RACHAT.majorationParPointPredateur * (acheteur.reputationPredateur ?? 0);
   return arrondi(Math.max(RACHAT.minimumMEUR, c.salaireMEUR * restant * RACHAT.multipleIndemnite * majoration));
 }
@@ -120,13 +130,16 @@ export function indexerContrats(monde: Monde): IndexContrats {
   return idx;
 }
 
-export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: number, idx?: IndexContrats): Disponibilite | string {
+export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: number, idx?: IndexContrats, poste: Poste = POSTE_MARCHE): Disponibilite | string {
   if (p.statut === 'retraite') return 'Cette personne a pris sa retraite.';
-  if (!p.poste.startsWith('pilote')) return 'Le marché de la phase 7a ne concerne que les pilotes.';
-  if (debut - p.anneeNaissance < AGE_MINIMAL_F1) return `Trop jeune pour la F1 à cette date (âge minimal ${AGE_MINIMAL_F1} ans).`;
+  if (estPilote(poste)) {
+    if (!p.poste.startsWith('pilote')) return 'Seul un pilote peut occuper un baquet de titulaire.';
+    if (debut - p.anneeNaissance < AGE_MINIMAL_F1) return `Trop jeune pour la F1 à cette date (âge minimal ${AGE_MINIMAL_F1} ans).`;
+  } else if (!candidatPour(p, poste)) return `Cette personne n’a pas le profil pour le poste de ${poste.replace(/_/g, ' ')}.`;
   if (idx ? idx.signe.has(p.id) : contratSigne(monde, p.id)) return 'Cette personne a déjà signé ailleurs pour la suite.';
   const c = idx ? idx.emploi.get(p.id) : contratEmploi(monde, p.id);
-  if (c && c.organisation === e.id && p.poste === POSTE_MARCHE) return 'Pilote déjà titulaire de l’écurie : passer par une prolongation.';
+  if (c && c.organisation === e.id && p.poste === poste) return 'Déjà à ce poste dans l’écurie : passer par une prolongation.';
+  if (c && c.organisation === e.id) return { indemniteMEUR: 0, debauchage: false }; // promotion interne
   if (c && c.organisation !== e.id && c.fin >= debut) {
     const vendeur = ecurie(monde, c.organisation);
     if (c.clauses.rachatMEUR !== undefined) return { indemniteMEUR: c.clauses.rachatMEUR, beneficiaire: c.organisation, debauchage: true };
@@ -145,17 +158,19 @@ export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: numbe
  * nombres finis, durée entière, salaire validé après arrondi, disponibilité de la personne, effectif sur toute la durée,
  * trésorerie et état financier pour l'indemnité, arbitrage du conseil pour les engagements salariaux élevés.
  */
-export function motifRefusEngagement(monde: Monde, e: Ecurie, p: Personne, salaireBrut: unknown, dureeBrute: unknown, debut: number): string | null {
+export function motifRefusEngagement(monde: Monde, e: Ecurie, p: Personne, salaireBrut: unknown, dureeBrute: unknown, debut: number, poste: Poste = POSTE_MARCHE, remplace?: string): string | null {
   const cond = lireConditions(salaireBrut, dureeBrute);
   if (typeof cond === 'string') return cond;
-  const d = disponibilite(monde, p, e, debut);
+  const d = disponibilite(monde, p, e, debut, undefined, poste);
   if (typeof d === 'string') return d;
-  const effectif = motifRefusEffectif(monde, e.id, p.id, POSTE_MARCHE, debut, debut + cond.duree - 1);
-  if (effectif) return effectif;
+  // Effectif (audit n°3) ; phase 7b : la personne remplacée libère sa place.
+  for (let y = debut; y < debut + cond.duree; y++) {
+    if (occupantsPour(monde, e.id, poste, y).filter((id) => id !== p.id && id !== remplace).length >= nombrePlaces(poste)) return `Effectif complet : aucune place de ${poste.replace(/_/g, ' ')} libre en ${y}.`;
+  }
   const fi = finances(monde, e.id);
   if (d.indemniteMEUR > 0 && fi && (fi.etatCrise === 'crise' || fi.etatCrise === 'administration')) return 'L’écurie est en difficulté financière : pas de débauchage possible.';
   if (d.indemniteMEUR > 0 && fi && fi.tresorerieMEUR < d.indemniteMEUR) return `Trésorerie insuffisante pour verser l’indemnité (${d.indemniteMEUR} M€).`;
-  return motifRefusConseil(monde, e, p.id, cond.salaire, debut, debut + cond.duree - 1);
+  return estPilote(poste) ? motifRefusConseil(monde, e, p.id, cond.salaire, debut, debut + cond.duree - 1) : null;
 }
 
 /** Règles communes au joueur et à l'IA pour faire une offre (commande « marche.offre »). */
@@ -170,7 +185,16 @@ export function motifRefusOffre(monde: Monde, auteur: string, prm: Record<string
   const debut = prm['debut'];
   if (debut !== monde.date.annee + 1 && debut !== monde.date.annee + 2) return 'Un contrat commence la saison suivante, ou celle d’après (pré-accord).';
   if (prm['statutN1'] !== undefined && typeof prm['statutN1'] !== 'boolean') return 'Statut de n°1 : vrai ou faux.';
-  const refus = motifRefusEngagement(monde, e, p, prm['salaire'], prm['duree'], debut);
+  const poste = (prm['poste'] ?? POSTE_MARCHE) as Poste;
+  if (!POSTES_MARCHE.includes(poste)) return 'Poste non ouvert au marché.';
+  if (prm['statutN1'] === true && !estPilote(poste)) return 'Le statut de n°1 ne concerne que les pilotes.';
+  const remplace = prm['remplace'] === undefined ? undefined : String(prm['remplace']);
+  if (remplace !== undefined) {
+    if (estPilote(poste)) return 'Le remplacement d’un titulaire en place ne concerne que le personnel.';
+    const cr = contratEmploi(monde, remplace);
+    if (!cr || cr.organisation !== e.id || cr.poste !== poste) return 'La personne à remplacer n’occupe pas ce poste dans l’écurie.';
+  }
+  const refus = motifRefusEngagement(monde, e, p, prm['salaire'], prm['duree'], debut, poste, remplace);
   if (refus) return refus;
   const miennes = offresMarche(monde).filter((o) => o.ecurie === e.id && (o.statut === 'en_attente' || o.statut === 'contre_offre'));
   const existante = miennes.find((o) => o.personne === p.id);
@@ -186,10 +210,11 @@ function enregistrerOffre(monde: Monde, auteur: string, prm: Record<string, unkn
   const e = ecurie(monde, String(prm['ecurie'])) as Ecurie;
   const p = table(monde, TABLES.personnes)[String(prm['personne'])] as unknown as Personne;
   const debut = Number(prm['debut']);
-  const d = disponibilite(monde, p, e, debut) as Disponibilite;
+  const poste = (prm['poste'] ?? POSTE_MARCHE) as Poste;
+  const d = disponibilite(monde, p, e, debut, undefined, poste) as Disponibilite;
   const existante = offresMarche(monde).find((o) => o.ecurie === e.id && o.personne === p.id && o.statut === 'contre_offre');
   const o: OffreMarche = existante ?? {
-    id: nouvelIdentifiant(monde, 'off'), ecurie: e.id, decideur: auteur, personne: p.id, poste: POSTE_MARCHE, salaireMEUR: 0, dureeAnnees: 0, debut,
+    id: nouvelIdentifiant(monde, 'off'), ecurie: e.id, decideur: auteur, personne: p.id, poste, salaireMEUR: 0, dureeAnnees: 0, debut,
     statutN1: false, indemniteMEUR: 0, tour: -1, annee: monde.date.annee, semaine: 0, statut: 'en_attente',
   };
   const cond = lireConditions(prm['salaire'], prm['duree']) as { salaire: number; duree: number };
@@ -197,6 +222,7 @@ function enregistrerOffre(monde: Monde, auteur: string, prm: Record<string, unkn
   o.dureeAnnees = cond.duree;
   o.debut = debut;
   o.statutN1 = prm['statutN1'] === true;
+  if (prm['remplace'] !== undefined) o.remplace = String(prm['remplace']);
   o.indemniteMEUR = d.indemniteMEUR;
   if (d.beneficiaire) o.beneficiaireIndemnite = d.beneficiaire;
   o.tour += 1;
@@ -257,7 +283,10 @@ function signer(monde: Monde, o: OffreMarche, p: Personne, raisons: string[], nb
   const c: Contrat = {
     id: nouvelIdentifiant(monde, 'ctr'), personne: p.id, organisation: e.id, type: 'emploi', poste: o.poste, debut: o.debut, fin: o.debut + o.dureeAnnees - 1,
     salaireMEUR: o.salaireMEUR, clauses: { ...(o.statutN1 ? { statutN1: true } : {}), rachatMEUR: arrondi(o.salaireMEUR * o.dureeAnnees * RACHAT.multiple) },
-    statut: 'signe', verification: 'contrat simulé (marché 7a)',
+    statut: 'signe', verification: 'contrat simulé (marché 7)',
+    ...(o.remplace ? { remplace: o.remplace } : {}),
+    // Phase 7b (D-117) : un membre du personnel débauché sert une période de non-concurrence au début de son nouveau contrat.
+    ...(debauche && !estPilote(o.poste) ? { nonConcurrenceSemaines: PERSONNEL_MARCHE.nonConcurrenceSemaines } : {}),
   };
   table(monde, TABLES.contrats)[c.id] = c as unknown as Entite;
   o.statut = 'acceptee';
@@ -298,22 +327,24 @@ function utiliteRester(monde: Monde, p: Personne, c: Contrat): number {
 /** Contre-attaque de l'employeur (IA) : il prolonge et augmente un pilote courtisé qu'il juge précieux. */
 function contreAttaque(monde: Monde, p: Personne, c: Contrat, offres: OffreMarche[]): boolean {
   const e = ecurie(monde, c.organisation);
-  if (!e || e.pilotee || c.poste !== POSTE_MARCHE) return false;
+  if (!e || e.pilotee || !POSTES_MARCHE.includes(c.poste)) return false;
   const tp = teamPrincipal(monde, e.id);
   if (!tp) return false;
-  const coequipier = contrats(monde).find((x) => x.type === 'emploi' && x.statut === 'actif' && x.organisation === e.id && x.poste === POSTE_MARCHE && x.personne !== p.id);
-  const niveauCoequipier = coequipier ? niveauMetier(table(monde, TABLES.personnes)[coequipier.personne] as unknown as Personne) : 0;
-  // On se bat pour son meilleur pilote (ou un pilote presque aussi bon), pas pour celui qu'on remplacerait volontiers.
-  if (niveauMetier(p) + PRIME_CONTINUITE.pilote < niveauCoequipier) return false;
-  // La prolongation ne peut pas empiéter sur des saisons où les deux baquets sont déjà promis à d'autres (pré-accords).
-  const dureeMax = Math.min(dureeContrat(monde, p), anneesLibres(monde, e.id, Math.max(c.fin, monde.date.annee)));
+  if (estPilote(c.poste)) {
+    const coequipier = contrats(monde).find((x) => x.type === 'emploi' && x.statut === 'actif' && x.organisation === e.id && x.poste === POSTE_MARCHE && x.personne !== p.id);
+    const niveauCoequipier = coequipier ? niveauMetier(table(monde, TABLES.personnes)[coequipier.personne] as unknown as Personne) : 0;
+    // On se bat pour son meilleur pilote (ou un pilote presque aussi bon), pas pour celui qu'on remplacerait volontiers.
+    if (niveauMetier(p) + PRIME_CONTINUITE.pilote < niveauCoequipier) return false;
+  }
+  // La prolongation ne peut pas empiéter sur des saisons où le poste est déjà promis à d'autres (pré-accords).
+  const dureeMax = Math.min(dureeContrat(monde, p), dureeMaxEffectif(monde, e.id, p.id, c.poste, Math.max(c.fin, monde.date.annee)));
   if (dureeMax < 1) return false;
   const meilleure = Math.max(...offres.map((o) => o.salaireMEUR));
-  const salaire = arrondi(Math.min(meilleure * CONTRE_ATTAQUE.surenchere, valeurTitulaire(monde, p) * CONTRE_ATTAQUE.plafondValeur));
+  const salaire = arrondi(Math.min(meilleure * CONTRE_ATTAQUE.surenchere, valeurAuPoste(monde, p, c.poste) * CONTRE_ATTAQUE.plafondValeur));
   if (salaire <= c.salaireMEUR) return false;
   const causes = offres.map((o) => o.id);
   let res = proposerProlongation(monde, c, tp.id, salaire, dureeMax, [], 0);
-  if (res.issue === 'contre_offre' && res.salaireDemande !== undefined && res.salaireDemande <= valeurTitulaire(monde, p) * CONTRE_ATTAQUE.plafondValeur) {
+  if (res.issue === 'contre_offre' && res.salaireDemande !== undefined && res.salaireDemande <= valeurAuPoste(monde, p, c.poste) * CONTRE_ATTAQUE.plafondValeur) {
     res = proposerProlongation(monde, c, tp.id, res.salaireDemande, dureeMax, [], 1, [res.evenement.id]);
   }
   if (res.issue !== 'accord') return false;
@@ -377,9 +408,13 @@ function repondreAuxOffres(monde: Monde, cloture = false): void {
 
 /** Revalidation complète d'une offre en attente au moment de la signature (audit n°3) : mêmes règles que pour la faire, hors calendrier et capacité. */
 function motifRefusOffreEnAttente(monde: Monde, o: OffreMarche, p: Personne, e: Ecurie): string | null {
-  const refus = motifRefusEngagement(monde, e, p, o.salaireMEUR, o.dureeAnnees, o.debut);
+  if (o.remplace) {
+    const cr = contratEmploi(monde, o.remplace);
+    if (!cr || cr.organisation !== e.id || cr.poste !== o.poste) return 'personne à remplacer partie';
+  }
+  const refus = motifRefusEngagement(monde, e, p, o.salaireMEUR, o.dureeAnnees, o.debut, o.poste, o.remplace);
   if (refus) return refus;
-  const d = disponibilite(monde, p, e, o.debut) as Disponibilite;
+  const d = disponibilite(monde, p, e, o.debut, undefined, o.poste) as Disponibilite;
   o.indemniteMEUR = d.indemniteMEUR;
   if (d.beneficiaire) o.beneficiaireIndemnite = d.beneficiaire;
   return null;
@@ -400,10 +435,10 @@ function vivier(monde: Monde): Personne[] {
 }
 
 /** Score de marché : score de recrutement (phase 4/6) + pari sur la progression pendant le contrat − coût de l'indemnité. */
-export function scoreMarche(monde: Monde, e: Ecurie, decideur: string, p: Personne, salaire: number, duree: number, indemnite: number): number {
+export function scoreMarche(monde: Monde, e: Ecurie, decideur: string, p: Personne, salaire: number, duree: number, indemnite: number, poste: Poste = POSTE_MARCHE): number {
   const base = scoreCandidat(monde, e, decideur, p, salaire).score;
   const progression = Math.max(0, Math.min(potentielEstime(monde, e.id, p).centre - niveauMetier(p), HORIZON.progressionParAn * duree));
-  const budgetPoste = e.budgetMEUR * 0.05;
+  const budgetPoste = e.budgetMEUR * (estPilote(poste) ? 0.05 : PERSONNEL_MARCHE.partBudgetPoste);
   return base + (HORIZON.poids * progression) / 20 - 0.4 * (indemnite / Math.max(1, budgetPoste * duree));
 }
 
@@ -522,6 +557,16 @@ export function activerContratsSignes(monde: Monde): void {
     }
     const ancienne = p.ecurie;
     const ancienPoste = p.poste;
+    // Phase 7b : la personne remplacée est libérée (licenciement, indemnité versée par le paiement centralisé).
+    if (c.remplace) {
+      const pr = table(monde, TABLES.personnes)[c.remplace] as unknown as Personne | undefined;
+      const cr = pr ? contratEmploi(monde, pr.id) : undefined;
+      if (pr && cr && cr.organisation === e.id && cr.poste === c.poste) liberer(monde, pr, cr, 'licenciement');
+    }
+    // Phase 7b : non-concurrence d'une personne débauchée (D-117 : 6 mois).
+    if (c.nonConcurrenceSemaines) p.nonConcurrenceJusqua = { annee: c.debut, semaine: c.nonConcurrenceSemaines };
+    // Phase 7b : départ en groupe d'un responsable technique influent débauché (D-077).
+    if (c.nonConcurrenceSemaines && ancienne && ancienne !== e.id) departEnGroupe(monde, p, ancienne, e.id);
     p.statut = 'actif';
     p.ecurie = e.id;
     delete p.junior;
@@ -536,10 +581,32 @@ export function activerContratsSignes(monde: Monde): void {
   }
 }
 
+/** Départ en groupe : l'influence (leadership, gestion humaine) d'un responsable technique entraîne une partie de son département. */
+function departEnGroupe(monde: Monde, p: Personne, ancienne: string, nouvelle: string): void {
+  const type = p.poste === 'responsable_aero' ? 'aero' : p.poste === 'responsable_conception' || p.poste === 'directeur_technique' ? 'conception' : null;
+  if (!type) return;
+  const influence = ((p.competences['leadership'] ?? 10) + (p.competences['gestionHumaine'] ?? 10)) / 40;
+  if (influence < DEPART_GROUPE.seuilInfluence) return;
+  const deps = Object.values(table(monde, TABLES.departements)) as unknown as Departement[];
+  const ancien = deps.find((d) => d.ecurie === ancienne && d.type === type);
+  const nouveau = deps.find((d) => d.ecurie === nouvelle && d.type === type);
+  if (!ancien || !nouveau) return;
+  const perte = Math.round(DEPART_GROUPE.niveauMax * influence * 10) / 10;
+  ancien.niveauMoyen = Math.max(1, Math.round((ancien.niveauMoyen - perte) * 10) / 10);
+  nouveau.niveauMoyen = Math.min(20, Math.round((nouveau.niveauMoyen + perte / 2) * 10) / 10);
+  ajouterEvenement(monde, {
+    type: 'personnel.depart_groupe', acteurs: [{ id: p.id, role: 'personne' }, { id: ancienne, role: 'ancienne' }, { id: nouvelle, role: 'organisation' }],
+    importance: 2, visibilite: 'public', contexte: { departement: type, perte },
+    texte: `Des ingénieurs suivent ${nom(monde, p.id)} chez ${nom(monde, nouvelle)}.`,
+  });
+}
+
 /** Fin de saison : offres effacées (volume borné), réputation de prédateur qui s'efface. */
 export function clotureMarche(monde: Monde): void {
   const t = table(monde, TABLES.offres);
   for (const id of Object.keys(t)) delete t[id];
+  const tc = table(monde, TABLES.candidatures);
+  for (const id of Object.keys(tc)) delete tc[id];
   for (const e of ecuriesActives(monde)) if (e.reputationPredateur) e.reputationPredateur = Math.round(e.reputationPredateur * PREDATEUR.inertie * 1000) / 1000 || undefined;
 }
 
@@ -565,13 +632,16 @@ export const systemeMarche: Systeme = {
     const liste = vivier(monde);
     if (date.semaine === FENETRE.debut) prolongationsTitulaires(monde, liste);
     repondreAuxOffres(monde);
+    if (date.semaine === CANDIDATURES.semaine) candidaturesSpontanees(monde, (c) => commanderIA(c));
     planIA(monde, liste, (c) => commanderIA(c));
+    planPersonnel(monde, (c) => commanderIA(c));
   },
 };
 
 export function installerMarche<M extends { ajouterSysteme(s: Systeme): M; commandes: { enregistrer(d: DefinitionCommande): unknown } }>(moteur: M): M {
   moteur.ajouterSysteme(systemeMarche);
   moteur.commandes.enregistrer(commandeOffre);
+  moteur.commandes.enregistrer(commandeCandidature);
   moteur.commandes.enregistrer(commandeRetirerOffre);
   return moteur;
 }

@@ -57,3 +57,48 @@ export const LASSITUDE_PILOTE = { anneesMin: 5, parAnnee: 0.02, parTitre: 0.05, 
  * Malus d'utilité des offres de cette écurie : parPoint × réputation, plafonné ; jamais une interdiction.
  */
 export const PREDATEUR = { parDebauchage: 1, inertie: 0.6, malusParPoint: 0.04, malusMax: 0.15 };
+
+/**
+ * Phase 7b — marché du personnel technique et dirigeant (D-116, D-117).
+ * - postes : postes ouverts au marché (le team principal reste nommé par le conseil) ;
+ * - nonConcurrenceSemaines : période de non-concurrence d'une personne débauchée (D-117 : 6 mois), pendant laquelle elle ne contribue pas
+ *   au développement de sa nouvelle écurie ;
+ * - ecartAmelioration : avance de niveau (points /20) exigée pour remplacer un responsable en place (il est alors libéré, avec indemnité) ;
+ *   au plus `ameliorationsParSaison` par écurie ;
+ * - partBudgetPoste : part du budget de l'écurie qui sert de référence de coût pour un poste de personnel (score de recrutement).
+ */
+export const PERSONNEL_MARCHE = {
+  postes: ['directeur_technique', 'responsable_aero', 'responsable_conception', 'directeur_sportif', 'directeur_financier'] as const,
+  nonConcurrenceSemaines: 26,
+  ecartAmelioration: 2,
+  ameliorationsParSaison: 1,
+  partBudgetPoste: 0.015,
+};
+
+/** Rang hiérarchique des postes (pour l'attrait d'un poste plus élevé, la lassitude et les candidatures spontanées). */
+export const RANG_POSTE: Record<string, number> = {
+  pilote_junior: 0, pilote_reserve: 0, pilote_titulaire: 0, ingenieur: 0,
+  responsable_aero: 1, responsable_conception: 1, directeur_sportif: 1, directeur_financier: 1,
+  directeur_technique: 2, team_principal: 3,
+};
+
+/**
+ * Lassitude du personnel (D-117 §15.1), calculée et non stockée : saisons au même poste dans la même écurie au-delà de `anneesMin`,
+ * titres constructeurs de l'écurie pendant ce temps, poste supérieur bloqué par quelqu'un de moins bon. Modulée comme pour les pilotes.
+ */
+export const LASSITUDE_PERSONNEL = { anneesMin: 4, parAnnee: 0.02, parTitre: 0.04, blocage: 0.05, max: 0.2 };
+
+/** Attrait d'une offre pour un poste plus élevé (utilité × ambition/20). */
+export const ATTRAIT_POSTE_SUPERIEUR = 0.3;
+
+/**
+ * Candidatures spontanées (D-117 §15.2) : une personne ambitieuse (ambition ≥ ambitionMin) et lassée (≥ lassitudeMin) propose ses services
+ * à au plus `parSaison` écuries, pour un poste égal ou supérieur où une place s'ouvre. Bonus de score pour l'écurie qui la reçoit.
+ */
+export const CANDIDATURES = { semaine: 28, ambitionMin: 13, lassitudeMin: 0.06, parSaison: 2, bonusScore: 0.04 };
+
+/**
+ * Départs en groupe (D-077) : un directeur technique ou un responsable débauché, influent (leadership et gestion humaine), entraîne une partie
+ * de son département : son ancien département perd jusqu'à `niveauMax` points de niveau moyen, le nouveau en gagne la moitié.
+ */
+export const DEPART_GROUPE = { niveauMax: 1, seuilInfluence: 0.6 };

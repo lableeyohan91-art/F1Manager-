@@ -27,7 +27,9 @@ export function occupantsPour(monde: Monde, idEcurie: string, poste: Poste, anne
   const res = new Set<string>();
   for (const c of tous) {
     if (c.organisation !== idEcurie || c.poste !== poste) continue;
-    if (c.statut === 'actif' && c.debut <= annee && c.fin >= annee && !signes.some((s) => s.personne === c.personne && s.id !== c.id && s.debut <= annee && s.fin >= annee)) res.add(c.personne);
+    // Phase 7b : une personne remplacée (contrat signé qui la remplace) libère sa place à partir du début de ce contrat.
+    const remplacee = signes.some((s) => s.remplace === c.personne && s.organisation === idEcurie && s.poste === poste && s.debut <= annee);
+    if (c.statut === 'actif' && c.debut <= annee && c.fin >= annee && !remplacee && !signes.some((s) => s.personne === c.personne && s.id !== c.id && s.debut <= annee && s.fin >= annee)) res.add(c.personne);
     if (c.statut === 'signe' && c.debut <= annee && c.fin >= annee) res.add(c.personne);
   }
   return [...res].sort();
