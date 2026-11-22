@@ -112,3 +112,8 @@ Aucun code à ce stade.
 
 ### Constat
 - Le réglage B (D-059) fait tomber « la dernière écurie marque un point » à 17 % : proposition de revenir au réglage A (D-074).
+
+## [Feuille de route] — 22/11/2026 (2)
+
+### Ajouté
+- Phase 15 « Direction artistique et immersion » (D-080) et fiche d'orientations : clés de ressources, graine visuelle persistante, images de remplacement, optimisation mobile, packs remplaçables. Question D-079 sur les portraits des personnages inspirés du réel.

@@ -26,6 +26,7 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | 12 | Monoplaces | Recherche, conception, fabrication, expertise, erreurs de concept |
 | 13 | Courses en 2D | Moteur de course qui remplace le modèle abstrait (reprise des modèles pneus/essence/météo de Paddock) |
 | 14 | Carrière du manager | Offres d'emploi, licenciement, changement d'écurie, héritage |
+| 15 | Direction artistique et immersion | Portraits, QG, infrastructures, monoplaces, circuits, illustrations d'événements, identités graphiques ; packs de ressources remplaçables ; optimisation mobile |
 
 ### Ce qui a changé par rapport à la proposition initiale
 
@@ -34,6 +35,7 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 - **Bac à sable d'interactions en phase 4** : déclencher à la main une négociation, une promesse ou un refus, et observer la réaction et son « Pourquoi ? ».
 - **Valeurs et convictions** intégrées au modèle de personnage dès la phase 2, et utilisées dans les décisions dès la phase 4.
 - **Groupes sociaux** en phase 8, une fois qu'il existe assez de relations pour qu'ils émergent.
+- **Phase 15 ajoutée (22/11/2026)** : direction artistique (ChatGPT) et intégration (Claude Code), une fois les mécaniques terminées et équilibrées. Anticipation technique : clés de ressources liées aux entités, graine visuelle persistante par personne, images de remplacement, WebP, chargement différé, cache, packs remplaçables, séparation complète avec la simulation. Voir [phase-15-direction-artistique.md](docs/systemes/phase-15-direction-artistique.md).
 - **Phase 6 enrichie (22/11/2026)** : écosystème complet de formation des pilotes, découpé en 6a (cycle de vie) et 6b (filières juniors). Le recrutement et le débauchage des jeunes sont rattachés au marché (phase 7). Orientations et dépendances : [phase-6-cycle-de-vie-filieres.md](docs/systemes/phase-6-cycle-de-vie-filieres.md). La phase 4 prévoit dès sa conception des contrats génériques (affiliation, financement, placement) et des organisations typées (écurie junior, académie, championnat).
 - **Simulation historique** en phase 9. Elle réutilise le moteur complet : elle ne peut pas venir avant les systèmes qu'elle fait tourner.
 

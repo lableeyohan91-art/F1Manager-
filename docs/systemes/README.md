@@ -13,6 +13,7 @@ Une fiche par système ou par phase, 2 à 4 pages maximum. Chaque fiche indique 
 | [phase-3-saison.md](phase-3-saison.md) | Détail et critères de la phase 3 | Réalisé |
 | [phase-4-contrats-memoire.md](phase-4-contrats-memoire.md) | Contrats, mémoire v1, promesses, interactions, bac à sable | Réalisé |
 | [phase-5-economie.md](phase-5-economie.md) | Économie : trésorerie, plafond, sponsors, propriétaires, IA économique, anti-cercle vertueux | **Proposé, à valider** |
+| [phase-15-direction-artistique.md](phase-15-direction-artistique.md) | Direction artistique, ressources graphiques, packs, anticipation technique | Orientations |
 | [tests-contrefactuels.md](tests-contrefactuels.md) | Limites des tests contrefactuels et améliorations prévues | Plan |
 | [phase-6-cycle-de-vie-filieres.md](phase-6-cycle-de-vie-filieres.md) | Cycle de vie, filières juniors, académies, affiliations : orientations et dépendances | Orientations, à détailler avant la phase 6 |
 
