@@ -177,6 +177,12 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['missionsReperage'] ??= {};
     return { ...m, versionFormat: 10 };
   },
+  // v10 → v11 (audit 6b) : connaissance progressive issue du repérage (vide au départ).
+  10: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['connaissances'] ??= {};
+    return { ...m, versionFormat: 11 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

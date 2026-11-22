@@ -9,14 +9,14 @@
  */
 
 import {
-  ACADEMIE, AFFILIATION, CATEGORIES_JUNIORS, MECENE, MEMOIRE_ACADEMIE, PROMESSE_ACADEMIE, RENOUVELLEMENT_AFFILIATION, REPERAGE, REPUTATION_ACADEMIE,
+  ACADEMIE, AFFILIATION, CATEGORIES_JUNIORS, CONNAISSANCE, MECENE, MEMOIRE_ACADEMIE, PROMESSE_ACADEMIE, RENOUVELLEMENT_AFFILIATION, REPERAGE, REPUTATION_ACADEMIE,
 } from '../../balance/juniors';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
 import { nouvelIdentifiant } from '../../core/identifiants';
 import { tirageLocal } from '../../core/moteur';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
-import { TABLES, type Academie, type Contrat, type Departement, type Ecurie, type Finances, type MissionReperage, type Personne } from '../../model/types';
+import { TABLES, type Academie, type Connaissance, type Contrat, type Departement, type Ecurie, type Finances, type MissionReperage, type Personne } from '../../model/types';
 import { lireEvenement } from '../memoire';
 import { potentielEstime } from '../carriere/estimation';
 import { faireUnePromesse, TABLE_PROMESSES, type Promesse } from '../humain/promesses';
@@ -175,6 +175,10 @@ export function missionsMax(monde: Monde, idEcurie: string): number {
 
 export function motifRefusMission(monde: Monde, idEcurie: string, idPersonne: string): string | null {
   if (!table(monde, TABLES.personnes)[idPersonne]) return 'Personne inconnue.';
+  // Audit 6b : une mission coûte de l'argent ; une écurie en crise, sous administration ou sans trésorerie ne peut pas en lancer.
+  const fi = (Object.values(table(monde, TABLES.finances)) as unknown as Finances[]).find((f) => f.ecurie === idEcurie);
+  if (fi && (fi.etatCrise === 'crise' || fi.etatCrise === 'administration')) return 'L’écurie est en difficulté financière : pas de repérage possible.';
+  if (fi && fi.tresorerieMEUR < REPERAGE.coutMEUR) return 'Trésorerie insuffisante pour financer une mission de repérage.';
   if (enReperage(monde, idEcurie, idPersonne)) return 'Une mission est déjà en cours sur cette personne.';
   if (missionsActives(monde, idEcurie).length >= missionsMax(monde, idEcurie)) return 'Le département recrutement n’a plus de capacité de repérage disponible.';
   return null;
@@ -228,6 +232,35 @@ function missionsIA(monde: Monde, annee: number, pourF1: boolean, commander: (c:
       commander({ type: 'recrutement.mission', auteur: tp.id, parametres: { ecurie: e.id, personne: p.id } });
       n++;
     }
+  }
+}
+
+/* ---------------------------------------------------------------- Connaissance (audit 6b) */
+
+/**
+ * Toutes les 4 semaines : la connaissance progresse pendant une mission (rendements décroissants), puis s'efface
+ * progressivement hors mission (demi-vie). Fiches effacées sous un seuil, ou si la personne a pris sa retraite ; volume borné par écurie.
+ */
+export function mettreAJourConnaissances(monde: Monde): void {
+  const t = table(monde, TABLES.connaissances);
+  const enCours = new Set(missionsActives(monde).map((x) => `${x.ecurie}:${x.personne}`));
+  for (const cle of enCours) if (!t[cle]) {
+    const [ecurie, personne] = cle.split(':') as [string, string];
+    t[cle] = { id: cle, ecurie, personne, niveau: 0 } satisfies Connaissance as unknown as Entite;
+  }
+  const oubli = Math.pow(0.5, 1 / CONNAISSANCE.demiViePeriodes);
+  for (const id of idsTries(t)) {
+    const k = t[id] as unknown as Connaissance;
+    const p = table(monde, TABLES.personnes)[k.personne] as unknown as Personne | undefined;
+    k.niveau = enCours.has(id) ? k.niveau + CONNAISSANCE.gainParPeriode * (1 - k.niveau) : k.niveau * oubli;
+    k.niveau = Math.round(k.niveau * 1000) / 1000;
+    if (!p || p.statut === 'retraite' || k.niveau < CONNAISSANCE.seuilEffacement) delete t[id];
+  }
+  const parEcurie = new Map<string, Connaissance[]>();
+  for (const k of Object.values(t) as unknown as Connaissance[]) parEcurie.set(k.ecurie, [...(parEcurie.get(k.ecurie) ?? []), k]);
+  for (const liste of parEcurie.values()) {
+    liste.sort((a, b) => b.niveau - a.niveau || (a.id < b.id ? -1 : 1));
+    for (const k of liste.slice(CONNAISSANCE.maxParEcurie)) delete t[k.id];
   }
 }
 

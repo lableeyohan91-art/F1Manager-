@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  academieDe, academies, affiliationDe, affiliationsActives, copierMonde, creerScenarioGrille2026, deserialiser, engageablePar, missionsMax,
+  academieDe, academies, affiliationDe, affiliationsActives, missionsActives, copierMonde, creerScenarioGrille2026, deserialiser, engageablePar, missionsMax,
   potentielEstime, serialiser, table, TABLES, teamPrincipal, VERSION_FORMAT, type Ecurie, type Monde, type Personne,
 } from '../src/engine';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
@@ -8,6 +8,7 @@ import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 const sc = creerScenarioGrille2026(lireDonneesGrille2026());
 const personnes = (m: Monde) => Object.values(table(m, TABLES.personnes)) as unknown as Personne[];
 const ecurie = (m: Monde, id: string) => table(m, TABLES.ecuries)[id] as unknown as Ecurie;
+const academiesMissions = (m: Monde) => missionsActives(m, 'eq_williams').length;
 
 describe('Phase 6b-2 — académies, affiliations, mécènes, repérage', () => {
   it('chaque écurie a une académie (2 à 8 places) qui recrute des jeunes et finance leur baquet', () => {
@@ -51,11 +52,13 @@ describe('Phase 6b-2 — académies, affiliations, mécènes, repérage', () => 
     expect(cmd('per_alonzo', jeune.id).ok).toBe(false); // pas le team principal
     expect(cmd(tp.id, jeune.id).ok).toBe(true);
     expect(cmd(tp.id, jeune.id).ok).toBe(false); // déjà en cours
+    // Audit 6b : la connaissance s'acquiert progressivement (rien au lancement, davantage après quelques semaines).
+    expect(potentielEstime(m, 'eq_williams', jeune).demiLargeur).toBe(avant);
+    moteur.avancer(m, 12);
     expect(potentielEstime(m, 'eq_williams', jeune).demiLargeur).toBeLessThan(avant);
-    expect(potentielEstime(m, 'eq_ferrari', jeune).demiLargeur).toBeGreaterThan(potentielEstime(m, 'eq_williams', jeune).demiLargeur);
     // Capacité limitée par le département recrutement.
-    const autres = personnes(m).filter((p) => p.poste === 'pilote_junior' && p.id !== jeune.id).slice(0, 20);
-    let acceptees = 1;
+    const autres = personnes(m).filter((p) => p.poste === 'pilote_junior' && p.id !== jeune.id).slice(0, 30);
+    let acceptees = academiesMissions(m);
     for (const p of autres) if (cmd(tp.id, p.id).ok) acceptees++;
     expect(acceptees).toBe(missionsMax(m, 'eq_williams'));
   });

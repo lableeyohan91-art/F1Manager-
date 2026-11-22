@@ -86,5 +86,10 @@ export const MECENE = { probabilite: 0.15, reputationMin: 55, potentielMin: 16, 
  * (demi-largeur × facteur, observation ajoutée), missions simultanées = min + niveau du département recrutement / parPoints.
  */
 /** IA : vivier examiné (nombre), poids de la réputation dans son classement, probabilité de retenir une cible (priorités propres à chaque écurie). */
+/**
+ * Connaissance issue du repérage (audit 6b) : gain par période de 4 semaines de mission (part de ce qui reste à apprendre),
+ * demi-vie de l'oubli hors mission (périodes), seuil d'effacement, nombre maximal de fiches par écurie (volume borné).
+ */
+export const CONNAISSANCE = { gainParPeriode: 0.3, demiViePeriodes: 13, seuilEffacement: 0.05, maxParEcurie: 80 };
 export const REPERAGE = { dureeSemaines: 26, coutMEUR: 0.05, facteurLargeur: 0.5, observationAjoutee: 2, missionsMin: 2, niveauParMission: 4, ciblesIA: 3, vivierIA: 12, poidsReputationIA: 0.02, probabiliteIA: 0.6 };
 

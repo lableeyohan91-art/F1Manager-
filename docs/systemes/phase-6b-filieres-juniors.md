@@ -172,3 +172,14 @@ Le recrutement F1 existant (D-066, en attendant le marché complet de la phase 7
 4. **Financement** : famille, mécène et académie en 6b ; sponsors nationaux en phase 7. D'accord ?
 5. **Prix des baquets** (ordre de grandeur) : environ 1 M€ par an en Apex 3 et 2,5 M€ en Apex 2. D'accord, ou préfères-tu que ChatGPT vérifie ces ordres de grandeur ?
 6. **Livraison en deux temps** (6b-1 puis 6b-2) : d'accord ?
+
+## 16. Audit indépendant de ChatGPT (commit f3120105) — suites données (D-115)
+
+| Constat de l'audit | Suite |
+| --- | --- |
+| Le repérage améliorait l'estimation dès le lancement, puis perdait tout à l'expiration | **Corrigé (anomalie structurelle)** : la **connaissance** (0 à 1) s'acquiert pendant la mission (30 % de ce qui reste à apprendre par période de 4 semaines), puis s'oublie progressivement (demi-vie ≈ 1 an). Elle est stockée par écurie et par personne ; le volume est borné (seuil d'effacement, 80 fiches par écurie) |
+| Les missions ne vérifiaient pas les moyens financiers | **Corrigé** : refus si l'écurie est en crise, sous administration, ou si sa trésorerie ne couvre pas le coût. Le coût reste faible (0,05 M€) et la capacité est bornée par le département recrutement. Les abus (multiplier les missions) sont limités par cette capacité, pas par le prix. À surveiller en laboratoire |
+| Baquets accordés à des jeunes incapables de payer, prix réel non conservé | **Comportement volontaire, documenté** : une écurie ne roule pas à vide et prend le meilleur candidat au prix qu'il peut payer. **Le prix réellement payé et l'indicateur « subventionné » sont désormais conservés** dans l'affectation. Leur fréquence est mesurée par `npm run demographie` et un test vérifie que les baquets subventionnés restent minoritaires et que l'argent reste un obstacle |
+
+Tests de non-régression : `tests/audit-6b.test.ts`. Format de sauvegarde 11 (table des connaissances).
+

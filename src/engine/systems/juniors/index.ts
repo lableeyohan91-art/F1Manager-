@@ -28,7 +28,7 @@ import { apresGrandPrix, modificateurNiveau } from '../carriere/performance';
 import { niveauCarriere } from '../carriere/profil';
 import { potentielEstime } from '../carriere/estimation';
 import { ecuriesActives, niveauPilote } from '../saison/performance';
-import { affiliationDe, commandeMissionReperage, finDeSaisonAcademies, financementExterieur, intersaisonAcademies, miSaisonAcademies } from './academies';
+import { affiliationDe, commandeMissionReperage, finDeSaisonAcademies, financementExterieur, intersaisonAcademies, mettreAJourConnaissances, miSaisonAcademies } from './academies';
 import { ACADEMIE, PLACEMENT_PARTENAIRE } from '../../balance/juniors';
 
 export * from './academies';
@@ -128,7 +128,8 @@ export function marcheBaquets(monde: Monde, annee: number): void {
         }
         // Une écurie ne roule pas à vide : faute de candidat capable de payer son prix, elle prend le meilleur au prix qu'il peut payer.
         const choix = meilleur ?? repli;
-        if (choix) choix.p.junior = { categorie: cat, ecurie: e.id, annee };
+        // Audit 6b : le prix réellement payé est conservé ; « subventionné » = baquet obtenu sans pouvoir payer le prix demandé.
+        if (choix) choix.p.junior = { categorie: cat, ecurie: e.id, annee, prixMEUR: Math.round(choix.prix * 100) / 100, subventionne: !meilleur };
       }
     }
   }
@@ -292,6 +293,7 @@ export const systemeJuniors: Systeme = {
     if (date.semaine === ACADEMIE.semaine) intersaisonAcademies(monde, date.annee, (c) => commanderIA(c));
     if (date.semaine === ACADEMIE.semaineMiSaison) miSaisonAcademies(monde, date.annee, (c) => commanderIA(c));
     if (date.semaine === SEMAINE_CLOTURE) finDeSaisonAcademies(monde, date.annee);
+    if (date.semaine % 4 === 0) mettreAJourConnaissances(monde);
     if (date.semaine === MARCHE_BAQUETS.semaine) {
       marcheBaquets(monde, date.annee);
       creerSaisonsJuniors(monde, date.annee);

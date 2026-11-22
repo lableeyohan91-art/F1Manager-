@@ -26,6 +26,7 @@ export const TABLES = {
   saisonsJuniors: 'saisonsJuniors',
   academies: 'academies',
   missionsReperage: 'missionsReperage',
+  connaissances: 'connaissances',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -133,7 +134,7 @@ export interface Personne {
   /** Année de retraite (retours possibles, D-072). */
   retraiteDepuis?: number;
   /** Phase 6b : baquet junior de la saison en cours (la personne reste « libre » au sens de la F1, donc recrutable). */
-  junior?: { categorie: 'apex3' | 'apex2'; ecurie: string; annee: number };
+  junior?: { categorie: 'apex3' | 'apex2'; ecurie: string; annee: number; prixMEUR?: number; subventionne?: boolean };
   /** Phase 6b : réputation sportive (0–100) — classements karting et Apex 4, résultats Apex 3 et Apex 2. */
   reputationJeune?: number;
   /** Phase 6b : budget familial annuel (M€), tiré une fois. Lu par le marché des baquets. */
@@ -150,6 +151,11 @@ export interface Academie {
 }
 /** Mission de repérage en cours (commande commune au joueur et à l'IA). */
 export interface MissionReperage { id: string; ecurie: string; personne: string; finAnnee: number; finSemaine: number }
+/**
+ * Connaissance qu'une écurie a d'une personne (audit 6b) : acquise progressivement pendant une mission de repérage,
+ * puis oubliée progressivement (obsolescence). 0 à 1. Lue par l'estimation du potentiel.
+ */
+export interface Connaissance { id: string; ecurie: string; personne: string; niveau: number }
 
 /** Écurie junior (phase 6b) : table séparée des écuries de F1. */
 export interface EcurieJunior {
