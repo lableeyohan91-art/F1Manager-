@@ -1,6 +1,6 @@
 # Phase 6 — Cycle de vie et filières de formation des pilotes
 
-> Statut : **ORIENTATIONS** (22/11/2026). Demande du porteur, intégrée à la feuille de route. **Pas d'implémentation maintenant.** La conception détaillée sera rédigée et validée avant le début de la phase 6.
+> Statut : **ORIENTATIONS VALIDÉES** par le porteur le 22/11/2026 (D-062, D-063 : découpage 6a / 6b). Demande du porteur, intégrée à la feuille de route. **Pas d'implémentation maintenant.** La conception détaillée sera rédigée et validée avant le début de la phase 6.
 > Ce document fixe surtout les **dépendances** avec les phases 4, 5 et 7, pour que les contrats de la phase 4 soient conçus dès le départ de façon compatible.
 
 ## 1. Ce que demande le porteur

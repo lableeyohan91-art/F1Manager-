@@ -87,3 +87,9 @@ Aucun code à ce stade.
 ### Modifié
 - Phase 6 enrichie : écosystème de formation des pilotes (D-062), découpage proposé en 6a / 6b (D-063), questions sur les noms et les grilles juniors (D-064).
 - Fiche d'orientations `docs/systemes/phase-6-cycle-de-vie-filieres.md` ; la conception de la phase 4 prévoit des contrats génériques compatibles (§12).
+
+## [Décisions] — 22/11/2026
+
+### Modifié
+- Conception de la phase 4 validée par le porteur (D-065), sous réserve des points ouverts soumis à ChatGPT ; orientations de la phase 6 et découpage 6a / 6b validés (D-063).
+- Message de synthèse pour ChatGPT : `docs/echanges/2026-11-22-claude-message-chatgpt-phases-4-6.md`.
