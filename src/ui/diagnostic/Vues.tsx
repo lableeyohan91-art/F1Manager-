@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'preact/hooks';
 import { SEUIL_CONVICTION, TRAITS, VALEURS, ASPIRATIONS } from '../../engine/balance/personnages';
 import { MemoirePersonne } from './Humain';
+import { potentielEstime } from '../../engine';
 import type { Carriere, Circuit, Departement, Installation, Monde, Palmares, Personne } from '../../engine';
 import {
   age, Barre, Carte, contrats, ecuries, LIBELLES_POSTES, Lien, liste, nomComplet, Note, ORDRE_POSTES, personnes, texteClauses,
@@ -193,8 +194,21 @@ export function FichePersonne({ monde, id, ouvrir }: { monde: Monde; id: string;
           {Object.entries(VALEURS).map(([k, lib]) => <Barre key={k} libelle={lib + ((p.valeurs[k] ?? 0) >= SEUIL_CONVICTION ? ' ★' : '')} v={p.valeurs[k] ?? 0} accent={(p.valeurs[k] ?? 0) >= SEUIL_CONVICTION} />)}
           <p class="muted" style={{ fontSize: '.8rem' }}>★ = conviction (≥ {SEUIL_CONVICTION})</p>
         </Carte>
-        <Carte titre={`3. Compétences · potentiel ${p.potentiel}`}>
-          {Object.entries(p.competences).map(([k, v]) => <Barre key={k} libelle={k} v={v} />)}
+        <Carte titre={`3. Compétences · potentiel réel ${p.potentiel} (caché)`}>
+          {Object.entries(p.competences).map(([k, v]) => <Barre key={k} libelle={`${k} ${v.toFixed(1)}`} v={v} />)}
+          {p.carriere && (() => {
+            const k = p.carriere;
+            const est = potentielEstime(monde, p.ecurie || null, p);
+            const LIB: Record<string, string> = { precoce: 'précoce', tardif: 'tardif', regulier: 'régulier', longevite: 'longévité', meteore: 'météore', irregulier: 'irrégulier' };
+            return (
+              <p class="muted" style={{ fontSize: '.85rem' }}>
+                Profil de carrière (caché) : {LIB[k.archetype] ?? k.archetype} · apogée de {k.debutApogee.toFixed(0)} à {k.finApogee.toFixed(0)} ans
+                · meilleur niveau {k.niveauMax.toFixed(1)} · {k.saisonsF1} saison{k.saisonsF1 > 1 ? 's' : ''} de titulaire en F1
+                {k.phaseSpeciale ? ` · ${k.phaseSpeciale.type === 'declic' ? 'déclic' : 'stagnation'} en cours` : ''}<br />
+                Potentiel estimé par {p.ecurie ? 'son écurie' : 'le paddock'} : {(est.centre - est.demiLargeur).toFixed(1)} à {Math.min(20, est.centre + est.demiLargeur).toFixed(1)}
+              </p>
+            );
+          })()}
         </Carte>
         <Carte titre="4 et 5. Aspirations et état">
           {p.aspirations.length === 0 ? <p class="muted">Aucune aspiration active.</p> : <ul>{p.aspirations.map((a) => <li key={a.type}>{libAsp(a.type)} <span class="muted">(horizon {a.horizon} an{a.horizon > 1 ? 's' : ''})</span></li>)}</ul>}
