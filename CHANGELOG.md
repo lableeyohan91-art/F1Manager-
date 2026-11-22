@@ -117,3 +117,9 @@ Aucun code à ce stade.
 
 ### Ajouté
 - Phase 15 « Direction artistique et immersion » (D-080) et fiche d'orientations : clés de ressources, graine visuelle persistante, images de remplacement, optimisation mobile, packs remplaçables. Question D-079 sur les portraits des personnages inspirés du réel.
+
+## [Campagne D-074] — 22/11/2026
+
+### Ajouté
+- Campagne de 21 réglages (100 graines × 10 saisons, mécaniques P4) et revalidation sur les graines 101–200 ; trois compromis présentés (rapport `docs/rapports/2026-11-22-p4-campagne-equilibrage.md`, tableaux et mesures archivés).
+- Constats : hiérarchie et dynasties insensibles au modèle de course ; forme sans effet ; réglage B parmi les moins bons compromis.
