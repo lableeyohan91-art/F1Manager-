@@ -183,6 +183,12 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['connaissances'] ??= {};
     return { ...m, versionFormat: 11 };
   },
+  // v11 → v12 (phase 7a) : offres du marché des transferts (vides au départ) ; contrats « signés » et réputation de prédateur optionnels.
+  11: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['offres'] ??= {};
+    return { ...m, versionFormat: 12 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

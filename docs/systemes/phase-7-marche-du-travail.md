@@ -1,6 +1,6 @@
 # Phase 7 — Marché du travail, IA des écuries, agents, valeur commerciale
 
-> Statut : **PROPOSITION — À VALIDER** (22/11/2026). Aucune ligne de code avant validation.
+> Statut : **VALIDÉE** (22/11/2026, D-116 et D-117). Voir §15 pour les réponses du porteur.
 > Cadre déjà validé :
 > - D-063 : recrutement et débauchage des jeunes rattachés au marché ;
 > - D-066 : remplacement provisoire, qui sera remplacé ici ;
@@ -198,10 +198,10 @@ Elles émergent des personnalités et des circonstances, avec des souvenirs et d
 
 | Question | Réponse | Conséquence dans la conception |
 | --- | --- | --- |
-| 1. Découpage 7a / 7b / 7c | **En attente** | — |
+| 1. Découpage 7a / 7b / 7c | **Oui** | 7a : marché des pilotes et lassitude des pilotes ; 7b : personnel, lassitude, candidatures ; 7c : agents et valeur commerciale |
 | 2. Non-concurrence | **6 mois** | Durée unique de 6 mois pour un ingénieur ou un dirigeant débauché. Elle est rangée dans `balance/`. |
 | 3. Pré-accords un an à l'avance | **Oui** | Contrats qui commencent l'année suivante, ou celle d'après, conservés tels quels (§4). |
-| 4. Agents pour tout le monde ? | **Question posée en retour** : est-ce beaucoup plus lourd ? Idée : les agents nous proposent les services de leurs clients | Voir §15.3 |
+| 4. Agents pour tout le monde ? | **Pilotes F1 et Apex 2 + personnel de haut niveau** ; les agents démarchent les écuries | Voir §15.3 |
 | 5. Réputation de prédateur | **Elle ne doit pas empêcher tout débauchage** | Voir §15.4 |
 | 6. Commission des agents | **Négociée** | Voir §15.3 |
 

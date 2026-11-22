@@ -3,6 +3,7 @@
 import type { Moteur } from '../../core/moteur';
 import { evenementsProteges, systemeOubli } from '../memoire';
 import { installerContrats } from './contrats';
+import { installerMarche } from '../marche';
 import { systemeEtat } from './etat';
 import { installerInteractions } from './interactions';
 import { systemePromesses } from './promesses';
@@ -14,6 +15,7 @@ import { systemePromesses } from './promesses';
 export function installerHumain(moteur: Moteur): Moteur {
   moteur.ajouterSysteme(systemePromesses);
   installerContrats(moteur);
+  installerMarche(moteur); // phase 7a : marché des transferts des pilotes
   installerInteractions(moteur);
   moteur.ajouterSysteme(systemeEtat).ajouterSysteme(systemeOubli);
   moteur.ajouterProtecteur(evenementsProteges);

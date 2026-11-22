@@ -216,6 +216,7 @@ function tenterReconversion(monde: Monde, p: Personne, f: ReturnType<typeof tira
 
 export function bilanCarrieres(monde: Monde): void {
   const annee = monde.date.annee;
+  const signes = new Set((Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).filter((c) => c.statut === 'signe').map((c) => c.personne));
   for (const p of personnes(monde)) {
     const k = p.carriere;
     if (!k) continue;
@@ -231,6 +232,8 @@ export function bilanCarrieres(monde: Monde): void {
       continue;
     }
     tirerPhaseSpeciale(monde, p);
+    // Phase 7a : on ne quitte pas le métier juste après avoir signé un contrat qui commence bientôt.
+    const vientDeSigner = signes.has(p.id);
     if (p.statut === 'actif') {
       k.saisonsActives++;
       if (p.poste === 'pilote_titulaire') k.saisonsF1++;
@@ -238,7 +241,7 @@ export function bilanCarrieres(monde: Monde): void {
     const age = annee - p.anneeNaissance;
     const f = tirageLocal(monde, 'carriere.fin', p.id, annee);
     // Abandon des jeunes qui n'ont pas percé (D-101) : jamais titulaire en F1, sans baquet.
-    if (estPilote(p) && p.statut === 'libre' && k.saisonsF1 === 0 && age >= 23) {
+    if (estPilote(p) && p.statut === 'libre' && k.saisonsF1 === 0 && age >= 23 && !vientDeSigner) {
       const pr = age >= ABANDON_AGE_QUASI_CERTAIN ? ABANDON_PROBABILITE_MAX : (ABANDON_JEUNES[age] ?? 0);
       if (f.chance(pr)) {
         prendreRetraite(monde, p, 'abandon : pas de baquet en F1');
@@ -246,7 +249,7 @@ export function bilanCarrieres(monde: Monde): void {
         continue;
       }
     }
-    if (f.chance(probabiliteRetraite(monde, p))) {
+    if (!vientDeSigner && f.chance(probabiliteRetraite(monde, p))) {
       prendreRetraite(monde, p, p.statut === 'libre' ? 'sans contrat' : 'choix personnel');
       tenterReconversion(monde, p, f);
     }

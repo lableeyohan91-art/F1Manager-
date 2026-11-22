@@ -27,6 +27,7 @@ export const TABLES = {
   academies: 'academies',
   missionsReperage: 'missionsReperage',
   connaissances: 'connaissances',
+  offres: 'offres',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -81,6 +82,8 @@ export interface Ecurie {
   pilotee?: boolean;
   /** Écurie « sœur » en F1 (lien réel conservé, D-112) : placement et promotion des affiliés de l'académie. */
   ecuriePartenaire?: string;
+  /** Phase 7a : réputation de prédatrice (débauchages récents, s'efface avec le temps). Lue par l'utilité des offres et l'indemnité exigée. */
+  reputationPredateur?: number;
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -264,7 +267,8 @@ export interface Contrat {
   fin: number;
   salaireMEUR: number;
   clauses: Clauses;
-  statut: 'actif' | 'termine' | 'rompu';
+  /** Phase 7a : « signe » = contrat conclu pendant la fenêtre, qui ne prend effet qu'à son début (pré-accord). */
+  statut: 'actif' | 'termine' | 'rompu' | 'signe';
   motifFin?: MotifFinContrat;
   /** L'organisation a décidé de ne pas prolonger : le contrat prendra fin à son échéance. */
   nonProlonge?: boolean;
@@ -564,6 +568,8 @@ export interface ComptesAnnee {
   apportsExceptionnels: number;
   /** Phase 6b-2 : académie (financement des affiliés) et missions de repérage, hors plafond. */
   academie?: number;
+  /** Phase 7a : indemnités de transfert reçues (rachat d'un pilote ou d'un affilié par une autre écurie), recette hors plafond. */
+  transfertsRecus?: number;
 }
 
 export interface Finances {
@@ -588,3 +594,30 @@ export interface Finances {
   chocApport?: { annee: number; semaine: number; facteur: number; annonce?: boolean };
   verification: string;
 }
+
+/** Phase 7a : offre faite pendant la fenêtre de transferts (bornée : effacée en fin de saison). */
+export interface OffreMarche {
+  id: string;
+  ecurie: string;
+  /** Team principal qui fait l'offre. */
+  decideur: string;
+  personne: string;
+  poste: Poste;
+  salaireMEUR: number;
+  dureeAnnees: number;
+  /** Première saison du contrat (année suivante, ou celle d'après pour un pré-accord). */
+  debut: number;
+  statutN1: boolean;
+  /** Montant à verser à l'employeur actuel (clause de rachat ou indemnité convenue), 0 si la personne est libre à cette date. */
+  indemniteMEUR: number;
+  /** Organisation qui reçoit l'indemnité (écurie employeuse, ou académie de l'affilié). */
+  beneficiaireIndemnite?: string;
+  /** Tour de négociation (0 à TOURS_MARCHE − 1). */
+  tour: number;
+  annee: number;
+  semaine: number;
+  statut: 'en_attente' | 'contre_offre' | 'acceptee' | 'refusee' | 'retiree' | 'expiree';
+  salaireDemande?: number;
+  raisons?: string[];
+}
+

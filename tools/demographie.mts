@@ -25,6 +25,8 @@ const ageTitre: number[] = [];
 const ageDebut: number[] = [];
 let baquetsJuniors = 0, baquetsSubventionnes = 0, prixPayes: number[] = [];
 let debutantsAffilies = 0, promessesTenues = 0, promessesRompues = 0, mecenes = 0; const ecartsReputationAcademies: number[] = [];
+// Phase 7a : marché des transferts.
+let signatures = 0, debauchages = 0, preAccords = 0, concurrentes = 0, contreAttaques = 0, indemnitesMEUR = 0, signaturesMoins23 = 0; const salaireTop5: number[][] = [];
 let debutantsTop5Apex2 = 0, debutantsTotal = 0, championsApex2 = 0, championsApex2Promus = 0, talentsBloques = 0, talents = 0, payantsMoyensF1 = 0, payantsMoyens = 0;
 
 for (let g = 1; g <= N; g++) {
@@ -47,6 +49,12 @@ for (let g = 1; g <= N; g++) {
         if (/abandon/.test(e.contexte?.motif ?? '')) compteurs['abandon'] = (compteurs['abandon'] ?? 0) + 1;
       }
       if (e.type === 'junior.mecene') mecenes++;
+      if (e.type === 'marche.signature') {
+        signatures++; if (e.contexte?.debauchage) debauchages++; if (e.contexte?.debut >= e.date.annee + 2) preAccords++;
+        if ((e.contexte?.offresConcurrentes ?? 1) > 1) concurrentes++; indemnitesMEUR += e.contexte?.indemnite ?? 0;
+        const pp = m.tables['personnes'][e.acteurs[0].id] as any; if (pp && e.contexte.debut - pp.anneeNaissance < 23) signaturesMoins23++;
+      }
+      if (e.type === 'marche.contre_attaque') contreAttaques++;
     }
     const tit = Object.values(m.tables['personnes']).filter((p: any) => p.poste === 'pilote_titulaire' && p.statut === 'actif') as any[];
     let nouveaux = 0;
@@ -61,6 +69,8 @@ for (let g = 1; g <= N; g++) {
     (niveauGrille[s] ??= []).push(moy(tit.map((p) => eng.niveauPilote(p, false))));
     (ageGrille[s] ??= []).push(moy(tit.map((p) => m.date.annee - p.anneeNaissance)));
     for (const p of Object.values(m.tables['personnes']) as any[]) if (p.junior && p.junior.annee >= m.date.annee - 1) { baquetsJuniors++; if (p.junior.subventionne) baquetsSubventionnes++; if (typeof p.junior.prixMEUR === 'number') prixPayes.push(p.junior.prixMEUR); }
+    const sal = (Object.values(m.tables['contrats']) as any[]).filter((c) => c.statut === 'actif' && c.type === 'emploi' && c.poste === 'pilote_titulaire').map((c) => c.salaireMEUR).sort((a, b) => b - a);
+    (salaireTop5[s] ??= []).push(moy(sal.slice(0, 5)));
     (population[s] ??= []).push(Object.values(m.tables['personnes']).filter((p: any) => p.statut !== 'retraite').length);
     if (s === S - 1 && g === 1) {
       const rep: Record<string, number> = {};
@@ -115,4 +125,6 @@ console.log(`Baquets juniors subventionnés (obtenus sans pouvoir payer le prix 
 console.log(`Débutants passés par une académie : ${(100 * debutantsAffilies / Math.max(1, debutantsTotal)).toFixed(0)} %`);
 console.log(`Promesses de titularisation tenues / rompues (fin de partie) : ${promessesTenues} / ${promessesRompues}`);
 console.log(`Mécènes trouvés : ${(mecenes / N / S).toFixed(2)} par saison ; écart de réputation entre la meilleure et la moins bonne académie : ${moy(ecartsReputationAcademies).toFixed(0)} points`);
+console.log(`Marché (7a) : ${(signatures / N / S).toFixed(2)} signatures par saison, dont ${(100 * concurrentes / Math.max(1, signatures)).toFixed(0)} % face à des offres concurrentes ; pré-accords à deux saisons ${(preAccords / N / S).toFixed(2)} ; débauchages ${(debauchages / N / S).toFixed(2)} par saison (indemnités ${(indemnitesMEUR / N / S).toFixed(1)} M€/saison) ; contre-attaques ${(contreAttaques / N / S).toFixed(2)} ; signatures à moins de 23 ans au début du contrat ${(100 * signaturesMoins23 / Math.max(1, signatures)).toFixed(0)} %`);
+console.log('Salaire moyen des 5 pilotes les mieux payés (M€, inflation) : ' + points.map((s) => `${2027 + s} ${moy(salaireTop5[s]!).toFixed(1)}`).join(' · '));
 console.log(`Pépites générées (potentiel ≥ 18) : ${(championsPepites.pepites / N).toFixed(1)} par partie (dont ${((10 * championsPepites.nesCohortes) / N / S).toFixed(2)} par décennie issues des cohortes annuelles ; cible D-102 : ≈ 2), championnes : ${championsPepites.championnes}`);

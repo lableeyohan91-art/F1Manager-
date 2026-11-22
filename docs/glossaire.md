@@ -143,3 +143,13 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Air perturbé / aspiration** | En virage, perte d'appui derrière une autre voiture (air perturbé) ; en ligne droite, réduction de traînée en la suivant (aspiration). Deux phénomènes distincts (D-114). |
 | **Fenêtre d'exploitation** | Plage de conditions (températures, piste, réglages, carburant, pilote) dans laquelle une voiture donne son maximum (D-114). |
 
+| **Fenêtre de transferts** | Période (semaines 26 à 48) pendant laquelle les écuries font des offres aux pilotes pour les saisons suivantes ; les contrats signés prennent effet en semaine 50 (phase 7a, D-116). |
+| **Offre (marché)** | Proposition d'une écurie à une personne : salaire, durée, première saison, statut de n°1, indemnité à verser à l'employeur actuel ; jusqu'à trois tours de négociation (phase 7a). |
+| **Pré-accord** | Contrat signé pendant la fenêtre qui ne commence qu'une saison plus tard (ou deux) ; la personne reste chez son employeur jusque-là (phase 7a, D-117). |
+| **Contrat signé** | Statut d'un contrat conclu mais pas encore commencé (« signe ») ; il devient actif en semaine 50 de l'année qui précède son début (phase 7a). |
+| **Débauchage** | Recrutement d'une personne encore sous contrat (ou affiliée à une académie) à la date de début du nouveau contrat, contre une indemnité versée à son employeur (phase 7a). |
+| **Clause de rachat** | Montant inscrit au contrat qui permet à une autre écurie de libérer la personne sans l'accord de son employeur (phase 7a). |
+| **Indemnité de transfert** | Somme versée à l'employeur actuel lors d'un débauchage : la clause de rachat si elle existe, sinon l'indemnité exigée par l'écurie (phase 7a). |
+| **Contre-attaque** | Réaction d'un employeur à une offre extérieure faite à son pilote : il le prolonge et l'augmente pour le garder (phase 7a). |
+| **Lassitude** | Envie d'un nouveau défi d'une personne installée depuis longtemps (et titrée) au même endroit ; calculée, modérée, jamais un départ automatique (D-117 ; pilotes en 7a, personnel en 7b). |
+| **Réputation de prédatrice** | Réputation d'une écurie qui débauche souvent : un coût (méfiance, indemnités plus chères), jamais une interdiction ; elle s'efface avec le temps (D-117). |

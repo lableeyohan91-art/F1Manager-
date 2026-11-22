@@ -24,6 +24,7 @@ import {
   age, ecurie, niveauMetier, repondre, scoreCandidat, teamPrincipal, texteRaisons, valeurMarche, type Offre, type Raison,
 } from './decision';
 import { faireUnePromesse, type TypePromesse } from './promesses';
+import { activerContratsSignes, clotureMarche } from '../marche';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 
@@ -159,8 +160,11 @@ export function dureeContrat(monde: Monde, p: Personne): number {
   return restant > 6 ? 3 : restant > 2 ? 2 : 1;
 }
 
-/** Décision de l'IA pour un contrat qui se termine : proposer une prolongation (et à quelles conditions) ou non. */
-function decisionIA(monde: Monde, c: Contrat, tp: Personne): void {
+/**
+ * Décision de l'IA pour un contrat qui se termine : proposer une prolongation (et à quelles conditions) ou non.
+ * Phase 7a : pour les pilotes titulaires, le marché fournit le niveau du meilleur remplaçant accessible (`remplacant`).
+ */
+export function deciderProlongation(monde: Monde, c: Contrat, tp: Personne, remplacant?: number, dureeMax = 5): void {
   const p = personneDe(monde, c.personne) as Personne;
   const e = ecurie(monde, c.organisation) as Ecurie;
   const f = tirageLocal(monde, 'ia.prolongation', c.id, monde.date.annee);
@@ -169,7 +173,7 @@ function decisionIA(monde: Monde, c: Contrat, tp: Personne): void {
   const loyaute = ((tp.traits['loyaute'] ?? 10) - 10) / 10;
   const declin = Math.max(0, age(monde, p) - 34) * (p.poste.startsWith('pilote') ? 0.25 : 0.05);
   const continuite = p.poste.startsWith('pilote') ? PRIME_CONTINUITE.pilote : PRIME_CONTINUITE.personnel;
-  const interet = niveauMetier(p) - meilleurLibre(monde, c.poste, e) + continuite + 0.8 * loyaute + 1.5 * (r.affinite + r.respect) / 2 - declin + f.normale(0, 0.6);
+  const interet = niveauMetier(p) - (remplacant ?? meilleurLibre(monde, c.poste, e)) + continuite + 0.8 * loyaute + 1.5 * (r.affinite + r.respect) / 2 - declin + f.normale(0, 0.6);
   if (interet < SEUIL_PROLONGATION) {
     nePasProlonger(monde, c, tp.id, 'remplaçant jugé meilleur ou moins cher');
     return;
@@ -178,7 +182,7 @@ function decisionIA(monde: Monde, c: Contrat, tp: Personne): void {
   const audace = (tp.traits['risque'] ?? 10) / 20;
   const budget = Math.min(1, e.budgetMEUR / 400);
   let salaire = valeur * (OFFRE_SALAIRE.min + (OFFRE_SALAIRE.max - OFFRE_SALAIRE.min) * (0.5 * audace + 0.5 * budget));
-  const duree = dureeContrat(monde, p);
+  const duree = Math.min(dureeMax, dureeContrat(monde, p));
   const promesses: TypePromesse[] = [];
   let res = proposerProlongation(monde, c, tp.id, salaire, duree, promesses, 0);
   if (res.issue === 'contre_offre' && res.salaireDemande !== undefined) {
@@ -223,8 +227,10 @@ export const systemeNegociations: Systeme = {
         if (!aProprietaire) decisionConseil(monde, c);
       }
       else {
+        // Phase 7a : les titulaires sont décidés à l'ouverture du marché (systems/marche), face aux offres possibles.
+        if (p.poste === 'pilote_titulaire') continue;
         const tp = teamPrincipal(monde, c.organisation);
-        if (tp) decisionIA(monde, c, tp);
+        if (tp) deciderProlongation(monde, c, tp);
       }
     }
   },
@@ -278,6 +284,8 @@ interface Proposition { ecurie: Ecurie; poste: Poste; salaire: number; decideur:
 export function pourvoirPostes(monde: Monde): void {
   const refusesPar = new Map<string, Set<string>>(); // écurie+poste → candidats qui ont refusé
   const debut = monde.date.semaine >= SEMAINE_FIN_CONTRATS ? monde.date.annee + 1 : monde.date.annee;
+  // Phase 7a : une personne qui a signé un pré-accord ailleurs n'est plus disponible.
+  const signes = new Set((Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).filter((c) => c.statut === 'signe').map((c) => c.personne));
   for (let tour = 0; tour < TOURS_RECRUTEMENT; tour++) {
     const offres = new Map<string, Proposition[]>();
     let vacants = 0;
@@ -293,7 +301,7 @@ export function pourvoirPostes(monde: Monde): void {
           const promis = (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[])
             .filter((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.organisation === e.id)
             .map((x) => personneDe(monde, x.beneficiaire))
-            .find((p): p is Personne => !!p && p.statut === 'libre' && assezAgePourLaF1(monde, p) && engageablePar(monde, p, e));
+            .find((p): p is Personne => !!p && p.statut === 'libre' && !signes.has(p.id) && assezAgePourLaF1(monde, p) && engageablePar(monde, p, e));
           if (promis) {
             recruter(monde, promis, e, 'pilote_titulaire', valeurMarche(monde, promis), debut, decideur);
             continue;
@@ -310,7 +318,7 @@ export function pourvoirPostes(monde: Monde): void {
         const cle = `${e.id}:${poste}`;
         const refus = refusesPar.get(cle) ?? new Set<string>();
         const candidats = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[])
-          .filter((p) => p.statut === 'libre' && candidatPour(p, poste) && assezAgePourLaF1(monde, p) && engageablePar(monde, p, e) && !refus.has(p.id) && !dejaVise.has(p.id))
+          .filter((p) => p.statut === 'libre' && candidatPour(p, poste) && assezAgePourLaF1(monde, p) && engageablePar(monde, p, e) && !refus.has(p.id) && !dejaVise.has(p.id) && !signes.has(p.id))
           .sort((a, b) => (a.id < b.id ? -1 : 1));
         if (candidats.length === 0) continue;
         const f = tirageLocal(monde, 'recrutement', e.id, poste, monde.date.annee, tour);
@@ -407,7 +415,10 @@ export const systemeFinsDeContrat: Systeme = {
       const p = personneDe(monde, c.personne);
       if (p) liberer(monde, p, c, c.nonProlonge ? 'non_prolonge' : 'echeance');
     }
+    // Phase 7a : les contrats signés pendant la fenêtre prennent effet ; le remplacement provisoire n'est plus qu'un filet de sécurité.
+    activerContratsSignes(monde);
     pourvoirPostes(monde);
+    clotureMarche(monde);
   },
 };
 

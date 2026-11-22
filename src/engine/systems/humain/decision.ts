@@ -15,6 +15,7 @@ import { ecuriesActives, indiceMoyen, niveauPilote } from '../saison/performance
 import { reputation, TABLE_PROMESSES, type Promesse, type TypePromesse } from './promesses';
 import { PROMOTION_AFFILIE, REPUTATION_RECRUTEMENT_F1 } from '../../balance/juniors';
 import { potentielEstime } from '../carriere/estimation';
+import { LASSITUDE_PILOTE, PREDATEUR } from '../../balance/marche';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
 
@@ -152,6 +153,12 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
   if (actuel && o.salaireMEUR < 0.9 * actuel) u += ajouter('baisse de salaire', -PENALITE_BAISSE_SALAIRE * (1 - o.salaireMEUR / actuel) * poidsValeur(p, 'argent'));
   if (eq && (eq.nationalite === p.nationalite || ecurieFormatrice(monde, p) === o.organisation)) u += ajouter('attachement à ses racines', poidsValeur(p, 'racines') / norme);
 
+  // Phase 7a : lassitude d'un pilote installé depuis longtemps (et titré) dans la même écurie : envie d'un nouveau défi.
+  const l = lassitudePilote(monde, p);
+  if (l.niveau > 0) u += o.organisation === l.ecurie ? ajouter('lassitude après des années dans la même écurie', -l.niveau / 2) : ajouter('envie d’un nouveau défi', l.niveau);
+  // Phase 7a : une écurie réputée prédatrice inspire de la méfiance (un coût, jamais une interdiction).
+  if (!o.prolongation && eq?.reputationPredateur) u += ajouter('écurie réputée prédatrice', -Math.min(PREDATEUR.malusMax, PREDATEUR.malusParPoint * eq.reputationPredateur));
+
   // Relations (seul canal des souvenirs) ; réputation si l'on ne se connaît pas.
   const rd = relation(monde, p.id, o.decideur);
   if (rd.familiarite > 0.05 || rd.confiance !== 0 || rd.affinite !== 0) {
@@ -177,6 +184,20 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
 
   raisons.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
   return { utilite: u, raisons, ligneRouge: ligneRouge(monde, p, o) };
+}
+
+/**
+ * Lassitude d'un pilote (D-117 §15.1), calculée et non stockée : saisons passées dans son écurie actuelle au-delà d'un seuil,
+ * titres remportés avec elle ; accélérée par le goût du défi et l'ambition, freinée par la loyauté ; plafonnée.
+ */
+export function lassitudePilote(monde: Monde, p: Personne): { niveau: number; ecurie?: string } {
+  if (p.poste !== 'pilote_titulaire' || p.statut !== 'actif' || !p.ecurie) return { niveau: 0 };
+  const annees = anneesDans(monde, p, p.ecurie);
+  if (annees < LASSITUDE_PILOTE.anneesMin) return { niveau: 0, ecurie: p.ecurie };
+  const titres = (Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[]).filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie).length;
+  const temperament = (((p.valeurs['defi'] ?? 10) + (p.traits['ambition'] ?? 10)) / 20) * (1.5 - (p.traits['loyaute'] ?? 10) / 20);
+  const brut = (LASSITUDE_PILOTE.parAnnee * (annees - LASSITUDE_PILOTE.anneesMin + 1) + LASSITUDE_PILOTE.parTitre * titres) * temperament;
+  return { niveau: Math.min(LASSITUDE_PILOTE.max, Math.max(0, brut)), ecurie: p.ecurie };
 }
 
 /** Utilité de l'alternative (partir, chercher ailleurs) : la valeur de marché moins le coût de l'incertitude. */

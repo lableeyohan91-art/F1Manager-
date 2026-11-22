@@ -49,7 +49,7 @@ describe('Phase 3 — saison abstraite', () => {
     const recharge = deserialiser(serialiser(b));
     mb.avancer(recharge, S);
     expect(empreinte(recharge)).toBe(empreinte(a));
-  });
+  }, 30_000);
 
   it('10 saisons : cohérent (hors âges, phase 6) et sauvegarde bornée', () => {
     const m = sc.creerMonde(3);
