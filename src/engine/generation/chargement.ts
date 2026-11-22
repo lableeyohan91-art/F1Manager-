@@ -6,6 +6,7 @@
 import { ARCHETYPES } from '../balance/carriere';
 import { COMPETENCES_PILOTE } from '../balance/personnages';
 import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, TypeProprietaire, Voiture } from '../model/types';
+import { CHAMPS_EXIGENCES, type ExigencesCircuit } from '../model/types';
 import { ErreurDonnees, Lecteur, lireCsv } from './csv';
 
 /** Texte des fichiers, indexé par nom de fichier. */
@@ -262,7 +263,7 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   }));
 
   // Circuits.
-  const lcir = lireCsv('circuits.csv', fichier(f, 'circuits.csv'), ['id', 'nom', 'ville', 'pays', 'type', 'altitudeM', 'climatPluie']);
+  const lcir = lireCsv('circuits.csv', fichier(f, 'circuits.csv'), ['id', 'nom', 'ville', 'pays', 'type', 'altitudeM', 'climatPluie', ...CHAMPS_EXIGENCES]);
   const rci = new Lecteur('circuits.csv');
   const circuits: Circuit[] = lcir.map((l) => ({
     id: rci.texte(l, 'id'),
@@ -272,6 +273,7 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     type: rci.parmi(l, 'type', ['rapide', 'lent et sinueux', 'mixte', 'urbain', 'altitude'] as const),
     altitudeM: rci.entier(l, 'altitudeM', -500, 5000),
     climatPluie: rci.parmi(l, 'climatPluie', ['très faible', 'faible', 'moyen', 'élevé'] as const),
+    exigences: Object.fromEntries(CHAMPS_EXIGENCES.map((c) => [c, rci.entier(l, c, 1, 5)])) as unknown as ExigencesCircuit,
     verification: l.valeurs['verification'] ?? '',
   }));
   verifierIdsUniques('circuits.csv', lcir.map((l, i) => ({ id: circuits[i]!.id, numero: l.numero })), problemes);

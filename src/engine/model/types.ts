@@ -146,6 +146,21 @@ export interface CarrierePersonne {
   niveauMax: number;
   /** Déclic ou stagnation en cours : multiplicateur et périodes restantes. Lu par la progression. */
   phaseSpeciale?: { type: 'declic' | 'stagnation'; periodes: number };
+  /** D-106 : expérience réelle (pilotes). Lue par la progression, les handicaps de nouveauté, la pluie, la pression. */
+  experience?: ExperiencePilote;
+  /** D-108 : affinités non neutres par circuit (−2 à +2). Lues par le niveau effectif en course. */
+  affinites?: Record<string, number>;
+}
+
+export interface ExperiencePilote {
+  gp: number;
+  pluie: number;
+  luttesTitre: number;
+  /** Courses disputées par circuit. */
+  circuits: Record<string, number>;
+  /** Écurie actuelle et Grands Prix disputés avec elle (handicap de nouvelle écurie). */
+  ecurie: string;
+  gpEcurie: number;
 }
 
 /**
@@ -225,10 +240,25 @@ export interface Circuit {
   type: 'rapide' | 'lent et sinueux' | 'mixte' | 'urbain' | 'altitude';
   altitudeM: number;
   climatPluie: 'très faible' | 'faible' | 'moyen' | 'élevé';
+  /** D-107 : exigences propres au circuit (1–5). Lues par le modèle de course (pilote, voiture, incidents). */
+  exigences: ExigencesCircuit;
   verification: string;
   /** Rang dans le calendrier (ordre du fichier circuits.csv). */
   ordre?: number;
 }
+
+export interface ExigencesCircuit {
+  lents: number;
+  rapides: number;
+  freinage: number;
+  motricite: number;
+  lignesDroites: number;
+  degradationPneus: number;
+  exigencePhysique: number;
+  difficulte: number;
+  risqueAccident: number;
+}
+export const CHAMPS_EXIGENCES = ['lents', 'rapides', 'freinage', 'motricite', 'lignesDroites', 'degradationPneus', 'exigencePhysique', 'difficulte', 'risqueAccident'] as const;
 
 export type TypeDepartement =
   | 'aero'
@@ -306,8 +336,11 @@ export interface ResultatPilote {
   rangVoiture: number;
   /** Retard de la voiture sur la meilleure voiture du circuit, en % du temps au tour (0 = la plus rapide). */
   retardVoiturePct: number;
-  /** Décomposition du « temps » (en %), conservée 2 saisons : voiture, pilote, forme, aléa. */
-  explication?: { voiture: number; pilote: number; forme: number; alea: number };
+  /**
+   * Décomposition du « temps » (en %), conservée 2 saisons : voiture, pilote (affinité et nouveauté comprises), forme, aléa ;
+   * phase 6a complémentaire : part de l'affinité, de la nouveauté (circuit, écurie) et erreur sous pression.
+   */
+  explication?: { voiture: number; pilote: number; forme: number; alea: number; affinite?: number; nouveaute?: number; pression?: number };
 }
 
 export interface GrandPrix {

@@ -9,6 +9,7 @@
  * sur la capacité de développement (cascade de référence, phase 4).
  */
 
+import { RESILIENCE_ETAT } from '../../balance/personnages';
 import { idsTries, table, type Monde } from '../../core/monde';
 import type { Systeme } from '../../core/moteur';
 import { TABLES, type Ecurie, type Personne } from '../../model/types';
@@ -35,8 +36,12 @@ export function mettreAJourEtat(monde: Monde, p: Personne, souvenirs: Souvenir[]
   }
   const moralCible = 65 + 30 * Math.tanh(bilan / SENSIBILITE_MORAL);
   const confianceCible = 65 + 25 * Math.tanh(confiance / 1.2);
-  p.etat.moral = Math.round(borner(p.etat.moral + INERTIE * (moralCible - p.etat.moral)));
-  p.etat.confiance = Math.round(borner(p.etat.confiance + INERTIE * (confianceCible - p.etat.confiance)));
+  // D-105 : un résilient se remet vite d'un coup dur et s'effondre moins vite.
+  const res = (p.traits['resilience'] ?? 10) / 20;
+  const inertie = (cible: number, actuel: number) =>
+    INERTIE * (cible >= actuel ? RESILIENCE_ETAT.min + RESILIENCE_ETAT.amplitude * res : RESILIENCE_ETAT.min + RESILIENCE_ETAT.amplitude * (1 - res));
+  p.etat.moral = Math.round(borner(p.etat.moral + inertie(moralCible, p.etat.moral) * (moralCible - p.etat.moral)));
+  p.etat.confiance = Math.round(borner(p.etat.confiance + inertie(confianceCible, p.etat.confiance) * (confianceCible - p.etat.confiance)));
   p.etat.motivation = Math.round(borner(p.etat.motivation + INERTIE * (60 + LIEN_MORAL_MOTIVATION * (p.etat.moral - 65) - p.etat.motivation)));
   const ecurie = table(monde, TABLES.ecuries)[p.ecurie] as unknown as Ecurie | undefined;
   const pression = ecurie ? ecurie.pressionMediatique * 2.5 : 20;

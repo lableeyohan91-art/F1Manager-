@@ -16,20 +16,28 @@ export const ECART_VOITURE_PAR_POINT = 0.28;
  */
 export const ECART_PILOTE_PAR_POINT = 0.15;
 
-/** Poids des compétences dans le niveau d'un pilote, sur le sec. Somme = 1. */
+/**
+ * Poids des compétences dans le niveau d'un pilote, sur le sec, pour un circuit neutre (D-104). Somme = 1.
+ * « rythme » est réparti entre freinage, virages lents, virages rapides et motricité selon les exigences du circuit ;
+ * gestion des pneus et condition sont modulées par la dégradation et l'exigence physique ; puis tout est renormalisé à 1.
+ */
 export const POIDS_PILOTE: Record<string, number> = {
-  vitesse: 0.45,
-  regularite: 0.15,
-  depassement: 0.1,
+  rythme: 0.4,
+  intelligenceCourse: 0.12,
+  regularite: 0.12,
+  depassement: 0.08,
   defense: 0.05,
-  gestionPneus: 0.1,
+  gestionPneus: 0.08,
   departs: 0.05,
   retourTechnique: 0.05,
   condition: 0.05,
 };
 
-/** Sous la pluie, cette part du poids de la vitesse passe à la compétence « pluie ». */
-export const PART_PLUIE_DANS_VITESSE = 0.7;
+/** Sous la pluie, cette part du poids du rythme passe à la compétence « pluie ». */
+export const PART_PLUIE_DANS_RYTHME = 0.7;
+
+/** Difficulté technique du circuit (1–5) : l'influence du pilote est multipliée par min + parPoint × difficulté (1 pour 3). */
+export const DIFFICULTE_CIRCUIT = { min: 0.85, parPoint: 0.05 };
 
 /** Forme du jour : écart maximal (en %) apporté par la confiance en soi (0–100, référence 65). */
 export const EFFET_FORME_MAX = 0.1;
@@ -44,7 +52,8 @@ export const MULTIPLICATEUR_ALEA_PLUIE = 1.7;
 export const ABANDON_MECANIQUE = { base: 0.025, parPoint: 0.007 };
 
 /** Incident de course : probabilité = base + (20 − régularité) × parPoint, multipliée selon les conditions. */
-export const INCIDENT = { base: 0.018, parPoint: 0.003, multiplicateurPluie: 1.8, multiplicateurUrbain: 1.5 };
+/** Incidents : probabilité = (base + (20 − régularité) × parPoint) × pluie × (risque d'accident du circuit / référence). */
+export const INCIDENT = { base: 0.018, parPoint: 0.003, multiplicateurPluie: 1.8, risqueReference: 3 };
 
 /**
  * Résultat inattendu : le vainqueur avait une voiture en retard d'au moins ce pourcentage de temps au tour

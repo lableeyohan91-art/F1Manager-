@@ -37,6 +37,7 @@ import { comptesVides } from '../model/finances';
 import { TABLES } from '../model/types';
 import { moyenne, type DonneesInitiales, type PersonneDonnees } from './chargement';
 import { plafondCompetence, tirerCarriere } from '../systems/carriere/profil';
+import { initialiserExperienceDonnees } from '../systems/carriere/performance';
 
 export const DATE_DEPART: DateJeu = { annee: 2027, semaine: 1 };
 
@@ -423,6 +424,9 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
       } satisfies Installation);
     }
   }
+
+  // D-106 : expérience initiale des pilotes issus des données (provisoire avant la phase 9).
+  initialiserExperienceDonnees(monde);
 
   return monde;
 }

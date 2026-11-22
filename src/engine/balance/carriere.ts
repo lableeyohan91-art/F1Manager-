@@ -26,6 +26,11 @@ export const ARCHETYPES: Record<string, { poids: number; decalageApogee: number;
 export const VARIATION_AGES = { apogee: 1.5, plateau: 1.5 };
 /** Écart type des points forts / faibles par compétence autour du potentiel global (D-051), en points. */
 export const ECART_COMPETENCES = 1.5;
+/**
+ * Style (D-104) : les quatre compétences de rythme partagent une composante commune (écart type, points),
+ * pour des profils cohérents ; leur écart individuel est alors réduit à `individuelRythme`.
+ */
+export const STYLE_RYTHME = { commun: 1.2, individuelRythme: 0.8 };
 /** Une personne issue des données encore au sommet garde au moins ce nombre d'années de plateau (§3.4). */
 export const PLATEAU_MINIMAL_DONNEES = 1;
 
@@ -51,9 +56,10 @@ export const NATURES: Record<string, { decalage: number; declin: number }> = {
   transversale: { decalage: 5, declin: 0.4 },
 };
 export const NATURE_COMPETENCE: Record<string, string> = {
-  vitesse: 'physique', departs: 'physique', condition: 'physique',
+  viragesRapides: 'physique', departs: 'physique', condition: 'physique',
+  freinage: 'technique', viragesLents: 'technique', motricite: 'technique',
   depassement: 'technique', defense: 'technique', pluie: 'technique',
-  regularite: 'experience', gestionPneus: 'experience', retourTechnique: 'experience',
+  regularite: 'experience', gestionPneus: 'experience', retourTechnique: 'experience', intelligenceCourse: 'experience',
   strategie: 'experience', reglement: 'experience', gestionProjet: 'experience', negociation: 'experience', politique: 'experience',
   relationConseil: 'experience', organisationStands: 'experience', gestionPilotes: 'experience', gestionBudgetaire: 'experience', maitrisePlafond: 'experience',
   leadership: 'transversale', communication: 'transversale', adaptabilite: 'transversale', gestionHumaine: 'transversale',
@@ -122,3 +128,42 @@ export const COHORTE = {
 export const AGE_MINIMAL_F1 = 18;
 /** Monde de départ : jeunes pilotes générés par âge, de 14 à 22 ans, avec un passé de progression calculé. */
 export const POPULATION_JEUNE_INITIALE = { ageMin: 14, ageMax: 22 };
+
+/* ---------------------------------------------------------------- Expérience réelle (D-106) */
+
+/**
+ * Facteur d'expérience des compétences d'« expérience » : min + amplitude × (1 − e^(−GP / echelle)).
+ * Il remplace l'âge comme moteur de leur progression (pour le personnel : saisons d'activité).
+ */
+export const FACTEUR_EXPERIENCE = { min: 0.6, amplitude: 0.8, echelleGP: 60, echelleSaisons: 8 };
+/** Circuit découvert : handicap (points de niveau) × e^(−visites / echelle) × (1,3 − adaptabilité / 20). */
+export const NOUVEAU_CIRCUIT = { handicap: 0.4, echelle: 1.5 };
+/** Nouvelle écurie : handicap (points) × e^(−GP avec l'écurie / echelle) × (1,3 − adaptabilité / 20). */
+export const NOUVELLE_ECURIE = { handicap: 0.3, echelle: 6 };
+/** Apprentissage de la pluie : après une course sous la pluie, part de l'écart au plafond comblée × e^(−courses / echelle). */
+export const APPRENTISSAGE_PLUIE = { part: 0.04, echelle: 15 };
+
+/* ---------------------------------------------------------------- Pression (D-105) */
+
+/**
+ * Erreur sous pression dans une course décisive (4 dernières manches, pilote encore en course pour le titre) :
+ * probabilité = base × (1,5 − sang-froid / 20) × (1 − experience × (1 − e^(−luttes / echelleLuttes))) ; coût en % du temps au tour.
+ */
+export const PRESSION = { manchesDecisives: 4, base: 0.12, experience: 0.6, echelleLuttes: 2, pertePct: 0.6 };
+
+/* ---------------------------------------------------------------- Affinités (D-108) */
+
+/** Effet par cran d'affinité (points de niveau effectif), bornes de l'échelle. */
+export const AFFINITE = { parCran: 0.15, min: -2, max: 2 };
+/** Affinité naturelle, tirée à la première visite : Grand Prix à domicile (+1 ou +2), ailleurs un cran rare. */
+export const AFFINITE_NATURELLE = { domicileUn: 0.5, domicileDeux: 0.15, ailleurs: 0.04 };
+/** Évolution après un événement : probabilité d'un cran (modulée par la personnalité). */
+export const AFFINITE_EVENEMENTS = { victoire: 0.35, podium: 0.15, titre: 0.5, incident: 0.25 };
+
+/** Modulation par un trait de personnalité (1–20) : multiplicateur = min + amplitude × trait / 20. */
+export const MODULATION_TRAIT = { min: 0.6, amplitude: 0.8 };
+/** Adaptabilité (1–20) : les handicaps de nouveauté sont multipliés par reference − adaptabilité / 20. */
+export const ADAPTABILITE_REFERENCE = 1.3;
+/** Expérience historique des pilotes des données (provisoire avant la phase 9) : par saison de titulaire. */
+export const EXPERIENCE_HISTORIQUE = { gpParSaison: 22, pluieParSaison: 2 };
+

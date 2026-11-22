@@ -12,7 +12,7 @@ import { SEMAINES_PAR_AN } from '../../balance/calendrier';
 import { PHASES_SAISON } from '../../balance/calendrier';
 import { CARACTERISTIQUES_VITESSE, PROBABILITE_PLUIE } from '../../balance/circuits';
 import {
-  ABANDON_MECANIQUE, ALEA_SIGMA, CONFIANCE_REFERENCE, ECART_PILOTE_PAR_POINT, ECART_VOITURE_PAR_POINT, EFFET_FORME_MAX, INCIDENT,
+  ABANDON_MECANIQUE, ALEA_SIGMA, CONFIANCE_REFERENCE, DIFFICULTE_CIRCUIT, ECART_PILOTE_PAR_POINT, ECART_VOITURE_PAR_POINT, EFFET_FORME_MAX, INCIDENT,
   MULTIPLICATEUR_ALEA_PLUIE, SEUIL_SURPRISE_PCT,
 } from '../../balance/course';
 import {
@@ -28,6 +28,7 @@ import {
   type Motoriste, type Palmares, type Personne, type ResultatPilote, type Saison, type Voiture,
 } from '../../model/types';
 import { genererChronique } from './chronique';
+import { apresGrandPrix, erreurPression, modificateurNiveau, noterLuttesTitre, titreSurCircuit } from '../carriere/performance';
 import { facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero } from '../economie';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 
@@ -91,7 +92,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   gp.pluie = tirageLocal(monde, 'meteo', gp.id).chance(PROBABILITE_PLUIE[circuit.climatPluie] ?? 0.1);
 
   // Rang des voitures sur ce circuit (1 = la plus rapide).
-  const indices = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, circuit.type)]));
+  const indices = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, circuit)]));
   const rangs = new Map([...indices.entries()].sort((a, b) => b[1] - a[1]).map(([id], i) => [id, i + 1]));
   const meilleurIndice = Math.max(...indices.values());
   const retard = (id: string) => Math.round((meilleurIndice - (indices.get(id) as number)) * ECART_VOITURE_PAR_POINT * 1000) / 1000;
@@ -102,14 +103,21 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const e = ecuries.get(p.ecurie) as Ecurie;
     const f = tirageLocal(monde, 'course', gp.id, p.id);
     const voiture = (indices.get(e.id) as number) * ECART_VOITURE_PAR_POINT;
-    const pilote = niveauPilote(p, gp.pluie) * parametre(monde, 'course.ecartPiloteParPoint', ECART_PILOTE_PAR_POINT);
+    // D-104 à D-108 : niveau du pilote sur CE circuit, affinité, handicaps de nouveauté ; la difficulté technique amplifie l'influence du pilote.
+    const ecartPilote = parametre(monde, 'course.ecartPiloteParPoint', ECART_PILOTE_PAR_POINT) * (DIFFICULTE_CIRCUIT.min + DIFFICULTE_CIRCUIT.parPoint * circuit.exigences.difficulte);
+    const mod = modificateurNiveau(monde, p, circuit);
+    const pilote = (niveauPilote(p, gp.pluie, circuit.exigences) + mod.affinite + mod.nouveaute) * ecartPilote;
+    const pression = erreurPression(monde, p, saison, gp.manche, gp.id);
     const forme = EFFET_FORME_MAX * borner((p.etat.confiance - CONFIANCE_REFERENCE) / (100 - CONFIANCE_REFERENCE), -1, 1);
     const alea = f.normale(0, sigma);
     const pMeca = ABANDON_MECANIQUE.base + (20 - voitureDe(monde, e.id).fiabilite) * ABANDON_MECANIQUE.parPoint;
     const pInc = (INCIDENT.base + (20 - (p.competences['regularite'] ?? 10)) * INCIDENT.parPoint)
-      * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.type === 'urbain' ? INCIDENT.multiplicateurUrbain : 1);
+      * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.exigences.risqueAccident / INCIDENT.risqueReference);
     const abandon = f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : null;
-    return { p, e, temps: -(voiture + pilote + forme) + alea, abandon, explication: { voiture, pilote, forme, alea } };
+    return {
+      p, e, temps: -(voiture + pilote + forme) + alea + pression, abandon,
+      explication: { voiture, pilote, forme, alea, affinite: mod.affinite * ecartPilote, nouveaute: mod.nouveaute * ecartPilote, pression },
+    };
   });
 
   const arrives = calcul.filter((c) => !c.abandon).sort((a, b) => a.temps - b.temps || (a.p.id < b.p.id ? -1 : 1));
@@ -125,10 +133,16 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   ];
   gp.resultats = resultats;
   gp.termine = true;
+  // Expérience, apprentissage de la pluie, affinités (D-106, D-108).
+  apresGrandPrix(monde, circuit, gp.id, gp.pluie, calcul.map((c) => {
+    const r = resultats.find((x) => x.pilote === c.p.id);
+    return { p: c.p, position: r?.position ?? null, incident: c.abandon === 'incident' };
+  }));
 
   // Avant la dernière manche : le titre est-il encore ouvert ? (définition exacte, égalités comprises)
   if (gp.manche === saison.calendrier.length) {
     trierClassements(saison);
+    noterLuttesTitre(saison, (id) => table(monde, TABLES.personnes)[id] as unknown as Personne | undefined);
     saison.leaderAvantDerniereManche = saison.pilotes[0]?.pilote ?? '';
     saison.titreOuvertDerniereManche = titreEncoreOuvert(saison);
   }
@@ -290,6 +304,11 @@ export function terminerSaison(monde: Monde, annee: number): void {
     const eqP = ecuries.get(champion.ecurie) as Ecurie;
     const eqC = ecuries.get(championC.ecurie) as Ecurie;
     eqP.titresPilotes++;
+    // D-108 : le champion s'attache souvent au circuit de son sacre (dernière manche).
+    const derniere = s.calendrier.length ? grandPrix(monde, s.calendrier[s.calendrier.length - 1]!) : undefined;
+    const circuitSacre = derniere ? (table(monde, TABLES.circuits)[derniere.circuit] as unknown as Circuit | undefined) : undefined;
+    const pChampion = table(monde, TABLES.personnes)[champion.pilote] as unknown as Personne | undefined;
+    if (circuitSacre && pChampion) titreSurCircuit(monde, pChampion, circuitSacre, annee);
     eqC.titresConstructeurs++;
     const pal: Palmares = { id: `pal_${annee}`, saison: annee, championPilote: champion.pilote, ecurieChampionPilote: champion.ecurie, championConstructeurs: championC.ecurie, note: 'simulé' };
     table(monde, TABLES.palmares)[pal.id] = pal as unknown as Entite;

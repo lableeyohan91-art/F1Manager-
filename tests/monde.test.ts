@@ -29,7 +29,7 @@ describe('Phase 2 — génération du monde (grille 2026)', () => {
     const b = personnes(sc.creerMonde(2)).find((p) => p.id === 'per_leclerq')!;
     expect(a.traits).not.toEqual(b.traits);
     // Les données réelles, elles, ne bougent pas.
-    expect(a.competences['vitesse']).toBe(b.competences['vitesse']);
+    expect(a.competences['freinage']).toBe(b.competences['freinage']);
   });
 
   it('critère 3 : contrôles de cohérence sans erreur sur 20 graines', () => {
@@ -70,7 +70,7 @@ describe('Phase 2 — erreurs de données claires (critère 4)', () => {
       expect.fail('aurait dû échouer');
     } catch (e) {
       expect(e).toBeInstanceOf(ErreurDonnees);
-      expect((e as ErreurDonnees).problemes.join('\n')).toMatch(/personnes\.csv, ligne 2, colonne « vitesse » : 25 hors des bornes/);
+      expect((e as ErreurDonnees).problemes.join('\n')).toMatch(/personnes\.csv, ligne 2, colonne « freinage » : 25 hors des bornes/);
     }
   });
 

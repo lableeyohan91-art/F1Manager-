@@ -23,9 +23,11 @@ import { relation } from '../memoire';
 import { liberer } from '../humain/contrats';
 import { niveauEffectif } from '../economie/infrastructures';
 import { changerMetier, competencesMetier, niveauCarriere, plafondCompetence } from './profil';
+import { facteurExperience } from './performance';
 
 export * from './profil';
 export * from './estimation';
+export * from './performance';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 const r2 = (x: number) => Math.round(x * 100) / 100;
@@ -85,17 +87,21 @@ export function faireProgresser(monde: Monde, p: Personne, equipe: Personne[], i
   const frein = TRAVAIL.freinDeclin - TRAVAIL.amplitudeDeclin * ((p.traits['professionnalisme'] ?? 10) / 20);
   const special = k.phaseSpeciale ? (k.phaseSpeciale.type === 'declic' ? DECLIC.multiplicateur : STAGNATION.multiplicateur) : 1;
   const f = tirageLocal(monde, 'progression', p.id, monde.date.annee, monde.date.semaine);
+  const experience = facteurExperience(p);
   for (const c of [...competencesMetier(p.poste), ...COMPETENCES_TRANSVERSALES]) {
     const v = p.competences[c];
     if (v === undefined) continue;
-    const nature = NATURES[NATURE_COMPETENCE[c] ?? 'technique']!;
+    const nomNature = NATURE_COMPETENCE[c] ?? 'technique';
+    const nature = NATURES[nomNature]!;
     const ageC = age - nature.decalage;
+    // D-106 : pour les compétences d'expérience, l'expérience réelle (et non l'âge seul) règle la progression et freine le déclin.
+    const exp = nomNature === 'experience' ? experience : 1;
     let delta: number;
     if (ageC < k.finApogee) {
-      const taux = TAUX_PROGRESSION * k.vitesseProgression * env * travail * special * (ageC < k.debutApogee ? 1 : PROGRESSION_PLATEAU);
+      const taux = TAUX_PROGRESSION * k.vitesseProgression * env * travail * special * exp * (ageC < k.debutApogee ? 1 : PROGRESSION_PLATEAU);
       delta = taux * Math.max(0, plafondCompetence(p, c) - v);
     } else {
-      delta = -DECLIN.pointsParPeriode * k.vitesseDeclin * nature.declin * (1 + DECLIN.acceleration * (ageC - k.finApogee)) * frein;
+      delta = (-DECLIN.pointsParPeriode * k.vitesseDeclin * nature.declin * (1 + DECLIN.acceleration * (ageC - k.finApogee)) * frein) / exp;
     }
     p.competences[c] = r2(borner(v + delta + f.normale(0, ALEA_PROGRESSION), 1, 20));
   }

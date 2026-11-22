@@ -12,6 +12,9 @@
 import { etatInitialFlux, Flux } from './hasard';
 import { VERSION_FORMAT, type Monde } from './monde';
 import { tirerCarriere } from '../systems/carriere/profil';
+import { EXIGENCES_PAR_TYPE } from '../balance/circuits';
+import { EXPERIENCE_HISTORIQUE } from '../balance/carriere';
+import { COMPETENCES_RYTHME } from '../balance/personnages';
 import type { Personne } from '../model/types';
 
 export const SIGNATURE = 'f1manager-sauvegarde';
@@ -121,6 +124,44 @@ const MIGRATIONS: Record<number, Migration> = {
       p.carriere = tirerCarriere(p, new Flux(etatInitialFlux(graine, `generation:carriere:${p.id}`)), annee - p.anneeNaissance, p.origine === 'donnees');
     }
     return { ...m, versionFormat: 7 };
+  },
+  // v7 → v8 (phase 6a complémentaire) : « vitesse » répartie entre les quatre compétences de rythme (style tiré de façon
+  // déterministe), intelligence de course, trait résilience, expérience réelle estimée, exigences des circuits selon leur type.
+  7: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, Record<string, unknown>>>;
+    const graine = Number(m['graine'] ?? 0);
+    const idsCircuits = Object.keys(tables['circuits'] ?? {});
+    for (const c of Object.values(tables['circuits'] ?? {})) {
+      c['exigences'] ??= { ...(EXIGENCES_PAR_TYPE[String(c['type'])] ?? EXIGENCES_PAR_TYPE['mixte']!) };
+    }
+    const r1 = (x: number) => Math.round(Math.min(20, Math.max(1, x)) * 10) / 10;
+    for (const brut of Object.values(tables['personnes'] ?? {})) {
+      const p = brut as unknown as Personne;
+      const f = new Flux(etatInitialFlux(graine, `generation:style:${p.id}`));
+      p.traits['resilience'] ??= Math.round(Math.min(20, Math.max(1, f.normale(10.5, 3.5))));
+      if (!p.poste.startsWith('pilote')) continue;
+      const v = p.competences['vitesse'];
+      if (v !== undefined) {
+        const style = f.normale(0, 0.5);
+        for (const c of COMPETENCES_RYTHME) p.competences[c] ??= r1(v + style + f.normale(0, 0.6));
+        delete p.competences['vitesse'];
+      }
+      p.competences['intelligenceCourse'] ??= r1(((p.competences['regularite'] ?? 10) + (p.competences['retourTechnique'] ?? 10)) / 2 + f.normale(0, 1));
+      if (p.carriere) {
+        const ev = p.carriere.ecarts['vitesse'] ?? 0;
+        for (const c of COMPETENCES_RYTHME) p.carriere.ecarts[c] ??= Math.round((ev + f.normale(0, 0.5)) * 100) / 100;
+        p.carriere.ecarts['intelligenceCourse'] ??= Math.round(f.normale(0, 1.5) * 100) / 100;
+        delete p.carriere.ecarts['vitesse'];
+        if (!p.carriere.experience) {
+          const saisons = p.carriere.saisonsF1;
+          p.carriere.experience = {
+            gp: saisons * EXPERIENCE_HISTORIQUE.gpParSaison, pluie: saisons * EXPERIENCE_HISTORIQUE.pluieParSaison, luttesTitre: 0,
+            circuits: saisons > 0 ? Object.fromEntries(idsCircuits.map((c) => [c, saisons])) : {}, ecurie: p.ecurie, gpEcurie: saisons > 0 ? EXPERIENCE_HISTORIQUE.gpParSaison : 0,
+          };
+        }
+      }
+    }
+    return { ...m, versionFormat: 8 };
   },
 };
 

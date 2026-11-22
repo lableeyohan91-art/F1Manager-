@@ -42,14 +42,14 @@ describe('Phase 6a — cycle de vie', () => {
     expect(niveauCarriere(titulaire)).toBeGreaterThan(niveauCarriere(jeune));
   });
 
-  it('déclin : la vitesse pure baisse avant la régularité', () => {
+  it('déclin : les virages rapides (physique) baissent avant la régularité (expérience)', () => {
     const m = sc.creerMonde(1);
     const v = structuredClone(p(m, 'per_alonzo'));
     v.carriere!.finApogee = 35; // déclin entamé à 45 ans
     v.carriere!.archetype = 'regulier';
     v.carriere!.vitesseDeclin = 1;
     const apres = evoluer(m, v, 13, () => undefined);
-    const perteVitesse = v.competences['vitesse']! - apres.competences['vitesse']!;
+    const perteVitesse = v.competences['viragesRapides']! - apres.competences['viragesRapides']!;
     const perteRegularite = v.competences['regularite']! - apres.competences['regularite']!;
     expect(perteVitesse).toBeGreaterThan(perteRegularite);
     expect(perteVitesse).toBeGreaterThan(0);
@@ -83,7 +83,7 @@ describe('Phase 6a — cycle de vie', () => {
     changerMetier(p(m, 'per_alonzo'), 'team_principal', tirageLocal(m, 'test'), 46);
     expect(p(m, 'per_alonzo').poste).toBe('team_principal');
     expect(p(m, 'per_alonzo').competences['negociation']).toBeGreaterThan(0);
-    expect(p(m, 'per_alonzo').competences['vitesse']).toBeUndefined();
+    expect(p(m, 'per_alonzo').competences['freinage']).toBeUndefined();
     expect(souvenirsDe(m, 'per_alonzo')).toHaveLength(n);
   });
 

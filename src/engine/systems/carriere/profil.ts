@@ -4,8 +4,8 @@
  * aux migrations de sauvegarde et aux systèmes.
  */
 
-import { AGE_MINIMAL_F1, ARCHETYPES, ECART_COMPETENCES, PLATEAU_MINIMAL_DONNEES, RECONVERSION, VARIATION_AGES } from '../../balance/carriere';
-import { COMPETENCES_PAR_POSTE, COMPETENCES_PILOTE, COMPETENCES_TRANSVERSALES, courbeAge } from '../../balance/personnages';
+import { AGE_MINIMAL_F1, ARCHETYPES, ECART_COMPETENCES, STYLE_RYTHME, PLATEAU_MINIMAL_DONNEES, RECONVERSION, VARIATION_AGES } from '../../balance/carriere';
+import { COMPETENCES_PAR_POSTE, COMPETENCES_PILOTE, COMPETENCES_RYTHME, COMPETENCES_TRANSVERSALES, courbeAge } from '../../balance/personnages';
 import type { Flux } from '../../core/hasard';
 import type { Monde } from '../../core/monde';
 import type { CarrierePersonne, Personne, Poste } from '../../model/types';
@@ -47,6 +47,11 @@ export function tirerCarriere(p: Personne, f: Flux, age: number, donnees: boolea
   const ecarts: Record<string, number> = {};
   const liste = [...competencesMetier(p.poste), ...COMPETENCES_TRANSVERSALES];
   for (const c of liste) ecarts[c] = f.normale(0, ECART_COMPETENCES);
+  // D-104 : style — les compétences de rythme partagent une composante commune (profils cohérents).
+  if (p.poste.startsWith('pilote')) {
+    const style = f.normale(0, STYLE_RYTHME.commun);
+    for (const c of COMPETENCES_RYTHME) ecarts[c] = style + f.normale(0, STYLE_RYTHME.individuelRythme);
+  }
   const moyenne = competencesMetier(p.poste).reduce((s, c) => s + (ecarts[c] ?? 0), 0) / Math.max(1, competencesMetier(p.poste).length);
   for (const c of competencesMetier(p.poste)) ecarts[c] = Math.round(((ecarts[c] ?? 0) - moyenne) * 100) / 100; // centrés : le potentiel global reste la moyenne
   for (const c of COMPETENCES_TRANSVERSALES) ecarts[c] = Math.round((ecarts[c] ?? 0) * 100) / 100;

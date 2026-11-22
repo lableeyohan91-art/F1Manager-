@@ -20,6 +20,8 @@ export const TRAITS = {
   // D-054 (phase 4)
   risque: 'Propension au risque',
   remiseEnQuestion: 'Remise en question',
+  // D-105 (phase 6a complémentaire)
+  resilience: 'Résilience',
 } as const;
 
 /** Couche 2 — les 7 valeurs proposées. */
@@ -56,16 +58,23 @@ export const COMPETENCES_TRANSVERSALES = ['leadership', 'communication', 'adapta
 
 /** Compétences propres aux pilotes (colonnes du fichier personnes.csv). */
 export const COMPETENCES_PILOTE = [
-  'vitesse',
-  'regularite',
+  // D-104 : « vitesse » supprimée ; le rythme résulte de ces quatre compétences face aux exigences de chaque circuit.
+  'freinage',
+  'viragesLents',
+  'viragesRapides',
+  'motricite',
   'depassement',
   'defense',
+  'departs',
   'pluie',
   'gestionPneus',
-  'departs',
   'retourTechnique',
   'condition',
+  'regularite',
+  'intelligenceCourse',
 ] as const;
+/** Les quatre compétences de « rythme » (D-104). */
+export const COMPETENCES_RYTHME = ['freinage', 'viragesLents', 'viragesRapides', 'motricite'] as const;
 
 /** Compétences métier des autres postes. */
 export const COMPETENCES_PAR_POSTE: Record<string, readonly string[]> = {
@@ -141,3 +150,10 @@ export const ASPIRATIONS: { type: string; postes: readonly string[]; libelle: st
 
 /** État émotionnel de départ (0 à 100) et dispersion. */
 export const ETAT_DEPART = { moyenne: 65, ecartType: 10 };
+
+/**
+ * Résilience (D-105, trait 1–20) : vitesse à laquelle le moral et la confiance remontent vers leur cible
+ * (inertie × (min + amplitude × résilience / 20)) et résistance quand ils chutent (inertie × (min + amplitude × (1 − résilience / 20))).
+ */
+export const RESILIENCE_ETAT = { min: 0.6, amplitude: 0.8 };
+
