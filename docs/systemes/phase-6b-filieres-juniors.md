@@ -1,6 +1,6 @@
 # Phase 6b — Filières juniors, académies, financement, repérage
 
-> Statut : **PROPOSITION — À VALIDER** (22/11/2026). Aucune ligne de code avant validation.
+> Statut : **VALIDÉE** (D-112, 22/11/2026). Réponses du porteur : tailles, académies, financement et prix acceptés ; liens réels conservés ; livraison 6b-1 puis 6b-2.
 > Cadre déjà validé :
 > - D-062, D-063, D-071 : écosystème de formation ; grilles juniors fictives et générées ; karting et Apex 4 abstraits ; Apex 3 et Apex 2 réellement simulés ; académies réputées par leurs résultats ; écuries partenaires sans contrôle direct ;
 > - D-036 : noms de travail Apex 2, 3 et 4 ;
