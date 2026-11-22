@@ -117,6 +117,17 @@ export interface IndicateursSerie {
   ecuriesSansVictoire: number;
   /** Nombre de fois où une écurie gagne au moins 3 places au classement constructeurs d'une saison à l'autre. */
   remontees: number;
+  /**
+   * D-081 — mobilité entre étages : étages = rangs 1–4 / 5–8 / 9 et plus au classement constructeurs.
+   * Nombre moyen d'écuries qui changent d'étage d'une saison à l'autre, et part des transitions sans aucun changement.
+   */
+  changementsEtageParSaison: number;
+  transitionsSansChangementEtage: number;
+}
+
+/** Étage (0 = haut, 1 = milieu, 2 = bas) d'un rang au classement constructeurs (1 = premier). */
+export function etage(rang: number): number {
+  return rang <= 4 ? 0 : rang <= 8 ? 1 : 2;
 }
 
 function rangs(valeurs: number[]): number[] {
@@ -240,14 +251,19 @@ export function indicateursSerie(monde: Monde): IndicateursSerie {
   });
   const gagnantes = new Set(saisons.flatMap((s) => s.constructeurs.filter((c) => c.victoires > 0).map((c) => c.ecurie)));
   const toutes = new Set(saisons.flatMap((s) => s.constructeurs.map((c) => c.ecurie)));
-  let remontees = 0;
+  let remontees = 0, changements = 0, sansChangement = 0;
   for (let i = 1; i < saisons.length; i++) {
     const avant = saisons[i - 1]!.constructeurs.map((c) => c.ecurie);
+    let n = 0;
     saisons[i]!.constructeurs.forEach((c, rang) => {
       const r = avant.indexOf(c.ecurie);
       if (r >= 0 && r - rang >= 3) remontees++;
+      if (r >= 0 && etage(r + 1) !== etage(rang + 1)) n++;
     });
+    changements += n;
+    if (n === 0) sansChangement++;
   }
+  const transitions = Math.max(1, saisons.length - 1);
   return {
     saisons: saisons.map((s) => indicateursSaison(monde, s)),
     championsPilotesDifferents: new Set(champP).size,
@@ -255,5 +271,7 @@ export function indicateursSerie(monde: Monde): IndicateursSerie {
     maxTitresConsecutifsEcurie: maxSerie,
     ecuriesSansVictoire: [...toutes].filter((e) => !gagnantes.has(e)).length,
     remontees,
+    changementsEtageParSaison: changements / transitions,
+    transitionsSansChangementEtage: sansChangement / transitions,
   };
 }

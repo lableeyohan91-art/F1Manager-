@@ -93,6 +93,8 @@ function lignes(c: Campagne): { saison: Ligne[]; serie: Ligne[]; proportions: Li
       { cle: 'serieTitres', nom: 'Plus longue série de titres constructeurs consécutifs', valeurs: c.series.map((s) => s.maxTitresConsecutifsEcurie), format: (x) => f(x, 1) },
       { cle: 'sansVictoire', nom: `Écuries sans aucune victoire sur ${nSaisons} saisons`, valeurs: c.series.map((s) => s.ecuriesSansVictoire), format: (x) => f(x, 1) },
       { cle: 'remontees', nom: 'Remontées (+3 places ou plus d’une saison à l’autre)', valeurs: c.series.map((s) => s.remontees), format: (x) => f(x, 1) },
+      { cle: 'changementsEtage', nom: 'Écuries changeant d’étage par saison (étages 1–4 / 5–8 / 9+, D-081)', valeurs: c.series.map((s) => s.changementsEtageParSaison), format: (x) => f(x, 1) },
+      { cle: 'sansChangementEtage', nom: 'Transitions de saison sans aucun changement d’étage (D-081)', valeurs: c.series.map((s) => s.transitionsSansChangementEtage), format: (x) => pct(x) },
     ],
     proportions: [
       { cle: 'derniereMarque', nom: 'Saisons où la dernière écurie marque au moins 1 point', valeurs: oui('derniereEcurieMarque'), cible: [0.4, 0.9], format: pct },

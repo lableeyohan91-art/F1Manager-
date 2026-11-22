@@ -1,6 +1,7 @@
 # Phase 5 — Économie
 
 > Statut : **VALIDÉ** (D-078, 22/11/2026). Livraison en deux temps : 5a puis 5b. Réponses aux questions du §12 dans D-078.
+> **5a réalisée** le 22/11/2026 (rapport `docs/rapports/2026-11-22-p5a-economie.md`). Écarts à valider : D-084 (effort technique au lieu du seul budget de développement), D-085 (dividendes), D-086 (marge de sécurité), D-087 (coûts), D-088 (étages).
 > Inspirations : la gestion financière de F1 Manager (budget, plafond, installations, sponsors) et la profondeur de Football Manager (propriétaires, conseil, finances qui pèsent sur chaque décision).
 > Dépendances : phase 3 (primes), phase 4 (contrats, salaires, indemnités, IA des dirigeants). Anticipe les phases 6a et 6b (académies, financement des jeunes), 7 (marché), 8 (règlement), 12 (pièces).
 

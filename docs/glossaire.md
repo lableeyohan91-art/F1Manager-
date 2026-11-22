@@ -124,3 +124,8 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Réconciliation** | Excuses, reconnaissance d'une erreur, discussion privée : réduisent les souvenirs négatifs, freinées par la rancune. |
 | **Écurie pilotée** | Écurie dont le joueur prend les décisions de personnel dans le bac à sable. |
 | **Score de réussite** | 40 % sport, 25 % personnel, 20 % finances, 15 % confiance et réputation (D-069). |
+| **Effort technique** | Total des dépenses plafonnées prévues d'une écurie sur l'année (personnel, installations, opérations, développement), rapporté à une référence : il règle la vitesse de développement de la voiture (D-084). |
+| **Restriction aérodynamique** | Efficacité du développement aéro selon le classement de l'an passé : 75 % pour le premier, 115 % pour le dernier. Réduite en cas de sanction pour dépassement du plafond. |
+| **Dividendes** | Part de la trésorerie excédentaire retirée chaque année par le propriétaire (D-085). |
+| **Étage** | Groupe de rangs au classement constructeurs (1–4, 5–8, 9 et plus) servant à mesurer la mobilité de la hiérarchie (D-088). |
+| **Rang attendu** | Rang des moyens financiers d'une écurie parmi toutes ; le conseil compare les résultats à ce rang pour juger le team principal. |

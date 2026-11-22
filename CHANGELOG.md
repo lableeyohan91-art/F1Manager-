@@ -130,3 +130,20 @@ Aucun code à ce stade.
 - Réglage C2 appliqué à titre provisoire (D-074 : pilote 0,15 / aléa 0,30), réglage B conservé comme référence ; nouvelle référence `docs/rapports/reference/p4-c2-reference.*`.
 - Orientation fondamentale « compétitivité » (D-081) ajoutée au GAME_DESIGN (§7, principe 11) ; laboratoire d'équilibrage documenté (`docs/systemes/laboratoire-equilibrage.md`) avec les cibles du jeu final et l'état actuel ; cibles intégrées à l'outil de campagne et à la fiche de la phase 5.
 - Propositions D-082 (indicateurs de tiers, mobilité, valeur des décisions) et question D-083 (départ 2027).
+
+## [Phase 5a] — 22/11/2026
+
+### Ajouté
+- Économie de base : données financières de départ (`finances.csv`), propriétaires, comptabilité par période de 4 semaines, bilan annuel, contrôle du plafond et sanctions, budget décidé par l'IA, coupes, dividendes.
+- Développement lié à l'effort technique sous plafond ; restrictions aéro selon le classement.
+- Conseil d'administration : prolongation et licenciement du team principal (remplace la règle provisoire de la phase 4).
+- Apparence persistante des personnes (D-080) ; format de sauvegarde 5 avec migration testée.
+- Onglet « Finances » du diagnostic ; outils `npm run finances` et `npm run statistiques-finances`.
+- Indicateurs de mobilité entre étages (D-082, D-088) dans le rapport d'équilibrage.
+- 6 tests (62 au total).
+- Rapport `docs/rapports/2026-11-22-p5a-economie.md` ; références conservées (`p4-c2-reference-v2`, `p4-c2-reference-20saisons`, `p5a-reference`, `p5a-reference-20saisons`).
+
+### Constat
+- Bas et milieu de grille resserrés (dernière écurie qui marque : 32 % → 44 % sur 10 saisons ; 47 % → 59 % sur 20), mobilité accrue ; sommet inchangé (dynasties 64 % → 66 %, dominations 8 % → 10 % sur 10 saisons). Économie encore très calme (aucune crise) : attendu avant la 5b.
+- Écarts à la conception à valider : D-084 à D-088.
+
