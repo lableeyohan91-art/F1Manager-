@@ -248,11 +248,14 @@ function rangAttendu(monde: Monde, idEcurie: string): number {
   return moyens.findIndex(([id]) => id === idEcurie) + 1;
 }
 
-/** Évaluation annuelle du team principal par le conseil (remplace la règle provisoire de la phase 4). */
+/**
+ * Évaluation annuelle du team principal par le conseil (remplace la règle provisoire de la phase 4).
+ * Mêmes règles pour l'écurie pilotée par le joueur (D-089) : s'il est licencié, il perd la main sur l'écurie.
+ */
 function evaluerTeamPrincipal(monde: Monde, e: Ecurie): void {
   const tp = teamPrincipal(monde, e.id);
   const p = proprietaireDe(monde, e.id);
-  if (!tp || !p || e.pilotee) return;
+  if (!tp || !p) return;
   const saisons = (Object.values(table(monde, TABLES.saisons)) as unknown as Saison[]).filter((s) => s.termine).sort((a, b) => b.annee - a.annee).slice(0, 2);
   const attendu = rangAttendu(monde, e.id);
   const ecarts = saisons.map((s) => s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1 - attendu);
@@ -262,18 +265,23 @@ function evaluerTeamPrincipal(monde: Monde, e: Ecurie): void {
   if (!tirageLocal(monde, 'conseil.evaluation', e.id, monde.date.annee).chance(CONSEIL.probabilite)) return;
   const c = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.personne === tp.id && x.statut === 'actif' && x.type === 'emploi');
   if (!c) return;
+  const joueur = !!e.pilotee;
   ajouterEvenement(monde, {
-    type: 'conseil.licenciement_tp', acteurs: [{ id: e.id, role: 'auteur' }, { id: tp.id, role: 'cible' }], importance: 4, visibilite: 'public',
-    contexte: { ecarts, attendu }, texte: `Le conseil de ${e.nom} se sépare de son team principal, ${tp.prenom} ${tp.nom}.`,
+    type: joueur ? 'conseil.licenciement_joueur' : 'conseil.licenciement_tp', acteurs: [{ id: e.id, role: 'auteur' }, { id: tp.id, role: 'cible' }],
+    importance: joueur ? 5 : 4, visibilite: 'public', contexte: { ecarts, attendu, joueur },
+    texte: joueur
+      ? `Le conseil de ${e.nom} vous congédie : les résultats sont trop loin de ce que permettent les moyens de l'écurie.`
+      : `Le conseil de ${e.nom} se sépare de son team principal, ${tp.prenom} ${tp.nom}.`,
   });
+  if (joueur) e.pilotee = false; // le joueur perd la main ; l'IA reprend l'écurie et recrute un successeur
   liberer(monde, tp, c, 'licenciement');
 }
 
-/** Prolongation du team principal décidée par le conseil (semaine des négociations). */
+/** Prolongation du team principal décidée par le conseil (semaine des négociations), joueur compris (D-089). */
 function prolongationTeamPrincipal(monde: Monde, e: Ecurie): void {
   const tp = teamPrincipal(monde, e.id);
   const p = proprietaireDe(monde, e.id);
-  if (!tp || !p || e.pilotee) return;
+  if (!tp || !p) return;
   const c = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.personne === tp.id && x.statut === 'actif' && x.type === 'emploi');
   if (!c || c.fin !== monde.date.annee || c.nonProlonge) return;
   const s = (Object.values(table(monde, TABLES.saisons)) as unknown as Saison[]).filter((x) => x.termine).sort((a, b) => b.annee - a.annee)[0];

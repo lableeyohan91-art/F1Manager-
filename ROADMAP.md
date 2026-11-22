@@ -18,7 +18,7 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | 6a | Cycle de vie | Progression et déclin individualisés, retraites, reconversions, nouvelles générations, réservoir karting/F4, potentiel incertain et rapports de recrutement |
 | 6b | Filières juniors | Deux championnats juniors réellement simulés (écuries, calendriers, résultats, classements, palmarès), académies, contrats d'affiliation, financement des carrières, placement, renouvellement des grilles |
 | 7 | Marché du travail + IA des écuries + agents | Recrutement actif, débauchage (adultes **et jeunes talents**), clauses de rachat, décisions de l'IA |
-| 8 | Mémoire v2 + groupes sociaux + politique | Circulation de l'information, réputation, groupes émergents, votes du règlement |
+| 8 | Mémoire v2 + groupes sociaux + politique | Circulation de l'information, réputation, groupes émergents, votes du règlement, **grands changements de règlement tous les 4 à 6 ans** (accent aéro / moteur / pneus, anticipation, coups de génie — D-090) |
 | 9 | Histoire ancrée (+ simulation libre pour les mondes fictifs) | Démarrage en 2027 avec la grille voulue, et des personnages qui partagent déjà un passé |
 | **A** | **Jalon A** | **10 saisons observées après un historique, chronique lisible, rapport de diagnostic** |
 | 10 | Le joueur | Prendre la tête d'une écurie, premiers écrans mobiles |
