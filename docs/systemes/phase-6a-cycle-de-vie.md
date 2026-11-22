@@ -1,6 +1,6 @@
 # Phase 6a — Cycle de vie des personnages
 
-> Statut : **VALIDÉE** (D-100, D-101, 22/11/2026). Réponses du porteur aux questions du §15 intégrées au §16.
+> Statut : **VALIDÉE** (D-100, D-101, 22/11/2026) — **réalisée** (rapport `docs/rapports/2026-11-22-p6a-cycle-de-vie.md`). Réponses du porteur aux questions du §15 intégrées au §16.
 > Cadre déjà validé : D-051 (potentiel global unique, progression différenciée par compétence, courbes d'âge par métier), D-062, D-063, D-071 (découpage 6a/6b, karting et F4 abstraits), D-072 (cibles démographiques), D-095 (méthode : mesurer, pas recalibrer trop tôt), D-099 (pas d'attribut commercial en 6a).
 > Concerne **tous les personnages** : pilotes, ingénieurs, responsables techniques et dirigeants.
 

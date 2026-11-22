@@ -74,7 +74,7 @@ console.log(`Carrière en F1 à la retraite (saisons) : moyenne ${moy(carriereF1
 console.log(`Âge de retraite des pilotes de F1 : moyenne ${moy(ageRetraite).toFixed(1)}, 10 % ${q(ageRetraite, 0.1)}, 90 % ${q(ageRetraite, 0.9)}`);
 console.log(`Âge de retraite du personnel : moyenne ${moy(ageRetraitePersonnel).toFixed(1)}, 10 % ${q(ageRetraitePersonnel, 0.1)}, 90 % ${q(ageRetraitePersonnel, 0.9)}`);
 console.log(`Âge des champions (titres simulés) : moyenne ${moy(ageTitre).toFixed(1)}, 10 % ${q(ageTitre, 0.1)}, 90 % ${q(ageTitre, 0.9)}`);
-const points = [0, 4, 9, 14, 19, 24, 29].filter((s) => s < S);
+const points = [0, ...Array.from({ length: Math.floor(S / 5) }, (_, i) => 5 * (i + 1) - 1)].filter((s) => s < S);
 console.log('Niveau moyen des titulaires (dérive) : ' + points.map((s) => `${2027 + s} ${moy(niveauGrille[s]!).toFixed(2)}`).join(' · '));
 console.log('Âge moyen des titulaires : ' + points.map((s) => `${2027 + s} ${moy(ageGrille[s]!).toFixed(1)}`).join(' · '));
 console.log('Population (hors retraités) : ' + points.map((s) => `${2027 + s} ${moy(population[s]!).toFixed(0)}`).join(' · '));

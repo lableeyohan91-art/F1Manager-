@@ -175,3 +175,16 @@ Aucun code à ce stade.
 - Orientations valeur commerciale, sponsors personnels et pilotes payants (D-096 à D-099) : `docs/systemes/orientations-valeur-commerciale.md`, réparties entre les phases 6b, 7, 8 et 11.
 - Fiche de conception de la phase 6a (cycle de vie) soumise à validation : `docs/systemes/phase-6a-cycle-de-vie.md` (D-100).
 
+## [Phase 6a] — 22/11/2026
+
+### Ajouté
+- Cycle de vie des personnages : profils de carrière (6 archétypes), progression et déclin par compétence, environnement (temps de jeu, encadrement, mentor, motivation, travail), déclics et stagnations.
+- Potentiel estimé par chaque écurie : l'IA ne lit plus le vrai potentiel.
+- Retraites, départs du milieu, abandon des jeunes qui n'ont pas percé (D-101), retours, reconversions, promotions entre métiers.
+- Jeunes pilotes de 14 à 22 ans dès 2027 ; cohortes annuelles ; accès à la F1 dès 18 ans.
+- Format de sauvegarde 7 ; 8 tests (74 au total) ; outils `npm run demographie` et `npm run persistance` ; références `p6a-reference*`.
+- Rapport `docs/rapports/2026-11-22-p6a-cycle-de-vie.md`.
+
+### Constat
+- Hiérarchie beaucoup plus vivante (dernière écurie qui marque 43 % → 64 %, top 3 qui chute 27 % → 52 %), mais dominations doublées sur 10 saisons (9 % → 20 %).
+
