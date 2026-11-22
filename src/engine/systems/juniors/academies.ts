@@ -35,11 +35,61 @@ export const affiliationsActives = (m: Monde, idEcurie?: string) => contrats(m).
 export const affiliationDe = (m: Monde, idPersonne: string) => contrats(m).find((c) => c.type === 'affiliation' && c.statut === 'actif' && c.personne === idPersonne);
 const personnes = (m: Monde) => idsTries(table(m, TABLES.personnes)).map((id) => table(m, TABLES.personnes)[id] as unknown as Personne);
 
+/** Plafond de places permis par les moyens et l'ambition de l'écurie (budget, politique « filière jeunes ») ; minimum en cas de crise. */
+export function capaciteMaxAcademie(monde: Monde, e: Ecurie): number {
+  const fi = (Object.values(table(monde, TABLES.finances)) as unknown as Finances[]).find((f) => f.ecurie === e.id);
+  if (fi && (fi.etatCrise === 'crise' || fi.etatCrise === 'administration')) return ACADEMIE.min;
+  return Math.round(borner(ACADEMIE.min + ACADEMIE.parTranche * Math.floor(e.budgetMEUR / ACADEMIE.trancheBudgetMEUR) + (FILIERE.test(e.politiqueRecrutement) ? ACADEMIE.bonusFiliere : 0), ACADEMIE.min, ACADEMIE.max));
+}
+
+/**
+ * Audit 6b n°2 : chaque intersaison, la capacité évolue vers sa cible (choix du team principal, ou plafond permis par les moyens),
+ * progressivement et sans rompre de contrat : on ne descend jamais sous le nombre d'affiliés sous contrat (les places se libèrent à leur échéance).
+ */
+export function ajusterCapacites(monde: Monde): void {
+  for (const a of academies(monde)) {
+    const e = table(monde, TABLES.ecuries)[a.ecurie] as unknown as Ecurie | undefined;
+    if (!e) continue;
+    const max = capaciteMaxAcademie(monde, e);
+    const cible = Math.min(max, a.placesVisees ?? max);
+    const occupees = affiliationsActives(monde, e.id).length;
+    let nouvelles = a.places;
+    if (cible > a.places) nouvelles = Math.min(cible, a.places + ACADEMIE.ajustementAnnuel);
+    else if (cible < a.places) nouvelles = Math.max(cible, a.places - ACADEMIE.ajustementAnnuel, occupees);
+    if (nouvelles === a.places) continue;
+    ajouterEvenement(monde, {
+      type: 'academie.capacite', acteurs: [{ id: e.id, role: 'organisation' }], importance: 1, visibilite: 'public',
+      contexte: { avant: a.places, apres: nouvelles, cible, max, affilies: occupees },
+      texte: `L'académie ${e.nom} passe de ${a.places} à ${nouvelles} places.`,
+    });
+    a.places = nouvelles;
+  }
+}
+
+/** Commande « academie.capacite » : le team principal fixe la capacité visée (entre le minimum et le plafond permis par les moyens). */
+export const commandeCapaciteAcademie: DefinitionCommande = {
+  type: 'academie.capacite',
+  valider(monde, c) {
+    const e = table(monde, TABLES.ecuries)[String(c.parametres['ecurie'] ?? '')] as unknown as Ecurie | undefined;
+    if (!e) return 'Écurie inconnue.';
+    const tp = teamPrincipal(monde, e.id);
+    if (!tp || tp.id !== c.auteur) return 'Seul le team principal de l’écurie peut fixer la capacité de son académie.';
+    if (!academieDe(monde, e.id)) return 'Cette écurie n’a pas encore d’académie.';
+    const n = Number(c.parametres['places']);
+    const max = capaciteMaxAcademie(monde, e);
+    if (!Number.isInteger(n) || n < ACADEMIE.min || n > max) return `Capacité à choisir entre ${ACADEMIE.min} et ${max} places (plafond permis par les moyens de l’écurie).`;
+    return null;
+  },
+  appliquer({ monde }, c) {
+    (academieDe(monde, String(c.parametres['ecurie'])) as Academie).placesVisees = Number(c.parametres['places']);
+  },
+};
+
 /** Crée les académies si besoin (une par écurie de F1). */
 export function initialiserAcademies(monde: Monde): void {
   for (const e of ecuriesActives(monde)) {
     if (academieDe(monde, e.id)) continue;
-    const places = Math.round(borner(ACADEMIE.min + ACADEMIE.parTranche * Math.floor(e.budgetMEUR / ACADEMIE.trancheBudgetMEUR) + (FILIERE.test(e.politiqueRecrutement) ? ACADEMIE.bonusFiliere : 0), ACADEMIE.min, ACADEMIE.max));
+    const places = capaciteMaxAcademie(monde, e);
     const a: Academie = { id: `aca_${e.id.replace(/^eq_/, '')}`, ecurie: e.id, places, reputation: Math.round(borner(ACADEMIE.reputationBase + ACADEMIE.reputationParPointPrestige * (e.prestige - 10), 0, 100)) };
     table(monde, TABLES.academies)[a.id] = a as unknown as Entite;
   }
@@ -298,6 +348,7 @@ function reputationAcademies(monde: Monde, annee: number): void {
 /** Début d'année (avant le marché des baquets) : académies, affiliations, mécènes, missions de l'IA. */
 export function intersaisonAcademies(monde: Monde, annee: number, commander: (c: { type: string; auteur: string; parametres: Record<string, unknown> }) => unknown): void {
   initialiserAcademies(monde);
+  ajusterCapacites(monde);
   missionsIA(monde, annee, false, commander);
   recruterAffilies(monde, annee);
   chercherMecenes(monde, annee);

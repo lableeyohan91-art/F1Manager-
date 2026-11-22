@@ -38,12 +38,12 @@ Date : 22/11/2026. Conception : `docs/systemes/phase-6b-filieres-juniors.md` (VA
 | Débutants passés par une académie | — | **90 %** | ✔ la voie principale |
 | Débutants passés par le top 5 de l'Apex 2 | 61 % | 46 % | Les académies placent aussi des affiliés moins brillants en résultats |
 | Champions Apex 2 promus | 60 % | 59 % | ✔ |
-| Talents (potentiel ≥ 17) jamais arrivés en F1 | 13 % | 13 % | ✔ |
+| Talents (potentiel ≥ 17) jamais arrivés en F1 | 13 % | 13 % | ✔ (cause non identifiée : voir l'erratum ci-dessous) |
 | Pilotes payants moyens arrivés en F1 | 1 % | 2 % | Attendu (valeur commerciale en phase 7) |
 | **Promesses tenues / rompues** | — | **50 / 2** | ✔ (après correction) |
 | Mécènes | — | 0,57 par saison | ✔ rares |
 | Écart de réputation entre académies | — | 83 points | ✔ des académies se distinguent réellement |
-| **Baquets subventionnés** | — | **0 %**, prix moyen réellement payé 1,06 M€ | La règle « pas de voiture vide » ne sert presque jamais, car il y a assez de payeurs. L'argent reste un obstacle : 13 % des talents ne percent pas |
+| **Baquets subventionnés** | — | **0 %**, prix moyen réellement payé 1,06 M€ | La règle « pas de voiture vide » ne sert presque jamais, car il y a assez de payeurs. Erratum (D-118) : les 13 % de talents qui ne percent pas ne sont pas tous des échecs financiers ; voir le rapport 7a pour la répartition des causes |
 | Niveau moyen des titulaires 2027 → 2056 | 16,07 → 16,08 | 15,91 → 15,90 | ✔ stable |
 
 ## 4. Équilibrage sportif — conditions identiques (référence 6b-1)
@@ -123,7 +123,7 @@ Les indicateurs de compétitivité à toutes les positions (D-113) restent tous 
   - les académies se distinguent par leurs résultats réels ;
   - les promesses sont tenues ;
   - les mécènes restent rares ;
-  - des talents restent bloqués faute d'argent (13 %) sans que ce soit la règle.
+  - 13 % des talents (potentiel ≥ 17) n'arrivent jamais en F1. *Erratum (audit ChatGPT n°2, D-118) : ce rapport attribuait ces échecs au manque d'argent, mais l'indicateur ne mesurait pas la cause. L'outil distingue désormais les causes probables : financière, sportive, contractuelle, manque d'opportunités.*
 - **Âges : progrès réels, objectif non atteint.** Champions à 30,1 ans, débutants à 24,0 ans. La cause principale est toujours le recrutement F1 provisoire, qui juge surtout le niveau actuel ; les académies n'y suffisent pas. Le vrai levier est la **phase 7**, avec un marché du travail où une écurie peut parier sur un jeune.
 - **Effet sportif : globalement neutre, quelques signaux défavorables** :
   - dynasties sur 10 saisons (69 % → 73 %) ;

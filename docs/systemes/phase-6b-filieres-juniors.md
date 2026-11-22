@@ -183,3 +183,14 @@ Le recrutement F1 existant (D-066, en attendant le marché complet de la phase 7
 
 Tests de non-régression : `tests/audit-6b.test.ts`. Format de sauvegarde 11 (table des connaissances).
 
+
+## 17. Deuxième audit de ChatGPT (commit 7d063051) — suites données (D-118)
+
+Les trois corrections du premier audit ont été retestées avec succès sur des fonctions isolées.
+
+| Constat de l'audit | Suite |
+| --- | --- |
+| La capacité d'une académie était figée à sa création : une écurie passée de 80 M€ à 600 M€, convertie à la formation des jeunes, gardait 2 places, alors qu'une académie neuve en aurait eu 8 | **Corrigé (anomalie structurelle)** : chaque intersaison, la capacité tend vers sa **cible**, c'est-à-dire le plafond permis par les moyens (budget, politique « filière jeunes ») ou la valeur choisie par le team principal (commande `academie.capacite`, entre 2 places et ce plafond). Elle bouge d'**au plus 2 places par an** et ne descend **jamais sous le nombre d'affiliés sous contrat** : les places se libèrent à l'échéance des contrats, sans rupture. Une écurie en crise ou sous administration est ramenée au minimum. Chaque changement produit un événement `academie.capacite` |
+| L'indicateur « talents jamais arrivés en F1 » était présenté comme un blocage financier sans mesurer la cause | **Corrigé dans l'outil, erratum dans le rapport 6b-2** : `npm run demographie` classe chaque cas selon sa **cause probable**, dans cet ordre : financière (jamais de baquet junior, ni académie ni mécène, budget familial sous le prix d'un baquet d'Apex 3) ; sportive (saisons en Apex 2 sans top 5 ni titre) ; contractuelle (bons résultats mais encore affilié, donc option prioritaire) ; manque d'opportunités (bons résultats, libre, sans baquet) ; indéterminée. Limite : les vieux contrats d'affiliation sont effacés (volume borné), l'affiliation ancienne n'est connue que par la liste bornée des anciens |
+
+Tests de non-régression : `tests/academies.test.ts` (scénario de l'audit). Pas de changement de format de sauvegarde : la cible du team principal est un champ optionnel.

@@ -27,6 +27,9 @@ let baquetsJuniors = 0, baquetsSubventionnes = 0, prixPayes: number[] = [];
 let debutantsAffilies = 0, promessesTenues = 0, promessesRompues = 0, mecenes = 0; const ecartsReputationAcademies: number[] = [];
 // Phase 7a : marché des transferts.
 let signatures = 0, debauchages = 0, preAccords = 0, concurrentes = 0, contreAttaques = 0, indemnitesMEUR = 0, signaturesMoins23 = 0; const salaireTop5: number[][] = [];
+// Audit 6b n°2 : causes probables des talents qui n'arrivent jamais en F1.
+const causesBlocage: Record<string, number> = { financier: 0, sportif: 0, contractuel: 0, opportunites: 0, indetermine: 0 };
+const { CATEGORIES_JUNIORS } = await import(`${racine}/src/engine/balance/juniors.ts`);
 let debutantsTop5Apex2 = 0, debutantsTotal = 0, championsApex2 = 0, championsApex2Promus = 0, talentsBloques = 0, talents = 0, payantsMoyensF1 = 0, payantsMoyens = 0;
 
 for (let g = 1; g <= N; g++) {
@@ -88,7 +91,28 @@ for (let g = 1; g <= N; g++) {
     if ((p.carriere?.juniors ?? []).some((r: any) => r.categorie === 'apex2' && r.titre)) { championsApex2++; if (auF1) championsApex2Promus++; }
     const fini = p.statut === 'retraite' || auF1;
     if (!fini) continue;
-    if (p.potentiel >= 17) { talents++; if (!auF1) talentsBloques++; }
+    if (p.potentiel >= 17) {
+      talents++;
+      if (!auF1) {
+        talentsBloques++;
+        // Classement par cause probable, dans cet ordre (une seule cause par talent) :
+        // - financier : jamais de baquet junior, sans académie ni mécène, budget familial sous le prix d'un baquet d'Apex 3 ;
+        // - sportif : des saisons juniors, mais ni top 5 ni titre en Apex 2 (résultats insuffisants pour les recruteurs) ;
+        // - contractuel : bons résultats, mais encore affilié à une académie (option prioritaire : seules deux écuries peuvent l'engager) ;
+        // - opportunités : bons résultats, libre de tout lien, et pourtant aucun baquet de F1 ;
+        // - indéterminé : le reste (par exemple : baquets juniors obtenus mais carrière interrompue avant l'Apex 2).
+        const saisons = p.carriere?.juniors ?? [];
+        const bons = saisons.some((r: any) => r.categorie === 'apex2' && (r.rang <= 5 || r.titre));
+        const affilie = (Object.values(m.tables['academies'] ?? {}) as any[]).some((a) => (a.anciens ?? []).includes(p.id)) || (Object.values(m.tables['contrats']) as any[]).some((c) => c.type === 'affiliation' && c.personne === p.id);
+        const affilieFin = (Object.values(m.tables['contrats']) as any[]).some((c) => c.type === 'affiliation' && c.personne === p.id && (c.statut === 'actif' || c.fin >= (p.retraiteDepuis ?? m.date.annee) - 1));
+        let cause = 'indetermine';
+        if (saisons.length === 0 && !affilie && !p.mecene && (p.budgetFamilleMEUR ?? 0) < CATEGORIES_JUNIORS.apex3.prixBaquetMEUR) cause = 'financier';
+        else if (saisons.length > 0 && saisons.some((r: any) => r.categorie === 'apex2') && !bons) cause = 'sportif';
+        else if (bons && affilieFin) cause = 'contractuel';
+        else if (bons) cause = 'opportunites';
+        causesBlocage[cause]++;
+      }
+    }
     if ((p.budgetFamilleMEUR ?? 0) >= 3 && p.potentiel <= 14) { payantsMoyens++; if (auF1) payantsMoyensF1++; }
   }
   // Pépites (potentiel ≥ 18) nées dans les cohortes générées, et titres.
@@ -120,6 +144,7 @@ console.log(`Âge des débutants en F1 : moyenne ${moy(ageDebut).toFixed(1)}, 10
 console.log(`Débutants passés par le top 5 de l'Apex 2 : ${(100 * debutantsTop5Apex2 / Math.max(1, debutantsTotal)).toFixed(0)} %`);
 console.log(`Champions Apex 2 promus en F1 : ${championsApex2Promus}/${championsApex2} (${(100 * championsApex2Promus / Math.max(1, championsApex2)).toFixed(0)} %)`);
 console.log(`Talents (potentiel ≥ 17, carrière finie) jamais arrivés en F1 : ${talentsBloques}/${talents} (${(100 * talentsBloques / Math.max(1, talents)).toFixed(0)} %)`);
+console.log(`  dont causes probables (audit 6b n°2) : ${Object.entries(causesBlocage).map(([k, v]) => `${({ financier: 'financière', sportif: 'sportive', contractuel: 'contractuelle (affilié)', opportunites: 'manque d’opportunités', indetermine: 'indéterminée' } as Record<string, string>)[k]} ${v}`).join(' · ')}`);
 console.log(`Pilotes payants moyens (budget ≥ 3 M€, potentiel ≤ 14) arrivés en F1 : ${payantsMoyensF1}/${payantsMoyens} (${(100 * payantsMoyensF1 / Math.max(1, payantsMoyens)).toFixed(0)} %)`);
 console.log(`Baquets juniors subventionnés (obtenus sans pouvoir payer le prix demandé) : ${(100 * baquetsSubventionnes / Math.max(1, baquetsJuniors)).toFixed(0)} % ; prix moyen réellement payé : ${moy(prixPayes).toFixed(2)} M€`);
 console.log(`Débutants passés par une académie : ${(100 * debutantsAffilies / Math.max(1, debutantsTotal)).toFixed(0)} %`);

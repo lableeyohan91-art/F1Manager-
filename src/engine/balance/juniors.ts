@@ -62,7 +62,12 @@ export const REPUTATION_RECRUTEMENT_F1 = 0.0015;
  * Académies (une par écurie de F1, D-112) : places de base selon le budget de l'écurie, bonus pour une politique « filière jeunes ».
  * places = borne(min + parTranche × budget / trancheBudget + bonusFiliere, min, max).
  */
-export const ACADEMIE = { min: 2, max: 8, parTranche: 1, trancheBudgetMEUR: 120, bonusFiliere: 2, semaine: 2, semaineMiSaison: 26, reputationBase: 30, reputationParPointPrestige: 3 };
+/**
+ * Académies : places = min + parTranche × (budget / tranche) + bonus « filière jeunes », bornées [min ; max].
+ * Audit 6b n°2 : la capacité évolue chaque intersaison vers ce plafond (ou vers la cible du team principal), d'au plus
+ * `ajustementAnnuel` places par an, sans jamais descendre sous le nombre d'affiliés sous contrat. Une écurie en crise est ramenée au minimum.
+ */
+export const ACADEMIE = { ajustementAnnuel: 2, min: 2, max: 8, parTranche: 1, trancheBudgetMEUR: 120, bonusFiliere: 2, semaine: 2, semaineMiSaison: 26, reputationBase: 30, reputationParPointPrestige: 3 };
 /** Recrutement d'affiliés : âges, durée du contrat, financement annuel (part du prix moyen d'un baquet de sa catégorie visée). */
 export const AFFILIATION = { ageMin: 14, ageMax: 21, dureeMin: 2, dureeMax: 3, partFinancement: 1, poidsReputation: 0.03, penaliteAge: 0.15, potentielMinimal: 14.5, gratitude: 0.6 };
 /** Renouvellement : l'académie garde un affilié si son potentiel estimé reste au-dessus de ce seuil et qu'il a au plus cet âge. */

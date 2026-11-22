@@ -28,7 +28,7 @@ import { apresGrandPrix, modificateurNiveau } from '../carriere/performance';
 import { niveauCarriere } from '../carriere/profil';
 import { potentielEstime } from '../carriere/estimation';
 import { ecuriesActives, niveauPilote } from '../saison/performance';
-import { affiliationDe, commandeMissionReperage, finDeSaisonAcademies, financementExterieur, intersaisonAcademies, mettreAJourConnaissances, miSaisonAcademies } from './academies';
+import { affiliationDe, commandeCapaciteAcademie, commandeMissionReperage, finDeSaisonAcademies, financementExterieur, intersaisonAcademies, mettreAJourConnaissances, miSaisonAcademies } from './academies';
 import { ACADEMIE, PLACEMENT_PARTENAIRE } from '../../balance/juniors';
 
 export * from './academies';
@@ -318,6 +318,6 @@ export const systemeJuniors: Systeme = {
 
 /** À installer après les systèmes de la saison (les Grands Prix de la semaine sont déjà courus) et de la carrière (cohorte). */
 export function installerJuniors(moteur: Moteur): Moteur {
-  moteur.commandes.enregistrer(commandeMissionReperage);
+  moteur.commandes.enregistrer(commandeMissionReperage).enregistrer(commandeCapaciteAcademie);
   return moteur.ajouterSysteme(systemeJuniors);
 }

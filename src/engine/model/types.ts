@@ -149,6 +149,8 @@ export interface Personne {
 /** Académie d'une écurie de F1 (phase 6b-2). */
 export interface Academie {
   id: string; ecurie: string; places: number; reputation: number;
+  /** Audit 6b n°2 : capacité visée par le team principal (commande « academie.capacite ») ; absente = le plafond permis par les moyens. */
+  placesVisees?: number;
   /** Anciens affiliés (liste bornée), lue par la réputation de l'académie ; les vieux contrats d'affiliation sont effacés. */
   anciens?: string[];
 }

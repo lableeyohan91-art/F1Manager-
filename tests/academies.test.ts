@@ -73,6 +73,40 @@ describe('Phase 6b-2 — académies, affiliations, mécènes, repérage', () => 
     expect(academieDe(m, 'eq_mercedes')).toBeDefined();
   }, 60_000);
 
+  it('audit 6b n°2 : la capacité évolue avec les moyens et les choix du team principal, progressivement et sans rompre de contrat', () => {
+    const m = sc.creerMonde(1);
+    const moteur = sc.creerMoteur();
+    // Scénario de l'audit : une écurie à 80 M€ sans politique de formation crée une académie de 2 places.
+    const e = ecurie(m, 'eq_haas');
+    e.budgetMEUR = 80;
+    e.politiqueRecrutement = 'pilotes confirmés';
+    moteur.avancer(m, 4);
+    const petite = academieDe(m, 'eq_haas')!;
+    expect(petite.places).toBe(2);
+    // L'écurie s'enrichit et adopte une politique de formation : la capacité monte, d'au plus 2 places par an, jusqu'au plafond.
+    e.budgetMEUR = 600;
+    e.politiqueRecrutement = 'filière jeunes';
+    moteur.avancer(m, 52);
+    expect(petite.places).toBe(4);
+    moteur.avancer(m, 2 * 52);
+    expect(petite.places).toBe(8);
+    expect(Object.values(m.evenements).some((x) => x.type === 'academie.capacite')).toBe(true);
+    // Le team principal choisit de réduire : la capacité baisse sans descendre sous le nombre d'affiliés sous contrat.
+    const tp = teamPrincipal(m, e.id)!;
+    const cmd = (places: number, auteur = tp.id) => moteur.commandes.executer(m, { type: 'academie.capacite', auteur, source: 'exterieur', parametres: { ecurie: e.id, places } });
+    expect(cmd(9).ok).toBe(false); // au-delà du plafond permis
+    expect(cmd(2, 'per_alonzo').ok).toBe(false); // pas le team principal
+    expect(cmd(2).ok).toBe(true);
+    const actifsAvant = affiliationsActives(m, e.id).map((c) => c.id);
+    moteur.avancer(m, 52);
+    expect(petite.places).toBeGreaterThanOrEqual(Math.max(6, affiliationsActives(m, e.id).length));
+    for (const id of actifsAvant) {
+      const c = table(m, TABLES.contrats)[id] as unknown as { statut: string; motifFin?: string; fin: number } | undefined;
+      // Aucune rupture imposée par la réduction : un contrat non renouvelé l'est à son échéance, pas avant.
+      if (c && c.motifFin === 'non_prolonge') expect(c.fin).toBeLessThanOrEqual(m.date.annee - 1);
+    }
+  }, 60_000);
+
   it('une sauvegarde au format 9 est migrée : les académies sont créées à la première intersaison', () => {
     const ancien = copierMonde(sc.creerMonde(1)) as unknown as Record<string, unknown>;
     const tables = ancien['tables'] as Record<string, unknown>;
