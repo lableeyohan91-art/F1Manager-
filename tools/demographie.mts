@@ -23,6 +23,7 @@ const championsPepites = { pepites: 0, championnes: 0, nesCohortes: 0 };
 const ageTitre: number[] = [];
 // Phase 6b : parcours vers la F1.
 const ageDebut: number[] = [];
+let debutantsAffilies = 0, promessesTenues = 0, promessesRompues = 0, mecenes = 0; const ecartsReputationAcademies: number[] = [];
 let debutantsTop5Apex2 = 0, debutantsTotal = 0, championsApex2 = 0, championsApex2Promus = 0, talentsBloques = 0, talents = 0, payantsMoyensF1 = 0, payantsMoyens = 0;
 
 for (let g = 1; g <= N; g++) {
@@ -44,6 +45,7 @@ for (let g = 1; g <= N; g++) {
         else if (!poste.startsWith('pilote')) ageRetraitePersonnel.push(e.contexte.age);
         if (/abandon/.test(e.contexte?.motif ?? '')) compteurs['abandon'] = (compteurs['abandon'] ?? 0) + 1;
       }
+      if (e.type === 'junior.mecene') mecenes++;
     }
     const tit = Object.values(m.tables['personnes']).filter((p: any) => p.poste === 'pilote_titulaire' && p.statut === 'actif') as any[];
     let nouveaux = 0;
@@ -52,6 +54,7 @@ for (let g = 1; g <= N; g++) {
       ageDebut.push(m.date.annee - p.anneeNaissance);
       debutantsTotal++;
       if ((p.carriere?.juniors ?? []).some((r: any) => r.categorie === 'apex2' && r.rang <= 5)) debutantsTop5Apex2++;
+      if ((Object.values(m.tables['academies'] ?? {}) as any[]).some((a) => (a.anciens ?? []).includes(p.id)) || (Object.values(m.tables['contrats']) as any[]).some((c) => c.type === 'affiliation' && c.personne === p.id)) debutantsAffilies++;
     }
     debutants.push(nouveaux);
     (niveauGrille[s] ??= []).push(moy(tit.map((p) => eng.niveauPilote(p, false))));
@@ -63,6 +66,9 @@ for (let g = 1; g <= N; g++) {
       console.log('Répartition (graine 1, fin) : ' + Object.entries(rep).sort().map(([k, v]) => `${k} ${v}`).join(' · '));
     }
   }
+  for (const pr of Object.values(m.tables['promesses'] ?? {}) as any[]) { if (pr.type === 'titularisation' && pr.statut === 'tenue') promessesTenues++; if (pr.type === 'titularisation' && pr.statut === 'rompue') promessesRompues++; }
+  const reps = (Object.values(m.tables['academies'] ?? {}) as any[]).map((a) => a.reputation);
+  if (reps.length) ecartsReputationAcademies.push(Math.max(...reps) - Math.min(...reps));
   // Phase 6b : champions Apex 2 promus en F1 ; talents bloqués ; pilotes payants moyens qui atteignent la F1.
   for (const p of Object.values(m.tables['personnes']) as any[]) {
     if (!p.poste.startsWith('pilote') || p.origine !== 'generee') continue;
@@ -103,4 +109,7 @@ console.log(`Débutants passés par le top 5 de l'Apex 2 : ${(100 * debutantsTop
 console.log(`Champions Apex 2 promus en F1 : ${championsApex2Promus}/${championsApex2} (${(100 * championsApex2Promus / Math.max(1, championsApex2)).toFixed(0)} %)`);
 console.log(`Talents (potentiel ≥ 17, carrière finie) jamais arrivés en F1 : ${talentsBloques}/${talents} (${(100 * talentsBloques / Math.max(1, talents)).toFixed(0)} %)`);
 console.log(`Pilotes payants moyens (budget ≥ 3 M€, potentiel ≤ 14) arrivés en F1 : ${payantsMoyensF1}/${payantsMoyens} (${(100 * payantsMoyensF1 / Math.max(1, payantsMoyens)).toFixed(0)} %)`);
+console.log(`Débutants passés par une académie : ${(100 * debutantsAffilies / Math.max(1, debutantsTotal)).toFixed(0)} %`);
+console.log(`Promesses de titularisation tenues / rompues (fin de partie) : ${promessesTenues} / ${promessesRompues}`);
+console.log(`Mécènes trouvés : ${(mecenes / N / S).toFixed(2)} par saison ; écart de réputation entre la meilleure et la moins bonne académie : ${moy(ecartsReputationAcademies).toFixed(0)} points`);
 console.log(`Pépites générées (potentiel ≥ 18) : ${(championsPepites.pepites / N).toFixed(1)} par partie (dont ${((10 * championsPepites.nesCohortes) / N / S).toFixed(2)} par décennie issues des cohortes annuelles ; cible D-102 : ≈ 2), championnes : ${championsPepites.championnes}`);
