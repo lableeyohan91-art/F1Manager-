@@ -19,7 +19,7 @@ const ageRetraite: number[] = [];
 const carriereF1: number[] = [];
 const ageRetraitePersonnel: number[] = [];
 const population: number[][] = [];
-const championsPepites = { pepites: 0, championnes: 0 };
+const championsPepites = { pepites: 0, championnes: 0, nesCohortes: 0 };
 const ageTitre: number[] = [];
 
 for (let g = 1; g <= N; g++) {
@@ -60,6 +60,7 @@ for (let g = 1; g <= N; g++) {
   for (const p of Object.values(m.tables['personnes']) as any[]) {
     if (p.origine !== 'generee' || !p.poste.startsWith('pilote') || p.potentiel < 18) continue;
     championsPepites.pepites++;
+    if (p.anneeNaissance >= 2027 - 14) championsPepites.nesCohortes++; // nés dans les cohortes annuelles (hors population de départ)
     if (pal.some((x) => x.championPilote === p.id)) championsPepites.championnes++;
   }
   for (const x of pal) {
@@ -79,4 +80,4 @@ console.log('Niveau moyen des titulaires (dérive) : ' + points.map((s) => `${20
 console.log('Âge moyen des titulaires : ' + points.map((s) => `${2027 + s} ${moy(ageGrille[s]!).toFixed(1)}`).join(' · '));
 console.log('Population (hors retraités) : ' + points.map((s) => `${2027 + s} ${moy(population[s]!).toFixed(0)}`).join(' · '));
 for (const k of ['abandon', 'personne.retraite', 'personne.retour', 'personne.reconversion', 'personne.declic', 'personne.stagnation', 'recrutement.genere', 'pilote.titularisation']) console.log(`${k} : ${parSaison(k)} par saison`);
-console.log(`Pépites générées (potentiel ≥ 18) : ${(championsPepites.pepites / N).toFixed(1)} par partie, dont championnes : ${championsPepites.championnes}`);
+console.log(`Pépites générées (potentiel ≥ 18) : ${(championsPepites.pepites / N).toFixed(1)} par partie (dont ${((10 * championsPepites.nesCohortes) / N / S).toFixed(2)} par décennie issues des cohortes annuelles ; cible D-102 : ≈ 2), championnes : ${championsPepites.championnes}`);

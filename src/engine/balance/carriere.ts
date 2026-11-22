@@ -106,9 +106,14 @@ export const RECONVERSION = { ageMaxPilote: 48, ageMaxPersonnel: 64, leadershipM
 
 /* ---------------------------------------------------------------- Générations */
 
-/** Cohortes annuelles (§9, D-100). Potentiel des jeunes : loi normale + rare queue de pépites. */
+/**
+ * Cohortes annuelles (§9, D-100). Potentiel des jeunes : loi normale + rare queue de pépites.
+ * D-102 : environ **deux pilotes d’exception (potentiel ≥ 18) par décennie** (premier réglage : ≈ un par an, jugé beaucoup trop).
+ * Distribution resserrée (moyenne plus haute, écart plus faible) : autant de bons pilotes (≈ 2 par an à 16 ou plus),
+ * beaucoup moins de pilotes d’exception, sans faire baisser le niveau de la grille au fil des décennies.
+ */
 export const COHORTE = {
-  pilotes: 15, agePilotes: 14, potentielPilotes: { moyenne: 13.5, ecartType: 2.2 }, pepite: { probabilite: 0.05, bonusMax: 3 },
+  pilotes: 15, agePilotes: 14, potentielPilotes: { moyenne: 14, ecartType: 1.45 }, pepite: { probabilite: 0.015, bonusMax: 2.5 },
   /** Écart initial au plafond à 14 ans (points), et sa variation. */
   ecartInitial: { moyenne: 7.5, ecartType: 1 },
   personnel: 10, agePersonnel: { min: 24, max: 30 }, potentielPersonnel: { moyenne: 13, ecartType: 2 }, ecartInitialPersonnel: { moyenne: 3, ecartType: 1 },
