@@ -93,18 +93,19 @@ const moy = (v: number[]) => v.reduce((a, b) => a + b, 0) / (v.length || 1);
 const f = (x: number, d = 1) => (Number.isFinite(x) ? x.toLocaleString('fr-FR', { maximumFractionDigits: d, minimumFractionDigits: d }) : '—');
 const pc = (x: number) => (Number.isFinite(x) ? `${Math.round(100 * x)} %` : '—');
 
-/** Objectifs statistiques utilisés pour repérer les compromis (jamais des contraintes, D-040). */
+/**
+ * Cibles du jeu final (D-081, docs/systemes/laboratoire-equilibrage.md) : repères expérimentaux, jamais des contraintes.
+ * Les cibles sur 20 saisons sont approchées ici par des séries de la longueur simulée.
+ */
 const OBJECTIFS: { cle: string; zone: 'saison' | 'serie'; min: number; max: number; libelle: string }[] = [
-  { cle: 'vainqueurs', zone: 'saison', min: 4, max: 8, libelle: 'vainqueurs différents 4–8' },
-  { cle: 'ecuriesVictorieuses', zone: 'saison', min: 3, max: 5, libelle: 'écuries victorieuses 3–5' },
-  { cle: 'championsP', zone: 'serie', min: 3, max: 7, libelle: 'champions pilotes 3–7' },
-  { cle: 'derniereMarque', zone: 'saison', min: 0.4, max: 0.9, libelle: 'dernière écurie marque 40–90 %' },
-  { cle: 'domination', zone: 'saison', min: 0, max: 0.1, libelle: 'dominations ≤ 10 %' },
-  { cle: 'ouvert', zone: 'saison', min: 0.3, max: 0.6, libelle: 'titre ouvert à la dernière manche 30–60 %' },
+  { cle: 'ecuriesVictorieuses', zone: 'saison', min: 4, max: 6, libelle: 'écuries victorieuses 4–6' },
+  { cle: 'ouvert', zone: 'saison', min: 0.3, max: 0.5, libelle: 'titre ouvert au dernier GP 30–50 %' },
+  { cle: 'domination', zone: 'saison', min: 0, max: 0.05, libelle: 'dominations < 5 %' },
+  { cle: 'dynastie', zone: 'serie', min: 0, max: 0.1, libelle: 'dynasties très rares (≤ 10 % des séries)' },
+  { cle: 'derniereMarque', zone: 'saison', min: 0.6, max: 0.9, libelle: 'dernière écurie marque 60–90 %' },
   { cle: 'lutteInter', zone: 'saison', min: 0.15, max: 1, libelle: 'luttes entre écuries ≥ 15 %' },
   { cle: 'coeqComp', zone: 'saison', min: 0.3, max: 0.7, libelle: 'part des compétences entre coéquipiers 30–70 %' },
   { cle: 'inattendus', zone: 'saison', min: 1, max: 3, libelle: 'victoires inattendues 1–3' },
-  { cle: 'dynastie', zone: 'serie', min: 0, max: 0.4, libelle: 'dynasties ≤ 40 % (avant les phases 5–8)' },
 ];
 
 function agreger(dossier: string): string {

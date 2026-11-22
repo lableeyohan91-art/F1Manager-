@@ -30,6 +30,7 @@ Le joueur incarne un directeur d'écurie, comme l'entraîneur dans Football Mana
 8. **Comprendre sans tout voir.** Le joueur ne voit pas les valeurs cachées, mais il peut toujours comprendre les principales raisons d'une réaction (bouton « Pourquoi ? »).
 9. **Pas de pay-to-win.** Aucun avantage ne s'achète.
 10. **Durable.** Le jeu reste fluide et ses sauvegardes restent de taille raisonnable après 50 saisons.
+11. **Compétitif.** Plusieurs écuries se battent pour le titre, la hiérarchie bouge, l'IA reste un adversaire redoutable sur des décennies, sans tricher (§7).
 
 ## 3. La mémoire du monde
 
@@ -70,7 +71,21 @@ Le départ d'une personne influente peut entraîner plusieurs collaborateurs. Un
 
 Le joueur ne débarque pas dans un monde vierge. Une **simulation historique préalable**, de durée configurable, génère les anciens champions, palmarès, transferts, rivalités, collaborations passées, souvenirs et réputations. Au départ de la partie, des personnages se connaissent déjà et partagent une histoire.
 
-## 7. Philosophie d'équilibrage
+## 7. Compétitivité du championnat (orientation fondamentale, D-081)
+
+**Réalisme des mécaniques, compétitivité des championnats, importance des décisions, difficulté durable.** Le but : un jeu auquel on a encore envie de jouer après 30 saisons.
+
+- On s'inspire du réalisme de la F1, mais **sans reproduire systématiquement ses longues dominations**. Le championnat visé est un peu plus équilibré que la vraie F1.
+- **Hiérarchie dynamique** : chaque saison peut raconter une histoire différente. Une grande écurie peut décliner par ses erreurs ; une petite peut monter, **y compris contrôlée par l'IA**. Remontées, reconstructions, concepts ratés, transferts qui changent l'équilibre, pilotes qui transcendent leur voiture, rivalités sur plusieurs saisons.
+- **L'équilibre vient de systèmes cohérents** : plafond budgétaire, restrictions aérodynamiques selon le classement, rendements décroissants, incertitude des projets, règlement, vieillissement, transferts, perte d'expertise, stratégies, circuits, pneus, intelligence des adversaires, anticipation de la saison suivante.
+- **Refusés** : bonus cachés pour l'IA et pénalités artificielles pour les équipes dominantes. Les règles qui freinent les meilleurs (plafond, restrictions selon le classement) sont **connues, visibles et identiques pour tous**, comme dans un vrai règlement.
+- **L'aléa reste présent, mais n'est pas le principal facteur d'équilibre.**
+- **Une IA qui rivalise durablement** : même après 20 saisons, un joueur expérimenté rencontre des difficultés. Les adversaires identifient leurs faiblesses, optimisent, anticipent, recrutent, développent, forment, s'adaptent, apprennent et **exploitent les erreurs du joueur**. Devenir champion est un accomplissement ; le rester est un nouveau défi.
+- **Garde-fou** : les mécanismes de rééquilibrage ne doivent jamais effacer les bonnes décisions du joueur. Bien gérer doit rester nettement payant (voir le laboratoire, indicateur « valeur des décisions »).
+
+Cibles du jeu final : [docs/systemes/laboratoire-equilibrage.md](docs/systemes/laboratoire-equilibrage.md). Ce sont des cibles expérimentales, jamais des contraintes imposées aux résultats.
+
+## 8. Philosophie d'équilibrage
 
 - Chaque caractéristique a une utilité identifiable. Chaque mécanique importante a des conséquences observables.
 - **Toutes les décisions n'ont pas de grandes conséquences.** Beaucoup sont mineures, et c'est normal.
@@ -81,6 +96,6 @@ Le joueur ne débarque pas dans un monde vierge. Une **simulation historique pr�
 - **L'attachement** : le joueur doit pouvoir s'attacher à ses pilotes, à ses ingénieurs et à son écurie. Cela passe par la continuité (histoires longues), la singularité (personnages reconnaissables) et la réciprocité (ils se souviennent de ce que le joueur a fait pour eux).
 - Les coefficients sont choisis, c'est inévitable. Ils sont nommés, documentés, rangés en un seul endroit, et calés sur des **résultats cibles** mesurables.
 
-## 8. Ce qui est hors du périmètre actuel
+## 9. Ce qui est hors du périmètre actuel
 
 Le moteur de course 2D, le développement détaillé des monoplaces, les médias complets et la carrière du manager sont prévus. L'architecture leur réserve leur place, mais ils viennent après le jalon A (voir [ROADMAP.md](ROADMAP.md)).

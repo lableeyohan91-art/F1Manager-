@@ -123,3 +123,10 @@ Aucun code à ce stade.
 ### Ajouté
 - Campagne de 21 réglages (100 graines × 10 saisons, mécaniques P4) et revalidation sur les graines 101–200 ; trois compromis présentés (rapport `docs/rapports/2026-11-22-p4-campagne-equilibrage.md`, tableaux et mesures archivés).
 - Constats : hiérarchie et dynasties insensibles au modèle de course ; forme sans effet ; réglage B parmi les moins bons compromis.
+
+## [Orientation compétitivité] — 22/11/2026
+
+### Modifié
+- Réglage C2 appliqué à titre provisoire (D-074 : pilote 0,15 / aléa 0,30), réglage B conservé comme référence ; nouvelle référence `docs/rapports/reference/p4-c2-reference.*`.
+- Orientation fondamentale « compétitivité » (D-081) ajoutée au GAME_DESIGN (§7, principe 11) ; laboratoire d'équilibrage documenté (`docs/systemes/laboratoire-equilibrage.md`) avec les cibles du jeu final et l'état actuel ; cibles intégrées à l'outil de campagne et à la fiche de la phase 5.
+- Propositions D-082 (indicateurs de tiers, mobilité, valeur des décisions) et question D-083 (départ 2027).

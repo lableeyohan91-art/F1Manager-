@@ -140,6 +140,12 @@ Financement par la trésorerie, l'apport du propriétaire ou l'emprunt. Le nivea
 
 `data/grille-2026/finances.csv` (estimations de game design, marquées comme telles) : trésorerie de départ, dette, type et apport du propriétaire, base de revenus commerciaux, popularité commerciale par marché, niveau du département marketing. `data/commun/secteurs.csv` : secteurs d'activité pour générer les sponsors fictifs.
 
+## 10 bis. Orientation compétitivité (D-081) appliquée à l'économie
+
+- Les **cibles du laboratoire** (`laboratoire-equilibrage.md`) sont les critères principaux de la phase 5. On mesurera notamment : dominations, dynasties, champions constructeurs sur 20 saisons, mobilité entre tiers, trajectoires des petites écuries.
+- **Accumulation des avantages** : les quatre accumulations à surveiller sont l'argent (trésorerie qui grossit), les hommes (meilleurs salariés attirés par les vainqueurs), la technique (avance qui se cumule) et l'image (sponsors et popularité). Chacune doit rencontrer une limite **systémique** et visible : le plafond, les restrictions selon le classement, l'entretien des grandes structures, les rendements décroissants, l'attractivité des projets ambitieux pour certains profils (valeur Défi). **Jamais** une pénalité cachée.
+- **Garde-fou** : mesurer la **valeur des décisions** ; les mécanismes ne doivent pas niveler au point de rendre la bonne gestion inutile.
+
 ## 11. Indicateurs et critères de validation
 
 | # | Critère | Mesure |
