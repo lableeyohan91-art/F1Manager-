@@ -66,6 +66,9 @@ export interface Ecurie {
   titresPilotes: number;
   verification: string;
   statut: 'active' | 'inactive';
+  typeOrganisation: TypeOrganisation;
+  /** Écurie pilotée par le joueur (bac à sable) : l'IA ne prend pas ses décisions de personnel à sa place. */
+  pilotee?: boolean;
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -110,20 +113,58 @@ export interface Personne {
   aspirations: Aspiration[];
   etat: EtatEmotionnel;
   verification: string;
+  /** Saison depuis laquelle la personne est libre (sans contrat d'emploi). */
+  libreDepuis?: number;
 }
+
+/**
+ * Types de contrats (phase 4, prévus pour la phase 6 — D-063) :
+ * emploi = poste dans une organisation ; affiliation / financement / placement = réservés aux filières juniors.
+ * Une personne peut avoir plusieurs contrats actifs simultanés, de types différents.
+ */
+export type TypeContrat = 'emploi' | 'affiliation' | 'financement' | 'placement';
+
+/** Clauses structurées (les champs « réservés » ne sont lus qu'à partir de la phase 6 ou 7). */
+export interface Clauses {
+  /** Statut de pilote n°1. */
+  statutN1?: boolean;
+  /** Indemnité due en cas de licenciement, en M€. */
+  indemniteRuptureMEUR?: number;
+  /** Prime par victoire, en M€. */
+  primeVictoireMEUR?: number;
+  /** Réservé (phase 6/7) : option prioritaire de l'académie, montant de rachat, financement annuel, organisation de placement. */
+  optionPrioritaire?: boolean;
+  rachatMEUR?: number;
+  financementAnnuelMEUR?: number;
+  placementOrganisation?: string;
+  /** Remarque libre (données). */
+  note?: string;
+}
+
+export type MotifFinContrat = 'echeance' | 'non_prolonge' | 'licenciement' | 'demission' | 'rachat';
 
 export interface Contrat {
   id: string;
   personne: string;
-  ecurie: string;
+  /** Organisation partie au contrat : écurie (phase 4) ; plus tard écurie junior, académie, sponsor personnel. */
+  organisation: string;
+  type: TypeContrat;
   poste: Poste;
   debut: number;
   fin: number;
   salaireMEUR: number;
-  clauses: string;
+  clauses: Clauses;
   statut: 'actif' | 'termine' | 'rompu';
+  motifFin?: MotifFinContrat;
+  /** L'organisation a décidé de ne pas prolonger : le contrat prendra fin à son échéance. */
+  nonProlonge?: boolean;
+  /** Demande d'augmentation en attente de réponse (salaire demandé, M€). */
+  demandeAugmentation?: number;
   verification: string;
 }
+
+/** Types d'organisation (D-063) : seules les écuries existent en phase 4, les autres sont réservés. */
+export type TypeOrganisation = 'ecurie' | 'motoriste' | 'instance' | 'ecurie_junior' | 'academie' | 'championnat' | 'sponsor';
 
 export interface Carriere {
   id: string;

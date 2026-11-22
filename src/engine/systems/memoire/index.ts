@@ -1,0 +1,272 @@
+/**
+ * Mémoire v1 (phase 4) : souvenirs, relations, résidu, réconciliation.
+ * Conception : docs/systemes/memoire.md, phase-4-contrats-memoire.md §4, D-070.
+ *
+ * Principe anti-double comptage (D-070) : les souvenirs agissent sur les décisions UNIQUEMENT à travers
+ * les relations (confiance, respect, affinité). Le calcul d'utilité lit les relations, jamais les souvenirs
+ * directement, et jamais le moral.
+ */
+
+import {
+  ETIQUETTES, FAMILIARITE_MENSUELLE, RECONCILIATION, RESIDU, RETOUR_BASE_MENSUEL, SATURATION, SEUIL_CREATION_SOUVENIR,
+  SEUIL_EFFACEMENT_SOUVENIR, SOUVENIRS_MAX_PAR_PERSONNE, TRAIT_OUBLI,
+} from '../../balance/memoire';
+import { rangSemaine, type DateJeu } from '../../core/calendrier';
+import { nouvelIdentifiant } from '../../core/identifiants';
+import { idsTries, table, type Entite, type Monde } from '../../core/monde';
+import type { Systeme } from '../../core/moteur';
+import { TABLES, type Personne } from '../../model/types';
+
+export const TABLE_SOUVENIRS = 'souvenirs';
+export const TABLE_RELATIONS = 'relations';
+
+export interface Souvenir {
+  id: string;
+  porteur: string;
+  /** Événement d'origine (protégé du compactage tant que le souvenir existe). */
+  evenement: string;
+  /** Personne ou organisation visée ; égal au porteur pour un souvenir envers soi-même. */
+  cible: string;
+  etiquette: string;
+  ressenti: number;
+  intensite: number;
+  /** Plus forte intensité atteinte (sert au résidu). */
+  intensitePic: number;
+  creeLe: DateJeu;
+  renforceLe: DateJeu;
+}
+
+export interface Axes {
+  confiance: number;
+  respect: number;
+  affinite: number;
+}
+
+export interface Relation {
+  id: string;
+  de: string;
+  vers: string;
+  /** Part durable de chaque axe (nourrie par les résidus, revient lentement vers 0). */
+  base: Axes;
+  /** Connaissance de l'autre (0 à 1). Amplifie les souvenirs, grandit en travaillant ensemble. */
+  familiarite: number;
+}
+
+export interface RelationCalculee extends Axes {
+  familiarite: number;
+}
+
+const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
+const idRelation = (de: string, vers: string) => `rel_${de}__${vers}`;
+
+export function personne(monde: Monde, id: string): Personne | undefined {
+  return table(monde, TABLES.personnes)[id] as unknown as Personne | undefined;
+}
+
+export function souvenirsDe(monde: Monde, porteur: string): Souvenir[] {
+  const t = table(monde, TABLE_SOUVENIRS);
+  return idsTries(t).map((id) => t[id] as unknown as Souvenir).filter((s) => s.porteur === porteur);
+}
+
+/** Index des souvenirs par porteur, en un seul passage (pour les traitements de masse). */
+export function indexSouvenirs(monde: Monde): Map<string, Souvenir[]> {
+  const t = table(monde, TABLE_SOUVENIRS);
+  const res = new Map<string, Souvenir[]>();
+  for (const id of idsTries(t)) {
+    const s = t[id] as unknown as Souvenir;
+    const l = res.get(s.porteur);
+    if (l) l.push(s);
+    else res.set(s.porteur, [s]);
+  }
+  return res;
+}
+
+export function relationBrute(monde: Monde, de: string, vers: string, creer = false): Relation | undefined {
+  const t = table(monde, TABLE_RELATIONS);
+  const id = idRelation(de, vers);
+  let r = t[id] as unknown as Relation | undefined;
+  if (!r && creer) {
+    r = { id, de, vers, base: { confiance: 0, respect: 0, affinite: 0 }, familiarite: 0 };
+    t[id] = r as unknown as Entite;
+  }
+  return r;
+}
+
+/** Relation de « de » vers « vers » : base durable + effet des souvenirs actifs envers la cible. */
+export function relation(monde: Monde, de: string, vers: string): RelationCalculee {
+  const r = relationBrute(monde, de, vers);
+  const res: RelationCalculee = { confiance: r?.base.confiance ?? 0, respect: r?.base.respect ?? 0, affinite: r?.base.affinite ?? 0, familiarite: r?.familiarite ?? 0 };
+  for (const s of souvenirsDe(monde, de)) {
+    if (s.cible !== vers || s.cible === s.porteur) continue;
+    const def = ETIQUETTES[s.etiquette];
+    if (!def) continue;
+    const effet = s.ressenti * s.intensite;
+    res.confiance += effet * def.axes.confiance;
+    res.respect += effet * def.axes.respect;
+    res.affinite += effet * def.axes.affinite;
+  }
+  res.confiance = borner(res.confiance);
+  res.respect = borner(res.respect);
+  res.affinite = borner(res.affinite);
+  return res;
+}
+
+function noteDe(p: Personne, cle: string): number {
+  const [type, nom] = cle.split(':') as [string, string];
+  return (type === 't' ? p.traits[nom] : p.valeurs[nom]) ?? 10.5;
+}
+
+export interface ContexteLecture {
+  /**
+   * Multiplicateur de contexte (D-070) : justification d'un refus, gravité d'une promesse rompue,
+   * importance d'un engagement, caractère public… 1 = neutre.
+   */
+  facteur?: number;
+}
+
+/**
+ * Grille de lecture : transforme un événement vécu par une personne en souvenir (ou renforce un souvenir existant).
+ * Renvoie le souvenir créé ou renforcé, ou null si l'événement ne marque pas.
+ */
+export function lireEvenement(monde: Monde, porteurId: string, cible: string, etiquette: string, idEvenement: string, ctx: ContexteLecture = {}): Souvenir | null {
+  const p = personne(monde, porteurId);
+  const def = ETIQUETTES[etiquette];
+  if (!p || !def) return null;
+  let amplification = 1;
+  for (const [cle, poids] of Object.entries(def.amplificateurs)) amplification *= Math.max(0.2, 1 + (poids * (noteDe(p, cle) - 10.5)) / 10);
+  const familiarite = cible === porteurId ? 1 : (relationBrute(monde, porteurId, cible)?.familiarite ?? 0);
+  const intensite = Math.min(1, def.intensite * amplification * (ctx.facteur ?? 1) * (0.8 + 0.4 * familiarite));
+  if (intensite < SEUIL_CREATION_SOUVENIR) return null;
+
+  // Renforcement d'un souvenir existant (même étiquette, même cible), avec saturation.
+  const existant = souvenirsDe(monde, porteurId).find((s) => s.etiquette === etiquette && s.cible === cible);
+  if (existant) {
+    const recent = rangSemaine(monde.date) - rangSemaine(existant.renforceLe) < SATURATION.semaines;
+    if (recent) {
+      // Saturation (D-070) : des répétitions rapprochées ne dépassent pas 1,2 fois l'effet d'un seul événement.
+      const plafond = Math.max(existant.intensite, Math.min(1, intensite * SATURATION.plafondRepetition));
+      existant.intensite = Math.min(plafond, existant.intensite + intensite * (1 - existant.intensite) * SATURATION.facteur);
+    } else {
+      existant.intensite = Math.min(1, existant.intensite + intensite * (1 - existant.intensite) * 0.6);
+    }
+    existant.intensitePic = Math.max(existant.intensitePic, existant.intensite);
+    existant.renforceLe = { ...monde.date };
+    existant.evenement = idEvenement;
+    return existant;
+  }
+
+  const s: Souvenir = {
+    id: nouvelIdentifiant(monde, 'mem'),
+    porteur: porteurId,
+    evenement: idEvenement,
+    cible,
+    etiquette,
+    ressenti: def.ressenti,
+    intensite,
+    intensitePic: intensite,
+    creeLe: { ...monde.date },
+    renforceLe: { ...monde.date },
+  };
+  table(monde, TABLE_SOUVENIRS)[s.id] = s as unknown as Entite;
+  if (cible !== porteurId) relationBrute(monde, porteurId, cible, true);
+
+  // Plafond de souvenirs par personne : le plus faible s'efface, avec son résidu.
+  const tous = souvenirsDe(monde, porteurId);
+  if (tous.length > SOUVENIRS_MAX_PAR_PERSONNE) {
+    const plusFaible = tous.filter((x) => x.id !== s.id).sort((a, b) => a.intensite - b.intensite || (a.id < b.id ? -1 : 1))[0];
+    if (plusFaible) effacer(monde, plusFaible);
+  }
+  return s;
+}
+
+/** Efface un souvenir en versant son résidu dans la base durable de la relation (mémoire résiduelle). */
+export function effacer(monde: Monde, s: Souvenir): void {
+  const p = personne(monde, s.porteur);
+  const def = ETIQUETTES[s.etiquette];
+  if (p && def && s.cible !== s.porteur) {
+    const trait = s.ressenti < 0 ? TRAIT_OUBLI.negatifAutrui : TRAIT_OUBLI.positifAutrui;
+    const part = RESIDU.min + ((p.traits[trait] ?? 10) / 20) * (RESIDU.max - RESIDU.min);
+    const r = relationBrute(monde, s.porteur, s.cible, true) as Relation;
+    const effet = s.ressenti * s.intensitePic * part;
+    r.base.confiance = borner(r.base.confiance + effet * def.axes.confiance);
+    r.base.respect = borner(r.base.respect + effet * def.axes.respect);
+    r.base.affinite = borner(r.base.affinite + effet * def.axes.affinite);
+  }
+  delete table(monde, TABLE_SOUVENIRS)[s.id];
+}
+
+/** Multiplicateur de vitesse d'oubli selon les traits (D-070 : la rancune agit sur la durée). */
+function multiplicateurOubli(p: Personne, s: Souvenir): number {
+  const trait = s.cible === s.porteur ? TRAIT_OUBLI.soiMeme : s.ressenti < 0 ? TRAIT_OUBLI.negatifAutrui : TRAIT_OUBLI.positifAutrui;
+  return 1.5 - (p.traits[trait] ?? 10) / 20;
+}
+
+/** Oubli mensuel, effacement avec résidu, retour lent des bases vers zéro, familiarité entre collègues. */
+export function passerUnMois(monde: Monde): void {
+  const ts = table(monde, TABLE_SOUVENIRS);
+  for (const id of idsTries(ts)) {
+    const s = ts[id] as unknown as Souvenir;
+    const p = personne(monde, s.porteur);
+    const def = ETIQUETTES[s.etiquette];
+    if (!p || !def) {
+      delete ts[id];
+      continue;
+    }
+    s.intensite *= 1 - def.oubli * multiplicateurOubli(p, s);
+    if (s.intensite < SEUIL_EFFACEMENT_SOUVENIR) effacer(monde, s);
+  }
+  const tr = table(monde, TABLE_RELATIONS);
+  for (const id of idsTries(tr)) {
+    const r = tr[id] as unknown as Relation;
+    for (const axe of ['confiance', 'respect', 'affinite'] as const) r.base[axe] *= 1 - RETOUR_BASE_MENSUEL;
+  }
+  // Familiarité : collègues individualisés d'une même écurie (et chacun envers son écurie).
+  const tp = table(monde, TABLES.personnes);
+  const parEcurie = new Map<string, string[]>();
+  for (const id of idsTries(tp)) {
+    const p = tp[id] as unknown as Personne;
+    if (p.statut === 'actif' && p.ecurie) parEcurie.set(p.ecurie, [...(parEcurie.get(p.ecurie) ?? []), p.id]);
+  }
+  for (const [ecurie, membres] of parEcurie) {
+    for (const a of membres) {
+      const ra = relationBrute(monde, a, ecurie, true) as Relation;
+      ra.familiarite = Math.min(1, ra.familiarite + FAMILIARITE_MENSUELLE);
+      for (const b of membres) {
+        if (a === b) continue;
+        const r = relationBrute(monde, a, b, true) as Relation;
+        r.familiarite = Math.min(1, r.familiarite + FAMILIARITE_MENSUELLE);
+      }
+    }
+  }
+}
+
+/**
+ * Réconciliation (D-070) : réduit l'intensité des souvenirs négatifs de « destinataire » envers « auteur ».
+ * La rancune du destinataire freine la réconciliation ; un geste répété récemment compte beaucoup moins.
+ */
+export function reconcilier(monde: Monde, destinataire: string, auteur: string, type: keyof typeof RECONCILIATION, dejaRecent: boolean): number {
+  const p = personne(monde, destinataire);
+  if (!p) return 0;
+  const reduction = RECONCILIATION[type] * (1.5 - (p.traits['rancune'] ?? 10) / 20) * (dejaRecent ? SATURATION.facteur : 1);
+  let total = 0;
+  for (const s of souvenirsDe(monde, destinataire)) {
+    if (s.cible !== auteur || s.ressenti >= 0) continue;
+    const avant = s.intensite;
+    s.intensite *= 1 - Math.min(0.9, reduction);
+    total += avant - s.intensite;
+    if (s.intensite < SEUIL_EFFACEMENT_SOUVENIR) effacer(monde, s);
+  }
+  return total;
+}
+
+/** Identifiants d'événements cités par des souvenirs : à protéger du compactage du journal. */
+export function evenementsProteges(monde: Monde): string[] {
+  return Object.values(table(monde, TABLE_SOUVENIRS)).map((s) => (s as unknown as Souvenir).evenement);
+}
+
+export const systemeOubli: Systeme = {
+  nom: 'memoire.oubli',
+  executer({ monde, date }) {
+    if (date.semaine % 4 === 0) passerUnMois(monde);
+  },
+};

@@ -4,7 +4,7 @@
  */
 
 import { COMPETENCES_PILOTE } from '../balance/personnages';
-import type { Carriere, Circuit, Contrat, Ecurie, Motoriste, Palmares, Poste, Voiture } from '../model/types';
+import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, Voiture } from '../model/types';
 import { ErreurDonnees, Lecteur, lireCsv } from './csv';
 
 /** Texte des fichiers, indexé par nom de fichier. */
@@ -57,6 +57,21 @@ export interface DonneesInitiales {
 /** Moyenne d'une liste de notes. */
 export function moyenne(valeurs: number[]): number {
   return valeurs.length === 0 ? 0 : valeurs.reduce((a, b) => a + b, 0) / valeurs.length;
+}
+
+/**
+ * Clauses écrites en clair dans contrats.csv (séparées par « / ») : « pilote n°1 » donne le statut de n°1,
+ * le reste est conservé comme remarque.
+ */
+export function lireClauses(texte: string): Clauses {
+  const clauses: Clauses = {};
+  const notes: string[] = [];
+  for (const morceau of texte.split('/').map((x) => x.trim()).filter(Boolean)) {
+    if (/n°\s*1|numéro 1|numero 1/i.test(morceau)) clauses.statutN1 = true;
+    else notes.push(morceau);
+  }
+  if (notes.length) clauses.note = notes.join(' / ');
+  return clauses;
 }
 
 function fichier(f: FichiersDonnees, nom: string): string {
@@ -138,6 +153,7 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     titresPilotes: re.entier(l, 'titresPilotes', 0, 100),
     verification: l.valeurs['verification'] ?? '',
     statut: 'active',
+    typeOrganisation: 'ecurie',
   }));
   const idsEq = verifierIdsUniques('ecuries.csv', leq.map((l, i) => ({ id: ecuries[i]!.id, numero: l.numero })), problemes);
   if (ecuries.length === 0) problemes.push('ecuries.csv : aucune écurie');
@@ -188,12 +204,13 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   const contrats = lctr.map((l) => ({
     id: rc.texte(l, 'id'),
     personne: rc.reference(l, 'personne', idsPer),
-    ecurie: rc.reference(l, 'ecurie', idsEq),
+    organisation: rc.reference(l, 'ecurie', idsEq),
+    type: 'emploi' as const,
     poste: rc.parmi(l, 'poste', POSTES_DONNEES),
     debut: rc.entier(l, 'debut', 1950, anneeMax),
     fin: rc.entier(l, 'fin', 1950, anneeMax),
     salaireMEUR: rc.decimal(l, 'salaireMEUR', 0, 500),
-    clauses: l.valeurs['clauses'] ?? '',
+    clauses: lireClauses(l.valeurs['clauses'] ?? ''),
     verification: l.valeurs['verification'] ?? '',
   }));
   verifierIdsUniques('contrats.csv', lctr.map((l, i) => ({ id: contrats[i]!.id, numero: l.numero })), problemes);

@@ -9,6 +9,7 @@
  * avec un test sur une sauvegarde de l'ancienne version.
  */
 
+import { etatInitialFlux, Flux } from './hasard';
 import { VERSION_FORMAT, type Monde } from './monde';
 
 export const SIGNATURE = 'f1manager-sauvegarde';
@@ -38,6 +39,35 @@ const MIGRATIONS: Record<number, Migration> = {
   1: (m) => ({ ...m, chronique: Array.isArray(m['chronique']) ? m['chronique'] : [], versionFormat: 2 }),
   // v2 → v3 : ajout des réglages d'expérience (vides).
   2: (m) => ({ ...m, parametres: m['parametres'] ?? {}, versionFormat: 3 }),
+  // v3 → v4 (phase 4) : contrats génériques (organisation, type, clauses structurées), écuries typées,
+  // deux nouveaux traits (D-054) tirés de façon déterministe avec le flux de génération de chaque personne.
+  3: (m) => {
+    const tables = (m['tables'] ?? {}) as Record<string, Record<string, Record<string, unknown>>>;
+    for (const c of Object.values(tables['contrats'] ?? {})) {
+      if (c['organisation'] === undefined) c['organisation'] = c['ecurie'];
+      delete c['ecurie'];
+      c['type'] ??= 'emploi';
+      if (typeof c['clauses'] === 'string') {
+        const texte = c['clauses'] as string;
+        const clauses: Record<string, unknown> = {};
+        if (/n°\s*1/i.test(texte)) clauses['statutN1'] = true;
+        const reste = texte.split('/').map((x) => x.trim()).filter((x) => x && !/n°\s*1/i.test(x));
+        if (reste.length) clauses['note'] = reste.join(' / ');
+        c['clauses'] = clauses;
+      }
+    }
+    for (const e of Object.values(tables['ecuries'] ?? {})) e['typeOrganisation'] ??= 'ecurie';
+    const graine = Number(m['graine'] ?? 0);
+    for (const p of Object.values(tables['personnes'] ?? {})) {
+      const traits = (p['traits'] ?? {}) as Record<string, number>;
+      const f = new Flux(etatInitialFlux(graine, `generation-v4:${String(p['id'])}`));
+      for (const t of ['risque', 'remiseEnQuestion']) {
+        if (traits[t] === undefined) traits[t] = Math.round(Math.min(20, Math.max(1, f.normale(10.5, 3.5))));
+      }
+      p['traits'] = traits;
+    }
+    return { ...m, versionFormat: 4 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

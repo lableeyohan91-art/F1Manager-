@@ -13,7 +13,7 @@ import type { Evenement } from './evenements';
 import type { Commande } from './commandes';
 
 /** Version actuelle du format de sauvegarde. Toute modification de structure l'incrémente (+ migration). */
-export const VERSION_FORMAT = 3;
+export const VERSION_FORMAT = 4;
 
 /** Version du jeu (informative). */
 export const VERSION_JEU = '0.1.0';

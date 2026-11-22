@@ -35,17 +35,17 @@ export function verifierCoherence(monde: Monde, options: { ages?: boolean } = {}
 
   for (const c of contrats) {
     if (!idsPer.has(c.personne)) pb.push(`Contrat ${c.id} : personne inconnue ${c.personne}`);
-    if (!idsEq.has(c.ecurie)) pb.push(`Contrat ${c.id} : écurie inconnue ${c.ecurie}`);
+    if (c.type === 'emploi' && !idsEq.has(c.organisation)) pb.push(`Contrat ${c.id} : organisation inconnue ${c.organisation}`);
     if (c.statut === 'actif' && c.fin < annee) pb.push(`Contrat ${c.id} : actif mais terminé en ${c.fin}`);
   }
-  const contratsActifs = new Map(contrats.filter((c) => c.statut === 'actif').map((c) => [c.personne, c]));
+  const contratsActifs = new Map(contrats.filter((c) => c.statut === 'actif' && c.type === 'emploi').map((c) => [c.personne, c]));
 
   for (const p of personnes) {
     const nom = `${p.prenom} ${p.nom}`;
     if (p.statut === 'actif' && p.ecurie) {
       const c = contratsActifs.get(p.id);
       if (!c) pb.push(`${nom} : actif dans une écurie mais sans contrat`);
-      else if (c.ecurie !== p.ecurie) pb.push(`${nom} : contrat chez ${c.ecurie} mais affecté à ${p.ecurie}`);
+      else if (c.organisation !== p.ecurie) pb.push(`${nom} : contrat chez ${c.organisation} mais affecté à ${p.ecurie}`);
     }
     if (verifierAges && p.statut !== 'retraite') {
       const age = annee - p.anneeNaissance;

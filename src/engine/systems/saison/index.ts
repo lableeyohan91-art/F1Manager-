@@ -230,7 +230,11 @@ function moyenne(v: number[]): number {
 /** Capacité de développement d'une écurie (≈ 0,3 à 1,1) : personnel technique, installations, budget. */
 export function capaciteDeveloppement(monde: Monde, e: Ecurie): number {
   const equipe = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).filter((p) => p.ecurie === e.id && p.statut === 'actif');
-  const c = (poste: string, comp: string) => equipe.find((p) => p.poste === poste)?.competences[comp] ?? 10;
+  // La motivation du personnel technique module son efficacité (phase 4 : cascade « DT démotivé → développement plus lent »).
+  const c = (poste: string, comp: string) => {
+    const p = equipe.find((x) => x.poste === poste);
+    return p ? (p.competences[comp] ?? 10) * (0.85 + 0.3 * (p.etat.motivation / 100)) : 10;
+  };
   const competences = moyenne([
     c('directeur_technique', 'visionTechnique'), c('directeur_technique', 'gestionProjet'),
     c('responsable_aero', 'aerodynamique'), c('responsable_conception', 'conception'),
@@ -296,14 +300,7 @@ export function terminerSaison(monde: Monde, annee: number): void {
   s.chronique = genererChronique(monde, s);
   s.termine = true;
 
-  // Contrats : prolongation PROVISOIRE d'un an tant que le marché du travail n'existe pas (phase 7).
-  for (const id of idsTries(table(monde, TABLES.contrats))) {
-    const c = table(monde, TABLES.contrats)[id] as unknown as Contrat;
-    if (c.statut === 'actif' && c.fin <= annee) {
-      c.fin = annee + 1;
-      ajouterEvenement(monde, { type: 'contrat.prolonge_provisoire', acteurs: [{ id: c.personne, role: 'personne' }, { id: c.ecurie, role: 'ecurie' }], importance: 1, contexte: { fin: c.fin } });
-    }
-  }
+  // (Phase 4 : la prolongation automatique provisoire des contrats est remplacée par les négociations, voir systems/humain.)
 
   // Les explications détaillées des vieux Grands Prix sont retirées (taille des sauvegardes).
   const ancienne = saisonDe(monde, annee - CONSERVATION_EXPLICATIONS_SAISONS);

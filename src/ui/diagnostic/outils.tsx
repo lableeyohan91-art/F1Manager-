@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact';
-import type { Contrat, Ecurie, Monde, Personne } from '../../engine';
+import type { Clauses, Contrat, Ecurie, Monde, Personne } from '../../engine';
 
 export const LIBELLES_POSTES: Record<string, string> = {
   team_principal: 'Team principal',
@@ -71,4 +71,14 @@ export function Lien({ onClick, children }: { onClick: () => void; children: Com
       {children}
     </a>
   );
+}
+
+/** Clauses d'un contrat en texte court. */
+export function texteClauses(c: Clauses): string {
+  const morceaux: string[] = [];
+  if (c.statutN1) morceaux.push('pilote n°1');
+  if (c.indemniteRuptureMEUR) morceaux.push(`indemnité ${c.indemniteRuptureMEUR} M€`);
+  if (c.primeVictoireMEUR) morceaux.push(`prime/victoire ${c.primeVictoireMEUR} M€`);
+  if (c.note) morceaux.push(c.note);
+  return morceaux.join(' · ');
 }

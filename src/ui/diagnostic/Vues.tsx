@@ -2,7 +2,7 @@ import { useMemo, useState } from 'preact/hooks';
 import { SEUIL_CONVICTION, TRAITS, VALEURS, ASPIRATIONS } from '../../engine/balance/personnages';
 import type { Carriere, Circuit, Departement, Installation, Monde, Palmares, Personne } from '../../engine';
 import {
-  age, Barre, Carte, contrats, ecuries, LIBELLES_POSTES, Lien, liste, nomComplet, Note, ORDRE_POSTES, personnes,
+  age, Barre, Carte, contrats, ecuries, LIBELLES_POSTES, Lien, liste, nomComplet, Note, ORDRE_POSTES, personnes, texteClauses,
 } from './outils';
 
 export type Selection = { type: 'ecurie' | 'personne'; id: string } | null;
@@ -178,7 +178,7 @@ export function FichePersonne({ monde, id, ouvrir }: { monde: Monde; id: string;
           <div><span class="muted">Poste</span><br />{LIBELLES_POSTES[p.poste]}</div>
           <div><span class="muted">Écurie</span><br />{eq ? <Lien onClick={() => ouvrir({ type: 'ecurie', id: eq.id })}>{eq.nom}</Lien> : '—'}</div>
           <div><span class="muted">Nationalité · âge</span><br />{p.nationalite} · {age(monde, p)} ans ({p.dateNaissance})</div>
-          <div><span class="muted">Contrat</span><br />{c ? `${c.debut} → ${c.fin} · ${c.salaireMEUR} M€/an${c.clauses ? ' · ' + c.clauses : ''}` : '—'}</div>
+          <div><span class="muted">Contrat</span><br />{c ? `${c.debut} → ${c.fin} · ${c.salaireMEUR} M€/an${texteClauses(c.clauses) ? ' · ' + texteClauses(c.clauses) : ''}` : '—'}</div>
           <div><span class="muted">Origine</span><br />{p.origine === 'donnees' ? 'Données (inspirée du réel)' : 'Personnage généré'}</div>
           {titres.length > 0 && <div><span class="muted">Titres</span><br />{titres.join(', ')}</div>}
         </div>
@@ -220,7 +220,7 @@ export function FichePersonne({ monde, id, ouvrir }: { monde: Monde; id: string;
 export function ListeContrats({ monde, ouvrir }: { monde: Monde; ouvrir: Ouvrir }) {
   const per = new Map(personnes(monde).map((p) => [p.id, p]));
   const nomsEq = new Map(ecuries(monde).map((e) => [e.id, e.nom]));
-  const cs = contrats(monde).sort((a, b) => a.fin - b.fin || (nomsEq.get(a.ecurie) ?? '').localeCompare(nomsEq.get(b.ecurie) ?? ''));
+  const cs = contrats(monde).sort((a, b) => a.fin - b.fin || (nomsEq.get(a.organisation) ?? '').localeCompare(nomsEq.get(b.organisation) ?? ''));
   return (
     <div class="defile">
       <table>
@@ -231,7 +231,7 @@ export function ListeContrats({ monde, ouvrir }: { monde: Monde; ouvrir: Ouvrir 
             return (
               <tr class="cliquable" key={c.id} onClick={() => ouvrir({ type: 'personne', id: c.personne })}>
                 <td class="num">{c.fin}</td><td>{p ? nomComplet(p) : c.personne}</td><td>{LIBELLES_POSTES[c.poste]}</td>
-                <td>{nomsEq.get(c.ecurie)}</td><td class="num">{c.salaireMEUR} M€</td><td class="muted">{c.clauses}</td>
+                <td>{nomsEq.get(c.organisation)}</td><td class="num">{c.salaireMEUR} M€</td><td class="muted">{texteClauses(c.clauses)}</td>
               </tr>
             );
           })}

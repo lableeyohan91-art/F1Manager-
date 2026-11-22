@@ -100,11 +100,30 @@ function competencesTransversales(f: Flux, base: number): Record<string, number>
   return res;
 }
 
+/** Référentiel conservé dans le monde : de quoi générer des personnes en cours de partie (noms, nationalités). */
+export interface Referentiel {
+  id: 'referentiel';
+  nationalites: DonneesInitiales['nationalites'];
+  noms: DonneesInitiales['noms'];
+}
+export const TABLE_REFERENTIEL = 'referentiel';
+
 interface Contexte {
   monde: Monde;
   graine: number;
-  d: DonneesInitiales;
+  d: Pick<DonneesInitiales, 'nationalites' | 'noms'>;
   nomsPris: Set<string>;
+}
+
+/**
+ * Génère une personne en cours de partie (remplacements, réservoir — D-066, provisoire avant la phase 6a),
+ * avec les mêmes règles qu'à la création du monde.
+ */
+export function genererPersonne(monde: Monde, poste: Poste, ecurie: Ecurie | null, statut: 'actif' | 'libre'): Personne {
+  const ref = table(monde, TABLE_REFERENTIEL)['referentiel'] as unknown as Referentiel | undefined;
+  if (!ref) throw new Error('Référentiel absent du monde : impossible de générer une personne');
+  const nomsPris = new Set((Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).map((p) => `${p.prenom} ${p.nom}`));
+  return personneGeneree({ monde, graine: monde.graine, d: ref, nomsPris }, poste, ecurie, statut);
 }
 
 function tirerNationalite(ctx: Contexte, f: Flux, preference?: string): string {
@@ -180,7 +199,7 @@ function personneGeneree(ctx: Contexte, poste: Poste, ecurie: Ecurie | null, sta
   const { prenom, nom } = tirerNom(ctx, f, nat);
   const ages = AGES_PAR_POSTE[poste] ?? { min: 25, max: 55 };
   const age = f.entier(ages.min, ages.max);
-  const anneeNaissance = DATE_DEPART.annee - age;
+  const anneeNaissance = ctx.monde.date.annee - age;
   let competences: Record<string, number>;
   let potentiel: number;
   if (poste === 'pilote_junior' || poste === 'pilote_reserve') {
@@ -222,12 +241,13 @@ function contratGenere(ctx: Contexte, p: Personne): Contrat {
   return ajouter(ctx.monde, TABLES.contrats, {
     id,
     personne: p.id,
-    ecurie: p.ecurie,
+    organisation: p.ecurie,
+    type: 'emploi',
     poste: p.poste,
     debut: DATE_DEPART.annee - f.entier(0, 6),
     fin: DATE_DEPART.annee - 1 + f.entier(DUREE_CONTRAT_GENERE.min, DUREE_CONTRAT_GENERE.max),
     salaireMEUR: Math.round((s.min + f.suivant() * (s.max - s.min)) * 10) / 10,
-    clauses: '',
+    clauses: {},
     statut: 'actif',
     verification: 'contrat généré (estimation)',
   } satisfies Contrat);
@@ -236,6 +256,7 @@ function contratGenere(ctx: Contexte, p: Personne): Contrat {
 export function construireMonde(graine: number, d: DonneesInitiales, scenario: string): Monde {
   const monde = creerMondeVide(graine, scenario, DATE_DEPART);
   const ctx: Contexte = { monde, graine, d, nomsPris: new Set() };
+  table(monde, TABLE_REFERENTIEL)['referentiel'] = { id: 'referentiel', nationalites: d.nationalites, noms: d.noms } satisfies Referentiel as unknown as Entite;
 
   for (const m of d.motoristes) ajouter(monde, TABLES.motoristes, { ...m });
   const ecuries = new Map<string, Ecurie>();

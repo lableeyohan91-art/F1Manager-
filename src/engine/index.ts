@@ -17,3 +17,5 @@ export * from './generation/coherence';
 export * from './systems/saison';
 export * from './systems/saison/performance';
 export * from './diagnostics/indicateurs';
+export * from './systems/memoire';
+export * from './systems/humain';

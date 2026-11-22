@@ -89,7 +89,7 @@ describe('Phase 2 — erreurs de données claires (critère 4)', () => {
     d.ecuries = d.ecuries.slice(0, 10).map((e) => e); // une écurie de moins : le monde s'adapte (D-041)
     const idsRestants = new Set(d.ecuries.map((e) => e.id));
     d.personnes = d.personnes.filter((p) => !p.ecurie || idsRestants.has(p.ecurie));
-    d.contrats = d.contrats.filter((c) => idsRestants.has(c.ecurie));
+    d.contrats = d.contrats.filter((c) => idsRestants.has(c.organisation));
     const m = construireMonde(5, d, 'test');
     expect(Object.keys(m.tables['ecuries'] ?? {})).toHaveLength(10);
     expect(verifierCoherence(m)).toEqual([]);

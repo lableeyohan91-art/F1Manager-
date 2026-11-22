@@ -17,6 +17,9 @@ export const TRAITS = {
   professionnalisme: 'Professionnalisme',
   sangFroid: 'Sang-froid',
   sociabilite: 'Sociabilité',
+  // D-054 (phase 4)
+  risque: 'Propension au risque',
+  remiseEnQuestion: 'Remise en question',
 } as const;
 
 /** Couche 2 — les 7 valeurs proposées. */

@@ -9,6 +9,7 @@ import { installerDemo } from './systems/demo';
 import { chargerDonnees, type FichiersDonnees } from './generation/chargement';
 import { construireMonde } from './generation/construction';
 import { installerSaison } from './systems/saison';
+import { installerHumain } from './systems/humain';
 
 export interface Scenario {
   nom: string;
@@ -57,6 +58,6 @@ export function creerScenarioGrille2026(fichiers: FichiersDonnees): Scenario {
     nom: 'grille-2026',
     description: 'Départ en 2027 avec la grille inspirée de 2026 (data/grille-2026).',
     creerMonde: (graine) => construireMonde(graine, donnees, 'grille-2026'),
-    creerMoteur: () => installerSaison(new Moteur()),
+    creerMoteur: () => installerHumain(installerSaison(new Moteur())),
   };
 }
