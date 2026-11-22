@@ -79,4 +79,5 @@ Mesures : avec quelle écurie de départ, et en combien de saisons, chaque profi
 | Effet quasi nul d'une augmentation de DT dans les dilemmes | P4 | 7 (débauchage) |
 | Dominations (9 % → 23 % sur 10 saisons après la 6a) : **la meilleure voiture** écrase la saison (80 % des cas), le plateau des pilotes étant plus resserré | P6a §8 | 7 (débauchage des ingénieurs), 8 (règlements, D-090), 12 (conception), 13 (moteur de course, D-103) |
 | Âge moyen de la grille ≈ 30 ans | P6a | 6b (filières juniors) |
+| Hiérarchie plus figée après la 6a complémentaire (persistance 0,635 → 0,687, champions constructeurs 4,6 → 3,9 sur 20 saisons) : hypothèse, l'expérience favorise les pilotes établis | P6a+ | 6b (expérience acquise chez les juniors) ; facteur d'expérience des débutants à revoir lors de la grande campagne |
 

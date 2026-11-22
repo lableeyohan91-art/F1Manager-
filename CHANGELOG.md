@@ -194,3 +194,14 @@ Aucun code à ce stade.
 - D-102 : pilotes d'exception rares (≈ 2 par décennie), distribution des potentiels des cohortes resserrée.
 - D-103 : affinités avec les circuits, forme du jour, forme à moyen terme (orientations, intégration en phase 13) : `docs/systemes/orientations-performance-pilote.md`.
 
+## [Phase 6a complémentaire] — 22/11/2026
+
+### Ajouté
+- Compétences des pilotes refondues (vitesse supprimée ; freinage, virages lents, virages rapides, motricité, intelligence de course), trait résilience, erreurs sous pression, expérience réelle, exigences propres aux 24 circuits, affinités légères (D-104 à D-108).
+- Mode développeur : commande `dev.modifier_personne` et éditeur dans l'interface de diagnostic.
+- Nouvelles notes des pilotes réels ; format de sauvegarde 8 ; 10 tests de laboratoire (84 au total) ; références `p6a-complement-reference*`.
+- Rapport `docs/rapports/2026-11-22-p6a-complement-competences.md`.
+
+### Constat
+- Dominations en recul sur 10 saisons (23 % → 19 %), mais hiérarchie plus figée (hypothèse : l'expérience favorise les pilotes établis) ; documenté, non recalibré (D-095).
+

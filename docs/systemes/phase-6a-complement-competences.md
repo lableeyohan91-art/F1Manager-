@@ -1,6 +1,6 @@
 # Phase 6a complémentaire — Compétences des pilotes, expérience, circuits, affinités
 
-> Statut : **VALIDÉE** (D-104 à D-108, 22/11/2026). Demande du porteur et de ChatGPT ; analyse critique de Claude Code acceptée (virages moyens supprimés, 2 attributs mentaux créés au lieu de 8, affinités légères dès maintenant, notes des pilotes réels fixées par Claude Code).
+> Statut : **VALIDÉE** (D-104 à D-108, 22/11/2026) — **réalisée** (rapport `docs/rapports/2026-11-22-p6a-complement-competences.md`). Demande du porteur et de ChatGPT ; analyse critique de Claude Code acceptée (virages moyens supprimés, 2 attributs mentaux créés au lieu de 8, affinités légères dès maintenant, notes des pilotes réels fixées par Claude Code).
 > Méthode : D-095 (mesurer, ne pas recalibrer). Chaque attribut a une formule qui le lit (§7).
 
 ## 1. Compétences des pilotes (liste définitive)
