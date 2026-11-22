@@ -72,6 +72,7 @@ Une décision qui en remplace une autre le dit (« remplace D-xxx »).
 | D-054 | 22/11/2026 | Ajout de deux traits : **propension au risque** et **capacité à se remettre en question** (11 traits). Mise en œuvre en phase 4 | Validé par le porteur et ChatGPT après analyse (personnalite.md). |
 | D-060 | 22/11/2026 | Les résultats de la phase 3 sont figés comme **référence** (`docs/rapports/reference/p3-reference.*`) pour mesurer l'effet des futures mécaniques | Demande du porteur et de ChatGPT. |
 | D-061 | 22/11/2026 | Titre « joué à la dernière manche » : définition exacte (un rival peut-il encore finir devant, égalités départagées par victoires puis podiums) | Demande de ChatGPT ; l'ancienne approximation ignorait les égalités et les 3es. |
+| D-062 | 22/11/2026 | La phase 6 comprend un **écosystème complet de formation** : championnats juniors réellement simulés, réservoir karting/F4, académies, affiliations, financement, placement, recrutement de jeunes, potentiel incertain, progression et déclin individualisés, retraites, reconversions, générations procédurales, renouvellement des grilles. Les résultats et relations juniors sont conservés toute la carrière | Demande du porteur. Orientations : `docs/systemes/phase-6-cycle-de-vie-filieres.md`. |
 
 ---
 
@@ -83,6 +84,8 @@ Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · 
 | --- | --- | --- | --- |
 | D-036 | AVANT P2 | Nom du championnat fictif et de l'instance dirigeante | ChatGPT propose 10 noms, le porteur choisit |
 | D-059 | AVANT P4 | Donner plus de poids au pilote : 0,20 % par point de niveau (au lieu de 0,10) et aléa de course à 0,22 (au lieu de 0,30) ? | Oui (réglage B du rapport `2026-11-22-p3-verifications.md`) : les compétences expliquent 44 % de l'écart entre coéquipiers au lieu de 10 % |
+| D-063 | AVANT P4 | Découper la phase 6 en **6a (cycle de vie)** et **6b (filières juniors)**, rattacher le recrutement et le débauchage des jeunes au marché (phase 7), et prévoir dès la phase 4 des contrats génériques (affiliation, financement, placement) ? | Oui : phase trop grosse sinon, et un seul marché du travail pour tous |
+| D-064 | AVANT P6 | Noms fictifs des catégories juniors (« F2 », « F3 », « F4 » sont des marques) ; grilles juniors de départ **générées** ou inspirées des grilles réelles 2026 ; karting et F4 abstraits ? | Noms proposés par ChatGPT ; grilles générées ; karting/F4 abstraits (classement de niveau annuel) |
 | D-039 | PLUS TARD | Option Carrera : importer les résultats réels de Paddock comme résultats de Grand Prix | Idée à garder, non prioritaire |
 
 ---

@@ -15,8 +15,9 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | 3 | Saison abstraite | Classements, points et primes sur 10 saisons |
 | 4 | Contrats + mémoire v1 + bac à sable | Négocier, promettre, se souvenir ; premières interactions testables à la main |
 | 5 | Économie | Sponsors, conseil d'administration, plafond budgétaire, installations |
-| 6 | Cycle de vie | Vieillissement, progression, retraites, nouvelles générations |
-| 7 | Marché du travail + IA des écuries + agents | Recrutement actif, débauchage, décisions de l'IA |
+| 6a | Cycle de vie | Progression et déclin individualisés, retraites, reconversions, nouvelles générations, réservoir karting/F4, potentiel incertain et rapports de recrutement |
+| 6b | Filières juniors | Deux championnats juniors réellement simulés (écuries, calendriers, résultats, classements, palmarès), académies, contrats d'affiliation, financement des carrières, placement, renouvellement des grilles |
+| 7 | Marché du travail + IA des écuries + agents | Recrutement actif, débauchage (adultes **et jeunes talents**), clauses de rachat, décisions de l'IA |
 | 8 | Mémoire v2 + groupes sociaux + politique | Circulation de l'information, réputation, groupes émergents, votes du règlement |
 | 9 | Histoire ancrée (+ simulation libre pour les mondes fictifs) | Démarrage en 2027 avec la grille voulue, et des personnages qui partagent déjà un passé |
 | **A** | **Jalon A** | **10 saisons observées après un historique, chronique lisible, rapport de diagnostic** |
@@ -33,6 +34,7 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 - **Bac à sable d'interactions en phase 4** : déclencher à la main une négociation, une promesse ou un refus, et observer la réaction et son « Pourquoi ? ».
 - **Valeurs et convictions** intégrées au modèle de personnage dès la phase 2, et utilisées dans les décisions dès la phase 4.
 - **Groupes sociaux** en phase 8, une fois qu'il existe assez de relations pour qu'ils émergent.
+- **Phase 6 enrichie (22/11/2026)** : écosystème complet de formation des pilotes, découpé en 6a (cycle de vie) et 6b (filières juniors). Le recrutement et le débauchage des jeunes sont rattachés au marché (phase 7). Orientations et dépendances : [phase-6-cycle-de-vie-filieres.md](docs/systemes/phase-6-cycle-de-vie-filieres.md). La phase 4 prévoit dès sa conception des contrats génériques (affiliation, financement, placement) et des organisations typées (écurie junior, académie, championnat).
 - **Simulation historique** en phase 9. Elle réutilise le moteur complet : elle ne peut pas venir avant les systèmes qu'elle fait tourner.
 
 ## Détail des phases 0 à 3

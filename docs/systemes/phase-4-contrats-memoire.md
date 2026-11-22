@@ -140,6 +140,18 @@ Elles sont toutes validées par les mêmes règles, et toutes produisent des év
 | 8 | Bac à sable | Le porteur rejoue lui-même la chaîne de référence sur son téléphone |
 | 9 | Référence | Rapport d'équilibrage comparé à la référence de la phase 3 (dynasties, champions différents, rotation du personnel) |
 
+## 12. Préparer la phase 6 (filières juniors) — sans l'implémenter
+
+Voir [phase-6-cycle-de-vie-filieres.md](phase-6-cycle-de-vie-filieres.md) §5. La phase 4 adopte dès maintenant :
+- des **contrats typés** (`emploi` ; et, réservés, `affiliation`, `financement`, `placement`), avec **plusieurs contrats actifs simultanés** possibles pour une même personne ;
+- des **parties génériques** : une personne et une organisation quelconque (écurie de F1, écurie junior, académie, sponsor personnel) ;
+- des **clauses structurées** (objet typé), au lieu d'un texte libre ;
+- un type de promesse « promotion à une saison donnée » réservé ;
+- des **organisations typées** (`ecurie_junior`, `academie`, `championnat` réservés) ;
+- une table `carrieres` alimentée par la simulation (catégorie, résumé de résultats).
+
+Coût en phase 4 : faible (structure de données). Gain : aucune migration lourde des contrats en phase 6.
+
 ## 11. Questions à trancher avant de coder
 
 1. **Remplacement provisoire** dès la phase 4 (la grille bouge), ou départs « gelés » jusqu'à la phase 7 ? Je recommande le remplacement provisoire, pour tester tôt les conséquences.

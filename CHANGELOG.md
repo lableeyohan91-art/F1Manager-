@@ -81,3 +81,9 @@ Aucun code à ce stade.
 
 ### Modifié
 - D-054 validée (11 traits, mise en œuvre en phase 4). Proposition D-059 (poids du pilote et aléa) en attente.
+
+## [Feuille de route] — 22/11/2026
+
+### Modifié
+- Phase 6 enrichie : écosystème de formation des pilotes (D-062), découpage proposé en 6a / 6b (D-063), questions sur les noms et les grilles juniors (D-064).
+- Fiche d'orientations `docs/systemes/phase-6-cycle-de-vie-filieres.md` ; la conception de la phase 4 prévoit des contrats génériques compatibles (§12).
