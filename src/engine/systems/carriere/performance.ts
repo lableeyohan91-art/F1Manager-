@@ -11,6 +11,7 @@ import {
   MODULATION_TRAIT, NOUVEAU_CIRCUIT, NOUVELLE_ECURIE, PRESSION,
 } from '../../balance/carriere';
 import { ajouterEvenement } from '../../core/evenements';
+import { POIDS_COURSE_JUNIOR } from '../../balance/juniors';
 import { tirageLocal } from '../../core/moteur';
 import { table, type Monde } from '../../core/monde';
 import { TABLES, type Carriere, type Circuit, type ExperiencePilote, type Palmares, type Personne, type Saison } from '../../model/types';
@@ -30,7 +31,7 @@ function experienceDe(p: Personne): ExperiencePilote | undefined {
 export function facteurExperience(p: Personne): number {
   const k = p.carriere;
   if (!k) return 1;
-  const x = p.poste.startsWith('pilote') ? 1 - Math.exp(-(k.experience?.gp ?? 0) / FACTEUR_EXPERIENCE.echelleGP) : 1 - Math.exp(-k.saisonsActives / FACTEUR_EXPERIENCE.echelleSaisons);
+  const x = p.poste.startsWith('pilote') ? 1 - Math.exp(-((k.experience?.gp ?? 0) + POIDS_COURSE_JUNIOR * (k.experience?.gpJuniors ?? 0)) / FACTEUR_EXPERIENCE.echelleGP) : 1 - Math.exp(-k.saisonsActives / FACTEUR_EXPERIENCE.echelleSaisons);
   return FACTEUR_EXPERIENCE.min + FACTEUR_EXPERIENCE.amplitude * x;
 }
 
@@ -105,14 +106,18 @@ export function erreurPression(monde: Monde, p: Personne, saison: Saison, manche
  * Après un Grand Prix : compteurs d'expérience, apprentissage de la pluie, évolution des affinités.
  * `positions` : position d'arrivée (null si abandon) et cause d'abandon de chaque partant.
  */
-export function apresGrandPrix(monde: Monde, circuit: Circuit, idGp: string, pluie: boolean, partants: { p: Personne; position: number | null; incident: boolean }[]): void {
+export function apresGrandPrix(monde: Monde, circuit: Circuit, idGp: string, pluie: boolean, partants: { p: Personne; position: number | null; incident: boolean }[], junior = false): void {
   for (const { p, position, incident } of partants) {
     const ex = experienceDe(p);
     if (!ex) continue;
-    ex.gp++;
+    // Phase 6b : une course junior compte à part (facteur d'expérience réduit) mais apprend pleinement le circuit.
+    if (junior) ex.gpJuniors = (ex.gpJuniors ?? 0) + 1;
+    else {
+      ex.gp++;
+      if (ex.ecurie !== p.ecurie) { ex.ecurie = p.ecurie; ex.gpEcurie = 0; }
+      ex.gpEcurie++;
+    }
     ex.circuits[circuit.id] = (ex.circuits[circuit.id] ?? 0) + 1;
-    if (ex.ecurie !== p.ecurie) { ex.ecurie = p.ecurie; ex.gpEcurie = 0; }
-    ex.gpEcurie++;
     if (pluie) {
       const v = p.competences['pluie'];
       if (v !== undefined) {

@@ -14,11 +14,12 @@ import {
   TEMPS_DE_JEU, TRAVAIL,
 } from '../../balance/carriere';
 import { COMPETENCES_TRANSVERSALES } from '../../balance/personnages';
+import { TEMPS_DE_JEU_BAQUET_JUNIOR } from '../../balance/juniors';
 import { ajouterEvenement } from '../../core/evenements';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import { idsTries, table, type Monde } from '../../core/monde';
 import { genererCohorte } from '../../generation/construction';
-import { TABLES, type Contrat, type Installation, type Palmares, type Personne, type Poste } from '../../model/types';
+import { TABLES, type Contrat, type EcurieJunior, type Installation, type Palmares, type Personne, type Poste } from '../../model/types';
 import { relation } from '../memoire';
 import { liberer } from '../humain/contrats';
 import { niveauEffectif } from '../economie/infrastructures';
@@ -42,16 +43,20 @@ const estPilote = (p: Personne) => p.poste.startsWith('pilote');
 
 /* ---------------------------------------------------------------- Environnement */
 
-function tempsDeJeu(p: Personne): number {
+function tempsDeJeu(p: Personne, anneeCourante: number): number {
   if (estPilote(p)) {
     if (p.statut === 'actif') return TEMPS_DE_JEU[p.poste === 'pilote_titulaire' ? 'pilote_titulaire' : 'pilote_reserve']!;
+    // Phase 6b : un baquet junior de la saison donne un temps de jeu proche de celui d'un titulaire.
+    if (p.junior && p.junior.annee >= anneeCourante) return TEMPS_DE_JEU_BAQUET_JUNIOR;
     return p.poste === 'pilote_junior' ? TEMPS_DE_JEU['junior']! : TEMPS_DE_JEU['pilote_libre']!;
   }
   return p.statut === 'actif' ? TEMPS_DE_JEU['personnel_actif']! : TEMPS_DE_JEU['personnel_libre']!;
 }
 
 /** Qualité de l'encadrement (0 à 1) : installations et chef direct, selon le métier. Libres : encadrement moyen-faible. */
-function qualiteEncadrement(p: Personne, equipe: Personne[], installations: Map<string, number>): number {
+function qualiteEncadrement(p: Personne, equipe: Personne[], installations: Map<string, number>, ecuriesJuniors?: Map<string, number>): number {
+  // Phase 6b : un jeune en baquet junior est encadré par son écurie junior.
+  if (p.statut === 'libre' && p.junior && ecuriesJuniors) return (ecuriesJuniors.get(p.junior.ecurie) ?? 10) / 20;
   if (p.statut !== 'actif' || !p.ecurie) return 0.35;
   const inst = (type: string) => installations.get(`${p.ecurie}:${type}`) ?? 0.5;
   const chef = (poste: string, comp: string) => (equipe.find((x) => x.poste === poste)?.competences[comp] ?? 10) / 20;
@@ -67,10 +72,19 @@ function aUnMentor(monde: Monde, p: Personne, equipe: Personne[]): boolean {
     && niveauCarriere(m) >= niveau + MENTOR.ecartNiveau && relation(monde, p.id, m.id).affinite >= MENTOR.seuilAffinite);
 }
 
+/** Qualité des écuries juniors extraite de l'index (clés « junior:<id> »). */
+function juniorsQualite(index: Map<string, number>): Map<string, number> {
+  const res = new Map<string, number>();
+  for (const [k, v] of index) if (k.startsWith('junior:')) res.set(k.slice(7), v);
+  return res;
+}
+
 /** Niveau effectif (0 à 1) des installations, indexé par « écurie:type » (calculé une fois par période). */
 export function indexInstallations(monde: Monde): Map<string, number> {
   const res = new Map<string, number>();
   for (const i of Object.values(table(monde, TABLES.installations)) as unknown as Installation[]) res.set(`${i.ecurie}:${i.type}`, niveauEffectif(i) / 10);
+  // Phase 6b : qualité des écuries juniors (clé = identifiant de l'écurie junior).
+  for (const e of Object.values(table(monde, TABLES.ecuriesJuniors)) as unknown as EcurieJunior[]) res.set(`junior:${e.id}`, e.qualite);
   return res;
 }
 
@@ -80,7 +94,7 @@ export function faireProgresser(monde: Monde, p: Personne, equipe: Personne[], i
   const k = p.carriere;
   if (!k) return;
   const age = ageExact(monde, p);
-  const env = tempsDeJeu(p) * (ENCADREMENT.min + ENCADREMENT.amplitude * Math.sqrt(qualiteEncadrement(p, equipe, installations)))
+  const env = tempsDeJeu(p, monde.date.annee) * (ENCADREMENT.min + ENCADREMENT.amplitude * Math.sqrt(qualiteEncadrement(p, equipe, installations, juniorsQualite(installations))))
     * (aUnMentor(monde, p, equipe) ? 1 + MENTOR.bonus : 1)
     * (MOTIVATION_PROGRESSION.min + MOTIVATION_PROGRESSION.amplitude * (p.etat.motivation / 100));
   const travail = TRAVAIL.min + TRAVAIL.amplitude * (((p.traits['professionnalisme'] ?? 10) + (p.traits['remiseEnQuestion'] ?? 10)) / 40);

@@ -163,6 +163,13 @@ const MIGRATIONS: Record<number, Migration> = {
     }
     return { ...m, versionFormat: 8 };
   },
+  // v8 → v9 (phase 6b) : tables juniors (les écuries juniors sont créées au premier marché des baquets).
+  8: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['ecuriesJuniors'] ??= {};
+    tables['saisonsJuniors'] ??= {};
+    return { ...m, versionFormat: 9 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

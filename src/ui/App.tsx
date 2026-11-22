@@ -3,6 +3,7 @@ import { creerScenarioGrille2026, ErreurDonnees, formaterDate, verifierCoherence
 import { VueBilan, VueSaisons, VueVoitures } from './diagnostic/Saisons';
 import { BacASable } from './diagnostic/Humain';
 import { VueFinances } from './diagnostic/Finances';
+import { VueJuniors } from './diagnostic/Juniors';
 import { EditeurDeveloppeur } from './diagnostic/Developpeur';
 import { fichiersGrille2026 } from './donnees';
 import { personnes } from './diagnostic/outils';
@@ -10,9 +11,9 @@ import {
   FicheEcurie, FichePersonne, ListeCircuits, ListeContrats, ListeEcuries, ListePalmares, ListePersonnes, type Selection,
 } from './diagnostic/Vues';
 
-type Onglet = 'bacasable' | 'saisons' | 'bilan' | 'finances' | 'ecuries' | 'voitures' | 'personnes' | 'contrats' | 'palmares' | 'circuits' | 'coherence';
+type Onglet = 'bacasable' | 'saisons' | 'bilan' | 'finances' | 'juniors' | 'ecuries' | 'voitures' | 'personnes' | 'contrats' | 'palmares' | 'circuits' | 'coherence';
 const ONGLETS: [Onglet, string][] = [
-  ['bacasable', 'Bac à sable'], ['saisons', 'Saisons'], ['bilan', 'Bilan'], ['finances', 'Finances'], ['ecuries', 'Écuries'], ['voitures', 'Voitures'], ['personnes', 'Personnes'],
+  ['bacasable', 'Bac à sable'], ['saisons', 'Saisons'], ['bilan', 'Bilan'], ['finances', 'Finances'], ['juniors', 'Juniors'], ['ecuries', 'Écuries'], ['voitures', 'Voitures'], ['personnes', 'Personnes'],
   ['contrats', 'Contrats'], ['palmares', 'Palmarès'], ['circuits', 'Circuits'], ['coherence', 'Cohérence'],
 ];
 
@@ -122,6 +123,7 @@ export function App() {
                 {onglet === 'saisons' && <VueSaisons monde={monde} ouvrir={ouvrir} />}
                 {onglet === 'bilan' && <VueBilan monde={monde} />}
                 {onglet === 'finances' && <VueFinances monde={monde} />}
+                {onglet === 'juniors' && <VueJuniors monde={monde} ouvrir={ouvrir} />}
                 {onglet === 'voitures' && <VueVoitures monde={monde} />}
                 {onglet === 'ecuries' && <ListeEcuries monde={monde} ouvrir={ouvrir} />}
                 {onglet === 'personnes' && <ListePersonnes monde={monde} ouvrir={ouvrir} />}

@@ -38,6 +38,7 @@ import { TABLES } from '../model/types';
 import { moyenne, type DonneesInitiales, type PersonneDonnees } from './chargement';
 import { plafondCompetence, tirerCarriere } from '../systems/carriere/profil';
 import { initialiserExperienceDonnees } from '../systems/carriere/performance';
+import { simulerPasseJunior } from '../systems/juniors';
 
 export const DATE_DEPART: DateJeu = { annee: 2027, semaine: 1 };
 
@@ -118,6 +119,8 @@ export interface Referentiel {
   /** Phase 5b (absents des sauvegardes plus anciennes : noms génériques en repli). */
   secteurs?: DonneesInitiales['secteurs'];
   racinesEntreprises?: string[];
+  /** Phase 6b. */
+  ecuriesJuniors?: DonneesInitiales['ecuriesJuniors'];
 }
 export const TABLE_REFERENTIEL = 'referentiel';
 
@@ -342,7 +345,7 @@ function contratGenere(ctx: Contexte, p: Personne): Contrat {
 export function construireMonde(graine: number, d: DonneesInitiales, scenario: string): Monde {
   const monde = creerMondeVide(graine, scenario, DATE_DEPART);
   const ctx: Contexte = { monde, graine, d, nomsPris: new Set() };
-  table(monde, TABLE_REFERENTIEL)['referentiel'] = { id: 'referentiel', nationalites: d.nationalites, noms: d.noms, secteurs: d.secteurs, racinesEntreprises: d.racinesEntreprises } satisfies Referentiel as unknown as Entite;
+  table(monde, TABLE_REFERENTIEL)['referentiel'] = { id: 'referentiel', nationalites: d.nationalites, noms: d.noms, secteurs: d.secteurs, racinesEntreprises: d.racinesEntreprises, ecuriesJuniors: d.ecuriesJuniors } satisfies Referentiel as unknown as Entite;
 
   for (const m of d.motoristes) ajouter(monde, TABLES.motoristes, { ...m });
   const ecuries = new Map<string, Ecurie>();
@@ -427,6 +430,8 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
 
   // D-106 : expérience initiale des pilotes issus des données (provisoire avant la phase 9).
   initialiserExperienceDonnees(monde);
+  // Phase 6b : écuries juniors et passé junior simulé (sans effet sur la grille de F1 de 2027).
+  simulerPasseJunior(monde);
 
   return monde;
 }

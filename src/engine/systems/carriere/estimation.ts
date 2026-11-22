@@ -30,7 +30,8 @@ export function potentielEstime(monde: Monde, idEcurie: string | null, p: Person
     ? (Object.values(table(monde, TABLES.departements)) as unknown as Departement[]).find((d) => d.ecurie === idEcurie && d.type === 'recrutement')
     : undefined;
   const niveauDep = dep?.niveauMoyen ?? 10;
-  const observees = (p.carriere?.saisonsActives ?? 0) + (idEcurie && p.ecurie === idEcurie ? 2 : 0);
+  // Phase 6b : les saisons juniors comptent comme du temps d'observation.
+  const observees = (p.carriere?.saisonsActives ?? 0) + (p.carriere?.juniors?.length ?? 0) + (idEcurie && p.ecurie === idEcurie ? 2 : 0);
   const demiLargeur = (base * (ESTIMATION.max - ESTIMATION.amplitude * (niveauDep / 20))) / (1 + ESTIMATION.observation * observees);
   const biais = dep ? tirageLocal(monde, 'recrutement.biais', dep.id).normale(0, ESTIMATION.biaisDepartement) : 0;
   const erreur = tirageLocal(monde, 'recrutement.estimation', idEcurie ?? 'paddock', p.id, monde.date.annee).normale(0, demiLargeur / 2);

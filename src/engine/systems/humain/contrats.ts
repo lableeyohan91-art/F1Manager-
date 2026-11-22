@@ -354,6 +354,7 @@ export function recruter(monde: Monde, c: Personne, e: Ecurie, poste: Poste, sal
   const ancienPoste = c.poste;
   c.statut = 'actif';
   c.ecurie = e.id;
+  delete c.junior; // un jeune engagé en F1 quitte son baquet junior
   // Phase 6a : un changement de métier (promotion) recrée les compétences du nouveau métier.
   changerMetier(c, poste, tirageLocal(monde, 'carriere.metier', c.id, monde.date.annee), monde.date.annee - c.anneeNaissance);
   delete c.libreDepuis;

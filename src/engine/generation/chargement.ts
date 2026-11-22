@@ -13,7 +13,7 @@ import { ErreurDonnees, Lecteur, lireCsv } from './csv';
 export type FichiersDonnees = Record<string, string>;
 
 export const FICHIERS_GRILLE = ['finances.csv', 'voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
-export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv', 'secteurs.csv', 'entreprises.csv'] as const;
+export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv', 'secteurs.csv', 'entreprises.csv', 'ecuries-juniors.csv'] as const;
 
 const POSTES_DONNEES: readonly Poste[] = [
   'team_principal', 'directeur_technique', 'directeur_sportif', 'directeur_financier',
@@ -60,6 +60,8 @@ export interface DonneesInitiales {
   /** Phase 5b : secteurs d'activité des sponsors fictifs, et racines de noms d'entreprises inventées. */
   secteurs: Secteur[];
   racinesEntreprises: string[];
+  /** Phase 6b : noms fictifs des écuries juniors. */
+  ecuriesJuniors: { nom: string; nationalite: string }[];
 }
 
 export interface Secteur {
@@ -331,5 +333,10 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   const racinesEntreprises = lireCsv('entreprises.csv', fichier(f, 'entreprises.csv'), ['racine']).map((l) => new Lecteur('entreprises.csv').texte(l, 'racine'));
   if (racinesEntreprises.length < 10) problemes.push('entreprises.csv : il faut au moins 10 racines de noms');
 
-  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises };
+  const ljun = lireCsv('ecuries-juniors.csv', fichier(f, 'ecuries-juniors.csv'), ['nom', 'nationalite']);
+  const rj = new Lecteur('ecuries-juniors.csv');
+  const ecuriesJuniors = ljun.map((l) => ({ nom: rj.texte(l, 'nom'), nationalite: rj.reference(l, 'nationalite', codesNat) }));
+  if (ecuriesJuniors.length < 21) problemes.push('ecuries-juniors.csv : il faut au moins 21 noms (10 écuries Apex 3 + 11 écuries Apex 2)');
+
+  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises, ecuriesJuniors };
 }

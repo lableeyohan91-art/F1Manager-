@@ -22,6 +22,8 @@ export const TABLES = {
   sponsors: 'sponsors',
   contratsSponsoring: 'contratsSponsoring',
   conjoncture: 'conjoncture',
+  ecuriesJuniors: 'ecuriesJuniors',
+  saisonsJuniors: 'saisonsJuniors',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -126,7 +128,44 @@ export interface Personne {
   carriere?: CarrierePersonne;
   /** Année de retraite (retours possibles, D-072). */
   retraiteDepuis?: number;
+  /** Phase 6b : baquet junior de la saison en cours (la personne reste « libre » au sens de la F1, donc recrutable). */
+  junior?: { categorie: 'apex3' | 'apex2'; ecurie: string; annee: number };
+  /** Phase 6b : réputation sportive (0–100) — classements karting et Apex 4, résultats Apex 3 et Apex 2. */
+  reputationJeune?: number;
+  /** Phase 6b : budget familial annuel (M€), tiré une fois. Lu par le marché des baquets. */
+  budgetFamilleMEUR?: number;
 }
+
+/** Écurie junior (phase 6b) : table séparée des écuries de F1. */
+export interface EcurieJunior {
+  id: string;
+  nom: string;
+  nationalite: string;
+  categorie: 'apex3' | 'apex2';
+  /** 1–20 : effet en course et encadrement des pilotes. */
+  qualite: number;
+  /** 0–100 : réputation de formatrice. */
+  reputation: number;
+  prixBaquetMEUR: number;
+  /** Écurie de F1 partenaire (placement préférentiel, 6b-2). */
+  partenaire?: string;
+}
+
+export interface ResultatJunior { pilote: string; ecurie: string; position: number | null; points: number }
+export interface MancheJunior { manche: number; circuit: string; semaine: number; pluie: boolean; termine: boolean; resultats: ResultatJunior[] }
+export interface SaisonJunior {
+  id: string;
+  categorie: 'apex3' | 'apex2';
+  annee: number;
+  manches: MancheJunior[];
+  classement: { pilote: string; ecurie: string; points: number; victoires: number; podiums: number }[];
+  classementEcuries: { ecurie: string; points: number }[];
+  termine: boolean;
+  champion?: string;
+}
+
+/** Résumé d'une saison junior dans la carrière d'un pilote (conservé toute la carrière, borné). */
+export interface ResumeJunior { annee: number; categorie: string; ecurie: string; rang: number; points: number; victoires: number; titre: boolean }
 
 /** Profil de carrière et compteurs (phase 6a, docs/systemes/phase-6a-cycle-de-vie.md §3, §10). */
 export interface CarrierePersonne {
@@ -150,6 +189,8 @@ export interface CarrierePersonne {
   experience?: ExperiencePilote;
   /** D-108 : affinités non neutres par circuit (−2 à +2). Lues par le niveau effectif en course. */
   affinites?: Record<string, number>;
+  /** Phase 6b : résumés des saisons juniors (lus par l'estimation et le recrutement). */
+  juniors?: ResumeJunior[];
 }
 
 export interface ExperiencePilote {
@@ -161,6 +202,8 @@ export interface ExperiencePilote {
   /** Écurie actuelle et Grands Prix disputés avec elle (handicap de nouvelle écurie). */
   ecurie: string;
   gpEcurie: number;
+  /** Phase 6b : courses juniors disputées (comptent à moitié pour le facteur d'expérience). */
+  gpJuniors?: number;
 }
 
 /**

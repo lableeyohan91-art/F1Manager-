@@ -25,3 +25,4 @@ export * from './systems/economie';
 export * from './model/finances';
 export * from './systems/carriere';
 export * from './systems/developpeur';
+export * from './systems/juniors';

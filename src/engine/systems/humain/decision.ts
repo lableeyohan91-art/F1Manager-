@@ -13,6 +13,7 @@ import { TABLES, type Carriere, type Contrat, type Ecurie, type Palmares, type P
 import { relation, souvenirsDe } from '../memoire';
 import { ecuriesActives, indiceMoyen, niveauPilote } from '../saison/performance';
 import { reputation, type TypePromesse } from './promesses';
+import { REPUTATION_RECRUTEMENT_F1 } from '../../balance/juniors';
 import { potentielEstime } from '../carriere/estimation';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
@@ -214,6 +215,8 @@ export function scoreCandidat(monde: Monde, e: Ecurie, decideur: string, c: Pers
   s += ajouter('niveau', niveauMetier(c) / 20);
   // Phase 6a : l'écurie juge sur SON estimation du potentiel (département recrutement), pas sur le vrai potentiel.
   s += ajouter('potentiel estimé', ((potentielEstime(monde, e.id, c).centre - niveauMetier(c)) / 20) * (0.3 + 0.4 * jeunesse));
+  // Phase 6b : la réputation sportive des jeunes (karting, Apex 4, Apex 3, Apex 2) compte pour les recruteurs.
+  if (c.reputationJeune) s += ajouter('réputation junior', REPUTATION_RECRUTEMENT_F1 * c.reputationJeune);
   const declin = Math.max(0, age(monde, c) - courbeAge(c.poste).declinApres);
   if (declin > 0) s += ajouter('âge', -PENALITE_AGE_RECRUTEMENT * declin);
   const budgetPoste = e.budgetMEUR * (c.poste.startsWith('pilote') ? 0.05 : 0.015);
