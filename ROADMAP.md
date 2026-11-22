@@ -16,6 +16,7 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | 4 | Contrats + mémoire v1 + bac à sable | Négocier, promettre, se souvenir ; premières interactions testables à la main |
 | 5 | Économie | Sponsors, conseil d'administration, plafond budgétaire, installations |
 | 6a | Cycle de vie | Progression et déclin individualisés, retraites, reconversions, nouvelles générations, réservoir karting/F4, potentiel incertain et rapports de recrutement |
+| 6a+ | Compléments | Compétences des pilotes (D-104), qualités mentales (D-105), expérience (D-106), exigences des circuits (D-107), affinités légères et mode développeur (D-108) |
 | 6b | Filières juniors | Deux championnats juniors réellement simulés (écuries, calendriers, résultats, classements, palmarès), académies, contrats d'affiliation, financement des carrières, placement, renouvellement des grilles |
 | 7 | Marché du travail + IA des écuries + agents | Recrutement actif, débauchage (adultes **et jeunes talents**), clauses de rachat, décisions de l'IA, **valeur commerciale, sponsors personnels, pilotes payants, pouvoir de négociation** (D-096 à D-099) |
 | 8 | Mémoire v2 + groupes sociaux + politique | Circulation de l'information, réputation, groupes émergents, votes du règlement, **grands changements de règlement tous les 4 à 6 ans** (accent aéro / moteur / pneus, anticipation, coups de génie — D-090) |
