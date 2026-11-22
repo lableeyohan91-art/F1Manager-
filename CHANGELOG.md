@@ -188,3 +188,9 @@ Aucun code à ce stade.
 ### Constat
 - Hiérarchie beaucoup plus vivante (dernière écurie qui marque 43 % → 64 %, top 3 qui chute 27 % → 52 %), mais dominations doublées sur 10 saisons (9 % → 20 %).
 
+## [Orientations performance pilote] — 22/11/2026
+
+### Ajouté
+- D-102 : pilotes d'exception rares (≈ 2 par décennie), distribution des potentiels des cohortes resserrée.
+- D-103 : affinités avec les circuits, forme du jour, forme à moyen terme (orientations, intégration en phase 13) : `docs/systemes/orientations-performance-pilote.md`.
+

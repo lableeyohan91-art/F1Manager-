@@ -133,4 +133,8 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Pilote payant** | Pilote dont l'accès au baquet est en partie financé par ses sponsors ou ses soutiens (D-097). |
 | **Profil de carrière** | Paramètres cachés propres à une personne (archétype, âges de progression, d'apogée et de déclin) qui façonnent sa courbe de carrière (phase 6a, à valider). |
 | **Potentiel estimé** | Fourchette que se fait une écurie du potentiel caché d'une personne, plus ou moins juste selon le temps d'observation et son département recrutement (phase 6a, à valider). |
+| **Affinité (circuit)** | Préférence individuelle d'un pilote pour un circuit (appréciée, neutre, redoutée), évolutive ; modifie sa performance effective (D-103, phase 13). |
+| **Forme du jour** | Écart ponctuel, cohérent sur un week-end, entre la performance d'un pilote et son niveau habituel (D-103, phase 13). |
+| **Forme à moyen terme** | Série de réussite ou de méforme sur plusieurs semaines, lue dans l'état émotionnel (confiance, motivation) (D-103, phase 13). |
+| **Budget de variance** | Répartition de l'écart total entre performance attendue et réelle entre des sources explicables (affinité, forme, stratégie, incidents) et un aléa résiduel (D-103). |
 

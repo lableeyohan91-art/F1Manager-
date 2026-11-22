@@ -24,7 +24,7 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | 10 | Le joueur | Prendre la tête d'une écurie, premiers écrans mobiles |
 | 11 | Médias et archives | Actualités, rumeurs, records, chronologie, **popularité et image publique qui font évoluer la valeur commerciale** |
 | 12 | Monoplaces | Recherche, conception, fabrication, expertise, erreurs de concept |
-| 13 | Courses en 2D | Moteur de course qui remplace le modèle abstrait (reprise des modèles pneus/essence/météo de Paddock) |
+| 13 | Courses en 2D | Moteur de course qui remplace le modèle abstrait (reprise des modèles pneus/essence/météo de Paddock) ; **affinités avec les circuits, forme du jour, forme à moyen terme** qui remplacent une partie de l'aléa générique (D-103) ; sang-froid (D-075) |
 | 14 | Carrière du manager | Offres d'emploi, licenciement, changement d'écurie, héritage |
 | 15 | Direction artistique et immersion | Portraits, QG, infrastructures, monoplaces, circuits, illustrations d'événements, identités graphiques ; packs de ressources remplaçables ; optimisation mobile |
 
