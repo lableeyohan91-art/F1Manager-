@@ -171,3 +171,49 @@ Mêmes graines, mêmes mécaniques hors 6a. Références conservées dans `docs/
 
 1. **Pépites** : environ un jeune par an avec un potentiel ≥ 18, est-ce trop ? Je propose de **garder ce réglage** jusqu'à la grande campagne d'après la phase 8. Mais si tu juges, comme moi, que les « talents générationnels » doivent être plus rares (par exemple un tous les 3 à 4 ans), c'est un choix de conception que l'on peut faire dès maintenant, sans attendre.
 2. On enchaîne sur la **conception de la phase 6b** (filières juniors, académies, financement des jeunes, repérage) ?
+
+## 8. Complément — pilotes d'exception rares (D-102) et vraie cause des dominations
+
+Le porteur a fixé la fréquence des pilotes d'exception à **environ deux par décennie** (D-102). Elle est mesurée à 2,4 par décennie, et le niveau de la grille reste stable : 16,15 en 2027 → 16,00 en 2056, maximum 16,65. Références : `docs/rapports/reference/p6a-d102-reference*`.
+
+### 8.1 Effet sur le championnat (mêmes graines, comparé à P6a)
+
+| Indicateur | P6a | P6a + D-102 |
+| --- | --- | --- |
+| Dominations (10 saisons) | 19,8 % | **22,7 %** |
+| Dominations (20 saisons) | 19,1 % | **24,3 %** |
+| Écart de points P1–P2 (10 / 20 saisons) | 72,2 / 69,8 | 75,0 / 77,4 |
+| Champions pilotes (10 / 20 saisons) | 3,20 / 6,50 | 3,12 / 6,24 |
+| Champions constructeurs (10 / 20 saisons) | 2,33 / 4,76 | 2,40 / 4,58 |
+| Titre ouvert avant la dernière manche (10 / 20 saisons) | 27 % / 28 % | 25 % / 26 % |
+| Dynasties (10 / 20 saisons) | 66 % / 80 % | 67 % / 84 % |
+| Dernière écurie qui marque (10 / 20 saisons) | 64 % / 78 % | 64 % / 79 % |
+| Écuries changeant d'étage / saison (10 / 20 saisons) | 2,44 / 3,32 | 2,40 / 3,28 |
+| Persistance du classement N ↔ N+3 | 0,626 | 0,635 |
+| Dernier tiers 2027 → top 3 un jour | 56 % | 60 % |
+| Top 3 2027 → dernier tiers un jour | 52 % | 52 % |
+
+Les autres indicateurs bougent dans le bruit statistique (tableau complet dans les références).
+
+### 8.2 Mon hypothèse du §5 était fausse
+
+Rendre les stars rares **n'a pas réduit** les dominations. Le diagnostic (`npm run dominations`, 30 graines × 15 saisons) en donne la vraie cause :
+
+| | P5b (compétences figées) | P6a + D-102 |
+| --- | --- | --- |
+| Saisons avec domination | 12 % | 26 % |
+| … dont champion dans la **meilleure voiture** | 38 % | **80 %** |
+| … dont dauphin = son coéquipier | 11 % | 31 % |
+| Écart d'indice entre les 1re et 2e voitures, saisons de domination | 0,39 | 0,67 (= écart moyen) |
+| Écart de niveau entre le 1er et le 6e pilote titulaire | 2,35 | **1,65** |
+
+- **Avant la 6a**, les dominations étaient celles d'un **pilote** très au-dessus des autres, même sans la meilleure voiture.
+- **Avec la 6a**, le plateau des pilotes est **plus resserré**. C'est donc **la voiture** qui fait la différence, et la meilleure voiture écrase la saison, souvent avec ses deux pilotes aux deux premières places.
+
+**Conséquence pour la suite** : le levier contre les dominations est du côté des **voitures**, pas des pilotes :
+- débauchage des ingénieurs (phase 7) ;
+- grands changements de règlement (phase 8, D-090) ;
+- incertitude de conception (phase 12) ;
+- moteur de course (phase 13, D-103).
+
+Conformément à D-095, rien n'est recalibré maintenant. Le déséquilibre est documenté dans le laboratoire.

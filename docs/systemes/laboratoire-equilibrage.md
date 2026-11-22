@@ -77,6 +77,6 @@ Mesures : avec quelle écurie de départ, et en combien de saisons, chaque profi
 | Aucune crise financière en 600 saisons | P5b | 7 (inflation salariale, transferts, indemnités), 12 (coûts de conception) |
 | Concentration du sponsoring (160 M€ pour le premier, 52 M€ pour le dernier) | P5b | 7 (diversification des motivations des sponsors, valeur commerciale), 11 (popularité) |
 | Effet quasi nul d'une augmentation de DT dans les dilemmes | P4 | 7 (débauchage) |
-| Dominations d'un pilote d'exception (9 % → 20 % sur 10 saisons après la 6a) | P6a | 7 (prix des stars, agents), 8 (règlements), 13 (moteur de course) ; fréquence des pépites à trancher |
+| Dominations (9 % → 23 % sur 10 saisons après la 6a) : **la meilleure voiture** écrase la saison (80 % des cas), le plateau des pilotes étant plus resserré | P6a §8 | 7 (débauchage des ingénieurs), 8 (règlements, D-090), 12 (conception), 13 (moteur de course, D-103) |
 | Âge moyen de la grille ≈ 30 ans | P6a | 6b (filières juniors) |
 
