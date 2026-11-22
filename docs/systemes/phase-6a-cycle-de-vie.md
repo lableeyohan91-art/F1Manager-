@@ -1,6 +1,6 @@
 # Phase 6a — Cycle de vie des personnages
 
-> Statut : **PROPOSITION — À VALIDER** (22/11/2026). Feu vert de principe du porteur ; aucune ligne de code avant validation de cette fiche.
+> Statut : **VALIDÉE** (D-100, D-101, 22/11/2026). Réponses du porteur aux questions du §15 intégrées au §16.
 > Cadre déjà validé : D-051 (potentiel global unique, progression différenciée par compétence, courbes d'âge par métier), D-062, D-063, D-071 (découpage 6a/6b, karting et F4 abstraits), D-072 (cibles démographiques), D-095 (méthode : mesurer, pas recalibrer trop tôt), D-099 (pas d'attribut commercial en 6a).
 > Concerne **tous les personnages** : pilotes, ingénieurs, responsables techniques et dirigeants.
 
@@ -268,3 +268,16 @@ Méthode D-095 : on mesure et on documente, sans recalibrer prématurément.
 5. **Personnes issues des données** : imposer certains profils dans `personnes.csv` (par exemple « longévité » pour Alonzo), ou laisser le tirage compatible avec l'âge décider ?
 6. **Porte d'entrée en F1 à 18 ans** en 6a, en attendant les filières juniors de la 6b : d'accord ?
 7. **Taille des cohortes** : ≈ 15 pilotes et ≈ 10 personnels par an, à ajuster par la mesure de la pyramide. D'accord sur le principe ?
+
+## 16. Réponses du porteur (22/11/2026) — intégrées à la conception
+
+| # | Réponse | Effet sur la conception |
+| --- | --- | --- |
+| 1 | Les 6 archétypes conviennent | Liste retenue (provisoire, enrichissable) |
+| 2 | **Rares déclics** | Le potentiel réel est fixe, sauf de rares révisions (+1 ou −1) liées aux événements « déclic » et « stagnation » ; chacune produit un événement avec ses causes |
+| 3 | Blessures **plus tard** | Avec le moteur de course (phase 13) |
+| 4 | Oui : compétences des autres écuries vues **en fourchette** ; le porteur ajoutera la possibilité de **repérer** (scouter) le personnel et les pilotes | Le modèle d'estimation de la 6a est conçu pour accueillir des missions de repérage (commandes communes au joueur et à l'IA), qui resserreront les fourchettes. Missions et rapports complets : conception à venir (6b) |
+| 5 | Oui : profils imposables dans `personnes.csv` | Colonne facultative `profilCarriere` |
+| 6 | Oui : accès à la F1 dès 18 ans en attendant la 6b | — |
+| 7 | Cohortes d'≈ 15 pilotes et ≈ 10 personnels : d'accord, tant que les championnats de jeunes vivent ; **le vivier reste un vivier** : pas de pilotes de F2 ou de F3 de 30 ans, quelqu'un qui n'a pas percé ne reste pas | **Abandon de carrière** (D-101) : un jeune pilote qui n'a jamais obtenu de baquet en F1 renonce à sa carrière de pilote. C'est sa décision (perspectives et financement épuisés), avec une probabilité qui croît fortement de 23 à 26 ans, quasi certaine à 27 ans. Il peut se reconvertir plus tard (ingénieur de piste, puis d'autres métiers avec les phases suivantes) |
+
