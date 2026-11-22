@@ -31,6 +31,7 @@ jobs:
       - run: npm run purete
       - run: npm test
       - run: npm run simuler -- --graine 42 --saisons 50
+      - run: npm run equilibrage -- --graines 10 --saisons 10 > /dev/null
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'

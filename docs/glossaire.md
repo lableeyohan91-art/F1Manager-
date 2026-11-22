@@ -94,3 +94,18 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Nom altéré** | Nom réel modifié d'une seule lettre, en gardant si possible la prononciation (Ferrari → Ferrary). |
 | **Histoire ancrée** | Préparation du passé où les faits viennent des données, et seule la couche humaine (souvenirs, relations) est simulée. Elle ne modifie pas la grille de départ. |
 | **Simulation historique libre** | Préparation du passé où tout est simulé. Réservée aux mondes entièrement fictifs. |
+
+## Saison et performance (phase 3)
+
+| Terme | Définition |
+| --- | --- |
+| **Caractéristiques de la voiture** | Virages lents, virages rapides, vitesse de pointe, efficacité aérodynamique, motorisation (celle du motoriste), fiabilité, gestion des pneus (D-056). |
+| **Profil de circuit** | Poids de chaque caractéristique de vitesse selon le type de circuit. |
+| **Indice voiture (sur un circuit)** | Moyenne pondérée des caractéristiques selon le profil du circuit. |
+| **Retard de la voiture** | Écart, en % du temps au tour, entre une voiture et la meilleure voiture du circuit. |
+| **Victoire inattendue** | Victoire avec une voiture en retard d'au moins 0,4 % sur la meilleure. |
+| **Tirage local** | Tirage au hasard déterminé seulement par la graine et une clé (système, date, entité) ; indépendant des autres tirages (D-057). |
+| **Élagage des causes** | Au-delà de 10 saisons, les liens vers des causes mineures sont remplacés par un résumé (D-058). |
+| **Capacité de développement** | Aptitude d'une écurie à améliorer sa voiture : personnel technique, installations, budget. |
+| **Rendements décroissants** | Plus une caractéristique est proche du plafond technique, plus elle progresse lentement. |
+| **Dynastie** | Série d'au moins 5 titres constructeurs consécutifs. |

@@ -18,7 +18,8 @@ export const ALEA_DEVELOPPEMENT_MENSUEL = 0.25;
 
 /** À l'intersaison : nouvelle voiture = l'équivalent de N mois de travail, avec un aléa plus fort (concept). */
 export const MOIS_EQUIVALENTS_INTERSAISON = 3;
-export const ALEA_INTERSAISON = 0.8;
+/** Réglé le 22/11/2026 : 1,3 (au lieu de 0,8) pour mieux refléter le risque d'un nouveau concept. */
+export const ALEA_INTERSAISON = 1.3;
 
 /** Poids des facteurs dans la capacité de développement d'une écurie (somme = 1). */
 export const POIDS_CAPACITE = { competences: 0.4, installations: 0.3, budget: 0.3 };

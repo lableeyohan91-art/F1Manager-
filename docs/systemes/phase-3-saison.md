@@ -1,6 +1,7 @@
 # Phase 3 — La saison abstraite
 
-> Statut : **PROPOSÉ**. Le principe d'un modèle abstrait est **VALIDÉ** (D-007). Les formules et les fourchettes cibles sont à valider et à calibrer.
+> Statut : **RÉALISÉ** le 22/11/2026 (voir docs/rapports/2026-11-22-p3-saison.md). Mises à jour : 24 Grands Prix (D-030b), 7 caractéristiques de voiture (D-056) au lieu de 4, fourchettes = objectifs statistiques (D-040).
+> Statut d'origine : **PROPOSÉ**. Le principe d'un modèle abstrait est **VALIDÉ** (D-007). Les formules et les fourchettes cibles sont à valider et à calibrer.
 > Objectif : des saisons complètes, avec Grands Prix, points, classements et primes, sans course visible. Ce modèle sera remplacé plus tard par le moteur de course 2D, qui devra conserver le même équilibre.
 
 ## Contenu

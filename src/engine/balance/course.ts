@@ -4,8 +4,11 @@
  * Plus le « temps » est bas, mieux la voiture est classée.
  */
 
-/** Écart de temps par point d'indice voiture (1–20), en % du temps au tour. 10 points ≈ 2 %. */
-export const ECART_VOITURE_PAR_POINT = 0.2;
+/**
+ * Écart de temps par point d'indice voiture (1–20), en % du temps au tour. 10 points ≈ 2,8 %.
+ * Réglé le 22/11/2026 (rapport d'équilibrage) : 0,2 donnait un plateau trop resserré (1,2 % en moyenne).
+ */
+export const ECART_VOITURE_PAR_POINT = 0.28;
 
 /** Écart de temps par point de niveau pilote (1–20), en % du temps au tour. */
 export const ECART_PILOTE_PAR_POINT = 0.1;
@@ -34,10 +37,10 @@ export const ALEA_SIGMA = 0.3;
 export const MULTIPLICATEUR_ALEA_PLUIE = 1.7;
 
 /** Abandon mécanique : probabilité = base + (20 − fiabilité) × parPoint. */
-export const ABANDON_MECANIQUE = { base: 0.015, parPoint: 0.007 };
+export const ABANDON_MECANIQUE = { base: 0.025, parPoint: 0.007 };
 
 /** Incident de course : probabilité = base + (20 − régularité) × parPoint, multipliée selon les conditions. */
-export const INCIDENT = { base: 0.01, parPoint: 0.003, multiplicateurPluie: 1.8, multiplicateurUrbain: 1.5 };
+export const INCIDENT = { base: 0.018, parPoint: 0.003, multiplicateurPluie: 1.8, multiplicateurUrbain: 1.5 };
 
 /**
  * Résultat inattendu : le vainqueur avait une voiture en retard d'au moins ce pourcentage de temps au tour

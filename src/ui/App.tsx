@@ -1,22 +1,24 @@
-import { useMemo, useState } from 'preact/hooks';
-import { creerScenarioGrille2026, ErreurDonnees, formaterDate, verifierCoherence, type Monde } from '../engine';
+import { useRef, useState } from 'preact/hooks';
+import { creerScenarioGrille2026, ErreurDonnees, formaterDate, verifierCoherence, type Monde, type Moteur } from '../engine';
+import { VueBilan, VueSaisons, VueVoitures } from './diagnostic/Saisons';
 import { fichiersGrille2026 } from './donnees';
 import { personnes } from './diagnostic/outils';
 import {
   FicheEcurie, FichePersonne, ListeCircuits, ListeContrats, ListeEcuries, ListePalmares, ListePersonnes, type Selection,
 } from './diagnostic/Vues';
 
-type Onglet = 'ecuries' | 'personnes' | 'contrats' | 'palmares' | 'circuits' | 'coherence';
+type Onglet = 'saisons' | 'bilan' | 'ecuries' | 'voitures' | 'personnes' | 'contrats' | 'palmares' | 'circuits' | 'coherence';
 const ONGLETS: [Onglet, string][] = [
-  ['ecuries', 'Écuries'], ['personnes', 'Personnes'], ['contrats', 'Contrats'],
-  ['palmares', 'Palmarès'], ['circuits', 'Circuits'], ['coherence', 'Cohérence'],
+  ['saisons', 'Saisons'], ['bilan', 'Bilan'], ['ecuries', 'Écuries'], ['voitures', 'Voitures'], ['personnes', 'Personnes'],
+  ['contrats', 'Contrats'], ['palmares', 'Palmarès'], ['circuits', 'Circuits'], ['coherence', 'Cohérence'],
 ];
 
-function construire(graine: number): { monde: Monde | null; erreur: string | null } {
+function construire(graine: number): { monde: Monde | null; moteur: Moteur | null; erreur: string | null } {
   try {
-    return { monde: creerScenarioGrille2026(fichiersGrille2026()).creerMonde(graine), erreur: null };
+    const sc = creerScenarioGrille2026(fichiersGrille2026());
+    return { monde: sc.creerMonde(graine), moteur: sc.creerMoteur(), erreur: null };
   } catch (e) {
-    return { monde: null, erreur: e instanceof ErreurDonnees ? e.problemes.join('\n') : String(e) };
+    return { monde: null, moteur: null, erreur: e instanceof ErreurDonnees ? e.problemes.join('\n') : String(e) };
   }
 }
 
@@ -25,9 +27,28 @@ export function App() {
   const [graine, setGraine] = useState(42);
   const [saisie, setSaisie] = useState('42');
   const [onglet, setOnglet] = useState<Onglet>('ecuries');
+  const [, setVersion] = useState(0);
   const [selection, setSelection] = useState<Selection>(null);
   const [historique, setHistorique] = useState<Selection[]>([]);
-  const { monde, erreur } = useMemo(() => construire(graine), [graine]);
+  const etat = useRef<ReturnType<typeof construire> | null>(null);
+  const grainEtat = useRef<number | null>(null);
+  if (grainEtat.current !== graine) {
+    etat.current = construire(graine);
+    grainEtat.current = graine;
+  }
+  const { monde, moteur, erreur } = etat.current as ReturnType<typeof construire>;
+
+  /** Simule n saisons (jusqu'à la fin de la saison en cours, puis les suivantes). */
+  const simuler = (n: number) => {
+    if (!monde || !moteur) return;
+    // Dernière saison à terminer : la saison en cours (ou la suivante si celle-ci est déjà bouclée), puis n − 1 autres.
+    const fin = (monde.date.semaine >= 50 ? monde.date.annee + 1 : monde.date.annee) + n - 1;
+    // On s'arrête juste après le bilan de fin de saison (semaine 49) de l'année « fin ».
+    while (monde.date.annee < fin || (monde.date.annee === fin && monde.date.semaine < 50)) moteur.avancerUneSemaine(monde);
+    setVersion((v) => v + 1);
+    setSelection(null);
+    setOnglet('saisons');
+  };
 
   const ouvrir = (s: Selection) => {
     setHistorique((h) => [...h, selection]);
@@ -54,7 +75,7 @@ export function App() {
       <header class="topbar">
         <span class="marque" />
         <span class="titre">DIAGNOSTIC</span>
-        <span class="muted">nom de travail · phase 2</span>
+        <span class="muted">nom de travail · phase 3</span>
       </header>
       <main class="page">
         <div class="carte" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -63,6 +84,8 @@ export function App() {
           <button class="btn principal" onClick={() => { const g = Number.parseInt(saisie, 10); if (Number.isInteger(g)) { setGraine(g); setSelection(null); setHistorique([]); } }}>
             Nouveau monde
           </button>
+          <button class="btn" onClick={() => simuler(1)} disabled={!monde}>Simuler 1 saison</button>
+          <button class="btn" onClick={() => simuler(10)} disabled={!monde}>Simuler 10 saisons</button>
           <button class="btn" onClick={exporter} disabled={!monde}>Exporter (JSON)</button>
           {monde && <span class="muted">{formaterDate(monde.date)} · {personnes(monde).length} personnes</span>}
         </div>
@@ -84,6 +107,9 @@ export function App() {
                 ))}
               </nav>
               <div class="carte">
+                {onglet === 'saisons' && <VueSaisons monde={monde} ouvrir={ouvrir} />}
+                {onglet === 'bilan' && <VueBilan monde={monde} />}
+                {onglet === 'voitures' && <VueVoitures monde={monde} />}
                 {onglet === 'ecuries' && <ListeEcuries monde={monde} ouvrir={ouvrir} />}
                 {onglet === 'personnes' && <ListePersonnes monde={monde} ouvrir={ouvrir} />}
                 {onglet === 'contrats' && <ListeContrats monde={monde} ouvrir={ouvrir} />}
@@ -103,7 +129,7 @@ export function App() {
 }
 
 function Coherence({ monde }: { monde: Monde }) {
-  const pb = verifierCoherence(monde);
+  const pb = verifierCoherence(monde, { ages: monde.date.annee === 2027 && monde.date.semaine === 1 });
   return pb.length === 0 ? <p style={{ color: 'var(--green)' }}>Aucun problème de cohérence détecté.</p> : (
     <ul class="erreur">{pb.map((x) => <li key={x}>{x}</li>)}</ul>
   );

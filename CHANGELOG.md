@@ -57,3 +57,16 @@ Aucun code à ce stade.
 
 ### Corrigé
 - Données de la grille 2026 : points-virgules dans les colonnes de vérification, nationalités MON et THA ajoutées, potentiel d'Alonzo.
+
+## [Phase 3] — 22/11/2026
+
+### Corrigé
+- La protection d'un événement se propage à ses causes (défaut signalé par ChatGPT).
+
+### Ajouté
+- Courbes d'âge par métier (D-051), élagage des causes (D-058), tirages locaux (D-057).
+- Voitures à 7 caractéristiques (`data/grille-2026/voitures.csv`), profils de circuits.
+- Saison complète : calendrier de 24 Grands Prix, résultats, classements, primes, titres, palmarès, évolution provisoire des voitures et des motoristes, chronique v1.
+- Indicateurs de crédibilité et d'intérêt, rapport d'équilibrage sur 100 graines (`npm run equilibrage`).
+- Diagnostic : onglets Saisons (classements, calendrier, résultats, « Pourquoi ? »), Bilan, Voitures ; boutons « Simuler 1 / 10 saisons ».
+- 15 tests de plus (40 au total). Rapports `docs/rapports/2026-11-22-p3-*.md`.
