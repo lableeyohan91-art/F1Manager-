@@ -27,3 +27,4 @@ export * from './decision';
 export * from './etat';
 export * from './interactions';
 export * from './promesses';
+export * from './effectifs';

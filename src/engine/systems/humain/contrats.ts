@@ -23,7 +23,8 @@ import { ecuriesActives } from '../saison/performance';
 import {
   age, ecurie, niveauMetier, repondre, scoreCandidat, teamPrincipal, texteRaisons, valeurMarche, type Offre, type Raison,
 } from './decision';
-import { faireUnePromesse, type TypePromesse } from './promesses';
+import { faireUnePromesse, motifPromesseInvalide, type TypePromesse } from './promesses';
+import { dureeMaxEffectif, lireConditions, motifRefusConseil, motifRefusEffectif } from './effectifs';
 import { activerContratsSignes, clotureMarche } from '../marche';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -75,8 +76,28 @@ export interface ResultatNegociation {
  * L'organisation propose une prolongation ; la personne répond (accepte, contre-propose, refuse).
  * Accord : le contrat est prolongé (nouvelle fin, nouveau salaire). Utilisé par le joueur ET par l'IA.
  */
-export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, salaire: number, duree: number, promesses: TypePromesse[], tour: number, causes: string[] = []): ResultatNegociation {
+export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, salaire: number, duree: number, promesses: TypePromesse[], tour: number, causes: string[] = [], cibles: Record<string, string> = {}): ResultatNegociation {
   const p = personneDe(monde, c.personne) as Personne;
+  const finAvant = c.fin;
+  // Audit n°3 : garde commune à toutes les prolongations (joueur, IA, conseil, contre-attaque) — pas de dépassement d'effectif.
+  const effectif = motifRefusEffectif(monde, c.organisation, c.personne, c.poste, c.fin + 1, Math.max(c.fin, monde.date.annee) + duree);
+  if (effectif) {
+    const evt = ajouterEvenement(monde, {
+      type: 'negociation.impossible', acteurs: [{ id: p.id, role: 'personne' }, { id: auteur, role: 'auteur' }, { id: c.organisation, role: 'organisation' }],
+      importance: 1, visibilite: 'prive', causes, contexte: { contrat: c.id, motif: effectif },
+    });
+    return { issue: 'refus', raisons: [effectif], evenement: evt };
+  }
+  // Audit n°3 : une augmentation d'un pilote titulaire passe par l'arbitrage du conseil, pour le joueur comme pour l'IA.
+  const e = ecurie(monde, c.organisation);
+  const conseil = e && c.poste === 'pilote_titulaire' && salaire > c.salaireMEUR ? motifRefusConseil(monde, e, c.personne, salaire, monde.date.annee, Math.max(c.fin, monde.date.annee) + duree) : null;
+  if (conseil) {
+    const evt = ajouterEvenement(monde, {
+      type: 'negociation.impossible', acteurs: [{ id: p.id, role: 'personne' }, { id: auteur, role: 'auteur' }, { id: c.organisation, role: 'organisation' }],
+      importance: 1, visibilite: 'prive', causes, contexte: { contrat: c.id, motif: conseil },
+    });
+    return { issue: 'refus', raisons: [conseil], evenement: evt };
+  }
   const offre: Offre = { organisation: c.organisation, decideur: auteur, poste: c.poste, salaireMEUR: salaire, dureeAnnees: duree, promesses, prolongation: true };
   const rep = repondre(monde, p, offre, `prolongation-${c.id}-${monde.date.annee}-${monde.date.semaine}-${tour}`, tour < 2);
   const raisons = texteRaisons(rep.raisons);
@@ -98,7 +119,8 @@ export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, s
     // Bonne reconnaissance : augmentation nette ou salaire au niveau de sa valeur.
     if (salaire >= Math.max(ancienSalaire * 1.1, valeurMarche(monde, p) * 0.95)) lireEvenement(monde, p.id, auteur, 'reconnaissance', evt.id, { facteur: 0.8 });
     for (const t of promesses) {
-      faireUnePromesse(monde, { auteur, organisation: c.organisation, beneficiaire: p.id, type: t, parametres: {}, echeance: { annee: c.fin, semaine: 48 }, publique: false }, [evt.id]);
+      // Audit n°3 : chaque promesse porte ses paramètres propres (montant, échéance précédente, personne visée).
+      faireUnePromesse(monde, { auteur, organisation: c.organisation, beneficiaire: p.id, type: t, parametres: parametresPromesse(t, salaire, finAvant, cibles), echeance: { annee: c.fin, semaine: 48 }, publique: false }, [evt.id]);
     }
     return { issue: 'accord', raisons, evenement: evt };
   }
@@ -119,6 +141,14 @@ export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, s
     lireEvenement(monde, auteur, p.id, 'conflit', evt.id, { facteur: 0.7 });
   }
   return { issue: 'refus', raisons, evenement: evt };
+}
+
+/** Paramètres propres à chaque promesse faite lors d'une prolongation (audit n°3). */
+function parametresPromesse(t: TypePromesse, salaire: number, finAvant: number, cibles: Record<string, string>): Record<string, string | number> {
+  if (t === 'salaire_minimum') return { salaire: Math.round(salaire * 10) / 10 };
+  if (t === 'prolongation') return { finAvant };
+  if (t === 'ne_pas_recruter') return cibles['ne_pas_recruter'] ? { personne: cibles['ne_pas_recruter'] } : {};
+  return {};
 }
 
 /** L'organisation refuse de prolonger : la personne s'en souvient. */
@@ -371,7 +401,9 @@ export function pourvoirPostes(monde: Monde): void {
 }
 
 export function recruter(monde: Monde, c: Personne, e: Ecurie, poste: Poste, salaire: number, debut: number, decideur: string, nbOffres = 1): Contrat {
-  const contrat = creerContrat(monde, c, e.id, poste, debut, Math.max(2, dureeContrat(monde, c)), salaire, false);
+  // Audit n°3 : durée bornée par les places réellement libres (pré-accords déjà signés pour les saisons suivantes).
+  const duree = Math.max(1, Math.min(Math.max(2, dureeContrat(monde, c)), dureeMaxEffectif(monde, e.id, c.id, poste, debut - 1)));
+  const contrat = creerContrat(monde, c, e.id, poste, debut, duree, salaire, false);
   const ancienPoste = c.poste;
   c.statut = 'actif';
   c.ecurie = e.id;
@@ -396,7 +428,8 @@ export function titulariser(monde: Monde, p: Personne, decideur: string): void {
   if (c) {
     c.poste = 'pilote_titulaire';
     c.salaireMEUR = arrondi(Math.max(c.salaireMEUR, valeurMarche(monde, p)));
-    c.fin = Math.max(c.fin, monde.date.annee + 2);
+    // Audit n°3 : la titularisation ne prolonge pas au-delà des saisons où un baquet reste libre.
+    c.fin = Math.max(c.fin, Math.min(monde.date.annee + 2, monde.date.annee + dureeMaxEffectif(monde, c.organisation, p.id, 'pilote_titulaire', monde.date.annee)));
   }
   const evt = ajouterEvenement(monde, {
     type: 'pilote.titularisation', acteurs: [{ id: p.id, role: 'pilote' }, { id: decideur, role: 'auteur' }, { id: p.ecurie, role: 'organisation' }],
@@ -457,18 +490,36 @@ export const commandeProposerProlongation: DefinitionCommande = {
   valider(monde, c) {
     const v = valideurTP(monde, c);
     if (v) return v;
-    const salaire = Number(c.parametres['salaire']);
-    const duree = Number(c.parametres['duree']);
-    if (!(salaire > 0) || !(duree >= 1 && duree <= 5)) return 'Salaire positif et durée de 1 à 5 ans requis.';
-    if (!contratEmploi(monde, String(c.parametres['personne']))) return 'Aucun contrat actif.';
+    // Audit n°3 : nombres finis, durée entière, salaire validé après arrondi ; effectif ; promesses complètes ; conseil.
+    const cond = lireConditions(c.parametres['salaire'], c.parametres['duree']);
+    if (typeof cond === 'string') return cond;
+    const contrat = contratEmploi(monde, String(c.parametres['personne']));
+    if (!contrat) return 'Aucun contrat actif.';
+    const tour = c.parametres['tour'] ?? 0;
+    if (!(typeof tour === 'number' && Number.isInteger(tour) && tour >= 0 && tour <= 2)) return 'Tour de négociation invalide (0 à 2).';
+    const effectif = motifRefusEffectif(monde, contrat.organisation, contrat.personne, contrat.poste, contrat.fin + 1, Math.max(contrat.fin, monde.date.annee) + cond.duree);
+    if (effectif) return effectif;
+    const promesses = c.parametres['promesses'] ?? [];
+    if (!Array.isArray(promesses)) return 'Liste de promesses invalide.';
+    const cibles = (c.parametres['cibles'] ?? {}) as Record<string, string>;
+    for (const t of promesses as TypePromesse[]) {
+      const m = motifPromesseInvalide(t, parametresPromesse(t, cond.salaire, contrat.fin, cibles));
+      if (m) return m;
+    }
+    const e = ecurie(monde, contrat.organisation);
+    if (e && contrat.poste === 'pilote_titulaire' && cond.salaire > contrat.salaireMEUR) {
+      const refus = motifRefusConseil(monde, e, contrat.personne, cond.salaire, monde.date.annee, Math.max(contrat.fin, monde.date.annee) + cond.duree);
+      if (refus) return refus;
+    }
     return null;
   },
   appliquer({ monde }, c) {
     const contrat = contratEmploi(monde, String(c.parametres['personne'])) as Contrat;
     const promesses = (c.parametres['promesses'] as TypePromesse[] | undefined) ?? [];
-    const res = proposerProlongation(monde, contrat, c.auteur, Number(c.parametres['salaire']), Number(c.parametres['duree']), promesses, Number(c.parametres['tour'] ?? 0));
+    const cond = lireConditions(c.parametres['salaire'], c.parametres['duree']) as { salaire: number; duree: number };
+    const res = proposerProlongation(monde, contrat, c.auteur, cond.salaire, cond.duree, promesses, Number(c.parametres['tour'] ?? 0), [], (c.parametres['cibles'] ?? {}) as Record<string, string>);
     if (res.issue === 'contre_offre') {
-      table(monde, TABLE_NEGOCIATIONS)[contrat.id] = { id: contrat.id, contrat: contrat.id, salaireDemande: res.salaireDemande, dureeAnnees: Number(c.parametres['duree']), promesses, evenement: res.evenement.id } as unknown as Entite;
+      table(monde, TABLE_NEGOCIATIONS)[contrat.id] = { id: contrat.id, contrat: contrat.id, salaireDemande: res.salaireDemande, dureeAnnees: cond.duree, promesses, evenement: res.evenement.id } as unknown as Entite;
     } else delete table(monde, TABLE_NEGOCIATIONS)[contrat.id];
   },
 };

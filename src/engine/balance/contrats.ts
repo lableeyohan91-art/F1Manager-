@@ -110,3 +110,16 @@ export const RESERVOIR_MINIMUM: Record<string, number> = {
 
 /** Nombre maximal de tours d'offres pour pourvoir les postes vacants. */
 export const TOURS_RECRUTEMENT = 8;
+
+/**
+ * Audit n°3 — bornes de validité d'un contrat (valeurs incohérentes refusées, décisions risquées permises) :
+ * salaire après arrondi au dixième, en M€/an ; durée en années entières.
+ */
+export const BORNES_CONTRAT = { salaireMinMEUR: 0.1, salaireMaxMEUR: 150, dureeMin: 1, dureeMax: 5 };
+
+/**
+ * Audit n°3 — engagements salariaux des pilotes titulaires pour une saison, rapportés au budget de l'écurie :
+ * jusqu'à `libre`, le team principal décide seul ; au-delà de `maximum`, le conseil refuse toujours ;
+ * entre les deux, le conseil arbitre (probabilité d'accord décroissante, + goût du risque et ambition du propriétaire, /40 par point au-dessus de 10).
+ */
+export const ENGAGEMENTS_PILOTES = { libre: 0.2, maximum: 0.5 };

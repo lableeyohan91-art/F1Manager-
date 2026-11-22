@@ -541,6 +541,11 @@ export interface ProjetInfrastructure {
   avancementSemaines: number;
   debut: { annee: number; semaine: number };
   retardAnnonce?: boolean;
+  /**
+   * Audit n°3 : semaines calendaires sans travail (crise, enveloppe épuisée), distinctes de l'avancement (temps de travail).
+   * Date prévue = début + durée annoncée ; date réelle = livraison ; retard = temps calendaire écoulé − durée annoncée.
+   */
+  semainesSuspendues?: number;
 }
 
 /** Comptes d'une année (M€). */

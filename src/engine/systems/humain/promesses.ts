@@ -44,7 +44,22 @@ export function promesses(monde: Monde): Promesse[] {
   return idsTries(t).map((id) => t[id] as unknown as Promesse);
 }
 
+/**
+ * Audit n°3 : paramètres requis par type de promesse. Sans eux, une promesse n'est pas vérifiable : elle ne peut pas être faite
+ * (et une ancienne promesse incomplète devient caduque à son échéance au lieu d'être considérée comme tenue).
+ */
+export function motifPromesseInvalide(type: TypePromesse, parametres: Record<string, string | number>): string | null {
+  const fini = (x: unknown) => typeof x === 'number' && Number.isFinite(x);
+  if (type === 'salaire_minimum' && !(fini(parametres['salaire']) && Number(parametres['salaire']) > 0)) return 'Une promesse de salaire minimum doit préciser un montant positif.';
+  if (type === 'prolongation' && !(fini(parametres['finAvant']) && Number.isInteger(parametres['finAvant']))) return 'Une promesse de prolongation doit préciser l’échéance actuelle du contrat.';
+  if (type === 'ne_pas_recruter' && !(typeof parametres['personne'] === 'string' && parametres['personne'] !== '')) return 'Une promesse de ne pas recruter doit désigner la personne concernée.';
+  if (type === 'promotion_categorie') return 'Type de promesse réservé, pas encore utilisable.';
+  return null;
+}
+
 export function faireUnePromesse(monde: Monde, p: Omit<Promesse, 'id' | 'statut' | 'evenementOrigine'>, causes: string[] = []): Promesse {
+  const invalide = motifPromesseInvalide(p.type, p.parametres);
+  if (invalide) throw new Error(`Promesse invalide : ${invalide}`);
   const evt = ajouterEvenement(monde, {
     type: 'promesse.faite',
     acteurs: [{ id: p.auteur, role: 'auteur' }, { id: p.beneficiaire, role: 'beneficiaire' }, { id: p.organisation, role: 'organisation' }],
@@ -63,16 +78,40 @@ function contratActif(monde: Monde, personne: string, organisation: string): Con
   return (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((c) => c.personne === personne && c.organisation === organisation && c.statut === 'actif' && c.type === 'emploi');
 }
 
+/** Le dernier contrat de la personne avec l'organisation a-t-il pris fin par décision de l'employeur ? */
+export function departProvoque(monde: Monde, personne: string, organisation: string): boolean {
+  const derniers = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[])
+    .filter((c) => c.personne === personne && c.organisation === organisation && c.type === 'emploi' && c.statut !== 'actif' && c.statut !== 'signe')
+    .sort((a, b) => b.fin - a.fin || (a.id < b.id ? 1 : -1));
+  const m = derniers[0]?.motifFin;
+  return m === 'licenciement' || m === 'non_prolonge';
+}
+
 /** La promesse est-elle respectée à cet instant ? (null = pas encore vérifiable) */
 export function promesseRespectee(monde: Monde, p: Promesse): boolean | null {
   const c = contratActif(monde, p.beneficiaire, p.organisation);
   const benef = table(monde, TABLES.personnes)[p.beneficiaire] as unknown as Personne | undefined;
   switch (p.type) {
-    case 'salaire_minimum': return !!c && c.salaireMEUR >= Number(p.parametres['salaire'] ?? 0);
-    case 'statut_n1': return !!c && !!c.clauses.statutN1;
+    case 'salaire_minimum': {
+      const min = p.parametres['salaire'];
+      if (typeof min !== 'number' || !Number.isFinite(min) || min <= 0) return null; // non vérifiable : jamais tenue d'office
+      return !!c && c.salaireMEUR >= min;
+    }
+    case 'statut_n1': {
+      // Audit n°3 : le statut de n°1 est exclusif. Si deux titulaires de la même écurie l'ont tous deux, aucun ne l'a réellement.
+      if (!c || !c.clauses.statutN1) return false;
+      const rival = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).some((x) => x.id !== c.id && x.organisation === p.organisation
+        && x.statut === 'actif' && x.type === 'emploi' && x.poste === 'pilote_titulaire' && !!x.clauses.statutN1);
+      return !rival;
+    }
     case 'titularisation': return !!benef && benef.ecurie === p.organisation && benef.poste === 'pilote_titulaire';
-    case 'prolongation': return !!c && c.fin > Number(p.parametres['finAvant'] ?? monde.date.annee);
+    case 'prolongation': {
+      const finAvant = p.parametres['finAvant'];
+      if (typeof finAvant !== 'number' || !Number.isFinite(finAvant)) return null;
+      return !!c && c.fin > finAvant;
+    }
     case 'ne_pas_recruter': {
+      if (typeof p.parametres['personne'] !== 'string') return null;
       const cible = table(monde, TABLES.personnes)[String(p.parametres['personne'])] as unknown as Personne | undefined;
       return !cible || cible.ecurie !== p.organisation;
     }
@@ -108,13 +147,17 @@ export const systemePromesses: Systeme = {
       const benef = table(monde, TABLES.personnes)[p.beneficiaire] as unknown as Personne | undefined;
       // Bénéficiaire parti de l'organisation (de lui-même) : la promesse devient caduque, sauf si on l'a fait partir.
       if (!benef || (benef.ecurie !== p.organisation && p.type !== 'ne_pas_recruter' && p.type !== 'titularisation')) {
-        p.statut = 'caduque';
+        // Audit n°3 : départ voulu par l'employeur (licenciement, non-prolongation) = promesse rompue ; départ de la personne
+        // (démission, rachat par une autre écurie, refus de prolonger) ou retraite = promesse caduque.
+        if (benef && departProvoque(monde, benef.id, p.organisation)) clore(monde, p, false);
+        else p.statut = 'caduque';
         continue;
       }
       const ok = promesseRespectee(monde, p);
       // Rupture anticipée : un statut de n°1 promis qui disparaît en cours de route.
       if (p.type === 'statut_n1' && ok === false) clore(monde, p, false);
       else if (echues.has(p.id) && ok !== null) clore(monde, p, ok);
+      else if (echues.has(p.id) && ok === null) p.statut = 'caduque'; // promesse incomplète (ancienne sauvegarde) : ni tenue ni rompue
     }
   },
 };

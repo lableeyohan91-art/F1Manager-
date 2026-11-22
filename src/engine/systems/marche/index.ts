@@ -29,6 +29,7 @@ import { TABLE_PROMESSES, type Promesse } from '../humain/promesses';
 import {
   age, ecurie, evaluerOffre, niveauMetier, repondre, scoreCandidat, teamPrincipal, texteRaisons, valeurMarche, type Offre,
 } from '../humain/decision';
+import { dureeMaxEffectif, lireConditions, motifRefusConseil, motifRefusEffectif, occupantsPour } from '../humain/effectifs';
 import { contratEmploi, deciderProlongation, dureeContrat, nePasProlonger, proposerProlongation } from '../humain/contrats';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -49,10 +50,8 @@ export function valeurTitulaire(monde: Monde, p: Personne): number {
 }
 
 /** Années consécutives après `depuis` pour lesquelles l'écurie a encore une place de titulaire (pour borner une prolongation). */
-export function anneesLibres(monde: Monde, idEcurie: string, depuis: number, max = 5): number {
-  let n = 0;
-  while (n < max && besoinsPour(monde, idEcurie, depuis + n + 1) > 0) n++;
-  return n;
+export function anneesLibres(monde: Monde, idEcurie: string, depuis: number, max = 5, personne?: string): number {
+  return personne ? dureeMaxEffectif(monde, idEcurie, personne, POSTE_MARCHE, depuis, max) : dureeMaxEffectif(monde, idEcurie, '', POSTE_MARCHE, depuis, max);
 }
 
 export function offresMarche(monde: Monde): OffreMarche[] {
@@ -69,16 +68,9 @@ export function contratSigne(monde: Monde, idPersonne: string): Contrat | undefi
   return contrats(monde).find((c) => c.personne === idPersonne && c.type === 'emploi' && c.statut === 'signe');
 }
 
-/** Pilotes titulaires assurés pour une saison donnée : contrats en cours qui la couvrent, plus contrats signés. */
+/** Pilotes titulaires assurés pour une saison donnée : contrats en cours qui la couvrent, plus contrats signés (règle commune, audit n°3). */
 export function titulairesPour(monde: Monde, idEcurie: string, annee: number): string[] {
-  const res = new Set<string>();
-  const signes = contrats(monde).filter((c) => c.type === 'emploi' && c.statut === 'signe');
-  for (const c of contrats(monde)) {
-    if (c.type !== 'emploi' || c.organisation !== idEcurie || c.poste !== POSTE_MARCHE) continue;
-    if (c.statut === 'actif' && c.fin >= annee && !signes.some((s) => s.personne === c.personne && s.organisation !== idEcurie && s.debut <= annee)) res.add(c.personne);
-    if (c.statut === 'signe' && c.debut <= annee && c.fin >= annee) res.add(c.personne);
-  }
-  return [...res].sort();
+  return occupantsPour(monde, idEcurie, POSTE_MARCHE, annee);
 }
 
 /** Places de titulaire encore à pourvoir pour une saison (sans compter les offres en attente). */
@@ -130,6 +122,24 @@ export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: numbe
   return { indemniteMEUR: 0, debauchage: false };
 }
 
+/**
+ * Règles d'un engagement de pilote titulaire (audit n°3), communes à la création de l'offre et à sa signature :
+ * nombres finis, durée entière, salaire validé après arrondi, disponibilité de la personne, effectif sur toute la durée,
+ * trésorerie et état financier pour l'indemnité, arbitrage du conseil pour les engagements salariaux élevés.
+ */
+export function motifRefusEngagement(monde: Monde, e: Ecurie, p: Personne, salaireBrut: unknown, dureeBrute: unknown, debut: number): string | null {
+  const cond = lireConditions(salaireBrut, dureeBrute);
+  if (typeof cond === 'string') return cond;
+  const d = disponibilite(monde, p, e, debut);
+  if (typeof d === 'string') return d;
+  const effectif = motifRefusEffectif(monde, e.id, p.id, POSTE_MARCHE, debut, debut + cond.duree - 1);
+  if (effectif) return effectif;
+  const fi = finances(monde, e.id);
+  if (d.indemniteMEUR > 0 && fi && (fi.etatCrise === 'crise' || fi.etatCrise === 'administration')) return 'L’écurie est en difficulté financière : pas de débauchage possible.';
+  if (d.indemniteMEUR > 0 && fi && fi.tresorerieMEUR < d.indemniteMEUR) return `Trésorerie insuffisante pour verser l’indemnité (${d.indemniteMEUR} M€).`;
+  return motifRefusConseil(monde, e, p.id, cond.salaire, debut, debut + cond.duree - 1);
+}
+
 /** Règles communes au joueur et à l'IA pour faire une offre (commande « marche.offre »). */
 export function motifRefusOffre(monde: Monde, auteur: string, prm: Record<string, unknown>): string | null {
   const e = ecurie(monde, String(prm['ecurie'] ?? ''));
@@ -139,17 +149,11 @@ export function motifRefusOffre(monde: Monde, auteur: string, prm: Record<string
   if (!enFenetre(monde)) return `Le marché n’est ouvert que de la semaine ${FENETRE.debut} à la semaine ${FENETRE.fin}.`;
   const p = table(monde, TABLES.personnes)[String(prm['personne'] ?? '')] as unknown as Personne | undefined;
   if (!p) return 'Personne inconnue.';
-  const debut = Number(prm['debut']);
+  const debut = prm['debut'];
   if (debut !== monde.date.annee + 1 && debut !== monde.date.annee + 2) return 'Un contrat commence la saison suivante, ou celle d’après (pré-accord).';
-  const duree = Number(prm['duree']);
-  const salaire = Number(prm['salaire']);
-  if (!(salaire > 0) || !(duree >= 1 && duree <= 5)) return 'Salaire positif et durée de 1 à 5 ans requis.';
-  const d = disponibilite(monde, p, e, debut);
-  if (typeof d === 'string') return d;
-  if (anneesLibres(monde, e.id, debut - 1, duree) < duree) return 'Aucune place de titulaire à pourvoir pour toute la durée proposée.';
-  const fi = finances(monde, e.id);
-  if (d.indemniteMEUR > 0 && fi && (fi.etatCrise === 'crise' || fi.etatCrise === 'administration')) return 'L’écurie est en difficulté financière : pas de débauchage possible.';
-  if (d.indemniteMEUR > 0 && fi && fi.tresorerieMEUR < d.indemniteMEUR) return `Trésorerie insuffisante pour verser l’indemnité (${d.indemniteMEUR} M€).`;
+  if (prm['statutN1'] !== undefined && typeof prm['statutN1'] !== 'boolean') return 'Statut de n°1 : vrai ou faux.';
+  const refus = motifRefusEngagement(monde, e, p, prm['salaire'], prm['duree'], debut);
+  if (refus) return refus;
   const miennes = offresMarche(monde).filter((o) => o.ecurie === e.id && (o.statut === 'en_attente' || o.statut === 'contre_offre'));
   const existante = miennes.find((o) => o.personne === p.id);
   if (existante && existante.statut === 'en_attente') return 'Une offre est déjà en attente de réponse.';
@@ -170,8 +174,9 @@ function enregistrerOffre(monde: Monde, auteur: string, prm: Record<string, unkn
     id: nouvelIdentifiant(monde, 'off'), ecurie: e.id, decideur: auteur, personne: p.id, poste: POSTE_MARCHE, salaireMEUR: 0, dureeAnnees: 0, debut,
     statutN1: false, indemniteMEUR: 0, tour: -1, annee: monde.date.annee, semaine: 0, statut: 'en_attente',
   };
-  o.salaireMEUR = arrondi(Number(prm['salaire']));
-  o.dureeAnnees = Number(prm['duree']);
+  const cond = lireConditions(prm['salaire'], prm['duree']) as { salaire: number; duree: number };
+  o.salaireMEUR = cond.salaire;
+  o.dureeAnnees = cond.duree;
   o.debut = debut;
   o.statutN1 = prm['statutN1'] === true;
   o.indemniteMEUR = d.indemniteMEUR;
@@ -351,13 +356,11 @@ function repondreAuxOffres(monde: Monde): void {
   }
 }
 
-/** Revalidation d'une offre en attente au moment de la réponse (mêmes règles que pour la faire, hors calendrier et capacité). */
+/** Revalidation complète d'une offre en attente au moment de la signature (audit n°3) : mêmes règles que pour la faire, hors calendrier et capacité. */
 function motifRefusOffreEnAttente(monde: Monde, o: OffreMarche, p: Personne, e: Ecurie): string | null {
-  const d = disponibilite(monde, p, e, o.debut);
-  if (typeof d === 'string') return d;
-  if (anneesLibres(monde, e.id, o.debut - 1, o.dureeAnnees) < o.dureeAnnees) return 'place pourvue';
-  const fi = finances(monde, e.id);
-  if (d.indemniteMEUR > 0 && fi && fi.tresorerieMEUR < d.indemniteMEUR) return 'trésorerie';
+  const refus = motifRefusEngagement(monde, e, p, o.salaireMEUR, o.dureeAnnees, o.debut);
+  if (refus) return refus;
+  const d = disponibilite(monde, p, e, o.debut) as Disponibilite;
   o.indemniteMEUR = d.indemniteMEUR;
   if (d.beneficiaire) o.beneficiaireIndemnite = d.beneficiaire;
   return null;

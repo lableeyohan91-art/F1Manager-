@@ -243,3 +243,35 @@ Aucun code à ce stade.
 ### Constat
 - Filière complète fonctionnelle (90 % des débutants passent par une académie) ; âges en baisse mais encore trop tardifs (champions 30,1 ans, débutants 24,0 ans) ; effet sportif globalement neutre.
 
+
+## [Phase 7a] — 22/11/2026
+
+### Ajouté
+- Conception de la phase 7 validée (D-116, D-117) : découpage 7a (pilotes), 7b (personnel), 7c (agents et valeur commerciale) ; lassitude ; candidatures spontanées ; non-concurrence de 6 mois ; commission des agents négociée.
+- **Marché des transferts des pilotes** (`src/engine/systems/marche/`, coefficients dans `balance/marche.ts`) :
+  - fenêtre (semaines 26 à 48) ;
+  - plan de personnel de l'IA avec pari sur la progression ;
+  - offres concurrentes et contre-offres (3 tours) ;
+  - pré-accords à deux saisons (rares) ;
+  - débauchage contre indemnité, versée à l'ancienne écurie ;
+  - contre-attaque de l'employeur ;
+  - lassitude des pilotes ;
+  - réputation de prédatrice.
+  - Commandes `marche.offre` et `marche.retirer_offre`, communes au joueur et à l'IA.
+- Format de sauvegarde 12 (offres, contrats « signés », réputation de prédatrice), avec migration et test.
+- Indicateurs du marché, causes des talents bloqués et inflation salariale dans `npm run demographie`.
+- Rapport : `docs/rapports/2026-11-22-p7a-marche-pilotes.md` ; références `docs/rapports/reference/p7a-*`.
+
+### Corrigé (audit n°2, D-118)
+- Capacité des académies évolutive (moyens, politique, choix du team principal ; commande `academie.capacite`), sans rupture de contrat.
+- Talents jamais arrivés en F1 : causes classées dans l'outil ; erratum dans le rapport 6b-2.
+
+### Corrigé (audit n°3, D-119)
+- Règles d'effectif centralisées (`systems/humain/effectifs.ts`) pour toutes les commandes et décisions de l'IA.
+- Validation numérique des contrats. Arbitrage du conseil pour les salaires de pilotes élevés. Revalidation complète à la signature.
+- Promesses :
+  - statut de n°1 exclusif ;
+  - paramètres obligatoires ;
+  - promesse rompue (départ provoqué par l'employeur) distinguée de la promesse caduque (départ volontaire).
+- Chantiers : date prévue, date réelle, temps de travail et semaines de suspension ; retard calendaire.
+- Tests d'invariants entre systèmes et décisions extrêmes d'un joueur (`tests/invariants.test.ts`). 112 tests.

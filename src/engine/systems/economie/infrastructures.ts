@@ -91,10 +91,32 @@ export function deciderProjet(monde: Monde, e: Ecurie, fi: Finances, reserveVise
   });
 }
 
+/** Retard annoncé dès que le temps calendaire écoulé dépasse la durée annoncée de plus de 4 semaines (suspensions comprises). */
+function annoncerRetard(monde: Monde, e: Ecurie, p: ProjetInfrastructure): void {
+  if (p.retardAnnonce || semainesEcoulees(monde, p) <= p.dureePrevueSemaines + 4) return;
+  p.retardAnnonce = true;
+  ajouterEvenement(monde, { type: 'infrastructure.retard', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 1, contexte: { projet: p.id, prevue: livraisonPrevue(p), semainesSuspendues: Math.round(p.semainesSuspendues ?? 0) } });
+}
+
 /** Période : paiement dans la limite de l'enveloppe annuelle, avancement proportionnel, livraison. */
+/** Semaines calendaires écoulées depuis le lancement d'un projet (temps réel, suspensions comprises). */
+export function semainesEcoulees(monde: Monde, p: ProjetInfrastructure): number {
+  return (monde.date.annee - p.debut.annee) * 52 + (monde.date.semaine - p.debut.semaine);
+}
+
+/** Date de livraison prévue (début + durée annoncée). */
+export function livraisonPrevue(p: ProjetInfrastructure): { annee: number; semaine: number } {
+  const t = p.debut.semaine - 1 + p.dureePrevueSemaines;
+  return { annee: p.debut.annee + Math.floor(t / 52), semaine: (t % 52) + 1 };
+}
+
 export function avancerProjets(monde: Monde, e: Ecurie, fi: Finances): void {
   for (const p of [...fi.projets]) {
-    if (fi.etatCrise === 'crise' || fi.etatCrise === 'administration') continue; // chantier à l'arrêt
+    if (fi.etatCrise === 'crise' || fi.etatCrise === 'administration') { // chantier à l'arrêt : le temps passe sans travail
+      p.semainesSuspendues = (p.semainesSuspendues ?? 0) + 4;
+      annoncerRetard(monde, e, p);
+      continue;
+    }
     const restantSemaines = Math.max(4, p.dureeReelleSemaines - p.avancementSemaines);
     const besoin = Math.max(0, ((p.coutReelMEUR - p.depenseMEUR) * 4) / restantSemaines);
     const disponible = Math.max(0, enveloppe(monde) - fi.comptes.investissements);
@@ -102,11 +124,10 @@ export function avancerProjets(monde: Monde, e: Ecurie, fi: Finances): void {
     p.depenseMEUR += paye;
     fi.comptes.investissements += paye;
     fi.tresorerieMEUR -= paye;
-    p.avancementSemaines += besoin > 0 ? 4 * (paye / besoin) : 4;
-    if (!p.retardAnnonce && p.avancementSemaines > p.dureePrevueSemaines + 4) {
-      p.retardAnnonce = true;
-      ajouterEvenement(monde, { type: 'infrastructure.retard', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 1, contexte: { projet: p.id } });
-    }
+    const travail = besoin > 0 ? 4 * (paye / besoin) : 4;
+    p.avancementSemaines += travail;
+    p.semainesSuspendues = (p.semainesSuspendues ?? 0) + (4 - travail); // enveloppe épuisée : chantier ralenti ou suspendu
+    annoncerRetard(monde, e, p);
     if (p.avancementSemaines >= p.dureeReelleSemaines && p.depenseMEUR >= p.coutReelMEUR - 0.01) {
       const i = table(monde, TABLES.installations)[p.installation] as unknown as Installation | undefined;
       if (i) {
@@ -117,7 +138,13 @@ export function avancerProjets(monde: Monde, e: Ecurie, fi: Finances): void {
       fi.projets = fi.projets.filter((x) => x.id !== p.id);
       ajouterEvenement(monde, {
         type: 'infrastructure.livraison', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'public',
-        contexte: { installation: i?.type, nature: p.nature, coutPrevu: p.coutPrevuMEUR, coutReel: p.coutReelMEUR, retardSemaines: Math.max(0, Math.round(p.avancementSemaines - p.dureePrevueSemaines)) },
+        contexte: {
+          installation: i?.type, nature: p.nature, coutPrevu: p.coutPrevuMEUR, coutReel: p.coutReelMEUR,
+          // Audit n°3 : retard calendaire (temps réellement écoulé), décomposé en dépassement du temps de travail et suspensions.
+          livraisonPrevue: livraisonPrevue(p), livraisonReelle: { ...monde.date }, dureeCalendaire: semainesEcoulees(monde, p),
+          retardSemaines: Math.max(0, Math.round(semainesEcoulees(monde, p) - p.dureePrevueSemaines)),
+          semainesTravail: Math.round(p.avancementSemaines), semainesSuspendues: Math.round(p.semainesSuspendues ?? 0),
+        },
         texte: `${e.nom} met en service sa nouvelle ${LIB[i?.type ?? ''] ?? 'installation'}${p.coutReelMEUR > p.coutPrevuMEUR + 0.1 ? ` (coût final ${p.coutReelMEUR} M€ au lieu de ${p.coutPrevuMEUR})` : ''}.`,
       });
     }
