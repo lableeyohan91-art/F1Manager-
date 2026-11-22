@@ -107,7 +107,31 @@ Détail complet, y compris tous les indicateurs de compétitivité à toutes les
 
 ### 4.2 50 graines × 20 saisons
 
-TABLEAU_20
+Détail complet : `docs/rapports/reference/p7a-reference-20saisons.md`.
+
+| Indicateur | 6b-2 | **7a** | Sens |
+| --- | --- | --- | --- |
+| Écuries victorieuses / saison | 5,16 | 5,3 | ≈ |
+| Vainqueurs de GP différents | 7,34 | 7,4 | ≈ |
+| **Champions pilotes / 20 saisons** | 5,64 | **7,5** | **très favorable** |
+| Champions constructeurs / 20 saisons | 4,10 | 4,7 | favorable |
+| Plus longue série de titres | 7,44 | 6,4 | favorable |
+| Écuries sans victoire | 0,40 | 0,2 | favorable |
+| Remontées | 16,4 | 20,0 | favorable |
+| Écuries changeant d'étage / saison | 2,98 | 3,4 | favorable |
+| Transitions sans changement d'étage | 12,6 % | 9 % | favorable |
+| La dernière écurie marque | 73 % | 74 % | ≈ |
+| **Dynasties** (20 saisons) | 84 % | **74 %** | favorable, encore très loin de l'objectif |
+| **Dominations** | 25,1 % | **18 %** | **favorable** |
+| Titre ouvert avant la dernière manche | 23,0 % | 25 % | favorable (léger) |
+| Écart de points P1–P2 | 80,5 | 67 | favorable |
+| Saisons très serrées | 10,5 % | 10 % | ≈ |
+| Retournement à la dernière manche | 5,6 % | 6 % | ≈ |
+| Corrélation voiture ↔ points | 0,81 | 0,82 | ≈ |
+| Champion et dauphin coéquipiers | 28,1 % | 33 % | **défavorable** |
+| Lutte finale entre écuries différentes | 16,4 % | 17 % | ≈ |
+
+Les signaux défavorables des 6a et 6b sur 20 saisons (dominations 22 → 25 %) sont résorbés. Un signal défavorable apparaît : champion et dauphin sont plus souvent coéquipiers (28 → 33 %). C'est cohérent avec la circulation des pilotes : deux très bons pilotes se retrouvent dans la meilleure voiture.
 
 ### 4.3 Hiérarchie dans le temps et dominations (30 graines)
 
