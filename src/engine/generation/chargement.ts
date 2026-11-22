@@ -4,13 +4,13 @@
  */
 
 import { COMPETENCES_PILOTE } from '../balance/personnages';
-import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, Voiture } from '../model/types';
+import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, TypeProprietaire, Voiture } from '../model/types';
 import { ErreurDonnees, Lecteur, lireCsv } from './csv';
 
 /** Texte des fichiers, indexé par nom de fichier. */
 export type FichiersDonnees = Record<string, string>;
 
-export const FICHIERS_GRILLE = ['voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
+export const FICHIERS_GRILLE = ['finances.csv', 'voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
 export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv'] as const;
 
 const POSTES_DONNEES: readonly Poste[] = [
@@ -49,6 +49,7 @@ export interface DonneesInitiales {
   palmares: Omit<Palmares, 'id'>[];
   circuits: Circuit[];
   voitures: Voiture[];
+  finances: { ecurie: string; tresorerieMEUR: number; typeProprietaire: TypeProprietaire; apportAnnuelMEUR: number; revenusCommerciauxMEUR: number; verification: string }[];
   nationalites: Nationalite[];
   /** Prénoms et noms par code de nationalité. */
   noms: Record<string, { prenoms: string[]; noms: string[] }>;
@@ -277,8 +278,24 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     if (n !== 1) problemes.push(`voitures.csv : ${n} ligne(s) pour l'écurie ${e.id} (il en faut exactement 1)`);
   }
 
-  problemes.push(...rv.problemes, ...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes);
+  // Finances (phase 5a).
+  const lfin = lireCsv('finances.csv', fichier(f, 'finances.csv'), ['ecurie', 'tresorerieMEUR', 'typeProprietaire', 'apportAnnuelMEUR', 'revenusCommerciauxMEUR']);
+  const rf = new Lecteur('finances.csv');
+  const finances = lfin.map((l) => ({
+    ecurie: rf.reference(l, 'ecurie', idsEq),
+    tresorerieMEUR: rf.decimal(l, 'tresorerieMEUR', -1000, 5000),
+    typeProprietaire: rf.parmi(l, 'typeProprietaire', ['constructeur', 'milliardaire', 'fonds', 'famille', 'consortium'] as const),
+    apportAnnuelMEUR: rf.decimal(l, 'apportAnnuelMEUR', 0, 2000),
+    revenusCommerciauxMEUR: rf.decimal(l, 'revenusCommerciauxMEUR', 0, 2000),
+    verification: l.valeurs['verification'] ?? '',
+  }));
+  for (const e of ecuries) {
+    const n = finances.filter((x) => x.ecurie === e.id).length;
+    if (n !== 1) problemes.push(`finances.csv : ${n} ligne(s) pour l'écurie ${e.id} (il en faut exactement 1)`);
+  }
+
+  problemes.push(...rf.problemes, ...rv.problemes, ...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes);
   if (problemes.length > 0) throw new ErreurDonnees(problemes);
 
-  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, circuits, voitures, nationalites, noms };
+  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, circuits, voitures, finances, nationalites, noms };
 }

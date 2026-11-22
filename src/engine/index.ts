@@ -20,3 +20,5 @@ export * from './diagnostics/indicateurs';
 export * from './systems/memoire';
 export * from './systems/humain';
 export * from './diagnostics/dilemmes';
+export * from './systems/economie';
+export * from './model/finances';

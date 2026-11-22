@@ -16,7 +16,8 @@
     "rejouer": "tsx src/cli/rejouer.ts",
     "equilibrage": "tsx src/cli/equilibrage.ts",
     "dilemmes": "tsx src/cli/dilemmes.ts",
-    "campagne": "tsx src/cli/campagne.ts"
+    "campagne": "tsx src/cli/campagne.ts",
+    "finances": "tsx tools/inspecter-finances.ts"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",

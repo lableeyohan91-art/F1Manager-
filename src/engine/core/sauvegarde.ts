@@ -68,6 +68,30 @@ const MIGRATIONS: Record<number, Migration> = {
     }
     return { ...m, versionFormat: 4 };
   },
+  // v4 → v5 (phase 5a) : apparence persistante (D-080) ; finances et propriétaires créés à partir du budget
+  // indicatif des écuries quand ils manquent (sauvegardes antérieures à l'économie).
+  4: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, Record<string, unknown>>>;
+    const graine = Number(m['graine'] ?? 0);
+    for (const p of Object.values(tables['personnes'] ?? {})) {
+      if (!p['apparence']) p['apparence'] = { graine: Math.floor(new Flux(etatInitialFlux(graine, `apparence:${String(p['id'])}`)).suivant() * 1e9) };
+    }
+    tables['finances'] ??= {};
+    tables['proprietaires'] ??= {};
+    const annee = Number((m['date'] as { annee?: number } | undefined)?.annee ?? 2027);
+    for (const e of Object.values(tables['ecuries'] ?? {})) {
+      const suffixe = String(e['id']).replace(/^eq_/, '');
+      const budget = Number(e['budgetMEUR'] ?? 300);
+      tables['proprietaires'][`pro_${suffixe}`] ??= { id: `pro_${suffixe}`, ecurie: e['id'], type: 'consortium', apportBaseMEUR: Math.round(0.3 * budget), patience: 10, ambition: 10, risque: 10 };
+      tables['finances'][`fin_${suffixe}`] ??= {
+        id: `fin_${suffixe}`, ecurie: e['id'], tresorerieMEUR: Math.round(0.3 * budget), revenusCommerciauxBaseMEUR: Math.round(0.45 * budget),
+        budget: { annee: 0, developpementMEUR: 0, plafondVise: 0, strategie: 'a_definir' },
+        comptes: { annee, primes: 0, commercial: 0, apport: 0, personnelPlafonne: 0, departements: 0, operations: 0, entretien: 0, developpement: 0, salairesHorsPlafond: 0, marketing: 0, indemnites: 0, amendes: 0, dividendes: 0 },
+        historique: [], sanctionAero: 0, verification: 'créé par migration (estimation)',
+      };
+    }
+    return { ...m, versionFormat: 5 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

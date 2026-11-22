@@ -28,6 +28,7 @@ import {
   type Motoriste, type Palmares, type Personne, type ResultatPilote, type Saison, type Voiture,
 } from '../../model/types';
 import { genererChronique } from './chronique';
+import { facteurBudgetDeveloppement, financesDe, restrictionAero } from '../economie';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 
 /** Durée de conservation des explications détaillées des résultats, en saisons. */
@@ -242,18 +243,23 @@ export function capaciteDeveloppement(monde: Monde, e: Ecurie): number {
   const inst = (Object.values(table(monde, TABLES.installations)) as unknown as Installation[])
     .filter((i) => i.ecurie === e.id && ['soufflerie', 'cfd', 'simulateur', 'bureau_etudes'].includes(i.type));
   const installations = moyenne(inst.map((i) => i.niveau)) / 10;
-  const budget = borner(e.budgetMEUR / BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET.min, FACTEUR_BUDGET.max);
+  // Phase 5a : le budget de développement réellement alloué (finances) remplace le budget indicatif de l'écurie.
+  const budget = financesDe(monde, e.id) ? facteurBudgetDeveloppement(monde, e.id) : borner(e.budgetMEUR / BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET.min, FACTEUR_BUDGET.max);
   return POIDS_CAPACITE.competences * competences + POIDS_CAPACITE.installations * installations + POIDS_CAPACITE.budget * budget;
 }
 
 const CARACS_VOITURE = ['viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero', 'fiabilite', 'gestionPneus'] as const;
+/** Caractéristiques soumises aux restrictions aérodynamiques (soufflerie/CFD) selon le classement (phase 5a). */
+const CARACS_AERO = new Set<string>(['viragesLents', 'viragesRapides', 'efficaciteAero']);
 
 function developper(monde: Monde, e: Ecurie, mois: number, alea: number, cle: string): void {
   const v = voitureDe(monde, e.id);
   const cap = capaciteDeveloppement(monde, e);
+  const fi = financesDe(monde, e.id);
+  const aero = fi ? restrictionAero(monde, e.id) * (1 - fi.sanctionAero) : 1;
   for (const c of CARACS_VOITURE) {
     const f = tirageLocal(monde, 'developpement', e.id, cle, c);
-    const gain = TAUX_DEVELOPPEMENT_MENSUEL * mois * cap * Math.max(0, 1 - v[c] / PLAFOND_TECHNIQUE);
+    const gain = TAUX_DEVELOPPEMENT_MENSUEL * mois * cap * (CARACS_AERO.has(c) ? aero : 1) * Math.max(0, 1 - v[c] / PLAFOND_TECHNIQUE);
     v[c] = borner(v[c] + gain + f.normale(0, alea), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
   }
 }

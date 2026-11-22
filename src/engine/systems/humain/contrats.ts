@@ -212,7 +212,11 @@ export const systemeNegociations: Systeme = {
       if (!e || e.pilotee) continue; // écurie pilotée par le joueur : il décide lui-même
       const p = personneDe(monde, c.personne);
       if (!p) continue;
-      if (p.poste === 'team_principal') decisionConseil(monde, c);
+      if (p.poste === 'team_principal') {
+        // Phase 5a : avec un propriétaire, c'est le conseil du système économie qui décide (economie.conseil).
+        const aProprietaire = Object.values(table(monde, TABLES.proprietaires)).some((x) => x['ecurie'] === c.organisation);
+        if (!aProprietaire) decisionConseil(monde, c);
+      }
       else {
         const tp = teamPrincipal(monde, c.organisation);
         if (tp) decisionIA(monde, c, tp);

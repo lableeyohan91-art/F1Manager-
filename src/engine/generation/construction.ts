@@ -31,7 +31,8 @@ import type { DateJeu } from '../core/calendrier';
 import { etatInitialFlux, Flux } from '../core/hasard';
 import { nouvelIdentifiant } from '../core/identifiants';
 import { creerMondeVide, idsTries, table, type Entite, type Monde } from '../core/monde';
-import type { Contrat, Departement, Ecurie, Installation, Personne, Poste } from '../model/types';
+import type { Contrat, Departement, Ecurie, Finances, Installation, Personne, Poste, Proprietaire } from '../model/types';
+import { comptesVides } from '../model/finances';
 import { TABLES } from '../model/types';
 import { moyenne, type DonneesInitiales, type PersonneDonnees } from './chargement';
 
@@ -43,6 +44,11 @@ const note = (x: number) => Math.round(borner(x, 1, 20));
 /** Flux de hasard temporaire, propre à une entité (non stocké dans le monde). */
 function fluxDe(graine: number, cle: string): Flux {
   return new Flux(etatInitialFlux(graine, `generation:${cle}`));
+}
+
+/** Apparence (D-080) : flux propre, pour ne décaler aucun autre tirage de la personne. */
+export function tirerApparence(graine: number, id: string): { graine: number } {
+  return { graine: Math.floor(new Flux(etatInitialFlux(graine, `apparence:${id}`)).suivant() * 1e9) };
 }
 
 function tirerTraits(f: Flux, poste: string): Record<string, number> {
@@ -189,6 +195,7 @@ function personneDepuisDonnees(ctx: Contexte, p: PersonneDonnees, ecuries: Map<s
     aspirations: p.statut === 'actif' ? tirerAspirations(f, p.poste) : [],
     etat: tirerEtat(f),
     verification: p.verification,
+    apparence: tirerApparence(ctx.graine, p.id),
   };
 }
 
@@ -235,6 +242,7 @@ function personneGeneree(ctx: Contexte, poste: Poste, ecurie: Ecurie | null, sta
     aspirations: tirerAspirations(f, poste),
     etat: tirerEtat(f),
     verification: 'personnage fictif généré',
+    apparence: tirerApparence(ctx.graine, id),
   } satisfies Personne);
 }
 
@@ -267,6 +275,16 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
   for (const e of d.ecuries) ecuries.set(e.id, ajouter(monde, TABLES.ecuries, { ...e }));
   d.circuits.forEach((c, i) => ajouter(monde, TABLES.circuits, { ...c, ordre: i + 1 }));
   for (const v of d.voitures) ajouter(monde, TABLES.voitures, { ...v });
+  // Finances et propriétaires (phase 5a).
+  for (const fi of d.finances) {
+    const fp = fluxDe(graine, `proprietaire:${fi.ecurie}`);
+    const trait = () => Math.round(Math.min(20, Math.max(1, fp.normale(10.5, 3.5))));
+    ajouter(monde, TABLES.proprietaires, { id: `pro_${fi.ecurie.replace(/^eq_/, '')}`, ecurie: fi.ecurie, type: fi.typeProprietaire, apportBaseMEUR: fi.apportAnnuelMEUR, patience: trait(), ambition: trait(), risque: trait() } satisfies Proprietaire);
+    ajouter(monde, TABLES.finances, {
+      id: `fin_${fi.ecurie.replace(/^eq_/, '')}`, ecurie: fi.ecurie, tresorerieMEUR: fi.tresorerieMEUR, revenusCommerciauxBaseMEUR: fi.revenusCommerciauxMEUR,
+      budget: { annee: 0, developpementMEUR: 0, plafondVise: 0, strategie: 'a_definir' }, comptes: comptesVides(DATE_DEPART.annee), historique: [], sanctionAero: 0, verification: fi.verification,
+    } satisfies Finances);
+  }
   d.palmares.forEach((p) => ajouter(monde, TABLES.palmares, { id: `pal_${p.saison}`, ...p }));
   d.carrieres.forEach((c, i) => ajouter(monde, TABLES.carrieres, { id: `car_${String(i + 1).padStart(6, '0')}`, ...c }));
 

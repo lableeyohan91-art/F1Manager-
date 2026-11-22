@@ -17,6 +17,8 @@ export const TABLES = {
   departements: 'departements',
   installations: 'installations',
   voitures: 'voitures',
+  finances: 'finances',
+  proprietaires: 'proprietaires',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -115,6 +117,8 @@ export interface Personne {
   verification: string;
   /** Saison depuis laquelle la personne est libre (sans contrat d'emploi). */
   libreDepuis?: number;
+  /** Apparence (D-080) : graine visuelle persistante, sans effet sur la simulation. */
+  apparence?: { graine: number };
 }
 
 /**
@@ -331,4 +335,56 @@ export interface Saison {
   indiceFin: Record<string, number>;
   termine: boolean;
   chronique: string[];
+}
+
+/* ------------------------------------------------------------------ Économie (phase 5a) */
+
+export type TypeProprietaire = 'constructeur' | 'milliardaire' | 'fonds' | 'famille' | 'consortium';
+
+export interface Proprietaire {
+  id: string;
+  ecurie: string;
+  type: TypeProprietaire;
+  apportBaseMEUR: number;
+  /** Personnalité du propriétaire (1–20). */
+  patience: number;
+  ambition: number;
+  risque: number;
+}
+
+/** Comptes d'une année (M€). */
+export interface ComptesAnnee {
+  annee: number;
+  primes: number;
+  commercial: number;
+  apport: number;
+  /** Dépenses plafonnées. */
+  personnelPlafonne: number;
+  departements: number;
+  operations: number;
+  entretien: number;
+  developpement: number;
+  /** Dépenses hors plafond. */
+  salairesHorsPlafond: number;
+  marketing: number;
+  indemnites: number;
+  amendes: number;
+  /** Retrait du propriétaire (hors plafond). */
+  dividendes: number;
+}
+
+export interface Finances {
+  id: string;
+  ecurie: string;
+  tresorerieMEUR: number;
+  revenusCommerciauxBaseMEUR: number;
+  /** Budget de l'année en cours. */
+  budget: { annee: number; developpementMEUR: number; plafondVise: number; strategie: string };
+  /** Comptes de l'année en cours (cumulés période par période). */
+  comptes: ComptesAnnee;
+  /** Bilans des années passées. */
+  historique: (ComptesAnnee & { tresorerieFin: number; plafonnees: number; depassement: number })[];
+  /** Réduction d'efficacité aérodynamique due à une sanction (0 à 1), pour l'année en cours. */
+  sanctionAero: number;
+  verification: string;
 }
