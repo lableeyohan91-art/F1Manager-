@@ -147,3 +147,20 @@ Aucun code à ce stade.
 - Bas et milieu de grille resserrés (dernière écurie qui marque : 32 % → 44 % sur 10 saisons ; 47 % → 59 % sur 20), mobilité accrue ; sommet inchangé (dynasties 64 % → 66 %, dominations 8 % → 10 % sur 10 saisons). Économie encore très calme (aucune crise) : attendu avant la 5b.
 - Écarts à la conception à valider : D-084 à D-088.
 
+
+## [Phase 5b] — 22/11/2026
+
+### Ajouté
+- Sponsors fictifs (secteurs et racines de noms dans `data/commun`), marché annuel, objectifs, primes, départs, rancunes, conjoncture mondiale.
+- Dette, intérêts, remboursements ; tension, crise, sauvetage, administration, rachat ; vente par lassitude ; retrait du propriétaire ; emprunt offensif.
+- Projets d'infrastructure avec retards et surcoûts, enveloppe annuelle hors plafond, vieillissement des installations.
+- Le conseil juge aussi le joueur (D-089). Orientations des grands changements de règlement pour la phase 8 (D-090).
+- Onglet Finances enrichi ; format de sauvegarde 6 ; 4 tests (66 au total) ; références `p5b-reference*`.
+- Rapport `docs/rapports/2026-11-22-p5b-economie.md`.
+
+### Corrigé
+- `npm run statistiques-finances` comptait les événements après élagage : fréquences très sous-estimées sur 20 saisons.
+
+### Constat
+- 5b quasi neutre pour le sport (différences dans le bruit). Aucune crise financière en 600 saisons : objectif « quelques crises par décennie » non atteint.
+- Décisions à valider : D-092 à D-094.
