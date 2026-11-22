@@ -257,8 +257,8 @@ export function scoreCandidat(monde: Monde, e: Ecurie, decideur: string, c: Pers
 
 /** Team principal actif d'une écurie. */
 export function teamPrincipal(monde: Monde, idEcurie: string): Personne | undefined {
-  const t = table(monde, TABLES.personnes);
-  return idsTries(t).map((id) => t[id] as unknown as Personne).find((p) => p.statut === 'actif' && p.ecurie === idEcurie && p.poste === 'team_principal');
+  // Un seul team principal actif par écurie (invariant vérifié par verifierCoherence) : recherche sans tri (performance, audit n°4).
+  return (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === idEcurie && p.poste === 'team_principal');
 }
 
 export function texteRaisons(raisons: Raison[]): string[] {

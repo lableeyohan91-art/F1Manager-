@@ -34,8 +34,8 @@ export function personneDe(monde: Monde, id: string): Personne | undefined {
 }
 
 export function contratEmploi(monde: Monde, idPersonne: string): Contrat | undefined {
-  const t = table(monde, TABLES.contrats);
-  return idsTries(t).map((id) => t[id] as unknown as Contrat).find((c) => c.personne === idPersonne && c.statut === 'actif' && c.type === 'emploi');
+  // Au plus un contrat d'emploi actif par personne (invariant vérifié) : l'ordre de parcours est indifférent, pas de tri.
+  return (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((c) => c.personne === idPersonne && c.statut === 'actif' && c.type === 'emploi');
 }
 
 function nomDe(monde: Monde, id: string): string {

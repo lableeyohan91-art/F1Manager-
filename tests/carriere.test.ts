@@ -120,5 +120,5 @@ describe('Phase 6a — cycle de vie', () => {
     expect((Object.values(table(migre, TABLES.personnes)) as unknown as Personne[]).every((x) => x.carriere)).toBe(true);
     expect(p(migre, 'per_alonzo').carriere!.finApogee).toBeGreaterThan(2027 - p(migre, 'per_alonzo').anneeNaissance);
     sc.creerMoteur().avancer(migre, S + 1);
-  }, 60_000);
+  }, 120_000); // 10 saisons : référence locale ≈ 7 s
 });

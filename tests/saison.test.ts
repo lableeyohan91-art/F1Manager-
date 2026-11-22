@@ -49,7 +49,7 @@ describe('Phase 3 — saison abstraite', () => {
     const recharge = deserialiser(serialiser(b));
     mb.avancer(recharge, S);
     expect(empreinte(recharge)).toBe(empreinte(a));
-  }, 30_000);
+  }, 90_000); // référence locale ≈ 4 à 7 s
 
   it('10 saisons : cohérent (hors âges, phase 6) et sauvegarde bornée', () => {
     const m = sc.creerMonde(3);
@@ -62,7 +62,7 @@ describe('Phase 3 — saison abstraite', () => {
     // Phase 6b : +≈ 0,2 Mo (juniors). Le plus lourd reste le détail des Grands Prix de F1 (≈ 1 Mo), optimisation à prévoir avant la version mobile.
     // Phase 6b-2 : relations et souvenirs nés des académies. Limite à 30 saisons inchangée (12 Mo, test humain).
     expect(serialiser(m).length).toBeLessThan(4_000_000);
-  }, 30_000);
+  }, 90_000); // référence locale ≈ 4 à 7 s
 
   it('tirages locaux : changer la météo d’une course ne change pas l’aléa des autres courses', () => {
     const a = sc.creerMonde(11);

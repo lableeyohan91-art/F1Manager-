@@ -21,7 +21,8 @@
     "statistiques-finances": "tsx tools/statistiques-finances.ts",
     "persistance": "tsx tools/persistance-classements.mts .",
     "demographie": "tsx tools/demographie.mts",
-    "dominations": "tsx tools/diagnostic-dominations.mts"
+    "dominations": "tsx tools/diagnostic-dominations.mts",
+    "performance": "tsx tools/performance.mts"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.6",

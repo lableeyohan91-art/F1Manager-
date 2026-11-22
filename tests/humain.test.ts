@@ -116,7 +116,7 @@ describe('Phase 4 — simulation longue', () => {
     const titulaires = Object.values(a.tables['personnes']!).filter((x) => x['poste'] === 'pilote_titulaire' && x['statut'] === 'actif').map((x) => x.id);
     expect(titulaires).toHaveLength(22);
     expect(titulaires.filter((id) => /^per_\d/.test(id)).length).toBeGreaterThan(0); // au moins un pilote généré est arrivé en F1
-  }, 30_000);
+  }, 120_000); // simulation longue : délai large pour les machines d'intégration (référence locale ≈ 13 s, voir le rapport de performances)
 
   it('30 saisons : mémoire bornée et sauvegarde raisonnable', () => {
     const m = sc.creerMonde(9);
@@ -126,7 +126,7 @@ describe('Phase 4 — simulation longue', () => {
     expect(Math.max(0, ...parPersonne.values())).toBeLessThanOrEqual(40);
     expect(serialiser(m).length).toBeLessThan(12_000_000);
     expect(verifierCoherence(m, { ages: false })).toEqual([]);
-  }, 60_000);
+  }, 240_000); // 30 saisons : référence locale ≈ 27 s
 });
 
 describe('Migration v3 → v4', () => {

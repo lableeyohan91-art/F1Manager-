@@ -275,3 +275,18 @@ Aucun code à ce stade.
   - promesse rompue (départ provoqué par l'employeur) distinguée de la promesse caduque (départ volontaire).
 - Chantiers : date prévue, date réelle, temps de travail et semaines de suspension ; retard calendaire.
 - Tests d'invariants entre systèmes et décisions extrêmes d'un joueur (`tests/invariants.test.ts`). 112 tests.
+
+## [Audit n°4] — 22/11/2026
+
+### Corrigé (D-121)
+- Sauvegardes validées avant chargement (structure, version, date, identifiants, références), messages en français, sauvegarde de secours.
+- CSV : colonnes en double ou sans nom et guillemets non refermés signalés.
+- Indemnités de licenciement réellement débitées, une seule fois, quel que soit le déclencheur.
+- Contrôles de cohérence étendus ; finances orphelines d'une écurie retirée des données corrigées.
+- Spearman à rangs moyens (série constante indéfinie) ; classements successifs départagés comme le championnat.
+- Indicateurs historiques calculés sur les niveaux contemporains (format de sauvegarde 13, migration et test).
+- Clôture du marché en semaine 49 avec expiration notifiée.
+
+### Performances
+- Outil `npm run performance`. 50 saisons : 97 s → 57 s, résultats identiques (empreintes vérifiées).
+- Délais des simulations longues adaptés aux machines d'intégration, avec durées de référence documentées.

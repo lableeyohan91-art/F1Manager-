@@ -37,7 +37,9 @@ const POSTE_MARCHE: Poste = 'pilote_titulaire';
 const NOMBRE_TITULAIRES = 2;
 
 const personnes = (m: Monde) => Object.values(table(m, TABLES.personnes)) as unknown as Personne[];
-const contrats = (m: Monde) => idsTries(table(m, TABLES.contrats)).map((id) => table(m, TABLES.contrats)[id] as unknown as Contrat);
+// Performance (audit n°4) : tri par identifiant seulement là où l'ordre compte (prise d'effet), pas pour les recherches.
+const contrats = (m: Monde) => Object.values(table(m, TABLES.contrats)) as unknown as Contrat[];
+const contratsTries = (m: Monde) => idsTries(table(m, TABLES.contrats)).map((id) => table(m, TABLES.contrats)[id] as unknown as Contrat);
 const finances = (m: Monde, idEcurie: string) => (Object.values(table(m, TABLES.finances)) as unknown as Finances[]).find((f) => f.ecurie === idEcurie);
 const nom = (m: Monde, id: string) => {
   const p = table(m, TABLES.personnes)[id] as unknown as Personne | undefined;
@@ -102,12 +104,28 @@ export interface Disponibilite {
 }
 
 /** Une personne peut-elle signer avec cette écurie pour la saison `debut`, et à quel prix pour son employeur actuel ? */
-export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: number): Disponibilite | string {
+/**
+ * Performance (audit n°4, mesuré : le marché parcourait tous les contrats pour chaque candidat, chaque écurie et chaque tour) :
+ * index des contrats courants par personne, construit une fois par tour de marché. Lecture seule : il n'est utilisé
+ * que pour noter les candidats ; toute offre reste validée sur l'état réel par la commande.
+ */
+export interface IndexContrats { emploi: Map<string, Contrat>; signe: Set<string>; affiliation: Map<string, Contrat> }
+export function indexerContrats(monde: Monde): IndexContrats {
+  const idx: IndexContrats = { emploi: new Map(), signe: new Set(), affiliation: new Map() };
+  for (const c of contrats(monde)) {
+    if (c.type === 'emploi' && c.statut === 'actif') idx.emploi.set(c.personne, c);
+    if (c.type === 'emploi' && c.statut === 'signe') idx.signe.add(c.personne);
+    if (c.type === 'affiliation' && c.statut === 'actif') idx.affiliation.set(c.personne, c);
+  }
+  return idx;
+}
+
+export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: number, idx?: IndexContrats): Disponibilite | string {
   if (p.statut === 'retraite') return 'Cette personne a pris sa retraite.';
   if (!p.poste.startsWith('pilote')) return 'Le marché de la phase 7a ne concerne que les pilotes.';
   if (debut - p.anneeNaissance < AGE_MINIMAL_F1) return `Trop jeune pour la F1 à cette date (âge minimal ${AGE_MINIMAL_F1} ans).`;
-  if (contratSigne(monde, p.id)) return 'Cette personne a déjà signé ailleurs pour la suite.';
-  const c = contratEmploi(monde, p.id);
+  if (idx ? idx.signe.has(p.id) : contratSigne(monde, p.id)) return 'Cette personne a déjà signé ailleurs pour la suite.';
+  const c = idx ? idx.emploi.get(p.id) : contratEmploi(monde, p.id);
   if (c && c.organisation === e.id && p.poste === POSTE_MARCHE) return 'Pilote déjà titulaire de l’écurie : passer par une prolongation.';
   if (c && c.organisation !== e.id && c.fin >= debut) {
     const vendeur = ecurie(monde, c.organisation);
@@ -115,7 +133,7 @@ export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: numbe
     if (vendeur?.pilotee) return 'Sous contrat avec une écurie dirigée par un joueur, sans clause de rachat : son accord serait nécessaire.';
     return { indemniteMEUR: indemniteExigee(monde, c, e, debut), beneficiaire: c.organisation, debauchage: true };
   }
-  const aff = affiliationDe(monde, p.id);
+  const aff = idx ? idx.affiliation.get(p.id) : affiliationDe(monde, p.id);
   if (aff && aff.organisation !== e.id && aff.organisation !== e.ecuriePartenaire) {
     return { indemniteMEUR: arrondi(aff.clauses.rachatMEUR ?? Math.max(RACHAT.minimumMEUR, (aff.clauses.financementAnnuelMEUR ?? 0) * RACHAT.multipleAffiliation)), beneficiaire: aff.organisation, debauchage: true };
   }
@@ -397,11 +415,15 @@ function salaireOffert(monde: Monde, e: Ecurie, tp: Personne | undefined, p: Per
 
 function ciblesPour(monde: Monde, e: Ecurie, tp: Personne, debut: number, liste: Personne[]): Cible[] {
   const res: Cible[] = [];
+  const idx = indexerContrats(monde);
+  // Places libres de l'écurie : identiques pour tous les candidats (aucun n'en occupe encore), calculées une fois.
+  const libres = anneesLibres(monde, e.id, debut - 1);
+  if (libres < 1) return res;
   for (const p of liste) {
-    const d = disponibilite(monde, p, e, debut);
+    const d = disponibilite(monde, p, e, debut, idx);
     if (typeof d === 'string') continue;
     const salaire = salaireOffert(monde, e, tp, p);
-    const duree = Math.min(Math.max(2, dureeContrat(monde, p)), anneesLibres(monde, e.id, debut - 1));
+    const duree = Math.min(Math.max(2, dureeContrat(monde, p)), libres);
     if (duree < 1) continue;
     res.push({ p, salaire, duree, indemnite: d.indemniteMEUR, debauchage: d.debauchage, score: scoreMarche(monde, e, tp.id, p, salaire, duree, d.indemniteMEUR) });
   }
@@ -462,7 +484,8 @@ function planIA(monde: Monde, liste: Personne[], commander: Commander): void {
 
 /** Ouverture de la fenêtre : décisions de prolongation des titulaires dont le contrat finit cette année (IA), face au marché. */
 function prolongationsTitulaires(monde: Monde, liste: Personne[]): void {
-  for (const c of contrats(monde)) {
+  const idx = indexerContrats(monde);
+  for (const c of contratsTries(monde)) {
     if (c.statut !== 'actif' || c.type !== 'emploi' || c.poste !== POSTE_MARCHE || c.fin !== monde.date.annee || c.nonProlonge) continue;
     const e = ecurie(monde, c.organisation);
     if (!e || e.pilotee) continue;
@@ -470,8 +493,8 @@ function prolongationsTitulaires(monde: Monde, liste: Personne[]): void {
     if (!tp) continue;
     // Meilleur remplaçant accessible sur le marché (libres, fins de contrat, jeunes) : niveau, plus le pari sur sa progression.
     const remplacant = Math.max(0, ...liste
-      .filter((p) => p.id !== c.personne && typeof disponibilite(monde, p, e, monde.date.annee + 1) !== 'string')
-      .filter((p) => (disponibilite(monde, p, e, monde.date.annee + 1) as Disponibilite).indemniteMEUR === 0 && valeurTitulaire(monde, p) <= e.budgetMEUR * 0.06)
+      .filter((p) => { if (p.id === c.personne) return false; const d = disponibilite(monde, p, e, monde.date.annee + 1, idx); return typeof d !== 'string' && d.indemniteMEUR === 0; })
+      .filter((p) => valeurTitulaire(monde, p) <= e.budgetMEUR * 0.06)
       .map((p) => niveauMetier(p) + HORIZON.poids * Math.max(0, Math.min(potentielEstime(monde, e.id, p).centre - niveauMetier(p), HORIZON.progressionParAn * 2))));
     // Les baquets de l'an prochain sont déjà tous promis (pré-accords) : pas de prolongation possible.
     const dureeMax = anneesLibres(monde, e.id, monde.date.annee);
@@ -485,7 +508,7 @@ function prolongationsTitulaires(monde: Monde, liste: Personne[]): void {
 /** Contrats signés qui commencent l'an prochain : la personne quitte son employeur (fin ou rachat) et rejoint sa nouvelle écurie. */
 export function activerContratsSignes(monde: Monde): void {
   const annee = monde.date.annee;
-  for (const c of contrats(monde)) {
+  for (const c of contratsTries(monde)) {
     if (c.type !== 'emploi' || c.statut !== 'signe' || c.debut !== annee + 1) continue;
     const p = table(monde, TABLES.personnes)[c.personne] as unknown as Personne | undefined;
     const e = ecurie(monde, c.organisation);

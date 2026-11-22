@@ -64,8 +64,8 @@ export function personne(monde: Monde, id: string): Personne | undefined {
 }
 
 export function souvenirsDe(monde: Monde, porteur: string): Souvenir[] {
-  const t = table(monde, TABLE_SOUVENIRS);
-  return idsTries(t).map((id) => t[id] as unknown as Souvenir).filter((s) => s.porteur === porteur);
+  // Performance (audit n°4) : filtrer d'abord, trier ensuite (même ordre qu'avant, sans trier toute la table à chaque appel).
+  return (Object.values(table(monde, TABLE_SOUVENIRS)) as unknown as Souvenir[]).filter((s) => s.porteur === porteur).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
 /** Index des souvenirs par porteur, en un seul passage (pour les traitements de masse). */

@@ -12,7 +12,8 @@ import { idsTries, table, type Monde } from '../../core/monde';
 import { tirageLocal } from '../../core/moteur';
 import { TABLES, type Contrat, type Ecurie, type Poste, type Proprietaire } from '../../model/types';
 
-const contrats = (m: Monde) => idsTries(table(m, TABLES.contrats)).map((id) => table(m, TABLES.contrats)[id] as unknown as Contrat);
+// Performance (audit n°4) : ces recherches ne dépendent pas de l'ordre des contrats ; pas de tri des identifiants.
+const contrats = (m: Monde) => Object.values(table(m, TABLES.contrats)) as unknown as Contrat[];
 
 /** Nombre de places d'un poste dans une écurie (postes individualisés) ; sans limite pour les autres. */
 export function nombrePlaces(poste: Poste): number {

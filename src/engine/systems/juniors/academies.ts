@@ -32,7 +32,8 @@ export const academies = (m: Monde) => idsTries(table(m, TABLES.academies)).map(
 export const academieDe = (m: Monde, idEcurie: string) => academies(m).find((a) => a.ecurie === idEcurie);
 const contrats = (m: Monde) => idsTries(table(m, TABLES.contrats)).map((id) => table(m, TABLES.contrats)[id] as unknown as Contrat);
 export const affiliationsActives = (m: Monde, idEcurie?: string) => contrats(m).filter((c) => c.type === 'affiliation' && c.statut === 'actif' && (!idEcurie || c.organisation === idEcurie));
-export const affiliationDe = (m: Monde, idPersonne: string) => contrats(m).find((c) => c.type === 'affiliation' && c.statut === 'actif' && c.personne === idPersonne);
+// Au plus une affiliation active par personne : recherche sans tri (performance, audit n°4).
+export const affiliationDe = (m: Monde, idPersonne: string) => (Object.values(table(m, TABLES.contrats)) as unknown as Contrat[]).find((c) => c.type === 'affiliation' && c.statut === 'actif' && c.personne === idPersonne);
 const personnes = (m: Monde) => idsTries(table(m, TABLES.personnes)).map((id) => table(m, TABLES.personnes)[id] as unknown as Personne);
 
 /** Plafond de places permis par les moyens et l'ambition de l'écurie (budget, politique « filière jeunes ») ; minimum en cas de crise. */
@@ -142,13 +143,20 @@ function recruterAffilies(monde: Monde, annee: number): void {
     .map((a) => ({ a, e: table(monde, TABLES.ecuries)[a.ecurie] as unknown as Ecurie | undefined }))
     .filter((x): x is { a: Academie; e: Ecurie } => !!x.e && x.e.statut === 'active')
     .sort((x, y) => y.e.prestige + y.a.reputation / 20 - (x.e.prestige + x.a.reputation / 20) || (x.a.id < y.a.id ? -1 : 1));
+  // Performance (audit n°4, mesuré) : vivier des jeunes et ensemble des affiliés calculés une fois (même ordre, mêmes résultats),
+  // au lieu de reparcourir toute la population et tous les contrats pour chaque place.
+  const affilies = new Set(affiliationsActives(monde).map((c) => c.personne));
+  const vivier = personnes(monde).filter((p) => {
+    const age = annee - p.anneeNaissance;
+    return p.statut === 'libre' && p.poste.startsWith('pilote') && (p.carriere?.saisonsF1 ?? 0) === 0 && age >= AFFILIATION.ageMin && age <= AFFILIATION.ageMax;
+  });
   for (const { a, e } of parPrestige) {
     let libres = a.places - affiliationsActives(monde, e.id).length;
     while (libres > 0) {
       let meilleur: { p: Personne; score: number; centre: number } | undefined;
-      for (const p of personnes(monde)) {
+      for (const p of vivier) {
         const age = annee - p.anneeNaissance;
-        if (p.statut !== 'libre' || !p.poste.startsWith('pilote') || (p.carriere?.saisonsF1 ?? 0) > 0 || age < AFFILIATION.ageMin || age > AFFILIATION.ageMax || affiliationDe(monde, p.id)) continue;
+        if (affilies.has(p.id)) continue;
         const centre = potentielEstime(monde, e.id, p).centre;
         if (centre < AFFILIATION.potentielMinimal) continue;
         const score = centre + AFFILIATION.poidsReputation * (p.reputationJeune ?? 0) - AFFILIATION.penaliteAge * Math.max(0, age - 16);
@@ -156,6 +164,7 @@ function recruterAffilies(monde: Monde, annee: number): void {
       }
       if (!meilleur) break;
       affilier(monde, e, meilleur.p, meilleur.centre, annee);
+      affilies.add(meilleur.p.id);
       libres--;
     }
   }
