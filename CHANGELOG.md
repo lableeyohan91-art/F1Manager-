@@ -164,3 +164,14 @@ Aucun code à ce stade.
 ### Constat
 - 5b quasi neutre pour le sport (différences dans le bruit). Aucune crise financière en 600 saisons : objectif « quelques crises par décennie » non atteint.
 - Décisions à valider : D-092 à D-094.
+
+## [Orientations après la phase 5] — 22/11/2026
+
+### Modifié
+- D-092 à D-094 validées (valeurs provisoires).
+- Nouvelle méthode d'équilibrage D-095 : mesurer et documenter après chaque phase, grandes campagnes après les phases 8, 12 et 13 (CLAUDE.md, laboratoire, feuille de route) ; tableau des déséquilibres connus et de leurs remèdes attendus.
+
+### Ajouté
+- Orientations valeur commerciale, sponsors personnels et pilotes payants (D-096 à D-099) : `docs/systemes/orientations-valeur-commerciale.md`, réparties entre les phases 6b, 7, 8 et 11.
+- Fiche de conception de la phase 6a (cycle de vie) soumise à validation : `docs/systemes/phase-6a-cycle-de-vie.md` (D-100).
+

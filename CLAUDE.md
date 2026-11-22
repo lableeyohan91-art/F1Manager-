@@ -49,6 +49,7 @@ Ce fichier est relu au début de chaque session de Claude Code. Il prime sur les
 - Les objectifs non atteints sont signalés explicitement. Le provisoire est distingué du définitif.
 - Claude Code critique aussi les propositions de ChatGPT ; le porteur a le dernier mot.
 - Aucun bonus caché pour l'IA, aucun équilibrage artificiel des résultats.
+- **Méthode D-095** : après chaque phase, on vérifie, on corrige les bugs, on **mesure et documente** les déséquilibres et les mécaniques futures susceptibles de les résoudre, sans recalibrage prématuré. Grandes campagnes d'équilibrage après les phases 8, 12 et 13.
 
 ## Git
 

@@ -129,3 +129,8 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Dividendes** | Part de la trésorerie excédentaire retirée chaque année par le propriétaire (D-085). |
 | **Étage** | Groupe de rangs au classement constructeurs (1–4, 5–8, 9 et plus) servant à mesurer la mobilité de la hiérarchie (D-088). |
 | **Rang attendu** | Rang des moyens financiers d'une écurie parmi toutes ; le conseil compare les résultats à ce rang pour juger le team principal. |
+| **Valeur commerciale** | Ce qu'un personnage rapporte commercialement (sponsors, marchés), distinct de ses compétences ; dynamique. Prévue en phase 7 (D-096). |
+| **Pilote payant** | Pilote dont l'accès au baquet est en partie financé par ses sponsors ou ses soutiens (D-097). |
+| **Profil de carrière** | Paramètres cachés propres à une personne (archétype, âges de progression, d'apogée et de déclin) qui façonnent sa courbe de carrière (phase 6a, à valider). |
+| **Potentiel estimé** | Fourchette que se fait une écurie du potentiel caché d'une personne, plus ou moins juste selon le temps d'observation et son département recrutement (phase 6a, à valider). |
+

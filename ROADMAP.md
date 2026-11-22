@@ -17,12 +17,12 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | 5 | Économie | Sponsors, conseil d'administration, plafond budgétaire, installations |
 | 6a | Cycle de vie | Progression et déclin individualisés, retraites, reconversions, nouvelles générations, réservoir karting/F4, potentiel incertain et rapports de recrutement |
 | 6b | Filières juniors | Deux championnats juniors réellement simulés (écuries, calendriers, résultats, classements, palmarès), académies, contrats d'affiliation, financement des carrières, placement, renouvellement des grilles |
-| 7 | Marché du travail + IA des écuries + agents | Recrutement actif, débauchage (adultes **et jeunes talents**), clauses de rachat, décisions de l'IA |
+| 7 | Marché du travail + IA des écuries + agents | Recrutement actif, débauchage (adultes **et jeunes talents**), clauses de rachat, décisions de l'IA, **valeur commerciale, sponsors personnels, pilotes payants, pouvoir de négociation** (D-096 à D-099) |
 | 8 | Mémoire v2 + groupes sociaux + politique | Circulation de l'information, réputation, groupes émergents, votes du règlement, **grands changements de règlement tous les 4 à 6 ans** (accent aéro / moteur / pneus, anticipation, coups de génie — D-090) |
 | 9 | Histoire ancrée (+ simulation libre pour les mondes fictifs) | Démarrage en 2027 avec la grille voulue, et des personnages qui partagent déjà un passé |
 | **A** | **Jalon A** | **10 saisons observées après un historique, chronique lisible, rapport de diagnostic** |
 | 10 | Le joueur | Prendre la tête d'une écurie, premiers écrans mobiles |
-| 11 | Médias et archives | Actualités, rumeurs, records, chronologie |
+| 11 | Médias et archives | Actualités, rumeurs, records, chronologie, **popularité et image publique qui font évoluer la valeur commerciale** |
 | 12 | Monoplaces | Recherche, conception, fabrication, expertise, erreurs de concept |
 | 13 | Courses en 2D | Moteur de course qui remplace le modèle abstrait (reprise des modèles pneus/essence/météo de Paddock) |
 | 14 | Carrière du manager | Offres d'emploi, licenciement, changement d'écurie, héritage |
@@ -104,3 +104,5 @@ Elles seront détaillées une par une, avant leur démarrage, dans `docs/systeme
 - [ ] Audit des attributs : aucun attribut sans effet mesurable.
 - [ ] Chronique de 10 saisons lue par le porteur et par ChatGPT, jugée crédible **et** intéressante.
 - [ ] Taille de sauvegarde après 50 saisons : moins de 5 Mo compressés.
+
+**Équilibrage (D-095)** : mesure et documentation après chaque phase ; grandes campagnes d'équilibrage après les phases 8, 12 et 13.

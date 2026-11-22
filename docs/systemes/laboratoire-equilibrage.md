@@ -63,3 +63,18 @@ Mesures : avec quelle écurie de départ, et en combien de saisons, chaque profi
 - Chaque phase se termine par une évaluation de ces cibles, comparée aux références précédentes. Ces références sont conservées dans `docs/rapports/reference/` et `archives/`.
 - Aucune cible n'est poursuivie seule : un réglage qui en améliore une en dégradant les autres est présenté comme tel.
 - Le réglage du modèle de course (C2) reste **provisoire** et sera réévalué après les phases 5, 6a et 13.
+
+## 6. Calendrier des campagnes (D-095)
+
+- **Après chaque phase** : vérification des mécaniques, correction des bugs, mesure et documentation des déséquilibres (rapport D-076, références conservées), liste des mécaniques futures susceptibles de les résoudre. **Pas de recalibrage prématuré.**
+- **Grandes campagnes d'équilibrage** : après la **phase 8** (générations, marché, règlements en place), après la **phase 12** (conception des pièces), après la **phase 13** (moteur de course).
+- Déséquilibres documentés à ce jour, avec leur remède attendu :
+
+| Déséquilibre mesuré | Rapport | Mécaniques futures susceptibles de le résoudre |
+| --- | --- | --- |
+| Dynasties fréquentes (88 % des séries de 20 saisons) et dominations (17 %) | P5a, P5b | 6a (déclin et générations), 7 (débauchage des ingénieurs), 8 (changements de règlement, D-090), 12 (incertitude de conception) |
+| La forme du pilote ne pèse rien (0 %) | campagne D-074 | 13 (moteur de course) |
+| Aucune crise financière en 600 saisons | P5b | 7 (inflation salariale, transferts, indemnités), 12 (coûts de conception) |
+| Concentration du sponsoring (160 M€ pour le premier, 52 M€ pour le dernier) | P5b | 7 (diversification des motivations des sponsors, valeur commerciale), 11 (popularité) |
+| Effet quasi nul d'une augmentation de DT dans les dilemmes | P4 | 7 (débauchage) |
+
