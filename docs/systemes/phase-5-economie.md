@@ -1,6 +1,6 @@
 # Phase 5 — Économie
 
-> Statut : **PROPOSÉ** (22/11/2026). À valider par le porteur et relire par ChatGPT **avant toute ligne de code**.
+> Statut : **VALIDÉ** (D-078, 22/11/2026). Livraison en deux temps : 5a puis 5b. Réponses aux questions du §12 dans D-078.
 > Inspirations : la gestion financière de F1 Manager (budget, plafond, installations, sponsors) et la profondeur de Football Manager (propriétaires, conseil, finances qui pèsent sur chaque décision).
 > Dépendances : phase 3 (primes), phase 4 (contrats, salaires, indemnités, IA des dirigeants). Anticipe les phases 6a et 6b (académies, financement des jeunes), 7 (marché), 8 (règlement), 12 (pièces).
 
