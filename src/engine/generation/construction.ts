@@ -240,7 +240,8 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
   for (const m of d.motoristes) ajouter(monde, TABLES.motoristes, { ...m });
   const ecuries = new Map<string, Ecurie>();
   for (const e of d.ecuries) ecuries.set(e.id, ajouter(monde, TABLES.ecuries, { ...e }));
-  for (const c of d.circuits) ajouter(monde, TABLES.circuits, { ...c });
+  d.circuits.forEach((c, i) => ajouter(monde, TABLES.circuits, { ...c, ordre: i + 1 }));
+  for (const v of d.voitures) ajouter(monde, TABLES.voitures, { ...v });
   d.palmares.forEach((p) => ajouter(monde, TABLES.palmares, { id: `pal_${p.saison}`, ...p }));
   d.carrieres.forEach((c, i) => ajouter(monde, TABLES.carrieres, { id: `car_${String(i + 1).padStart(6, '0')}`, ...c }));
 

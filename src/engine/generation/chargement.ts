@@ -4,13 +4,13 @@
  */
 
 import { COMPETENCES_PILOTE } from '../balance/personnages';
-import type { Carriere, Circuit, Contrat, Ecurie, Motoriste, Palmares, Poste } from '../model/types';
+import type { Carriere, Circuit, Contrat, Ecurie, Motoriste, Palmares, Poste, Voiture } from '../model/types';
 import { ErreurDonnees, Lecteur, lireCsv } from './csv';
 
 /** Texte des fichiers, indexé par nom de fichier. */
 export type FichiersDonnees = Record<string, string>;
 
-export const FICHIERS_GRILLE = ['ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
+export const FICHIERS_GRILLE = ['voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
 export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv'] as const;
 
 const POSTES_DONNEES: readonly Poste[] = [
@@ -48,6 +48,7 @@ export interface DonneesInitiales {
   carrieres: Omit<Carriere, 'id'>[];
   palmares: Omit<Palmares, 'id'>[];
   circuits: Circuit[];
+  voitures: Voiture[];
   nationalites: Nationalite[];
   /** Prénoms et noms par code de nationalité. */
   noms: Record<string, { prenoms: string[]; noms: string[] }>;
@@ -237,8 +238,30 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   }));
   verifierIdsUniques('circuits.csv', lcir.map((l, i) => ({ id: circuits[i]!.id, numero: l.numero })), problemes);
 
-  problemes.push(...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes);
+  // Voitures (D-056).
+  const lvoi = lireCsv('voitures.csv', fichier(f, 'voitures.csv'), ['ecurie', 'viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero', 'fiabilite', 'gestionPneus']);
+  const rv = new Lecteur('voitures.csv');
+  const voitures: Voiture[] = lvoi.map((l) => {
+    const ecurie = rv.reference(l, 'ecurie', idsEq);
+    return {
+      id: `voi_${ecurie.replace(/^eq_/, '')}`,
+      ecurie,
+      viragesLents: rv.entier(l, 'viragesLents', 1, 20),
+      viragesRapides: rv.entier(l, 'viragesRapides', 1, 20),
+      vitessePointe: rv.entier(l, 'vitessePointe', 1, 20),
+      efficaciteAero: rv.entier(l, 'efficaciteAero', 1, 20),
+      fiabilite: rv.entier(l, 'fiabilite', 1, 20),
+      gestionPneus: rv.entier(l, 'gestionPneus', 1, 20),
+      verification: l.valeurs['verification'] ?? '',
+    };
+  });
+  for (const e of ecuries) {
+    const n = voitures.filter((v) => v.ecurie === e.id).length;
+    if (n !== 1) problemes.push(`voitures.csv : ${n} ligne(s) pour l'écurie ${e.id} (il en faut exactement 1)`);
+  }
+
+  problemes.push(...rv.problemes, ...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes);
   if (problemes.length > 0) throw new ErreurDonnees(problemes);
 
-  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, circuits, nationalites, noms };
+  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, circuits, voitures, nationalites, noms };
 }

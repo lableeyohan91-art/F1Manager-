@@ -11,7 +11,11 @@ import { TABLES, type Contrat, type Ecurie, type Personne } from '../model/types
 /** Âges plausibles par famille de postes (années). */
 const AGES_PLAUSIBLES = { pilote: { min: 15, max: 46 }, autre: { min: 22, max: 82 } };
 
-export function verifierCoherence(monde: Monde): string[] {
+/**
+ * @param options.ages vérifier la plausibilité des âges (à désactiver tant que le vieillissement et les retraites n'existent pas, phase 6).
+ */
+export function verifierCoherence(monde: Monde, options: { ages?: boolean } = {}): string[] {
+  const verifierAges = options.ages ?? true;
   const pb: string[] = [];
   const annee = monde.date.annee;
   const ecuries = Object.values(table(monde, TABLES.ecuries)) as unknown as Ecurie[];
@@ -43,7 +47,7 @@ export function verifierCoherence(monde: Monde): string[] {
       if (!c) pb.push(`${nom} : actif dans une écurie mais sans contrat`);
       else if (c.ecurie !== p.ecurie) pb.push(`${nom} : contrat chez ${c.ecurie} mais affecté à ${p.ecurie}`);
     }
-    if (p.statut !== 'retraite') {
+    if (verifierAges && p.statut !== 'retraite') {
       const age = annee - p.anneeNaissance;
       const bornes = p.poste.startsWith('pilote') ? AGES_PLAUSIBLES.pilote : AGES_PLAUSIBLES.autre;
       if (!(age >= bornes.min && age <= bornes.max)) pb.push(`${nom} : âge peu plausible (${age} ans) pour ${p.poste}`);

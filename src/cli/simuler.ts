@@ -30,7 +30,8 @@ moteur.avancer(monde, saisons * SEMAINES_PAR_AN_EXPORT);
 const duree = performance.now() - debut;
 
 const taille = ecrireSauvegarde(sortie, monde);
-const problemes = verifierCoherence(monde);
+// Sans vieillissement ni retraites (phase 6), la plausibilité des âges n'est vérifiée qu'au départ.
+const problemes = verifierCoherence(monde, { ages: saisons === 0 });
 
 console.log(`Scénario      : ${sc.nom} (graine ${graine})`);
 console.log(`Simulé        : ${saisons} saisons, jusqu'à ${formaterDate(monde.date)}`);

@@ -16,6 +16,9 @@ export const TABLES = {
   circuits: 'circuits',
   departements: 'departements',
   installations: 'installations',
+  voitures: 'voitures',
+  saisons: 'saisons',
+  grandsPrix: 'grandsprix',
 } as const;
 
 /** Note de 1 à 20 (D-027). */
@@ -151,6 +154,8 @@ export interface Circuit {
   altitudeM: number;
   climatPluie: 'très faible' | 'faible' | 'moyen' | 'élevé';
   verification: string;
+  /** Rang dans le calendrier (ordre du fichier circuits.csv). */
+  ordre?: number;
 }
 
 export type TypeDepartement =
@@ -198,4 +203,84 @@ export interface Installation {
 
 export interface DateNaissanceInfo {
   date: DateJeu;
+}
+
+/** Caractéristiques d'une monoplace (D-056), décimales en interne, échelle ≈ 1–20. */
+export interface Voiture {
+  id: string;
+  ecurie: string;
+  viragesLents: number;
+  viragesRapides: number;
+  vitessePointe: number;
+  efficaciteAero: number;
+  fiabilite: number;
+  gestionPneus: number;
+  /** La motorisation n'est pas stockée : c'est le niveau du motoriste de l'écurie. */
+  verification: string;
+}
+
+export type CauseAbandon = 'mecanique' | 'incident';
+
+export interface ResultatPilote {
+  pilote: string;
+  ecurie: string;
+  /** Position à l'arrivée, ou null en cas d'abandon. */
+  position: number | null;
+  abandon: CauseAbandon | null;
+  points: number;
+  /** Écart avec le vainqueur, en % du temps au tour (null si abandon). */
+  ecartPct: number | null;
+  /** Rang de l'indice voiture sur ce circuit (1 = meilleure voiture), pour mesurer les surprises. */
+  rangVoiture: number;
+  /** Retard de la voiture sur la meilleure voiture du circuit, en % du temps au tour (0 = la plus rapide). */
+  retardVoiturePct: number;
+  /** Décomposition du « temps » (en %), conservée 2 saisons : voiture, pilote, forme, aléa. */
+  explication?: { voiture: number; pilote: number; forme: number; alea: number };
+}
+
+export interface GrandPrix {
+  id: string;
+  saison: number;
+  manche: number;
+  circuit: string;
+  semaine: number;
+  pluie: boolean;
+  termine: boolean;
+  resultats: ResultatPilote[];
+}
+
+export interface LigneClassementPilote {
+  pilote: string;
+  ecurie: string;
+  points: number;
+  victoires: number;
+  podiums: number;
+  abandons: number;
+  meilleurResultat: number | null;
+}
+
+export interface LigneClassementConstructeur {
+  ecurie: string;
+  points: number;
+  victoires: number;
+  doubles: number;
+  primesMEUR?: number;
+}
+
+export interface Saison {
+  id: string;
+  annee: number;
+  calendrier: string[];
+  bareme: number[];
+  pilotes: LigneClassementPilote[];
+  constructeurs: LigneClassementConstructeur[];
+  /** Leader du championnat pilotes après chaque manche. */
+  leaders: string[];
+  /** Écart de points entre le 1er et le 2e du championnat pilotes après chaque manche. */
+  ecartsTete: number[];
+  /** Indice moyen de chaque écurie (toutes caractéristiques de vitesse) au début et à la fin de la saison. */
+  indiceDebut: Record<string, number>;
+  indiceFin: Record<string, number>;
+  termine: boolean;
+  chronique: string[];
 }
