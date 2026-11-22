@@ -70,3 +70,14 @@ Aucun code à ce stade.
 - Indicateurs de crédibilité et d'intérêt, rapport d'équilibrage sur 100 graines (`npm run equilibrage`).
 - Diagnostic : onglets Saisons (classements, calendrier, résultats, « Pourquoi ? »), Bilan, Voitures ; boutons « Simuler 1 / 10 saisons ».
 - 15 tests de plus (40 au total). Rapports `docs/rapports/2026-11-22-p3-*.md`.
+
+## [Vérifications phase 3] — 22/11/2026
+
+### Ajouté
+- Décomposition de l'écart entre coéquipiers (compétences, forme, aléa), indicateurs de luttes pour le titre (coéquipiers / écuries différentes, retournements).
+- Définition exacte du titre ouvert à la dernière manche (D-061), testée.
+- Réglages d'expérience par monde (format de sauvegarde 3, migration testée) ; options `--alea`, `--param`, `--balayage-alea`, `--json`, `--reference` pour `npm run equilibrage`.
+- Référence figée des résultats de la phase 3 (D-060). Rapports `2026-11-22-p3-verifications.md` et `2026-11-22-p3-balayage-alea.md`.
+
+### Modifié
+- D-054 validée (11 traits, mise en œuvre en phase 4). Proposition D-059 (poids du pilote et aléa) en attente.

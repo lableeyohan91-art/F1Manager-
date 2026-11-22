@@ -13,7 +13,7 @@ import type { Evenement } from './evenements';
 import type { Commande } from './commandes';
 
 /** Version actuelle du format de sauvegarde. Toute modification de structure l'incrémente (+ migration). */
-export const VERSION_FORMAT = 2;
+export const VERSION_FORMAT = 3;
 
 /** Version du jeu (informative). */
 export const VERSION_JEU = '0.1.0';
@@ -70,6 +70,11 @@ export interface Monde {
   fileCommandes: Commande[];
   /** Journal des commandes extérieures appliquées (pour rejouer). */
   journalCommandes: CommandeJournalisee[];
+  /**
+   * Réglages d'expérience (format 3) : remplacent ponctuellement un coefficient d'équilibrage pour CE monde,
+   * par ex. { 'course.aleaSigma': 0.2 }. Utilisés par les outils d'équilibrage ; vides dans une partie normale.
+   */
+  parametres: Record<string, number>;
 }
 
 export function creerMondeVide(graine: number, scenario: string, dateDepart: DateJeu): Monde {
@@ -88,6 +93,7 @@ export function creerMondeVide(graine: number, scenario: string, dateDepart: Dat
     agenda: [],
     fileCommandes: [],
     journalCommandes: [],
+    parametres: {},
   };
 }
 
@@ -109,4 +115,10 @@ export function table(monde: Monde, nom: string): Record<string, Entite> {
 /** Identifiants d'une table, triés : à utiliser pour tout parcours (déterminisme). */
 export function idsTries(t: Record<string, unknown>): string[] {
   return Object.keys(t).sort();
+}
+
+/** Valeur d'un coefficient pour ce monde : le réglage d'expérience s'il existe, sinon la valeur par défaut. */
+export function parametre(monde: Monde, nom: string, defaut: number): number {
+  const v = monde.parametres?.[nom];
+  return typeof v === 'number' && Number.isFinite(v) ? v : defaut;
 }

@@ -278,6 +278,13 @@ export interface Saison {
   leaders: string[];
   /** Écart de points entre le 1er et le 2e du championnat pilotes après chaque manche. */
   ecartsTete: number[];
+  /**
+   * Avant la dernière manche : le titre pilotes était-il encore mathématiquement ouvert ?
+   * (un rival pouvait encore finir devant, égalités départagées par les victoires puis les podiums)
+   */
+  titreOuvertDerniereManche?: boolean;
+  /** Leader du championnat pilotes avant la dernière manche. */
+  leaderAvantDerniereManche?: string;
   /** Indice moyen de chaque écurie (toutes caractéristiques de vitesse) au début et à la fin de la saison. */
   indiceDebut: Record<string, number>;
   indiceFin: Record<string, number>;

@@ -28,8 +28,13 @@ export function genererChronique(monde: Monde, s: Saison): string[] {
   if (ecart <= 10) lignes.push('Le titre s’est joué à quelques points : une des saisons les plus serrées.');
   else if (ecart >= 120) lignes.push('Une domination sans partage.');
 
-  const avantDerniere = s.ecartsTete.at(-2);
-  if (avantDerniere !== undefined && avantDerniere <= (s.bareme[0] ?? 25)) lignes.push('Tout s’est décidé lors de la dernière manche.');
+  if (s.titreOuvertDerniereManche) {
+    lignes.push(
+      s.leaderAvantDerniereManche && s.leaderAvantDerniereManche !== c1.pilote
+        ? `Retournement lors de la dernière manche : ${nomP(c1.pilote)} arrache le titre à ${nomP(s.leaderAvantDerniereManche)}.`
+        : 'Le titre restait ouvert avant la dernière manche.',
+    );
+  }
 
   const changements = s.leaders.filter((l, i) => i > 0 && l !== s.leaders[i - 1]).length;
   if (changements >= 4) lignes.push(`La tête du championnat a changé ${changements} fois.`);

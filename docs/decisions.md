@@ -69,6 +69,9 @@ Une décision qui en remplace une autre le dit (« remplace D-xxx »).
 | D-056 | 22/11/2026 | Une monoplace est décrite par 7 caractéristiques : virages lents, virages rapides, vitesse de pointe, efficacité aérodynamique, motorisation, fiabilité, gestion des pneumatiques. Elles serviront de fondation au développement des pièces | Forces et faiblesses distinctes selon les circuits. |
 | D-057 | 22/11/2026 | Tirages **locaux** par clé (système + date + entité + événement) pour les systèmes qui demandent des comparaisons contrefactuelles précises (résultats des Grands Prix d'abord) | Un tirage de plus dans un système ne décale plus les tirages suivants de ce système. |
 | D-058 | 22/11/2026 | Élagage des chaînes de causes : au-delà d'un horizon (10 saisons), un événement conservé ne protège plus ses causes mineures ; leurs liens sont remplacés par un résumé (type et date) | Borne la croissance à long terme du journal (remarque de ChatGPT). |
+| D-054 | 22/11/2026 | Ajout de deux traits : **propension au risque** et **capacité à se remettre en question** (11 traits). Mise en œuvre en phase 4 | Validé par le porteur et ChatGPT après analyse (personnalite.md). |
+| D-060 | 22/11/2026 | Les résultats de la phase 3 sont figés comme **référence** (`docs/rapports/reference/p3-reference.*`) pour mesurer l'effet des futures mécaniques | Demande du porteur et de ChatGPT. |
+| D-061 | 22/11/2026 | Titre « joué à la dernière manche » : définition exacte (un rival peut-il encore finir devant, égalités départagées par victoires puis podiums) | Demande de ChatGPT ; l'ancienne approximation ignorait les égalités et les 3es. |
 
 ---
 
@@ -79,7 +82,7 @@ Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · 
 | ID | Urgence | Question | Proposition de Claude Code |
 | --- | --- | --- | --- |
 | D-036 | AVANT P2 | Nom du championnat fictif et de l'instance dirigeante | ChatGPT propose 10 noms, le porteur choisit |
-| D-054 | AVANT P4 | Ajouter deux traits : **propension au risque** et **capacité à se remettre en question** ? | Voir l'analyse dans [personnalite.md](systemes/personnalite.md) : propension au risque oui ; remise en question oui, en remplaçant une partie du rôle de la rancune pour éviter un doublon |
+| D-059 | AVANT P4 | Donner plus de poids au pilote : 0,20 % par point de niveau (au lieu de 0,10) et aléa de course à 0,22 (au lieu de 0,30) ? | Oui (réglage B du rapport `2026-11-22-p3-verifications.md`) : les compétences expliquent 44 % de l'écart entre coéquipiers au lieu de 10 % |
 | D-039 | PLUS TARD | Option Carrera : importer les résultats réels de Paddock comme résultats de Grand Prix | Idée à garder, non prioritaire |
 
 ---

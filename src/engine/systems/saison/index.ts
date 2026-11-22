@@ -22,7 +22,7 @@ import {
 import { BAREME_POINTS, ENVELOPPE_PRIMES_MEUR, GRANDS_PRIX_PAR_SAISON, PARTS_PRIMES } from '../../balance/reglement';
 import { ajouterEvenement } from '../../core/evenements';
 import { planifier, tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
-import { idsTries, table, type Entite, type Monde } from '../../core/monde';
+import { idsTries, parametre, table, type Entite, type Monde } from '../../core/monde';
 import {
   TABLES, type Circuit, type Contrat, type Ecurie, type GrandPrix, type Installation, type LigneClassementConstructeur, type LigneClassementPilote,
   type Motoriste, type Palmares, type Personne, type ResultatPilote, type Saison, type Voiture,
@@ -95,13 +95,13 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const meilleurIndice = Math.max(...indices.values());
   const retard = (id: string) => Math.round((meilleurIndice - (indices.get(id) as number)) * ECART_VOITURE_PAR_POINT * 1000) / 1000;
 
-  const sigma = ALEA_SIGMA * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1);
+  const sigma = parametre(monde, 'course.aleaSigma', ALEA_SIGMA) * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1);
   const partants = pilotesTitulaires(monde).filter((p) => ecuries.has(p.ecurie));
   const calcul = partants.map((p) => {
     const e = ecuries.get(p.ecurie) as Ecurie;
     const f = tirageLocal(monde, 'course', gp.id, p.id);
     const voiture = (indices.get(e.id) as number) * ECART_VOITURE_PAR_POINT;
-    const pilote = niveauPilote(p, gp.pluie) * ECART_PILOTE_PAR_POINT;
+    const pilote = niveauPilote(p, gp.pluie) * parametre(monde, 'course.ecartPiloteParPoint', ECART_PILOTE_PAR_POINT);
     const forme = EFFET_FORME_MAX * borner((p.etat.confiance - CONFIANCE_REFERENCE) / (100 - CONFIANCE_REFERENCE), -1, 1);
     const alea = f.normale(0, sigma);
     const pMeca = ABANDON_MECANIQUE.base + (20 - voitureDe(monde, e.id).fiabilite) * ABANDON_MECANIQUE.parPoint;
@@ -124,6 +124,13 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   ];
   gp.resultats = resultats;
   gp.termine = true;
+
+  // Avant la dernière manche : le titre est-il encore ouvert ? (définition exacte, égalités comprises)
+  if (gp.manche === saison.calendrier.length) {
+    trierClassements(saison);
+    saison.leaderAvantDerniereManche = saison.pilotes[0]?.pilote ?? '';
+    saison.titreOuvertDerniereManche = titreEncoreOuvert(saison);
+  }
 
   // Classements.
   const lp = new Map(saison.pilotes.map((l) => [l.pilote, l]));
@@ -189,6 +196,23 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     ajouterEvenement(monde, { type: 'gp.abandon', acteurs: [{ id: r.pilote, role: 'pilote' }, { id: r.ecurie, role: 'ecurie' }], importance: 1, contexte: { gp: gp.id, cause: r.abandon } });
   }
   return gp;
+}
+
+/**
+ * Un rival peut-il encore être champion à la dernière manche ? Cas le plus favorable au rival :
+ * il gagne (points du vainqueur, +1 victoire, +1 podium) et le leader ne marque rien.
+ * Départage comme le classement : points, puis victoires, puis podiums ; égalité parfaite = encore ouvert.
+ */
+export function titreEncoreOuvert(s: Saison): boolean {
+  const [leader, ...rivaux] = s.pilotes;
+  if (!leader) return false;
+  const maxPoints = s.bareme[0] ?? 0;
+  return rivaux.some((r) => {
+    const pts = r.points + maxPoints, v = r.victoires + 1, pod = r.podiums + 1;
+    if (pts !== leader.points) return pts > leader.points;
+    if (v !== leader.victoires) return v > leader.victoires;
+    return pod >= leader.podiums;
+  });
 }
 
 export function trierClassements(s: Saison): void {

@@ -36,6 +36,8 @@ type Migration = (monde: Record<string, unknown>) => Record<string, unknown>;
  */
 const MIGRATIONS: Record<number, Migration> = {
   1: (m) => ({ ...m, chronique: Array.isArray(m['chronique']) ? m['chronique'] : [], versionFormat: 2 }),
+  // v2 → v3 : ajout des réglages d'expérience (vides).
+  2: (m) => ({ ...m, parametres: m['parametres'] ?? {}, versionFormat: 3 }),
 };
 
 export function serialiser(monde: Monde): string {
