@@ -56,7 +56,19 @@ Une décision qui en remplace une autre le dit (« remplace D-xxx »).
 | D-044 | 22/11/2026 | Postes non pilotes (team principal, directeurs dont le directeur sportif, responsables techniques) : **personnes réelles, noms altérés** quand elles sont publiquement connues ; personnages fictifs pour les postes sans titulaire public connu | Choix du porteur, contre l'avis de Claude Code (personnes moins publiques, risque d'image plus fort ; atténué par D-043). |
 | D-045 | 22/11/2026 | Circuits réels, noms altérés | Cohérence avec la grille. |
 | D-046 | 22/11/2026 | Histoire ancrée pour le départ « grille 2026 » : faits passés lus dans les données depuis 2010, couche humaine simulée par-dessus, marché désactivé. Simulation libre conservée pour les mondes fictifs | Seule façon de garantir la grille de 2027 (D-048). Remplace D-033 pour ce départ. |
-| D-049 | 22/11/2026 | La grille 2026 de référence est la grille d'**ouverture** de la saison 2026 ; les changements en cours de saison sont ignorés | Sources contradictoires sur les remplacements en cours de saison ; grille stable et vérifiable. Proposée par Claude Code, à confirmer par le porteur. |
+| D-049 | 22/11/2026 | La grille 2026 de référence est la grille d'**ouverture** de la saison 2026 ; les changements en cours de saison sont ignorés | Sources contradictoires sur les remplacements en cours de saison ; grille stable et vérifiable. Confirmée par le porteur et ChatGPT le 22/11/2026 (validation de la phase 2). |
+| D-030b | 22/11/2026 | **Modifie D-030.** Calendrier de 24 Grands Prix sur les circuits réels altérés ; le nombre reste un paramètre du règlement | Validé par le porteur et ChatGPT. |
+| D-025 | 22/11/2026 | Les 9 traits proposés sont la **base de travail** (liste dans [personnalite.md](systemes/personnalite.md)). Deux ajouts à l'étude : D-054 | Validé par le porteur et ChatGPT. |
+| D-026 | 22/11/2026 | Les 7 valeurs proposées sont la **base de travail**. Loyauté (trait) et Fidélité (valeur) doivent avoir des effets distincts (voir personnalite.md) | Idem. |
+| D-040 | 22/11/2026 | Les fourchettes de la phase 3 sont des **objectifs statistiques**, jamais des limites imposées. Aucun mécanisme ne force le renouvellement des champions ni le rapprochement des performances. Fourchettes à réévaluer quand marché, vieillissement et développement existeront | Dominations exceptionnelles, saisons serrées, disettes et surprises doivent rester possibles. |
+| D-050 | 22/11/2026 | Les données actuelles sont la base provisoire, affinée progressivement. Chaque donnée reste marquée « vérifiée » ou « estimation de game design » | Validé par le porteur et ChatGPT. |
+| D-051 | 22/11/2026 | Un **potentiel global unique** par personne ; la progression reste différenciée selon les compétences, avec des **courbes d'âge propres à chaque métier** (un directeur technique de 40 ans progresse encore) | Remarque de ChatGPT sur la marge nulle après 30 ans pour tous. |
+| D-052 | 22/11/2026 | 31 % de personnes avec au moins une conviction forte : maintenu à titre provisoire. **Conviction forte ≠ ligne rouge** : une conviction pèse fortement dans la décision ; seule une petite partie des convictions sont des lignes rouges absolues | Évite des refus systématiques et prévisibles. Conception détaillée en phase 4. |
+| D-053 | 22/11/2026 | Indicateurs d'intérêt narratif dans les rapports de simulation | Crédible ne suffit pas : il faut que ce soit intéressant. |
+| D-055 | 22/11/2026 | Distinguer le **budget total** d'une écurie et ses **dépenses soumises au plafond budgétaire** | Réalisme du plafond (salaires des pilotes, marketing… hors plafond). Mise en œuvre en phase 5 ; phase 3 : documenté seulement. |
+| D-056 | 22/11/2026 | Une monoplace est décrite par 7 caractéristiques : virages lents, virages rapides, vitesse de pointe, efficacité aérodynamique, motorisation, fiabilité, gestion des pneumatiques. Elles serviront de fondation au développement des pièces | Forces et faiblesses distinctes selon les circuits. |
+| D-057 | 22/11/2026 | Tirages **locaux** par clé (système + date + entité + événement) pour les systèmes qui demandent des comparaisons contrefactuelles précises (résultats des Grands Prix d'abord) | Un tirage de plus dans un système ne décale plus les tirages suivants de ce système. |
+| D-058 | 22/11/2026 | Élagage des chaînes de causes : au-delà d'un horizon (10 saisons), un événement conservé ne protège plus ses causes mineures ; leurs liens sont remplacés par un résumé (type et date) | Borne la croissance à long terme du journal (remarque de ChatGPT). |
 
 ---
 
@@ -66,12 +78,8 @@ Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · 
 
 | ID | Urgence | Question | Proposition de Claude Code |
 | --- | --- | --- | --- |
-| D-025 | AVANT P2 | Liste définitive des traits de personnalité | 9 traits, voir [personnalite.md](systemes/personnalite.md). Accord de principe du porteur le 22/11/2026 ; à finaliser avec ChatGPT, comme prévu |
-| D-026 | AVANT P2 | Liste définitive des valeurs et convictions | 7 valeurs, voir [personnalite.md](systemes/personnalite.md). Même statut que D-025 |
 | D-036 | AVANT P2 | Nom du championnat fictif et de l'instance dirigeante | ChatGPT propose 10 noms, le porteur choisit |
-| D-040 | AVANT P3 | Fourchettes cibles de la phase 3 | Voir [phase-3-saison.md](systemes/phase-3-saison.md), à relire par ChatGPT |
-| D-030b | AVANT P3 | **Conflit entre D-030 (20 Grands Prix fictifs) et D-045 (circuits réels)** : 24 circuits réels sont saisis | Passer à un calendrier de 24 Grands Prix sur les circuits réels altérés ; le nombre reste un paramètre du règlement |
-| D-050 | AVANT P2 | Relecture des estimations de `data/grille-2026/` (notes des pilotes, budgets, niveaux, contrats) | Relecture par le porteur et ChatGPT avant la phase 2 |
+| D-054 | AVANT P4 | Ajouter deux traits : **propension au risque** et **capacité à se remettre en question** ? | Voir l'analyse dans [personnalite.md](systemes/personnalite.md) : propension au risque oui ; remise en question oui, en remplaçant une partie du rôle de la rancune pour éviter un doublon |
 | D-039 | PLUS TARD | Option Carrera : importer les résultats réels de Paddock comme résultats de Grand Prix | Idée à garder, non prioritaire |
 
 ---

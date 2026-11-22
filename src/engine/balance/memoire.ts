@@ -14,3 +14,9 @@ export const CONSERVATION_NOTABLES_RESUME_SAISONS = 6;
 
 /** Importance à partir de laquelle un événement est versé dans la Chronique (conservé pour toujours). */
 export const IMPORTANCE_CHRONIQUE = 4;
+
+/**
+ * Élagage des chaînes de causes (D-058), en saisons : au-delà, un événement conservé ne protège plus
+ * ses causes mineures ; les liens vers elles sont remplacés par un résumé.
+ */
+export const ELAGAGE_CAUSES_SAISONS = 10;

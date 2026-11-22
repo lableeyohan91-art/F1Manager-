@@ -10,6 +10,7 @@ import {
   CONSERVATION_MINEURS_SAISONS,
   CONSERVATION_NOTABLES_DETAIL_SAISONS,
   CONSERVATION_NOTABLES_RESUME_SAISONS,
+  ELAGAGE_CAUSES_SAISONS,
   IMPORTANCE_CHRONIQUE,
 } from '../balance/memoire';
 import type { DateJeu } from './calendrier';
@@ -39,6 +40,8 @@ export interface Evenement {
   connuPar: string[];
   /** Vrai quand l'événement a été résumé (contexte retiré) pour gagner de la place. */
   resume?: boolean;
+  /** Causes supprimées par le compactage, résumées (type et date). */
+  causesResumees?: { type: string; date: DateJeu }[];
   /** Phrase lisible, utilisée par la Chronique et le diagnostic. */
   texte?: string;
 }
@@ -133,6 +136,8 @@ export function profondeurCauses(monde: Monde, idEvenement: string, memo = new M
 export interface BilanCompactage {
   resumes: number;
   supprimes: number;
+  /** Liens de causes remplacés par un résumé (élagage, D-058). */
+  liensElagues: number;
 }
 
 /**
@@ -140,12 +145,15 @@ export interface BilanCompactage {
  * - importance 1–2 : supprimés après CONSERVATION_MINEURS_SAISONS ;
  * - importance 3 : résumés après CONSERVATION_NOTABLES_DETAIL_SAISONS, supprimés après CONSERVATION_NOTABLES_RESUME_SAISONS ;
  * - importance ≥ 4 : conservés (et déjà copiés dans la Chronique).
- * Un événement encore cité comme cause par un événement conservé, ou protégé par un autre système
- * (ex. : un souvenir qui le référence), n'est pas supprimé.
+ *
+ * Protections : un événement protégé par un autre système (ex. : cité par un souvenir), ou cité comme cause
+ * par un événement conservé, n'est pas supprimé — et cette protection se propage à SES causes.
+ * Élagage (D-058) : un événement plus vieux que ELAGAGE_CAUSES_SAISONS ne protège plus ses causes ;
+ * les liens vers des causes supprimées sont remplacés par un résumé (type et date).
  */
 export function compacterJournal(monde: Monde, idsProteges: ReadonlySet<string> = new Set()): BilanCompactage {
   const anneeCourante = monde.date.annee;
-  const bilan: BilanCompactage = { resumes: 0, supprimes: 0 };
+  const bilan: BilanCompactage = { resumes: 0, supprimes: 0, liensElagues: 0 };
   const ids = idsTries(monde.evenements);
 
   const aSupprimer = new Set<string>();
@@ -163,7 +171,10 @@ export function compacterJournal(monde: Monde, idsProteges: ReadonlySet<string> 
     }
   }
 
-  // Un événement cité par un événement conservé reste (on itère jusqu'à stabilité).
+  // 1. Les protections extérieures d'abord (corrige le défaut signalé le 22/11/2026 : elles doivent se propager).
+  for (const id of idsProteges) aSupprimer.delete(id);
+
+  // 2. Propagation : tout événement conservé et assez récent protège ses causes, jusqu'à stabilité.
   let change = true;
   while (change) {
     change = false;
@@ -171,12 +182,28 @@ export function compacterJournal(monde: Monde, idsProteges: ReadonlySet<string> 
       if (aSupprimer.has(id)) continue;
       const e = monde.evenements[id];
       if (!e) continue;
+      const protegeParExterieur = idsProteges.has(id);
+      if (!protegeParExterieur && anneeCourante - e.date.annee > ELAGAGE_CAUSES_SAISONS) continue;
       for (const c of e.causes) {
         if (aSupprimer.delete(c)) change = true;
       }
     }
   }
-  for (const id of idsProteges) aSupprimer.delete(id);
+
+  // 3. Résumé des liens vers les causes qui vont disparaître.
+  for (const id of ids) {
+    const e = monde.evenements[id];
+    if (!e || aSupprimer.has(id)) continue;
+    const gardees: string[] = [];
+    for (const c of e.causes) {
+      if (aSupprimer.has(c)) {
+        const cause = monde.evenements[c] as Evenement;
+        (e.causesResumees ??= []).push({ type: cause.type, date: { ...cause.date } });
+        bilan.liensElagues++;
+      } else gardees.push(c);
+    }
+    e.causes = gardees;
+  }
 
   for (const id of aSupprimer) {
     delete monde.evenements[id];

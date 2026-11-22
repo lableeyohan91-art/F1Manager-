@@ -106,3 +106,36 @@ Pour chaque personne, l'observateur (le joueur ou une IA) possède une **fourche
 2. Les 7 valeurs couvrent-elles les comportements que vous voulez voir ? Par exemple, faut-il une valeur « image publique / célébrité » ?
 3. Seuil de conviction : un seul seuil (17) pour tout le monde, ou variable selon le trait « tempérament » ?
 4. La personnalité doit-elle pouvoir changer après un événement très fort (une tragédie, un titre) ? Proposition : oui, de 1 ou 2 points au maximum, rarement.
+
+## Retours du 22/11/2026 (porteur + ChatGPT) et réponses
+
+### Loyauté (trait) et Fidélité (valeur) : deux effets distincts
+
+Le risque, c'est de compter deux fois la même qualité. Règle proposée :
+
+| | Loyauté (trait, couche 1) | Fidélité (valeur, couche 2) |
+| --- | --- | --- |
+| Nature | Une **manière de réagir** aux personnes | Un **critère de choix** de carrière |
+| S'applique à | Des personnes précises (un mentor, un collègue, le team principal) | Une institution : l'écurie, le projet, ceux qui ont fait confiance |
+| Mécanisme | Ralentit l'oubli des souvenirs **positifs** ; augmente l'envie de suivre une personne qui part (groupes sociaux) | Ajoute à l'utilité de **rester** dans l'organisation actuelle, en proportion des années passées et des souvenirs positifs liés à elle |
+| Exemple | Suit son directeur technique chez un rival | Refuse une écurie dominante pour rester dans son écurie formatrice |
+
+Dans une même décision, chaque mécanisme n'agit que sur son propre terme du calcul d'utilité. L'audit des attributs (phase 4) vérifiera qu'ils ont des effets mesurables et différents.
+
+### Deux traits à l'étude (D-054)
+
+1. **Propension au risque** : **à ajouter.** Elle produit des comportements qu'aucun trait actuel ne couvre : paris techniques (concept audacieux), stratégie de course (pneus, arrêts), recrutement de profils incertains, gestion financière (dette, investissements). L'ambition dit ce qu'on veut, le risque dit comment on y va.
+2. **Capacité à se remettre en question** : **à ajouter, avec une précaution.** Elle règle la réaction aux critiques et l'apprentissage après un échec. Pour éviter le doublon avec la rancune : la rancune agit sur les **souvenirs envers les autres** (ce qu'on m'a fait), la remise en question agit sur les **souvenirs envers soi-même** (ce que j'ai fait, mes décisions).
+
+Ces deux traits porteraient la liste à 11. Ils seront ajoutés en phase 4, avec les premières décisions humaines, quand ils pourront vraiment être lus par une formule.
+
+### Apprendre de ses erreurs, ou persister
+
+Mécanisme proposé (conception détaillée en phase 4 et suivantes) :
+- Une décision qui échoue (concept technique raté, pilote recruté qui déçoit) produit un **souvenir envers soi-même**, avec une étiquette (« pari raté », « mauvais recrutement »).
+- Ce souvenir modifie les choix suivants du même type : une personne qui se remet facilement en question en tire une **prudence** proportionnée. Une personne qui se remet peu en question et a une **conviction** sur le sujet garde le cap, voire s'obstine (« le concept était bon, l'exécution a manqué »).
+- Les mêmes règles valent pour les dirigeants de l'IA : une écurie peut s'entêter dans une mauvaise direction technique pendant plusieurs saisons.
+
+### Courbes d'âge par métier (D-051)
+
+Mise en œuvre dès la phase 2 : voir `src/engine/balance/personnages.ts` (`COURBES_AGE`). Chaque métier a un âge jusqu'auquel il progresse, et un âge à partir duquel il décline. Elles servent au potentiel dès maintenant, et à l'évolution réelle des compétences en phase 6.

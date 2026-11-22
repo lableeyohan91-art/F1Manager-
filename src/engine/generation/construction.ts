@@ -19,7 +19,7 @@ import {
   COMPETENCES_PILOTE,
   COMPETENCES_TRANSVERSALES,
   ETAT_DEPART,
-  MARGE_POTENTIEL_PAR_AGE,
+  courbeAge,
   NIVEAU_PERSONNEL_GENERE,
   TIRAGE_TRAITS,
   TIRAGE_VALEURS,
@@ -79,8 +79,10 @@ function moyenneMetier(competences: Record<string, number>): number {
   return moyenne(metier.map(([, v]) => v));
 }
 
-function margePotentiel(age: number): number {
-  return (MARGE_POTENTIEL_PAR_AGE.find((m) => age <= m.ageMax) ?? { marge: 0 }).marge;
+/** Marge de potentiel selon l'âge et le métier (D-051). */
+function margePotentiel(age: number, poste: string): number {
+  const c = courbeAge(poste);
+  return Math.min(c.margeMax, Math.max(0, c.progressionJusqua - age) * c.margeParAnnee);
 }
 
 /** Compétences générées pour un poste, autour d'un niveau moyen. */
@@ -146,7 +148,7 @@ function personneDepuisDonnees(ctx: Contexte, p: PersonneDonnees, ecuries: Map<s
     const prestige = ecuries.get(p.ecurie)?.prestige ?? 10;
     const niveau = NIVEAU_PERSONNEL_GENERE.base + 1 + NIVEAU_PERSONNEL_GENERE.facteurPrestige * (prestige - 10);
     competences = tirerCompetences(f, p.poste, niveau);
-    potentiel = note(moyenneMetier(competences) + margePotentiel(age));
+    potentiel = note(moyenneMetier(competences) + margePotentiel(age, p.poste));
   }
   ctx.nomsPris.add(`${p.prenom} ${p.nom}`);
   return {
@@ -185,12 +187,12 @@ function personneGeneree(ctx: Contexte, poste: Poste, ecurie: Ecurie | null, sta
     const niveau = poste === 'pilote_reserve' ? 13 : f.normale(10.5, 1.5);
     competences = tirerCompetences(f, poste, niveau);
     // Quelques pépites : le potentiel des jeunes varie beaucoup.
-    potentiel = note(moyenneMetier(competences) + margePotentiel(age) + Math.abs(f.normale(0, 2.5)));
+    potentiel = note(moyenneMetier(competences) + margePotentiel(age, poste) + Math.abs(f.normale(0, 2.5)));
   } else {
     const prestige = ecurie?.prestige ?? 9;
     const niveau = NIVEAU_PERSONNEL_GENERE.base + NIVEAU_PERSONNEL_GENERE.facteurPrestige * (prestige - 10);
     competences = tirerCompetences(f, poste, niveau);
-    potentiel = note(moyenneMetier(competences) + margePotentiel(age) + Math.abs(f.normale(0, 1)));
+    potentiel = note(moyenneMetier(competences) + margePotentiel(age, poste) + Math.abs(f.normale(0, 1)));
   }
   return ajouter(ctx.monde, TABLES.personnes, {
     id,

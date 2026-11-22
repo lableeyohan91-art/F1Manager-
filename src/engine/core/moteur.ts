@@ -148,3 +148,13 @@ export class Moteur {
     return monde;
   }
 }
+
+/**
+ * Tirage LOCAL (D-057) : un flux de hasard déterminé uniquement par la graine du monde et une clé
+ * (système, date, entité, événement…). Il n'est pas stocké et ne dépend pas des tirages précédents :
+ * un tirage de plus ailleurs ne décale jamais ce résultat. Indispensable aux tests contrefactuels précis.
+ * Exemple : tirageLocal(monde, 'resultats', 'gp_2027_03', 'per_leclerq', 'abandon').
+ */
+export function tirageLocal(monde: Monde, ...cles: (string | number)[]): Flux {
+  return new Flux(etatInitialFlux(monde.graine, `local|${cles.join('|')}`));
+}

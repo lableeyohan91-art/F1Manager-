@@ -81,13 +81,28 @@ export const COMPETENCES_PAR_POSTE: Record<string, readonly string[]> = {
  */
 export const NIVEAU_PERSONNEL_GENERE = { base: 12, facteurPrestige: 0.35, ecartType: 2.2 };
 
-/** Écart entre le potentiel et le niveau actuel, selon l'âge (années). */
-export const MARGE_POTENTIEL_PAR_AGE = [
-  { ageMax: 21, marge: 4 },
-  { ageMax: 25, marge: 2.5 },
-  { ageMax: 30, marge: 1 },
-  { ageMax: 200, marge: 0 },
-] as const;
+/**
+ * Courbes d'âge par métier (D-051), en années.
+ * - progressionJusqua : âge jusqu'auquel la personne peut encore nettement progresser ;
+ * - declinApres : âge à partir duquel les compétences déclinent (phase 6).
+ * La marge de potentiel d'une personne générée = (années de progression restantes) × margeParAnnee,
+ * plafonnée à margeMax.
+ */
+export const COURBES_AGE: Record<string, { progressionJusqua: number; declinApres: number; margeParAnnee: number; margeMax: number }> = {
+  pilote: { progressionJusqua: 28, declinApres: 34, margeParAnnee: 0.6, margeMax: 5 },
+  team_principal: { progressionJusqua: 55, declinApres: 68, margeParAnnee: 0.25, margeMax: 4 },
+  directeur_technique: { progressionJusqua: 52, declinApres: 64, margeParAnnee: 0.25, margeMax: 4 },
+  directeur_sportif: { progressionJusqua: 50, declinApres: 63, margeParAnnee: 0.25, margeMax: 4 },
+  directeur_financier: { progressionJusqua: 50, declinApres: 65, margeParAnnee: 0.2, margeMax: 3 },
+  responsable_aero: { progressionJusqua: 48, declinApres: 62, margeParAnnee: 0.3, margeMax: 4 },
+  responsable_conception: { progressionJusqua: 48, declinApres: 62, margeParAnnee: 0.3, margeMax: 4 },
+  ingenieur: { progressionJusqua: 45, declinApres: 60, margeParAnnee: 0.3, margeMax: 4 },
+};
+
+/** Courbe d'âge d'un poste (les pilotes de tous types partagent la courbe « pilote »). */
+export function courbeAge(poste: string) {
+  return COURBES_AGE[poste.startsWith('pilote') ? 'pilote' : poste] ?? COURBES_AGE['ingenieur']!;
+}
 
 /** Âges tirés pour les personnes générées, par poste (années). */
 export const AGES_PAR_POSTE: Record<string, { min: number; max: number }> = {
