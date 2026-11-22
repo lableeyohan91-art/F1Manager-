@@ -122,6 +122,30 @@ export interface Personne {
   libreDepuis?: number;
   /** Apparence (D-080) : graine visuelle persistante, sans effet sur la simulation. */
   apparence?: { graine: number };
+  /** Phase 6a — cycle de vie (caché). Lu par la progression (§4) et la retraite (§7). */
+  carriere?: CarrierePersonne;
+  /** Année de retraite (retours possibles, D-072). */
+  retraiteDepuis?: number;
+}
+
+/** Profil de carrière et compteurs (phase 6a, docs/systemes/phase-6a-cycle-de-vie.md §3, §10). */
+export interface CarrierePersonne {
+  archetype: string;
+  /** Âges propres : début et fin du plateau d'apogée (années). */
+  debutApogee: number;
+  finApogee: number;
+  /** Multiplicateurs propres (archétype × variation individuelle). */
+  vitesseProgression: number;
+  vitesseDeclin: number;
+  /** Plafond propre par compétence = potentiel + écart (points forts / faibles). Lu par la progression. */
+  ecarts: Record<string, number>;
+  /** Expérience : saisons comme titulaire en F1, saisons d'activité. Lue par l'estimation, la retraite, l'abandon. */
+  saisonsF1: number;
+  saisonsActives: number;
+  /** Meilleur niveau métier de la carrière. Lu par la retraite (déclin ressenti). */
+  niveauMax: number;
+  /** Déclic ou stagnation en cours : multiplicateur et périodes restantes. Lu par la progression. */
+  phaseSpeciale?: { type: 'declic' | 'stagnation'; periodes: number };
 }
 
 /**

@@ -3,6 +3,7 @@
  * Toutes les erreurs sont accumulées puis signalées ensemble, avec fichier, ligne et colonne.
  */
 
+import { ARCHETYPES } from '../balance/carriere';
 import { COMPETENCES_PILOTE } from '../balance/personnages';
 import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, TypeProprietaire, Voiture } from '../model/types';
 import { ErreurDonnees, Lecteur, lireCsv } from './csv';
@@ -31,6 +32,8 @@ export interface PersonneDonnees {
   statut: 'actif' | 'retraite';
   competences: Record<string, number> | null;
   potentiel: number | null;
+  /** Archétype de carrière imposé (colonne facultative, phase 6a §3.4), vide sinon. */
+  profilCarriere?: string;
   verification: string;
 }
 
@@ -200,6 +203,11 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
       statut,
       competences,
       potentiel,
+      profilCarriere: (() => {
+        const v = rp.texte(l, 'profilCarriere', false);
+        if (v && !ARCHETYPES[v]) rp.signaler(l, `profil de carrière « ${v} » inconnu (${Object.keys(ARCHETYPES).join(', ')})`);
+        return v || undefined;
+      })(),
       verification: l.valeurs['verification'] ?? '',
     };
   });

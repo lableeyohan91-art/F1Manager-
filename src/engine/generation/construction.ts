@@ -10,6 +10,7 @@
  * modifier une ligne des données ne change pas la personnalité des autres.
  */
 
+import { COHORTE, POPULATION_JEUNE_INITIALE, TAUX_PROGRESSION, TEMPS_DE_JEU } from '../balance/carriere';
 import { DEPARTEMENTS, DUREE_CONTRAT_GENERE, INSTALLATIONS, POSTES_INDIVIDUALISES, RESERVOIR, SALAIRES_GENERES } from '../balance/monde';
 import {
   AGES_PAR_POSTE,
@@ -35,6 +36,7 @@ import type { Contrat, Departement, Ecurie, Finances, Installation, Personne, Po
 import { comptesVides } from '../model/finances';
 import { TABLES } from '../model/types';
 import { moyenne, type DonneesInitiales, type PersonneDonnees } from './chargement';
+import { plafondCompetence, tirerCarriere } from '../systems/carriere/profil';
 
 export const DATE_DEPART: DateJeu = { annee: 2027, semaine: 1 };
 
@@ -180,7 +182,7 @@ function personneDepuisDonnees(ctx: Contexte, p: PersonneDonnees, ecuries: Map<s
     potentiel = note(moyenneMetier(competences) + margePotentiel(age, p.poste));
   }
   ctx.nomsPris.add(`${p.prenom} ${p.nom}`);
-  return {
+  const res: Personne = {
     id: p.id,
     prenom: p.prenom,
     nom: p.nom,
@@ -200,6 +202,8 @@ function personneDepuisDonnees(ctx: Contexte, p: PersonneDonnees, ecuries: Map<s
     verification: p.verification,
     apparence: tirerApparence(ctx.graine, p.id),
   };
+  res.carriere = tirerCarriere(res, fluxDe(ctx.graine, `carriere:${p.id}`), age, true, p.profilCarriere);
+  return res;
 }
 
 /** Personne entièrement générée. */
@@ -227,7 +231,7 @@ function personneGeneree(ctx: Contexte, poste: Poste, ecurie: Ecurie | null, sta
     competences = tirerCompetences(f, poste, niveau);
     potentiel = note(moyenneMetier(competences) + margePotentiel(age, poste) + Math.abs(f.normale(0, 1)));
   }
-  return ajouter(ctx.monde, TABLES.personnes, {
+  const res: Personne = {
     id,
     prenom,
     nom,
@@ -246,7 +250,73 @@ function personneGeneree(ctx: Contexte, poste: Poste, ecurie: Ecurie | null, sta
     etat: tirerEtat(f),
     verification: 'personnage fictif généré',
     apparence: tirerApparence(ctx.graine, id),
-  } satisfies Personne);
+  };
+  res.carriere = tirerCarriere(res, fluxDe(ctx.graine, `carriere:${id}`), age, false);
+  return ajouter(ctx.monde, TABLES.personnes, res);
+}
+
+/**
+ * Jeune pilote de la cohorte (phase 6a §9) : potentiel tiré, compétences = plafond − écart restant à son âge.
+ * L'écart restant suit la progression moyenne d'un jeune (karting et F4 abstraits) depuis 14 ans.
+ */
+function jeunePilote(ctx: Contexte, age: number): Personne {
+  const id = nouvelIdentifiant(ctx.monde, 'per');
+  const f = fluxDe(ctx.graine, id);
+  const nat = tirerNationalite(ctx, f);
+  const { prenom, nom } = tirerNom(ctx, f, nat);
+  const anneeNaissance = ctx.monde.date.annee - age;
+  let potentiel = f.normale(COHORTE.potentielPilotes.moyenne, COHORTE.potentielPilotes.ecartType);
+  if (f.chance(COHORTE.pepite.probabilite)) potentiel += f.suivant() * COHORTE.pepite.bonusMax; // rares pépites
+  const p: Personne = {
+    id, prenom, nom, nationalite: nat, dateNaissance: String(anneeNaissance), anneeNaissance, poste: 'pilote_junior', ecurie: '', statut: 'libre',
+    origine: 'generee', traits: tirerTraits(f, 'pilote_junior'), valeurs: tirerValeurs(f), competences: {}, potentiel: note(potentiel),
+    aspirations: tirerAspirations(f, 'pilote_junior'), etat: tirerEtat(f), verification: 'personnage fictif généré (cohorte)',
+    apparence: tirerApparence(ctx.graine, id), libreDepuis: ctx.monde.date.annee,
+  };
+  p.carriere = tirerCarriere(p, fluxDe(ctx.graine, `carriere:${id}`), age, false);
+  const retention = Math.pow(1 - TAUX_PROGRESSION * TEMPS_DE_JEU['junior']! * p.carriere.vitesseProgression, 13);
+  const ecart = Math.max(0.5, f.normale(COHORTE.ecartInitial.moyenne, COHORTE.ecartInitial.ecartType)) * Math.pow(retention, age - COHORTE.agePilotes);
+  for (const c of [...COMPETENCES_PILOTE, ...COMPETENCES_TRANSVERSALES]) p.competences[c] = Math.round(borner(plafondCompetence(p, c) - ecart * (0.8 + 0.4 * f.suivant()), 1, 20) * 10) / 10;
+  p.carriere.niveauMax = Math.round(moyenne(COMPETENCES_PILOTE.map((c) => p.competences[c]!)) * 10) / 10;
+  return ajouter(ctx.monde, TABLES.personnes, p);
+}
+
+/** Jeune ingénieur de la cohorte (phase 6a §9). */
+function jeuneIngenieur(ctx: Contexte): Personne {
+  const id = nouvelIdentifiant(ctx.monde, 'per');
+  const f = fluxDe(ctx.graine, id);
+  const nat = tirerNationalite(ctx, f);
+  const { prenom, nom } = tirerNom(ctx, f, nat);
+  const age = f.entier(COHORTE.agePersonnel.min, COHORTE.agePersonnel.max);
+  const anneeNaissance = ctx.monde.date.annee - age;
+  const p: Personne = {
+    id, prenom, nom, nationalite: nat, dateNaissance: String(anneeNaissance), anneeNaissance, poste: 'ingenieur', ecurie: '', statut: 'libre',
+    origine: 'generee', traits: tirerTraits(f, 'ingenieur'), valeurs: tirerValeurs(f), competences: {},
+    potentiel: note(f.normale(COHORTE.potentielPersonnel.moyenne, COHORTE.potentielPersonnel.ecartType)),
+    aspirations: tirerAspirations(f, 'ingenieur'), etat: tirerEtat(f), verification: 'personnage fictif généré (cohorte)',
+    apparence: tirerApparence(ctx.graine, id), libreDepuis: ctx.monde.date.annee,
+  };
+  p.carriere = tirerCarriere(p, fluxDe(ctx.graine, `carriere:${id}`), age, false);
+  const ecart = Math.max(0.5, f.normale(COHORTE.ecartInitialPersonnel.moyenne, COHORTE.ecartInitialPersonnel.ecartType));
+  for (const c of [...(COMPETENCES_PAR_POSTE['ingenieur'] ?? []), ...COMPETENCES_TRANSVERSALES]) p.competences[c] = Math.round(borner(plafondCompetence(p, c) - ecart * (0.8 + 0.4 * f.suivant()), 1, 20) * 10) / 10;
+  p.carriere.niveauMax = Math.round(moyenne((COMPETENCES_PAR_POSTE['ingenieur'] ?? []).map((c) => p.competences[c]!)) * 10) / 10;
+  return ajouter(ctx.monde, TABLES.personnes, p);
+}
+
+function contexteMonde(monde: Monde): Contexte {
+  const ref = table(monde, TABLE_REFERENTIEL)['referentiel'] as unknown as Referentiel | undefined;
+  if (!ref) throw new Error('Référentiel absent du monde : impossible de générer une personne');
+  const nomsPris = new Set((Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).map((p) => `${p.prenom} ${p.nom}`));
+  return { monde, graine: monde.graine, d: ref, nomsPris };
+}
+
+/** Cohorte annuelle (phase 6a §9) : jeunes pilotes de 14 ans et jeunes ingénieurs. Renvoie les identifiants créés. */
+export function genererCohorte(monde: Monde): string[] {
+  const ctx = contexteMonde(monde);
+  const ids: string[] = [];
+  for (let i = 0; i < COHORTE.pilotes; i++) ids.push(jeunePilote(ctx, COHORTE.agePilotes).id);
+  for (let i = 0; i < COHORTE.personnel; i++) ids.push(jeuneIngenieur(ctx).id);
+  return ids;
 }
 
 function contratGenere(ctx: Contexte, p: Personne): Contrat {
@@ -312,8 +382,10 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
     if (p.statut === 'actif' && p.ecurie && !sousContrat.has(p.id)) contratGenere(ctx, p);
   }
 
-  // Réservoir de personnes libres.
-  for (let i = 0; i < RESERVOIR.pilotesJuniors; i++) personneGeneree(ctx, 'pilote_junior', null, 'libre');
+  // Réservoir de personnes libres. Phase 6a : jeunes pilotes de 14 à 22 ans, une cohorte par âge, avec leur passé de progression.
+  for (let age = POPULATION_JEUNE_INITIALE.ageMin; age <= POPULATION_JEUNE_INITIALE.ageMax; age++) {
+    for (let i = 0; i < COHORTE.pilotes; i++) jeunePilote(ctx, age);
+  }
   for (let i = 0; i < RESERVOIR.ingenieursLibres; i++) personneGeneree(ctx, 'ingenieur', null, 'libre');
 
   // Départements et installations.

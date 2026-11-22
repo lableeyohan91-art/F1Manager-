@@ -11,6 +11,8 @@
 
 import { etatInitialFlux, Flux } from './hasard';
 import { VERSION_FORMAT, type Monde } from './monde';
+import { tirerCarriere } from '../systems/carriere/profil';
+import type { Personne } from '../model/types';
 
 export const SIGNATURE = 'f1manager-sauvegarde';
 
@@ -106,6 +108,19 @@ const MIGRATIONS: Record<number, Migration> = {
       fi['historique'] = ((fi['historique'] ?? []) as object[]).map((h) => ({ ...lignes, ...h }));
     }
     return { ...m, versionFormat: 6 };
+  },
+  // v6 → v7 (phase 6a) : profil de carrière caché pour chaque personne, tiré avec le même flux qu'à la construction,
+  // compatible avec son âge et son niveau (une personne des données encore active ne s'effondre pas).
+  6: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, Record<string, unknown>>>;
+    const graine = Number(m['graine'] ?? 0);
+    const annee = Number((m['date'] as { annee?: number } | undefined)?.annee ?? 2027);
+    for (const brut of Object.values(tables['personnes'] ?? {})) {
+      const p = brut as unknown as Personne;
+      if (p.carriere) continue;
+      p.carriere = tirerCarriere(p, new Flux(etatInitialFlux(graine, `generation:carriere:${p.id}`)), annee - p.anneeNaissance, p.origine === 'donnees');
+    }
+    return { ...m, versionFormat: 7 };
   },
 };
 

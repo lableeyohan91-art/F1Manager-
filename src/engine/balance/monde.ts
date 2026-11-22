@@ -14,8 +14,7 @@ export const POSTES_INDIVIDUALISES: { poste: string; nombre: number }[] = [
 
 /** Réservoir de personnes libres au départ. */
 export const RESERVOIR = {
-  /** Jeunes pilotes des catégories inférieures. */
-  pilotesJuniors: 60,
+  // Jeunes pilotes : remplacés en phase 6a par une cohorte par âge de 14 à 22 ans (balance/carriere.ts, POPULATION_JEUNE_INITIALE).
   /** Ingénieurs et cadres sans poste. */
   ingenieursLibres: 50,
 };

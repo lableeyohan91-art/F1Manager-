@@ -3,13 +3,15 @@
  * Renvoie la liste des problèmes, en français. Liste vide = monde cohérent.
  */
 
+import { COHORTE } from '../balance/carriere';
 import { POSTES_INDIVIDUALISES } from '../balance/monde';
 import { COMPETENCES_TRANSVERSALES, TRAITS, VALEURS } from '../balance/personnages';
 import { table, type Monde } from '../core/monde';
 import { TABLES, type Contrat, type Ecurie, type Personne } from '../model/types';
 
 /** Âges plausibles par famille de postes (années). */
-const AGES_PLAUSIBLES = { pilote: { min: 15, max: 46 }, autre: { min: 22, max: 82 } };
+// Les pilotes entrent dans le vivier à l'âge de la cohorte (phase 6a, 14 ans).
+const AGES_PLAUSIBLES = { pilote: { min: COHORTE.agePilotes, max: 46 }, autre: { min: 22, max: 82 } };
 
 /**
  * @param options.ages vérifier la plausibilité des âges (à désactiver tant que le vieillissement et les retraites n'existent pas, phase 6).
