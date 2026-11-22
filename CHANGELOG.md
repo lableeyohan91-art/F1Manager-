@@ -229,3 +229,17 @@ Aucun code à ce stade.
 ### Ajouté
 - Fondations techniques des monoplaces pour les phases 12 et 13 (D-114) : `docs/systemes/fondations-techniques-monoplaces.md`. Principe proposé : frontière de compromis et circuits en segments types.
 
+## [Phase 6b-2] — 22/11/2026
+
+### Ajouté
+- Académies (une par écurie de F1), contrats d'affiliation (financement, option prioritaire, promesses tenables), placement et promotion préférentiels, mécènes, missions de repérage (commande commune au joueur et à l'IA), ligne « académie » dans les comptes.
+- Suites de l'audit indépendant de ChatGPT (D-115) : connaissance progressive et oubli, vérification financière des missions, prix réel des baquets juniors conservé.
+- Formats de sauvegarde 10 et 11 ; 9 tests (98 au total) ; indicateurs d'académies dans `npm run demographie` ; références `p6b2-reference*`.
+- Rapport `docs/rapports/2026-11-22-p6b2-academies.md`.
+
+### Corrigé
+- Promesses d'académie intenables (7 tenues pour 56 rompues → 50 pour 2).
+
+### Constat
+- Filière complète fonctionnelle (90 % des débutants passent par une académie) ; âges en baisse mais encore trop tardifs (champions 30,1 ans, débutants 24,0 ans) ; effet sportif globalement neutre.
+
