@@ -3,6 +3,7 @@ import { creerScenarioGrille2026, ErreurDonnees, formaterDate, verifierCoherence
 import { VueBilan, VueSaisons, VueVoitures } from './diagnostic/Saisons';
 import { BacASable } from './diagnostic/Humain';
 import { VueFinances } from './diagnostic/Finances';
+import { EditeurDeveloppeur } from './diagnostic/Developpeur';
 import { fichiersGrille2026 } from './donnees';
 import { personnes } from './diagnostic/outils';
 import {
@@ -32,6 +33,7 @@ export function App() {
   const [, setVersion] = useState(0);
   const [selection, setSelection] = useState<Selection>(null);
   const [historique, setHistorique] = useState<Selection[]>([]);
+  const [developpeur, setDeveloppeur] = useState(false);
   const etat = useRef<ReturnType<typeof construire> | null>(null);
   const grainEtat = useRef<number | null>(null);
   if (grainEtat.current !== graine) {
@@ -89,6 +91,9 @@ export function App() {
           <button class="btn" onClick={() => simuler(1)} disabled={!monde}>Simuler 1 saison</button>
           <button class="btn" onClick={() => simuler(10)} disabled={!monde}>Simuler 10 saisons</button>
           <button class="btn" onClick={exporter} disabled={!monde}>Exporter (JSON)</button>
+          <label class="muted" style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+            <input type="checkbox" checked={developpeur} onChange={() => setDeveloppeur(!developpeur)} /> mode développeur
+          </label>
           {monde && <span class="muted">{formaterDate(monde.date)} · {personnes(monde).length} personnes</span>}
         </div>
 
@@ -100,6 +105,10 @@ export function App() {
               <button class="btn" onClick={retour}>← Retour</button>
               {selection.type === 'ecurie' && <FicheEcurie monde={monde} id={selection.id} ouvrir={ouvrir} />}
               {selection.type === 'personne' && <FichePersonne monde={monde} id={selection.id} ouvrir={ouvrir} />}
+              {selection.type === 'personne' && developpeur && moteur && (() => {
+                const p = personnes(monde).find((x) => x.id === selection.id);
+                return p ? <EditeurDeveloppeur monde={monde} moteur={moteur} p={p} rafraichir={() => setVersion((v) => v + 1)} /> : null;
+              })()}
             </>
           ) : (
             <>
