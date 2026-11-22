@@ -1,7 +1,8 @@
 # Rapport — Phase 7a : marché des transferts des pilotes
 
 > Date : 22/11/2026. Conception : `docs/systemes/phase-7-marche-du-travail.md` (D-116, D-117, validées).
-> Code mesuré : commit c341064, c'est-à-dire la phase 7a **avant** la correction de la capacité des académies (audit n°2, D-118, commit 05bc1ff), mesurée à part (§7).
+> Code mesuré : commit c341064, c'est-à-dire la phase 7a **avant** les corrections des audits n°2 à n°4 (D-118, D-119, D-121), mesurées à part (§7).
+> Mesures **indicatives** (D-120) : le modèle de course reste abstrait jusqu'aux phases 12 et 13.
 > Référence de comparaison : 6b-2, mêmes graines, même outil, même machine (D-076). Références conservées : `docs/rapports/reference/p6b2-*` et `p7a-*`.
 
 ## 1. Ce qui a été livré
@@ -179,9 +180,15 @@ Les indemnités de transfert sont trop rares (1,1 M€ par saison pour toute la 
 | Aucune crise financière | 0,01 par saison | 0 | 7b (salaires du personnel, indemnités), 12 |
 | La forme ne pèse rien | 0 % | 0 % | 13 |
 
-## 7. Audit n°2 de ChatGPT : capacité des académies (mesurée à part)
+## 7. Corrections des audits n°2 à n°4 (mesurées à part)
 
-ACADEMIES
+Mesures indicatives (D-120), mêmes graines que la référence 7a :
+
+| Correction | Effet mesuré |
+| --- | --- |
+| Audit n°2 : capacité évolutive des académies (10 graines × 30 saisons) | Négligeable : débutants 22,8 ans, promesses 49/2, talents bloqués 7 %. Peu d'écuries changent de moyens ou de politique en cours de partie dans le modèle actuel |
+| Audit n°3 : effectifs, validation, arbitrage du conseil, promesses, délais (100 graines × 10 saisons, 10 × 30) | Négligeable : champions différents 4,6 (identique), dynasties 57 % → 59 %, dominations 18 % (identique) ; champions 31,3 ans, débutants 22,8 ans ; talents bloqués 8 % ; contre-attaques 0,01 par saison |
+| Audit n°4 : optimisations | Résultats strictement identiques (empreintes vérifiées) |
 
 ## 8. Suite
 
