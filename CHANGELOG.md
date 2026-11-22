@@ -212,3 +212,15 @@ Aucun code à ce stade.
 - Premières mesures et limite connue (égalités à 0 point en bas de classement) dans `docs/systemes/laboratoire-equilibrage.md` §7 ; référence `p6a-complement-reference-v2`.
 - Documentation de la phase 12 (D-109), du multiplateforme (D-110), de la règle sur l'âge des champions (D-111) ; fiche de la phase 6b proposée (D-112).
 
+## [Phase 6b-1] — 22/11/2026
+
+### Ajouté
+- Filières juniors : écuries juniors (Apex 3 et Apex 2), courses sur les circuits du calendrier, marché annuel des baquets, budget familial, réputation des jeunes (karting et Apex 4 abstraits), rivalités, passé simulé de 3 saisons.
+- Expérience et connaissance des circuits acquises chez les juniors ; recrutement F1 sensible à la réputation junior.
+- Format de sauvegarde 9 ; onglet Juniors ; 4 tests (89 au total) ; indicateurs de parcours dans `npm run demographie` ; références `p6b1-reference*`.
+- Rapport `docs/rapports/2026-11-22-p6b1-filieres-juniors.md`.
+
+### Constat
+- La filière fonctionne (61 % des débutants viennent du top 5 de l'Apex 2) ; effet sportif légèrement favorable sur 20 saisons.
+- Débutants trop âgés (24,9 ans) et champions encore trop âgés (30,5 ans) : cause identifiée (recrutement F1 provisoire), remèdes en 6b-2 et en phase 7.
+

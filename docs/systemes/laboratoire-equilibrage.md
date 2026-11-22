@@ -81,7 +81,8 @@ Mesures : avec quelle écurie de départ, et en combien de saisons, chaque profi
 | Âge moyen de la grille ≈ 30 ans | P6a | 6b (filières juniors) |
 | Hiérarchie plus figée après la 6a complémentaire (persistance 0,635 → 0,687, champions constructeurs 4,6 → 3,9 sur 20 saisons) : hypothèse, l'expérience favorise les pilotes établis | P6a+ | 6b (expérience acquise chez les juniors) ; facteur d'expérience des débutants à revoir lors de la grande campagne |
 | **Convergence des voitures vers le plafond** (moyenne 13,4 → ≈ 22,5 en 30 saisons ; ≈ 65 caractéristiques sur 66 à 19 ou plus après 20 saisons) | constat du 22/11/2026 | 8 (règlements : convergence partielle à chaque nouveau règlement), 12 (compromis, architectures, coûts marginaux, D-109) |
-| Champions trop âgés (31 ans en moyenne) | P6a+ | 6b, puis nouvelle mesure (D-111) |
+| Champions trop âgés (31,3 ans → 30,5 après la 6b-1) et **débutants trop âgés (24,9 ans)** : le recrutement F1 provisoire privilégie le niveau actuel | P6a+, P6b-1 | 6b-2 (académies, placement, promesses), 7 (marché) ; ou plus de poids au potentiel estimé (décision du porteur) |
+| Pilotes payants quasi absents de la F1 (1 %) | P6b-1 | 7 (valeur commerciale, sponsors personnels) |
 
 ## 7. Compétitivité à toutes les positions (D-113)
 
