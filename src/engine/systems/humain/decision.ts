@@ -12,8 +12,8 @@ import { tirageLocal } from '../../core/moteur';
 import { TABLES, type Carriere, type Contrat, type Ecurie, type Palmares, type Personne, type Saison } from '../../model/types';
 import { relation, souvenirsDe } from '../memoire';
 import { ecuriesActives, indiceMoyen, niveauPilote } from '../saison/performance';
-import { reputation, type TypePromesse } from './promesses';
-import { REPUTATION_RECRUTEMENT_F1 } from '../../balance/juniors';
+import { reputation, TABLE_PROMESSES, type Promesse, type TypePromesse } from './promesses';
+import { PROMOTION_AFFILIE, REPUTATION_RECRUTEMENT_F1 } from '../../balance/juniors';
 import { potentielEstime } from '../carriere/estimation';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
@@ -217,6 +217,11 @@ export function scoreCandidat(monde: Monde, e: Ecurie, decideur: string, c: Pers
   s += ajouter('potentiel estimé', ((potentielEstime(monde, e.id, c).centre - niveauMetier(c)) / 20) * (0.3 + 0.4 * jeunesse));
   // Phase 6b : la réputation sportive des jeunes (karting, Apex 4, Apex 3, Apex 2) compte pour les recruteurs.
   if (c.reputationJeune) s += ajouter('réputation junior', REPUTATION_RECRUTEMENT_F1 * c.reputationJeune);
+  // Phase 6b-2 : préférence pour ses propres affiliés (et ceux de l'écurie partenaire), surtout si une promesse arrive à échéance.
+  const aff = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.type === 'affiliation' && x.statut === 'actif' && x.personne === c.id);
+  if (aff && (aff.organisation === e.id || aff.organisation === e.ecuriePartenaire)) s += ajouter('affilié de l’académie', aff.organisation === e.id ? PROMOTION_AFFILIE.propre : PROMOTION_AFFILIE.partenaire);
+  const promesseEchue = (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[]).some((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.beneficiaire === c.id && x.organisation === e.id && x.echeance.annee <= monde.date.annee + 1);
+  if (promesseEchue) s += ajouter('promesse de titularisation', PROMOTION_AFFILIE.promesseEchue);
   const declin = Math.max(0, age(monde, c) - courbeAge(c.poste).declinApres);
   if (declin > 0) s += ajouter('âge', -PENALITE_AGE_RECRUTEMENT * declin);
   const budgetPoste = e.budgetMEUR * (c.poste.startsWith('pilote') ? 0.05 : 0.015);

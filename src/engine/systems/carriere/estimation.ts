@@ -13,6 +13,14 @@ import { tirageLocal } from '../../core/moteur';
 import { table, type Monde } from '../../core/monde';
 import { TABLES, type Departement, type Personne } from '../../model/types';
 import { niveauCarriere } from './profil';
+import { REPERAGE } from '../../balance/juniors';
+import type { MissionReperage } from '../../model/types';
+
+/** Mission de repérage en cours (lecture directe de la table, pour éviter une dépendance circulaire). */
+function missionEnCours(monde: Monde, idEcurie: string, idPersonne: string): boolean {
+  const maintenant = monde.date.annee * 100 + monde.date.semaine;
+  return (Object.values(table(monde, TABLES.missionsReperage)) as unknown as MissionReperage[]).some((x) => x.ecurie === idEcurie && x.personne === idPersonne && x.finAnnee * 100 + x.finSemaine >= maintenant);
+}
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 
@@ -32,7 +40,9 @@ export function potentielEstime(monde: Monde, idEcurie: string | null, p: Person
   const niveauDep = dep?.niveauMoyen ?? 10;
   // Phase 6b : les saisons juniors comptent comme du temps d'observation.
   const observees = (p.carriere?.saisonsActives ?? 0) + (p.carriere?.juniors?.length ?? 0) + (idEcurie && p.ecurie === idEcurie ? 2 : 0);
-  const demiLargeur = (base * (ESTIMATION.max - ESTIMATION.amplitude * (niveauDep / 20))) / (1 + ESTIMATION.observation * observees);
+  // Phase 6b-2 : une mission de repérage en cours resserre la fourchette (le biais du département demeure).
+  const mission = !!idEcurie && missionEnCours(monde, idEcurie, p.id);
+  const demiLargeur = ((base * (ESTIMATION.max - ESTIMATION.amplitude * (niveauDep / 20))) / (1 + ESTIMATION.observation * (observees + (mission ? REPERAGE.observationAjoutee : 0)))) * (mission ? REPERAGE.facteurLargeur : 1);
   const biais = dep ? tirageLocal(monde, 'recrutement.biais', dep.id).normale(0, ESTIMATION.biaisDepartement) : 0;
   const erreur = tirageLocal(monde, 'recrutement.estimation', idEcurie ?? 'paddock', p.id, monde.date.annee).normale(0, demiLargeur / 2);
   // On ne peut pas estimer un potentiel inférieur à ce que la personne montre déjà.

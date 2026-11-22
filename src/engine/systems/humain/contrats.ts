@@ -7,6 +7,7 @@ import {
   OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
 } from '../../balance/contrats';
 import { assezAgePourLaF1, changerMetier } from '../carriere/profil';
+import { engageablePar } from '../juniors/academies';
 import { POSTES_INDIVIDUALISES } from '../../balance/monde';
 import { courbeAge } from '../../balance/personnages';
 import type { Commande, DefinitionCommande } from '../../core/commandes';
@@ -297,7 +298,7 @@ export function pourvoirPostes(monde: Monde): void {
         const cle = `${e.id}:${poste}`;
         const refus = refusesPar.get(cle) ?? new Set<string>();
         const candidats = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[])
-          .filter((p) => p.statut === 'libre' && candidatPour(p, poste) && assezAgePourLaF1(monde, p) && !refus.has(p.id) && !dejaVise.has(p.id))
+          .filter((p) => p.statut === 'libre' && candidatPour(p, poste) && assezAgePourLaF1(monde, p) && engageablePar(monde, p, e) && !refus.has(p.id) && !dejaVise.has(p.id))
           .sort((a, b) => (a.id < b.id ? -1 : 1));
         if (candidats.length === 0) continue;
         const f = tirageLocal(monde, 'recrutement', e.id, poste, monde.date.annee, tour);

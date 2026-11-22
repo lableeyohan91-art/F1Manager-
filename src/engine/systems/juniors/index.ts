@@ -28,6 +28,10 @@ import { apresGrandPrix, modificateurNiveau } from '../carriere/performance';
 import { niveauCarriere } from '../carriere/profil';
 import { potentielEstime } from '../carriere/estimation';
 import { ecuriesActives, niveauPilote } from '../saison/performance';
+import { affiliationDe, commandeMissionReperage, finDeSaisonAcademies, financementExterieur, intersaisonAcademies, miSaisonAcademies } from './academies';
+import { ACADEMIE, PLACEMENT_PARTENAIRE } from '../../balance/juniors';
+
+export * from './academies';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 const CATEGORIES = Object.keys(CATEGORIES_JUNIORS) as CategorieJunior[];
@@ -104,7 +108,8 @@ export function marcheBaquets(monde: Monde, annee: number): void {
   for (const cat of [...CATEGORIES].sort((a, b) => CATEGORIES_JUNIORS[b].rangCategorie - CATEGORIES_JUNIORS[a].rangCategorie)) {
     const equipes = ecuriesJuniors(monde).filter((e) => e.categorie === cat).sort((a, b) => b.qualite + b.reputation / 10 - (a.qualite + a.reputation / 10) || (a.id < b.id ? -1 : 1));
     const candidats = tous.filter((p) => !p.junior && eligible(p, cat, annee));
-    const infos = new Map(candidats.map((p) => [p.id, { ...talent(monde, p), budget: budgetFamille(monde, p) }]));
+    // Phase 6b-2 : budget = famille + mécène + financement de l'académie.
+    const infos = new Map(candidats.map((p) => [p.id, { ...talent(monde, p), budget: budgetFamille(monde, p) + financementExterieur(monde, p, annee), academie: affiliationDe(monde, p.id)?.organisation }]));
     for (let tour = 0; tour < CATEGORIES_JUNIORS[cat].pilotesParEcurie; tour++) {
       for (const e of equipes) {
         let meilleur: { p: Personne; score: number; prix: number } | undefined;
@@ -117,7 +122,7 @@ export function marcheBaquets(monde: Monde, annee: number): void {
           const abordable = i.budget >= prix;
           const argent = (Math.min(i.budget, e.prixBaquetMEUR) / e.prixBaquetMEUR) * MARCHE_BAQUETS.poidsArgent * (MARCHE_BAQUETS.poidsArgentQualiteRef / e.qualite);
           const score = MARCHE_BAQUETS.poidsNiveau * i.niveau + MARCHE_BAQUETS.poidsPotentiel * i.potentiel + MARCHE_BAQUETS.poidsReputation * (p.reputationJeune ?? 0)
-            + argent + (precedent.get(p.id) === e.id ? MARCHE_BAQUETS.continuite : 0) + tirageLocal(monde, 'juniors.marche', e.id, p.id, annee).normale(0, MARCHE_BAQUETS.alea);
+            + argent + (precedent.get(p.id) === e.id ? MARCHE_BAQUETS.continuite : 0) + (i.academie && e.partenaire === i.academie ? PLACEMENT_PARTENAIRE : 0) + tirageLocal(monde, 'juniors.marche', e.id, p.id, annee).normale(0, MARCHE_BAQUETS.alea);
           if (abordable && (!meilleur || score > meilleur.score)) meilleur = { p, score, prix };
           if (!repli || score > repli.score) repli = { p, score, prix: Math.min(prix, i.budget) };
         }
@@ -282,7 +287,11 @@ export function simulerPasseJunior(monde: Monde): void {
 
 export const systemeJuniors: Systeme = {
   nom: 'juniors',
-  executer({ monde, date }) {
+  executer({ monde, date, commanderIA }) {
+    // Phase 6b-2 : académies, affiliations, mécènes et repérage de l'IA, avant le marché des baquets.
+    if (date.semaine === ACADEMIE.semaine) intersaisonAcademies(monde, date.annee, (c) => commanderIA(c));
+    if (date.semaine === ACADEMIE.semaineMiSaison) miSaisonAcademies(monde, date.annee, (c) => commanderIA(c));
+    if (date.semaine === SEMAINE_CLOTURE) finDeSaisonAcademies(monde, date.annee);
     if (date.semaine === MARCHE_BAQUETS.semaine) {
       marcheBaquets(monde, date.annee);
       creerSaisonsJuniors(monde, date.annee);
@@ -307,5 +316,6 @@ export const systemeJuniors: Systeme = {
 
 /** À installer après les systèmes de la saison (les Grands Prix de la semaine sont déjà courus) et de la carrière (cohorte). */
 export function installerJuniors(moteur: Moteur): Moteur {
+  moteur.commandes.enregistrer(commandeMissionReperage);
   return moteur.ajouterSysteme(systemeJuniors);
 }

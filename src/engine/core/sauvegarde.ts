@@ -170,6 +170,13 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['saisonsJuniors'] ??= {};
     return { ...m, versionFormat: 9 };
   },
+  // v9 → v10 (phase 6b-2) : académies (créées à la première intersaison) et missions de repérage.
+  9: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['academies'] ??= {};
+    tables['missionsReperage'] ??= {};
+    return { ...m, versionFormat: 10 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

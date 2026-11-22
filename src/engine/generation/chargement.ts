@@ -173,6 +173,7 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     verification: l.valeurs['verification'] ?? '',
     statut: 'active',
     typeOrganisation: 'ecurie',
+    ...(re.texte(l, 'ecuriePartenaire', false) ? { ecuriePartenaire: re.texte(l, 'ecuriePartenaire', false) } : {}),
   }));
   const idsEq = verifierIdsUniques('ecuries.csv', leq.map((l, i) => ({ id: ecuries[i]!.id, numero: l.numero })), problemes);
   if (ecuries.length === 0) problemes.push('ecuries.csv : aucune écurie');

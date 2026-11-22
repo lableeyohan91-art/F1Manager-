@@ -60,8 +60,9 @@ describe('Phase 3 — saison abstraite', () => {
     const vieux = gps(m).filter((g) => g.saison <= 2034);
     expect(vieux.every((g) => g.resultats.every((r) => r.explication === undefined))).toBe(true);
     // Phase 6b : +≈ 0,2 Mo (juniors). Le plus lourd reste le détail des Grands Prix de F1 (≈ 1 Mo), optimisation à prévoir avant la version mobile.
-    expect(serialiser(m).length).toBeLessThan(3_500_000);
-  });
+    // Phase 6b-2 : relations et souvenirs nés des académies. Limite à 30 saisons inchangée (12 Mo, test humain).
+    expect(serialiser(m).length).toBeLessThan(4_000_000);
+  }, 30_000);
 
   it('tirages locaux : changer la météo d’une course ne change pas l’aléa des autres courses', () => {
     const a = sc.creerMonde(11);

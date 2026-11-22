@@ -33,6 +33,7 @@ import { forceEcurie, teamPrincipal, valeurMarche } from '../humain/decision';
 import { evaluerSponsors, initialiserSponsors, marcheSponsors, revenusSponsors } from './sponsors';
 import { capaciteEmprunt, gererTresorerie, proprietaireActif, tauxDette, verifierLassitude } from './crises';
 import { avancerProjets, deciderProjet, negligerEntretien, vieillirInstallations } from './infrastructures';
+import { coutAnnuelAcademie } from '../juniors/academies';
 
 export * from './sponsors';
 export * from './crises';
@@ -219,7 +220,7 @@ export function deciderBudget(monde: Monde, e: Ecurie, fi: Finances): number {
   const fixes = depensesFixes(monde, e);
   const recettes = primesAttendues(monde, e.id) + commercialAnnuel(monde, e, fi) + revenusSponsors(monde, e.id, annee) + apportAnnuel(monde, e, fi, annee);
   // Engagements hors exploitation (phase 5b) : intérêts de la dette, chantiers en cours (dans l'enveloppe annuelle).
-  const engagements = fi.detteMEUR * tauxDette(fi, recettes)
+  const engagements = fi.detteMEUR * tauxDette(fi, recettes) + coutAnnuelAcademie(monde, e.id)
     + Math.min(INVESTISSEMENT_ANNUEL_MAX, fi.projets.reduce((a, p) => a + Math.max(0, p.coutPrevuMEUR - p.depenseMEUR), 0));
   const fixesTotal = fixes.personnelPlafonne + fixes.departements + fixes.operations + fixes.entretien + fixes.salairesHorsPlafond + fixes.marketing + engagements;
   const proprietaire = proprietaireDe(monde, e.id);
@@ -276,6 +277,8 @@ function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
   const depenses = {
     personnelPlafonne: fixes.personnelPlafonne / n, departements: fixes.departements / n, operations: fixes.operations / n,
     entretien: fixes.entretien / n, developpement: fi.budget.developpementMEUR / n, salairesHorsPlafond: fixes.salairesHorsPlafond / n, marketing: fixes.marketing / n,
+    // Phase 6b-2 : financement des affiliés de l'académie (hors plafond).
+    academie: coutAnnuelAcademie(monde, e.id) / n,
   };
   for (const [k, v] of Object.entries(recettes)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;
   for (const [k, v] of Object.entries(depenses)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;

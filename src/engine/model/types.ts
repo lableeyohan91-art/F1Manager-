@@ -24,6 +24,8 @@ export const TABLES = {
   conjoncture: 'conjoncture',
   ecuriesJuniors: 'ecuriesJuniors',
   saisonsJuniors: 'saisonsJuniors',
+  academies: 'academies',
+  missionsReperage: 'missionsReperage',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -76,6 +78,8 @@ export interface Ecurie {
   typeOrganisation: TypeOrganisation;
   /** Écurie pilotée par le joueur (bac à sable) : l'IA ne prend pas ses décisions de personnel à sa place. */
   pilotee?: boolean;
+  /** Écurie « sœur » en F1 (lien réel conservé, D-112) : placement et promotion des affiliés de l'académie. */
+  ecuriePartenaire?: string;
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -134,7 +138,18 @@ export interface Personne {
   reputationJeune?: number;
   /** Phase 6b : budget familial annuel (M€), tiré une fois. Lu par le marché des baquets. */
   budgetFamilleMEUR?: number;
+  /** Phase 6b-2 : mécène (montant annuel, dernière année de soutien). Lu par le marché des baquets. */
+  mecene?: { montantMEUR: number; jusqua: number };
 }
+
+/** Académie d'une écurie de F1 (phase 6b-2). */
+export interface Academie {
+  id: string; ecurie: string; places: number; reputation: number;
+  /** Anciens affiliés (liste bornée), lue par la réputation de l'académie ; les vieux contrats d'affiliation sont effacés. */
+  anciens?: string[];
+}
+/** Mission de repérage en cours (commande commune au joueur et à l'IA). */
+export interface MissionReperage { id: string; ecurie: string; personne: string; finAnnee: number; finSemaine: number }
 
 /** Écurie junior (phase 6b) : table séparée des écuries de F1. */
 export interface EcurieJunior {
@@ -541,6 +556,8 @@ export interface ComptesAnnee {
   investissements: number;
   /** Apports exceptionnels du propriétaire (sauvetage, rachat) : recette hors exploitation. */
   apportsExceptionnels: number;
+  /** Phase 6b-2 : académie (financement des affiliés) et missions de repérage, hors plafond. */
+  academie?: number;
 }
 
 export interface Finances {
