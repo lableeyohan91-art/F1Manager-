@@ -10,6 +10,7 @@ Une fiche par système ou par phase, 2 à 4 pages maximum. Chaque fiche indique 
 | [donnees-initiales.md](donnees-initiales.md) | Grille inspirée de 2026, altération des noms, base modifiable, histoire ancrée | Principe validé, modalités proposées |
 | [phase-1-noyau.md](phase-1-noyau.md) | Détail et critères de la phase 1 | Proposé |
 | [phase-2-monde.md](phase-2-monde.md) | Détail et critères de la phase 2 | Proposé |
-| [phase-3-saison.md](phase-3-saison.md) | Détail et critères de la phase 3 | Proposé |
+| [phase-3-saison.md](phase-3-saison.md) | Détail et critères de la phase 3 | Réalisé |
+| [phase-4-contrats-memoire.md](phase-4-contrats-memoire.md) | Contrats, mémoire v1, promesses, interactions, bac à sable | **Proposé, à valider** |
 
 À venir, avant leur phase : contrats et mémoire v1 (phase 4), économie (5), cycle de vie (6), marché du travail et IA (7), mémoire v2, groupes sociaux et politique (8), simulation historique (9).
