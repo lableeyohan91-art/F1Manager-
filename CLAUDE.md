@@ -42,6 +42,14 @@ Ce fichier est relu au début de chaque session de Claude Code. Il prime sur les
 - Les sauvegardes portent un numéro de version. Toute évolution de format s'accompagne d'une migration et d'un test.
 - Aucun nom réel **exact** d'écurie, de pilote, de circuit ni de marque. La grille de départ s'inspire de la F1 2026 avec des noms altérés (D-042), qui ne figurent que dans les fichiers de données, jamais dans le code. Personnalités et relations des personnages inspirés de personnes réelles : toujours fictives. Publication du jeu de données réel : voir D-043.
 
+## Équilibrage (D-076)
+
+- Toute modification d'équilibrage s'accompagne d'un rapport complet, avec une comparaison dans des conditions identiques (mêmes graines, mêmes mécaniques) à la référence précédente, qui est conservée.
+- Les indicateurs défavorables sont présentés autant que les favorables. Un tableau soumis pour décision contient **tous** les indicateurs suivis, pas une sélection.
+- Les objectifs non atteints sont signalés explicitement. Le provisoire est distingué du définitif.
+- Claude Code critique aussi les propositions de ChatGPT ; le porteur a le dernier mot.
+- Aucun bonus caché pour l'IA, aucun équilibrage artificiel des résultats.
+
 ## Git
 
 - Messages de commit en français, à l'impératif, avec un résumé court (« Ajoute le glossaire »).

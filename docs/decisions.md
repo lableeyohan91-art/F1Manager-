@@ -84,6 +84,9 @@ Une décision qui en remplace une autre le dit (« remplace D-xxx »).
 | D-071 | 22/11/2026 | Phase 6 : grilles juniors fictives et générées ; karting et F4 en classements annuels abstraits ; F2 et F3 équivalents réellement simulés ; vitesses de progression différentes ; académies réputées par leurs résultats réels ; écuries partenaires (y compris en F1) sans contrôle direct | ChatGPT + porteur (complète D-062, D-063). |
 | D-072 | 22/11/2026 | Cibles démographiques (statistiques, jamais des quotas) : 2 à 4 nouveaux titulaires par saison, carrière moyenne de 6 à 10 saisons, carrières très courtes et de plus de 20 saisons possibles, retours après absence possibles. Aucune retraite pour libérer une place | ChatGPT + porteur. |
 | D-073 | 22/11/2026 | Laboratoire de simulation conservé et enrichi à chaque phase (carrières de 20 à 50 saisons, influence des statistiques, stratégies optimales, compétitivité des adversaires) ; aucun bonus caché | ChatGPT + porteur. |
+| D-075 | 22/11/2026 | Le **sang-froid** influencera les performances sous pression : qualifications, départs, dépassements décisifs, fins de championnat, situations difficiles, erreurs à fort enjeu. Intégration progressive en phases 6a et 13 | ChatGPT + porteur. |
+| D-076 | 22/11/2026 | **Méthode d'équilibrage** : rapport complet pour toute modification ; conditions identiques ; références conservées ; indicateurs défavorables présentés autant que les favorables ; objectifs non atteints signalés ; provisoire distingué du définitif ; critique réciproque Claude ↔ ChatGPT ; dernier mot au porteur | Leçon de l'erreur sur le réglage B. Inscrit dans CLAUDE.md. |
+| D-077 | 22/11/2026 | Conséquences humaines à enrichir dans les phases 5 à 7 : recherche active d'un autre employeur, demandes de départ, démission et rupture négociée, départs en groupe derrière une personne influente, pertes d'expertise, motivation collective, conflits durables, critiques constructives qui font progresser. Sans amplifier artificiellement les coefficients ; dilemmes réévalués après les phases 5, 6 et 7 | ChatGPT + porteur. |
 
 ---
 
@@ -93,9 +96,9 @@ Urgence : **AVANT P2** = avant la phase 2 · **AVANT P3** = avant la phase 3 · 
 
 | ID | Urgence | Question | Proposition de Claude Code |
 | --- | --- | --- | --- |
-| D-036 | AVANT P4 | Nom du championnat, des catégories juniors et de l'instance dirigeante | Propositions de ChatGPT (préférence : gamme **Apex** — Apex World Championship, Apex 2/3/4, World Racing Federation). **Choix du porteur** ; disponibilité juridique à vérifier avant publication |
-| D-074 | MAINTENANT | Revenir du réglage B au **réglage A** (pilote 0,20 · aléa 0,30) ? Le réglage B fait tomber « la dernière écurie marque un point » de 45 % à 17 % et monter les dominations de 4 % à 17 % (lignes absentes du tableau soumis à ChatGPT) | Oui : A donne 38 % et 14 %, avec 30 % de part des compétences entre coéquipiers |
-| D-075 | AVANT P6a | Brancher `sangFroid` (aujourd'hui seulement lu par le stress, lui-même inutilisé) sur la performance sous pression | Oui, en phase 6a ou 13 |
+| D-036 | AVANT PUBLICATION | Noms définitifs | **Noms de travail adoptés** (22/11/2026) : APEX Manager ; Apex World Championship ; Apex 2, 3, 4 ; World Racing Federation. Validation définitive du porteur et vérification juridique avant publication |
+| D-074 | MAINTENANT | Réglage pilote / aléa : **campagne de 20 combinaisons + B** (100 graines, mécaniques P4), puis revalidation des meilleures sur de nouvelles graines ; trois compromis présentés | Rapport `docs/rapports/2026-11-22-p4-campagne-equilibrage.md`. Le réglage B reste provisoirement en place |
+| D-078 | AVANT P5 | Conception de la phase 5 (`phase-5-economie.md`) et découpage proposé en **5a** (trésorerie, budget, plafond, salaires, développement, primes, commercial, propriétaire simple) et **5b** (sponsors détaillés, dette, crises, rachats, projets d'infrastructure) ; questions du §12 | À valider par le porteur, relecture de ChatGPT |
 | D-039 | PLUS TARD | Option Carrera : importer les résultats réels de Paddock comme résultats de Grand Prix | Idée à garder, non prioritaire |
 
 ---

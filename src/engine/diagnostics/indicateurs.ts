@@ -3,12 +3,27 @@
  * Ce sont des MESURES, jamais des contraintes (D-040) : rien dans le moteur ne les lit.
  */
 
-import { ECART_VOITURE_PAR_POINT, SEUIL_SURPRISE_PCT } from '../balance/course';
+import { ECART_VOITURE_PAR_POINT, POIDS_PILOTE, SEUIL_SURPRISE_PCT } from '../balance/course';
 import { table, type Monde } from '../core/monde';
 import { TABLES, type GrandPrix, type Saison } from '../model/types';
 
 export interface IndicateursSaison {
   annee: number;
+  /** Écuries ayant obtenu au moins un podium / une victoire dans la saison. */
+  ecuriesAvecPodium: string[];
+  ecuriesAvecVictoire: string[];
+  /** Part des points constructeurs de l'écurie la mieux classée, et des 3 premières. */
+  partPointsPremiere: number;
+  partPointsTop3: number;
+  /** Coefficient de Gini des points constructeurs (0 = parfaitement réparti, 1 = tout pour une écurie). */
+  giniPoints: number;
+  /** Corrélation de rang entre le classement constructeurs de cette saison et celui de la précédente (null la 1re saison). */
+  stabiliteHierarchie: number | null;
+  /**
+   * Gain moyen de places, par rapport à la place attendue de leur voiture, des pilotes du quintile supérieur
+   * (par niveau) : mesure la capacité des meilleurs pilotes à dépasser leur voiture.
+   */
+  surperformanceMeilleursPilotes: number;
   vainqueursDifferents: number;
   ecuriesVictorieuses: number;
   /** Part des victoires de l'écurie qui en a gagné le plus (0–1). */
@@ -120,6 +135,15 @@ export function spearman(a: number[], b: number[]): number {
   return 1 - (6 * d2) / (n * (n * n - 1));
 }
 
+function gini(v: number[]): number {
+  const t = [...v].sort((a, b) => a - b);
+  const n = t.length, somme = t.reduce((a, b) => a + b, 0);
+  if (n === 0 || somme === 0) return 0;
+  let cumul = 0;
+  t.forEach((x, i) => (cumul += (i + 1) * x));
+  return (2 * cumul) / (n * somme) - (n + 1) / n;
+}
+
 export function indicateursSaison(monde: Monde, s: Saison): IndicateursSaison {
   const gps = s.calendrier.map((id) => table(monde, TABLES.grandsPrix)[id] as unknown as GrandPrix).filter((g) => g?.termine);
   const vainqueurs = gps.map((g) => g.resultats[0]).filter((r) => r?.position === 1);
@@ -143,8 +167,44 @@ export function indicateursSaison(monde: Monde, s: Saison): IndicateursSaison {
     if (d > progressionMax) [progressionMax, progressionEcurie] = [d, e];
   }
 
+  // Podiums et victoires par écurie.
+  const podium = new Set<string>(), victoire = new Set<string>();
+  for (const g of gps) for (const r of g.resultats) {
+    if (r.position !== null && r.position <= 3) podium.add(r.ecurie);
+    if (r.position === 1) victoire.add(r.ecurie);
+  }
+  const pts = s.constructeurs.map((c) => c.points);
+  const total = pts.reduce((a, b) => a + b, 0) || 1;
+  // Stabilité de la hiérarchie.
+  const prec = table(monde, TABLES.saisons)[`ssn_${s.annee - 1}`] as unknown as Saison | undefined;
+  let stabilite: number | null = null;
+  if (prec?.termine) {
+    const communes = s.constructeurs.map((c) => c.ecurie).filter((e) => prec.constructeurs.some((x) => x.ecurie === e));
+    stabilite = spearman(communes.map((e) => -s.constructeurs.findIndex((x) => x.ecurie === e)), communes.map((e) => -prec.constructeurs.findIndex((x) => x.ecurie === e)));
+  }
+  // Surperformance des meilleurs pilotes : place attendue = 2 × rang de la voiture − 0,5.
+  const personnes = table(monde, TABLES.personnes);
+  const niveau = (id: string) => {
+    const p = personnes[id] as unknown as { competences: Record<string, number> } | undefined;
+    if (!p) return 0;
+    let n = 0;
+    for (const [c, w] of Object.entries(POIDS_PILOTE)) n += w * (p.competences[c] ?? 10);
+    return n;
+  };
+  const partants = [...new Set(gps.flatMap((g) => g.resultats.map((r) => r.pilote)))].sort((a, b) => niveau(b) - niveau(a));
+  const elite = new Set(partants.slice(0, Math.max(1, Math.round(partants.length / 5))));
+  const gains: number[] = [];
+  for (const g of gps) for (const r of g.resultats) if (elite.has(r.pilote) && r.position !== null) gains.push(2 * r.rangVoiture - 0.5 - r.position);
+
   return {
     annee: s.annee,
+    ecuriesAvecPodium: [...podium].sort(),
+    ecuriesAvecVictoire: [...victoire].sort(),
+    partPointsPremiere: (pts[0] ?? 0) / total,
+    partPointsTop3: pts.slice(0, 3).reduce((a, b) => a + b, 0) / total,
+    giniPoints: gini(pts),
+    stabiliteHierarchie: stabilite,
+    surperformanceMeilleursPilotes: gains.length ? gains.reduce((a, b) => a + b, 0) / gains.length : 0,
     vainqueursDifferents: new Set(vainqueurs.map((r) => r!.pilote)).size,
     ecuriesVictorieuses: new Set(vainqueurs.map((r) => r!.ecurie)).size,
     partVictoiresDominante: gps.length ? Math.max(0, ...vic) / gps.length : 0,
