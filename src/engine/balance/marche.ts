@@ -3,8 +3,12 @@
  * Estimations de game design, provisoires : elles seront mesurées (D-095) puis calibrées lors de la campagne d'après la phase 8.
  */
 
-/** Fenêtre principale : tours d'offres de la semaine `debut` à la semaine `fin`, tous les `pas` semaines. Les contrats prennent effet en semaine 50. */
-export const FENETRE = { debut: 26, fin: 48, pas: 2 };
+/**
+ * Fenêtre principale : tours d'offres de la semaine `debut` à la semaine `fin`, tous les `pas` semaines.
+ * Audit n°4 : séance de clôture en semaine `cloture` (réponses définitives, sans contre-offre ; offres restantes expirées et notifiées).
+ * Les contrats prennent effet en semaine 50.
+ */
+export const FENETRE = { debut: 26, fin: 48, pas: 2, cloture: 49 };
 
 /** Nombre de tours de négociation d'une offre (offre, contre-offre, offre finale). */
 export const TOURS_MARCHE = 3;

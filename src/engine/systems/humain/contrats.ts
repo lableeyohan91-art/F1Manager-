@@ -4,7 +4,7 @@
  */
 
 import {
-  OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
+  INDEMNITE_RUPTURE, OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
 } from '../../balance/contrats';
 import { assezAgePourLaF1, changerMetier } from '../carriere/profil';
 import { engageablePar } from '../juniors/academies';
@@ -17,7 +17,7 @@ import { nouvelIdentifiant } from '../../core/identifiants';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import { genererPersonne } from '../../generation/construction';
-import { TABLES, type Contrat, type Ecurie, type Personne, type Poste } from '../../model/types';
+import { TABLES, type Contrat, type Ecurie, type Finances, type Personne, type Poste } from '../../model/types';
 import { lireEvenement, relation } from '../memoire';
 import { ecuriesActives } from '../saison/performance';
 import {
@@ -268,7 +268,26 @@ export const systemeNegociations: Systeme = {
 
 /* ===================================================================== Fins de contrat et remplacements */
 
+/** Indemnité de rupture due pour ce contrat (clause, sinon part du salaire annuel), en M€. */
+export function indemniteRupture(c: Contrat): number {
+  return Math.round((c.clauses.indemniteRuptureMEUR ?? c.salaireMEUR * INDEMNITE_RUPTURE.partSalaireAnnuel) * 10) / 10;
+}
+
+/**
+ * Audit n°4 : paiement centralisé de l'indemnité de rupture (un seul endroit, une seule fois par contrat) :
+ * débitée de la trésorerie de l'employeur, inscrite à la ligne « indemnités » de ses comptes.
+ */
+function payerIndemniteRupture(monde: Monde, c: Contrat): number {
+  if (c.indemniteVerseeMEUR !== undefined) return 0; // déjà versée : pas de double comptage
+  const montant = indemniteRupture(c);
+  const fi = (Object.values(table(monde, TABLES.finances)) as unknown as Finances[]).find((f) => f.ecurie === c.organisation);
+  if (fi && montant > 0) { fi.tresorerieMEUR -= montant; fi.comptes.indemnites += montant; }
+  c.indemniteVerseeMEUR = montant;
+  return montant;
+}
+
 function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin']): Evenement {
+  if (motif === 'licenciement') payerIndemniteRupture(monde, c);
   c.statut = motif === 'licenciement' ? 'rompu' : 'termine';
   c.motifFin = motif;
   const ancienne = p.ecurie;
@@ -277,7 +296,7 @@ function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin
   p.libreDepuis = monde.date.annee;
   const evt = ajouterEvenement(monde, {
     type: 'contrat.fin', acteurs: [{ id: p.id, role: 'personne' }, { id: ancienne, role: 'organisation' }],
-    importance: 2, visibilite: 'public', contexte: { contrat: c.id, motif },
+    importance: 2, visibilite: 'public', contexte: { contrat: c.id, motif, ...(c.indemniteVerseeMEUR !== undefined ? { indemnite: c.indemniteVerseeMEUR } : {}) },
     texte: `${nomDe(monde, p.id)} quitte ${nomDe(monde, ancienne)}.`,
   });
   // Départ d'un proche : ceux qui l'apprécient s'en souviennent.

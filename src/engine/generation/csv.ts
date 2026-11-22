@@ -16,7 +16,7 @@ export class ErreurDonnees extends Error {
   }
 }
 
-/** Découpe une ligne en tenant compte des guillemets ("a;b" reste une seule valeur). */
+/** Découpe une ligne en tenant compte des guillemets ("a;b" reste une seule valeur). Lève une erreur si un guillemet n'est pas refermé. */
 function decouper(ligne: string, sep: string): string[] {
   const res: string[] = [];
   let cur = '';
@@ -35,6 +35,7 @@ function decouper(ligne: string, sep: string): string[] {
       cur = '';
     } else cur += c;
   }
+  if (guillemets) throw new Error('guillemet non refermé');
   res.push(cur);
   return res.map((v) => v.trim());
 }
@@ -45,8 +46,20 @@ function decouper(ligne: string, sep: string): string[] {
  */
 export function lireCsv(nomFichier: string, texte: string, colonnesObligatoires: readonly string[], sep = ';'): LigneCsv[] {
   const lignes = texte.replace(/^﻿/, '').split(/\r?\n/);
-  const enTete = decouper(lignes[0] ?? '', sep);
   const problemes: string[] = [];
+  let enTete: string[];
+  try {
+    enTete = decouper(lignes[0] ?? '', sep);
+  } catch {
+    throw new ErreurDonnees([`${nomFichier}, ligne 1 (en-tête) : guillemet non refermé`]);
+  }
+  // Audit n°4 : une colonne vide ou en double écraserait silencieusement une autre.
+  const vues = new Set<string>();
+  enTete.forEach((col, j) => {
+    if (col === '') problemes.push(`${nomFichier} : colonne ${j + 1} sans nom dans l'en-tête`);
+    else if (vues.has(col)) problemes.push(`${nomFichier} : colonne « ${col} » en double dans l'en-tête`);
+    vues.add(col);
+  });
   for (const col of colonnesObligatoires) {
     if (!enTete.includes(col)) problemes.push(`${nomFichier} : colonne obligatoire manquante « ${col} »`);
   }
@@ -56,7 +69,13 @@ export function lireCsv(nomFichier: string, texte: string, colonnesObligatoires:
   for (let i = 1; i < lignes.length; i++) {
     const brute = lignes[i] as string;
     if (brute.trim() === '') continue;
-    const cellules = decouper(brute, sep);
+    let cellules: string[];
+    try {
+      cellules = decouper(brute, sep);
+    } catch {
+      problemes.push(`${nomFichier}, ligne ${i + 1} : guillemet non refermé`);
+      continue;
+    }
     if (cellules.length !== enTete.length) {
       problemes.push(`${nomFichier}, ligne ${i + 1} : ${cellules.length} colonnes au lieu de ${enTete.length}`);
       continue;

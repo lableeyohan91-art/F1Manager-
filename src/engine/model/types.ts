@@ -276,6 +276,8 @@ export interface Contrat {
   nonProlonge?: boolean;
   /** Demande d'augmentation en attente de réponse (salaire demandé, M€). */
   demandeAugmentation?: number;
+  /** Audit n°4 : indemnité de rupture effectivement versée (M€), une seule fois. */
+  indemniteVerseeMEUR?: number;
   verification: string;
 }
 
@@ -462,6 +464,8 @@ export interface Saison {
   leaderAvantDerniereManche?: string;
   /** Indice moyen de chaque écurie (toutes caractéristiques de vitesse) au début et à la fin de la saison. */
   indiceDebut: Record<string, number>;
+  /** Audit n°4 : niveau de chaque pilote relevé à sa première course de la saison (pour les indicateurs historiques). */
+  niveauxPilotes?: Record<string, number>;
   indiceFin: Record<string, number>;
   termine: boolean;
   chronique: string[];

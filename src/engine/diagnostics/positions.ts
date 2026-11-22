@@ -57,12 +57,22 @@ export interface IndicateursPositions { pilotes: MesurePositions; constructeurs:
 type Etage = 'haut' | 'milieu' | 'bas';
 
 /** Classements (points cumulés) après chaque Grand Prix : liste de [concurrent, points] triée, pour chaque manche. */
+/**
+ * Classements après chaque manche. Audit n°4 : mêmes règles de départage que le championnat (trierClassements) :
+ * points, puis victoires, puis (pilotes) podiums, puis identifiant.
+ */
 function classementsSuccessifs(gps: GrandPrix[], cle: 'pilote' | 'ecurie'): [string, number][][] {
-  const points = new Map<string, number>();
+  const points = new Map<string, number>(), victoires = new Map<string, number>(), podiums = new Map<string, number>();
   const res: [string, number][][] = [];
+  const plus = (m: Map<string, number>, k: string, x: number) => m.set(k, (m.get(k) ?? 0) + x);
   for (const g of gps) {
-    for (const r of g.resultats) points.set(r[cle], (points.get(r[cle]) ?? 0) + r.points);
-    res.push([...points.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)));
+    for (const r of g.resultats) {
+      plus(points, r[cle], r.points);
+      plus(victoires, r[cle], r.position === 1 ? 1 : 0);
+      plus(podiums, r[cle], r.position !== null && r.position <= 3 ? 1 : 0);
+    }
+    res.push([...points.entries()].sort((a, b) => b[1] - a[1] || (victoires.get(b[0])! - victoires.get(a[0])!)
+      || (cle === 'pilote' ? podiums.get(b[0])! - podiums.get(a[0])! : 0) || (a[0] < b[0] ? -1 : 1)));
   }
   return res;
 }

@@ -305,7 +305,7 @@ function contreAttaque(monde: Monde, p: Personne, c: Contrat, offres: OffreMarch
 }
 
 /** Les personnes répondent aux offres reçues avant cette semaine (le délai laisse aux concurrents et à l'employeur le temps de réagir). */
-function repondreAuxOffres(monde: Monde): void {
+function repondreAuxOffres(monde: Monde, cloture = false): void {
   const parPersonne = new Map<string, OffreMarche[]>();
   for (const o of offresMarche(monde)) {
     if (o.statut !== 'en_attente' || (o.annee === monde.date.annee && o.semaine >= monde.date.semaine)) continue;
@@ -340,7 +340,8 @@ function repondreAuxOffres(monde: Monde): void {
         } else { o.statut = 'refusee'; o.raisons = ['− préfère honorer son contrat actuel', ...texteRaisons(ev.raisons)]; }
         continue;
       }
-      const rep = repondre(monde, p, offre, cle, o.tour + 1 < TOURS_MARCHE);
+      // Séance de clôture : réponse définitive (plus de contre-offre possible).
+      const rep = repondre(monde, p, offre, cle, !cloture && o.tour + 1 < TOURS_MARCHE);
       if (rep.type === 'accepte') {
         if (!meilleure || ev.utilite > meilleure.u) meilleure = { o, u: ev.utilite, raisons: texteRaisons(rep.raisons) };
       } else if (rep.type === 'contre_offre') {
@@ -517,9 +518,24 @@ export function clotureMarche(monde: Monde): void {
   for (const e of ecuriesActives(monde)) if (e.reputationPredateur) e.reputationPredateur = Math.round(e.reputationPredateur * PREDATEUR.inertie * 1000) / 1000 || undefined;
 }
 
+/** Clôture de la fenêtre : réponses définitives aux offres en attente, puis expiration notifiée de celles qui restent. */
+export function cloturerFenetre(monde: Monde): void {
+  repondreAuxOffres(monde, true);
+  for (const o of offresMarche(monde)) {
+    if (o.statut !== 'en_attente' && o.statut !== 'contre_offre') continue;
+    o.statut = 'expiree';
+    ajouterEvenement(monde, {
+      type: 'marche.offre_expiree', acteurs: [{ id: o.personne, role: 'personne' }, { id: o.decideur, role: 'auteur' }, { id: o.ecurie, role: 'organisation' }],
+      importance: 1, visibilite: 'prive', contexte: { offre: o.id, salaire: o.salaireMEUR, debut: o.debut, salaireDemande: o.salaireDemande ?? null },
+      texte: `La fenêtre de transferts se ferme : l'offre de ${nom(monde, o.ecurie)} à ${nom(monde, o.personne)} expire sans accord.`,
+    });
+  }
+}
+
 export const systemeMarche: Systeme = {
   nom: 'marche.transferts',
   executer({ monde, date, commanderIA }) {
+    if (date.semaine === FENETRE.cloture) { cloturerFenetre(monde); return; }
     if (date.semaine < FENETRE.debut || date.semaine > FENETRE.fin || (date.semaine - FENETRE.debut) % FENETRE.pas !== 0) return;
     const liste = vivier(monde);
     if (date.semaine === FENETRE.debut) prolongationsTitulaires(monde, liste);

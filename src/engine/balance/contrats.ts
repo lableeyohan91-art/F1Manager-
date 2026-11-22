@@ -123,3 +123,9 @@ export const BORNES_CONTRAT = { salaireMinMEUR: 0.1, salaireMaxMEUR: 150, dureeM
  * entre les deux, le conseil arbitre (probabilité d'accord décroissante, + goût du risque et ambition du propriétaire, /40 par point au-dessus de 10).
  */
 export const ENGAGEMENTS_PILOTES = { libre: 0.2, maximum: 0.5 };
+
+/**
+ * Audit n°4 — indemnité de rupture versée par l'employeur à un licenciement (volontaire, du conseil, ou après un changement
+ * de propriétaire) : la clause du contrat si elle existe, sinon cette part du salaire annuel. Dépense hors plafond (ligne « indemnités »).
+ */
+export const INDEMNITE_RUPTURE = { partSalaireAnnuel: 0.5 };

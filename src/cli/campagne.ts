@@ -61,7 +61,7 @@ function simuler(pilote: number, alea: number, nGraines: number, debut: number, 
       pousser(saison, 'partPremiere', x.partPointsPremiere);
       pousser(saison, 'partTop3', x.partPointsTop3);
       pousser(saison, 'gini', x.giniPoints);
-      pousser(saison, 'surperformance', x.surperformanceMeilleursPilotes);
+      if (x.surperformanceMeilleursPilotes !== null) pousser(saison, 'surperformance', x.surperformanceMeilleursPilotes);
       pousser(saison, 'ecartPerf', x.ecartPerfPct);
       if (x.stabiliteHierarchie !== null) pousser(saison, 'stabilite', x.stabiliteHierarchie);
       if (x.coequipiers) {

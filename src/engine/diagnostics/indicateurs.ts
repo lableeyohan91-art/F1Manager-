@@ -24,7 +24,8 @@ export interface IndicateursSaison {
    * Gain moyen de places, par rapport à la place attendue de leur voiture, des pilotes du quintile supérieur
    * (par niveau) : mesure la capacité des meilleurs pilotes à dépasser leur voiture.
    */
-  surperformanceMeilleursPilotes: number;
+  /** Null si la saison n'a pas de relevé des niveaux contemporains (ancienne sauvegarde). */
+  surperformanceMeilleursPilotes: number | null;
   vainqueursDifferents: number;
   ecuriesVictorieuses: number;
   /** Part des victoires de l'écurie qui en a gagné le plus (0–1). */
@@ -133,20 +134,37 @@ export function etage(rang: number): number {
   return rang <= 4 ? 0 : rang <= 8 ? 1 : 2;
 }
 
-function rangs(valeurs: number[]): number[] {
-  const ordre = valeurs.map((v, i) => [v, i] as const).sort((a, b) => b[0] - a[0]);
+/** Rangs (1 = plus grande valeur) ; audit n°4 : les valeurs égales reçoivent le rang moyen de leur groupe. */
+export function rangs(valeurs: number[]): number[] {
+  const ordre = valeurs.map((v, i) => [v, i] as const).sort((a, b) => b[0] - a[0] || a[1] - b[1]);
   const r = new Array<number>(valeurs.length);
-  ordre.forEach(([, i], k) => (r[i] = k + 1));
+  for (let k = 0; k < ordre.length;) {
+    let fin = k;
+    while (fin + 1 < ordre.length && ordre[fin + 1]![0] === ordre[k]![0]) fin++;
+    const moyen = (k + fin) / 2 + 1;
+    for (let j = k; j <= fin; j++) r[ordre[j]![1]] = moyen;
+    k = fin + 1;
+  }
   return r;
 }
 
+/**
+ * Corrélation de Spearman = corrélation de Pearson entre rangs moyens (correcte avec des égalités).
+ * Audit n°4 : indéfinie (NaN) si une série est constante ou si elle compte moins de 2 valeurs ; les agrégations l'ignorent.
+ */
 export function spearman(a: number[], b: number[]): number {
   const n = a.length;
-  if (n < 2) return 1;
+  if (n < 2 || b.length !== n) return NaN;
   const ra = rangs(a), rb = rangs(b);
-  let d2 = 0;
-  for (let i = 0; i < n; i++) d2 += (ra[i]! - rb[i]!) ** 2;
-  return 1 - (6 * d2) / (n * (n * n - 1));
+  const ma = ra.reduce((x, y) => x + y, 0) / n, mb = rb.reduce((x, y) => x + y, 0) / n;
+  let num = 0, da = 0, db = 0;
+  for (let i = 0; i < n; i++) {
+    num += (ra[i]! - ma) * (rb[i]! - mb);
+    da += (ra[i]! - ma) ** 2;
+    db += (rb[i]! - mb) ** 2;
+  }
+  if (da === 0 || db === 0) return NaN;
+  return num / Math.sqrt(da * db);
 }
 
 function gini(v: number[]): number {
@@ -197,18 +215,18 @@ export function indicateursSaison(monde: Monde, s: Saison): IndicateursSaison {
     stabilite = spearman(communes.map((e) => -s.constructeurs.findIndex((x) => x.ecurie === e)), communes.map((e) => -prec.constructeurs.findIndex((x) => x.ecurie === e)));
   }
   // Surperformance des meilleurs pilotes : place attendue = 2 × rang de la voiture − 0,5.
-  const personnes = table(monde, TABLES.personnes);
-  const niveau = (id: string) => {
-    const p = personnes[id] as unknown as { competences: Record<string, number> } | undefined;
-    if (!p) return 0;
-    let n = 0;
-    for (const [c, w] of Object.entries(POIDS_PILOTE)) n += w * (p.competences[c] ?? 10);
-    return n;
-  };
-  const partants = [...new Set(gps.flatMap((g) => g.resultats.map((r) => r.pilote)))].sort((a, b) => niveau(b) - niveau(a));
-  const elite = new Set(partants.slice(0, Math.max(1, Math.round(partants.length / 5))));
-  const gains: number[] = [];
-  for (const g of gps) for (const r of g.resultats) if (elite.has(r.pilote) && r.position !== null) gains.push(2 * r.rangVoiture - 0.5 - r.position);
+  // Audit n°4 : niveaux CONTEMPORAINS de la saison (relevés à la première course de chaque pilote), jamais les compétences actuelles.
+  // Sauvegarde antérieure sans relevé : indicateur indéfini (null) plutôt que réécrit par l'évolution ultérieure des pilotes.
+  const niveaux = s.niveauxPilotes;
+  let surperformance: number | null = null;
+  if (niveaux) {
+    const partants = [...new Set(gps.flatMap((g) => g.resultats.map((r) => r.pilote)))].filter((id) => niveaux[id] !== undefined)
+      .sort((a, b) => niveaux[b]! - niveaux[a]! || (a < b ? -1 : 1));
+    const elite = new Set(partants.slice(0, Math.max(1, Math.round(partants.length / 5))));
+    const gains: number[] = [];
+    for (const g of gps) for (const r of g.resultats) if (elite.has(r.pilote) && r.position !== null) gains.push(2 * r.rangVoiture - 0.5 - r.position);
+    surperformance = gains.length ? gains.reduce((a, b) => a + b, 0) / gains.length : null;
+  }
 
   return {
     annee: s.annee,
@@ -218,7 +236,7 @@ export function indicateursSaison(monde: Monde, s: Saison): IndicateursSaison {
     partPointsTop3: pts.slice(0, 3).reduce((a, b) => a + b, 0) / total,
     giniPoints: gini(pts),
     stabiliteHierarchie: stabilite,
-    surperformanceMeilleursPilotes: gains.length ? gains.reduce((a, b) => a + b, 0) / gains.length : 0,
+    surperformanceMeilleursPilotes: surperformance,
     vainqueursDifferents: new Set(vainqueurs.map((r) => r!.pilote)).size,
     ecuriesVictorieuses: new Set(vainqueurs.map((r) => r!.ecurie)).size,
     partVictoiresDominante: gps.length ? Math.max(0, ...vic) / gps.length : 0,

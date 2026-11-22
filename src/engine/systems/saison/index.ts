@@ -99,6 +99,9 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
 
   const sigma = parametre(monde, 'course.aleaSigma', ALEA_SIGMA) * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1);
   const partants = pilotesTitulaires(monde).filter((p) => ecuries.has(p.ecurie));
+  // Audit n°4 : relevé du niveau contemporain de chaque pilote, à sa première course de la saison.
+  saison.niveauxPilotes ??= {};
+  for (const p of partants) saison.niveauxPilotes[p.id] ??= Math.round(niveauPilote(p, false) * 100) / 100;
   const calcul = partants.map((p) => {
     const e = ecuries.get(p.ecurie) as Ecurie;
     const f = tirageLocal(monde, 'course', gp.id, p.id);

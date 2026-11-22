@@ -61,8 +61,10 @@ function campagne(parametres: Record<string, number>): Campagne {
   return { parametres, saisons, series, chroniqueExemple, duree: (performance.now() - t0) / 1000 };
 }
 
-const quantile = (v: number[], q: number) => { const t = [...v].sort((a, b) => a - b); return t[Math.min(t.length - 1, Math.floor(q * t.length))] ?? 0; };
-const moy = (v: number[]) => v.reduce((a, b) => a + b, 0) / (v.length || 1);
+// Audit n°4 : les valeurs indéfinies (corrélation d'une série constante, NaN) sont écartées des agrégats.
+const finis = (v: number[]) => v.filter((x) => Number.isFinite(x));
+const quantile = (v: number[], q: number) => { const t = finis(v).sort((a, b) => a - b); return t[Math.min(t.length - 1, Math.floor(q * t.length))] ?? 0; };
+const moy = (v: number[]) => { const t = finis(v); return t.reduce((a, b) => a + b, 0) / (t.length || 1); };
 const f = (x: number, d = 1) => x.toLocaleString('fr-FR', { maximumFractionDigits: d, minimumFractionDigits: d });
 const pct = (x: number) => `${f(100 * x, 0)} %`;
 

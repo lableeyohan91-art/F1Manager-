@@ -354,6 +354,7 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
   for (const v of d.voitures) ajouter(monde, TABLES.voitures, { ...v });
   // Finances et propriétaires (phase 5a).
   for (const fi of d.finances) {
+    if (!ecuries.has(fi.ecurie)) continue; // audit n°4 : pas de finances orphelines pour une écurie absente des données
     const fp = fluxDe(graine, `proprietaire:${fi.ecurie}`);
     const trait = () => Math.round(Math.min(20, Math.max(1, fp.normale(10.5, 3.5))));
     ajouter(monde, TABLES.proprietaires, { id: `pro_${fi.ecurie.replace(/^eq_/, '')}`, ecurie: fi.ecurie, type: fi.typeProprietaire, apportBaseMEUR: fi.apportAnnuelMEUR, patience: trait(), ambition: trait(), risque: trait() } satisfies Proprietaire);

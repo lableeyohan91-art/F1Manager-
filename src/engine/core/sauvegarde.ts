@@ -189,6 +189,9 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['offres'] ??= {};
     return { ...m, versionFormat: 12 };
   },
+  // v12 → v13 (audit n°4) : relevé des niveaux contemporains par saison et indemnité versée par contrat, tous deux optionnels.
+  // Les saisons anciennes n'ont pas de relevé : leurs indicateurs historiques dépendant du niveau restent indéfinis (jamais recalculés).
+  12: (m) => ({ ...m, versionFormat: 13 }),
 };
 
 export function serialiser(monde: Monde): string {
@@ -212,9 +215,56 @@ export function lireEnTete(texte: string): EnTeteSauvegarde {
   return f.entete;
 }
 
+const estObjet = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x);
+const entier = (x: unknown): x is number => typeof x === 'number' && Number.isInteger(x);
+
+/** Date de jeu valide : année entière plausible, semaine de 1 à 52. */
+function dateValide(d: unknown): boolean {
+  return estObjet(d) && entier(d['annee']) && (d['annee'] as number) >= 1900 && (d['annee'] as number) <= 9999 && entier(d['semaine']) && (d['semaine'] as number) >= 1 && (d['semaine'] as number) <= 52;
+}
+
+/**
+ * Audit n°4 : validation d'un monde avant chargement (après migrations). Structure, valeurs numériques, dates,
+ * identifiants et références essentielles. Renvoie la liste des problèmes (vide si tout va bien), en français.
+ */
+export function problemesMonde(m: unknown): string[] {
+  const pb: string[] = [];
+  if (!estObjet(m)) return ['le contenu du monde est absent ou n’est pas un objet'];
+  if (!entier(m['versionFormat'])) pb.push('version de format absente ou invalide');
+  if (!entier(m['graine'])) pb.push('graine absente ou invalide');
+  if (!dateValide(m['date'])) pb.push(`date de jeu invalide (${JSON.stringify(m['date'])})`);
+  for (const champ of ['tables', 'evenements', 'flux', 'compteurs']) if (!estObjet(m[champ])) pb.push(`partie « ${champ} » absente ou invalide`);
+  if (!Array.isArray(m['chronique'])) pb.push('chronique absente ou invalide');
+  if (pb.length) return pb;
+  const tables = m['tables'] as Record<string, unknown>;
+  for (const [nom, t] of Object.entries(tables)) {
+    if (!estObjet(t)) { pb.push(`table « ${nom} » invalide`); continue; }
+    for (const [id, ent] of Object.entries(t)) {
+      if (!estObjet(ent)) { pb.push(`table « ${nom} » : entrée « ${id} » invalide`); continue; }
+      if ('id' in ent && ent['id'] !== id) pb.push(`table « ${nom} » : l’entrée « ${id} » porte l’identifiant « ${String(ent['id'])} »`);
+      if (pb.length > 20) return pb;
+    }
+  }
+  // Références essentielles : chaque contrat pointe vers une personne existante ; chaque personne active vers une organisation existante.
+  const personnes = (tables['personnes'] ?? {}) as Record<string, Record<string, unknown>>;
+  const organisations = new Set([...Object.keys((tables['ecuries'] ?? {}) as object), ...Object.keys((tables['ecuriesJuniors'] ?? {}) as object)]);
+  for (const c of Object.values((tables['contrats'] ?? {}) as Record<string, Record<string, unknown>>)) {
+    if (!personnes[String(c['personne'])]) pb.push(`contrat « ${String(c['id'])} » : personne inconnue « ${String(c['personne'])} »`);
+    for (const k of ['debut', 'fin', 'salaireMEUR']) if (typeof c[k] !== 'number' || !Number.isFinite(c[k] as number)) pb.push(`contrat « ${String(c['id'])} » : « ${k} » n’est pas un nombre`);
+    if (pb.length > 20) return pb;
+  }
+  for (const p of Object.values(personnes)) {
+    if (p['statut'] === 'actif' && p['ecurie'] && organisations.size > 0 && !organisations.has(String(p['ecurie']))) pb.push(`personne « ${String(p['id'])} » : organisation inconnue « ${String(p['ecurie'])} »`);
+    if (pb.length > 20) return pb;
+  }
+  return pb;
+}
+
 export function deserialiser(texte: string): Monde {
   const f = analyser(texte);
   let version = f.entete.versionFormat;
+  if (!entier(version) || version < 1) throw new ErreurSauvegarde('Sauvegarde illisible : la version du format est absente ou invalide.');
+  if (!estObjet(f.monde)) throw new ErreurSauvegarde('Sauvegarde illisible : le contenu du monde est absent ou invalide.');
   if (version > VERSION_FORMAT) {
     throw new ErreurSauvegarde(
       `Cette sauvegarde vient d'une version plus récente du jeu (format ${version}, ce jeu lit jusqu'au format ${VERSION_FORMAT}).`,
@@ -228,6 +278,8 @@ export function deserialiser(texte: string): Monde {
     version++;
   }
   monde['versionFormat'] = VERSION_FORMAT;
+  const pb = problemesMonde(monde);
+  if (pb.length) throw new ErreurSauvegarde(`Sauvegarde endommagée ou incohérente :\n- ${pb.slice(0, 10).join('\n- ')}${pb.length > 10 ? `\n- … et ${pb.length - 10} autre(s) problème(s)` : ''}`);
   return monde as unknown as Monde;
 }
 
@@ -239,7 +291,7 @@ function analyser(texte: string): FichierSauvegarde {
     throw new ErreurSauvegarde("Le fichier n'est pas une sauvegarde lisible (JSON invalide).");
   }
   const fichier = f as Partial<FichierSauvegarde>;
-  if (!fichier || typeof fichier !== 'object' || fichier.entete?.signature !== SIGNATURE || !fichier.monde) {
+  if (!fichier || typeof fichier !== 'object' || Array.isArray(fichier) || fichier.entete?.signature !== SIGNATURE || !fichier.monde) {
     throw new ErreurSauvegarde("Le fichier n'est pas une sauvegarde de ce jeu.");
   }
   return fichier as FichierSauvegarde;

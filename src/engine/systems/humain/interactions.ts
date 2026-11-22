@@ -14,7 +14,7 @@ import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Personne, type Saison } from '../../model/types';
 import { lireEvenement, reconcilier, relation, relationBrute } from '../memoire';
-import { contratEmploi, liberer, personneDe } from './contrats';
+import { contratEmploi, indemniteRupture, liberer, personneDe } from './contrats';
 import { niveauMetier, teamPrincipal, valeurMarche } from './decision';
 
 const nom = (p: Personne) => `${p.prenom} ${p.nom}`;
@@ -123,7 +123,7 @@ export function licencier(monde: Monde, auteur: Personne, cible: Personne): Even
   const ecurieId = cible.ecurie;
   const evt = ajouterEvenement(monde, {
     type: 'contrat.licenciement', acteurs: [{ id: auteur.id, role: 'auteur' }, { id: cible.id, role: 'cible' }, { id: ecurieId, role: 'organisation' }],
-    importance: 3, visibilite: 'public', contexte: { justifie, indemnite: c.clauses.indemniteRuptureMEUR ?? Math.round(c.salaireMEUR * 0.5 * 10) / 10 },
+    importance: 3, visibilite: 'public', contexte: { justifie, indemnite: indemniteRupture(c) },
     texte: `${nom(auteur)} licencie ${nom(cible)}.`,
   });
   lireEvenement(monde, cible.id, auteur.id, justifie ? 'humiliation' : 'injustice', evt.id, { facteur: 1.2 });
