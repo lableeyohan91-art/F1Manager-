@@ -139,4 +139,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Budget de variance** | Répartition de l'écart total entre performance attendue et réelle entre des sources explicables (affinité, forme, stratégie, incidents) et un aléa résiduel (D-103). |
 | **Veille technologique** | Observation légale des voitures et des performances adverses pour en comprendre les concepts, jamais pour en obtenir les plans (D-109). |
 | **Délégation** | Confier un domaine (recherche, fabrication, stocks, recrutement…) au personnel ; la qualité dépend de ses compétences (D-109). |
+| **Frontière de compromis** | Ensemble des combinaisons techniques possibles pour une écurie sous un règlement donné ; le concept est le point choisi sur cette frontière, le développement la repousse (D-114, proposition pour la phase 12). |
+| **Air perturbé / aspiration** | En virage, perte d'appui derrière une autre voiture (air perturbé) ; en ligne droite, réduction de traînée en la suivant (aspiration). Deux phénomènes distincts (D-114). |
+| **Fenêtre d'exploitation** | Plage de conditions (températures, piste, réglages, carburant, pilote) dans laquelle une voiture donne son maximum (D-114). |
 

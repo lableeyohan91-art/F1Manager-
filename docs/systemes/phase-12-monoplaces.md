@@ -2,6 +2,7 @@
 
 > Statut : **ORIENTATIONS VALIDÉES** (D-109, 22/11/2026), demande du porteur et de ChatGPT. **Pas d'implémentation maintenant** : la conception détaillée sera rédigée, critiquée et validée au début de la phase 12.
 > Inspiration : le développement de F1 Manager, avec davantage de profondeur et d'incertitude technique.
+> **Complément D-114** : fondations techniques (aérodynamique, mécanique, groupe propulseur, thermique, pneumatiques, énergie, frontière de compromis) dans `fondations-techniques-monoplaces.md`.
 
 ## 1. Découpage
 

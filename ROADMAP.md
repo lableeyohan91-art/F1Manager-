@@ -24,8 +24,8 @@ Règle : une phase est terminée quand **tous** ses critères de validation sont
 | **A** | **Jalon A** | **10 saisons observées après un historique, chronique lisible, rapport de diagnostic** |
 | 10 | Le joueur | Prendre la tête d'une écurie, premiers écrans mobiles |
 | 11 | Médias et archives | Actualités, rumeurs, records, chronologie, **popularité et image publique qui font évoluer la valeur commerciale** |
-| 12 | Monoplaces | **12a** architecture, pièces, philosophies · **12b** recherche, conception, coûts, délais, risques · **12c** fabrication, stocks, garage · **12d** innovations majeures, veille technologique légale · **12e** compatibilité pilote-monoplace ; pas de voiture parfaite ; délégation par domaine (D-109) |
-| 13 | Courses en 2D | Moteur de course qui remplace le modèle abstrait (reprise des modèles pneus/essence/météo de Paddock) ; **affinités avec les circuits, forme du jour, forme à moyen terme** qui remplacent une partie de l'aléa générique (D-103) ; sang-froid (D-075) |
+| 12 | Monoplaces | **12a** architecture, pièces, philosophies · **12b** recherche, conception, coûts, délais, risques · **12c** fabrication, stocks, garage · **12d** innovations majeures, veille technologique légale · **12e** compatibilité pilote-monoplace ; pas de voiture parfaite ; délégation par domaine (D-109) ; identités techniques et frontière de compromis (D-114) |
+| 13 | Courses en 2D | Moteur de course qui remplace le modèle abstrait (reprise des modèles pneus/essence/météo de Paddock) ; circuits en segments, thermique, énergie, aspiration et air perturbé, qualifications contre course (D-114) ; **affinités avec les circuits, forme du jour, forme à moyen terme** qui remplacent une partie de l'aléa générique (D-103) ; sang-froid (D-075) |
 | 14 | Carrière du manager | Offres d'emploi, licenciement, changement d'écurie, héritage |
 | 15 | Direction artistique et immersion | Portraits, QG, infrastructures, monoplaces, circuits, illustrations d'événements, identités graphiques ; packs de ressources remplaçables ; optimisation mobile |
 

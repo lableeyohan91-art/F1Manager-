@@ -224,3 +224,8 @@ Aucun code à ce stade.
 - La filière fonctionne (61 % des débutants viennent du top 5 de l'Apex 2) ; effet sportif légèrement favorable sur 20 saisons.
 - Débutants trop âgés (24,9 ans) et champions encore trop âgés (30,5 ans) : cause identifiée (recrutement F1 provisoire), remèdes en 6b-2 et en phase 7.
 
+## [Orientations techniques des monoplaces] — 22/11/2026
+
+### Ajouté
+- Fondations techniques des monoplaces pour les phases 12 et 13 (D-114) : `docs/systemes/fondations-techniques-monoplaces.md`. Principe proposé : frontière de compromis et circuits en segments types.
+
