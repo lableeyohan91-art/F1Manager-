@@ -10,7 +10,8 @@
  * - le leader est la personne qui reçoit le plus de respect de ses liens ; son groupe réunit ses liens encore sans groupe ;
  * - taille : au moins `membresMin` membres en plus du leader, au plus `membresMax` (les plus proches de lui).
  */
-export const DETECTION_GROUPES = { semaineDetection: 30, familiariteMin: 0.3, affiniteMin: 0.3, respectMin: 0.35, membresMin: 2, membresMax: 10 };
+// Jalon A bis (D-146) : affiniteMin 0.3 → 0.15, respectMin 0.35 → 0.2, membresMax 10 → 5 (0.66 → 1.16 groupe par écurie, mesure indicative sur 4 mondes).
+export const DETECTION_GROUPES = { semaineDetection: 30, familiariteMin: 0.3, affiniteMin: 0.15, respectMin: 0.2, membresMin: 2, membresMax: 5 };
 
 /**
  * Type d'un groupe (déduit, jamais imposé) :

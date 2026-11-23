@@ -11,10 +11,11 @@ import { copierMonde, table, type Monde } from '../core/monde';
 import type { Moteur } from '../core/moteur';
 import { TABLES, type Contrat, type Ecurie, type Personne, type Saison } from '../model/types';
 import { relation } from '../systems/memoire';
-import { contratEmploi, personneDe, proposerProlongation } from '../systems/humain/contrats';
+import { contratEmploi, nePasProlonger, personneDe, pourvoirPostes, proposerProlongation } from '../systems/humain/contrats';
+import { repondreDepart } from '../systems/humain/departs';
 import { niveauMetier, teamPrincipal, valeurMarche } from '../systems/humain/decision';
 import { reputation } from '../systems/humain/promesses';
-import { changerStatutN1, critiquer, repondreAugmentation, soutenir } from '../systems/humain/interactions';
+import { changerStatutN1, critiquer, licencier, repondreAugmentation, soutenir } from '../systems/humain/interactions';
 
 /** Pondérations du score de réussite (D-069), configurables. */
 export interface Ponderations { sport: number; personnel: number; finances: number; confiance: number }
@@ -145,6 +146,63 @@ export const DILEMMES: Dilemme[] = [
       if (!tp || !p) return;
       if (option === 0) soutenir(monde, tp, p, true);
       else critiquer(monde, tp, p, true);
+    },
+  },
+  // Jalon A bis : trois dilemmes de plus (une décision unique, jouée par les mêmes fonctions que les commandes du joueur).
+  {
+    nom: 'Le responsable aérodynamique demande à partir : accepter ou refuser',
+    options: ['accepter', 'refuser'],
+    preparer(monde) {
+      const e = ecurieDeLaGraine(monde);
+      const p = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((x) => x.statut === 'actif' && x.ecurie === e.id && x.poste === 'responsable_aero');
+      return p && contratEmploi(monde, p.id) ? { ecurie: e.id, personne: p.id } : null;
+    },
+    appliquer(monde, ctx, option) {
+      const tp = teamPrincipal(monde, ctx.ecurie);
+      const p = personneDe(monde, ctx.personne);
+      const c = contratEmploi(monde, ctx.personne);
+      if (!tp || !p || !c) return;
+      c.demandeDepart = { indemnite: 0.5, depuis: { ...monde.date } };
+      repondreDepart(monde, tp, p, option === 0);
+      if (option === 0) pourvoirPostes(monde, true);
+    },
+  },
+  {
+    nom: 'Directeur technique décevant : le licencier ou le garder',
+    options: ['licencier', 'garder'],
+    preparer(monde) {
+      const e = ecurieDeLaGraine(monde);
+      const dt = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'directeur_technique');
+      return dt && contratEmploi(monde, dt.id) ? { ecurie: e.id, personne: dt.id } : null;
+    },
+    appliquer(monde, ctx, option) {
+      if (option === 1) return;
+      const tp = teamPrincipal(monde, ctx.ecurie);
+      const dt = personneDe(monde, ctx.personne);
+      if (!tp || !dt) return;
+      licencier(monde, tp, dt);
+      pourvoirPostes(monde, true);
+    },
+  },
+  {
+    nom: 'Pilote vétéran en fin de contrat : le prolonger ou le laisser partir',
+    options: ['prolonger', 'laisser partir'],
+    preparer(monde) {
+      const e = ecurieDeLaGraine(monde);
+      const pilotes = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).filter((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'pilote_titulaire')
+        .sort((a, b) => a.anneeNaissance - b.anneeNaissance || (a.id < b.id ? -1 : 1));
+      const veteran = pilotes[0];
+      return veteran && contratEmploi(monde, veteran.id) ? { ecurie: e.id, personne: veteran.id } : null;
+    },
+    appliquer(monde, ctx, option) {
+      const tp = teamPrincipal(monde, ctx.ecurie);
+      const c = contratEmploi(monde, ctx.personne);
+      const p = personneDe(monde, ctx.personne);
+      if (!tp || !c || !p) return;
+      // Le contrat se termine à la fin de la saison dans les deux branches ; seule la décision diffère.
+      c.fin = monde.date.annee;
+      if (option === 0) proposerProlongation(monde, c, tp.id, valeurMarche(monde, p), 2, [], 1);
+      else nePasProlonger(monde, c, tp.id, 'choix sportif');
     },
   },
 ];
