@@ -20,6 +20,7 @@ import { TABLES, type Contrat, type Ecurie, type Personne, type Poste } from '..
 import { indexSouvenirs, lireEvenement, relation, type Souvenir } from '../memoire';
 import { candidatPour, contratEmploi, indemniteRupture, liberer, personneDe, pourvoirPostes } from './contrats';
 import { indexAnciennete, indexerAnciennete, lassitude, niveauMetier, teamPrincipal } from './decision';
+import { causesConnues, noterFaitDepart } from './causes';
 import { performanceInsuffisante } from './interactions';
 
 const r1 = (x: number) => Math.round(x * 10) / 10;
@@ -48,10 +49,10 @@ export function envieDePartir(monde: Monde, p: Personne, ctx?: ContexteDeparts):
 const concerne = (p: Personne) => p.statut === 'actif' && !!p.ecurie && !p.poste.startsWith('pilote') && p.poste !== 'team_principal' && p.poste !== 'ancien_pilote' && (RANG_POSTE[p.poste] ?? 0) > 0;
 
 /** Départ à l'amiable : contrat rompu, indemnité convenue versée par l'employeur. */
-function rompreALAmiable(monde: Monde, p: Personne, c: Contrat, indemnite: number, initiateur: 'employeur' | 'personne'): void {
+function rompreALAmiable(monde: Monde, p: Personne, c: Contrat, indemnite: number, initiateur: 'employeur' | 'personne', causes: string[] = []): void {
   delete c.demandeDepart;
   c.clauses.indemniteRuptureMEUR = r1(indemnite); // l'indemnité convenue remplace celle du contrat (versée une seule fois par liberer)
-  liberer(monde, p, c, initiateur === 'employeur' ? 'rupture_employeur' : 'rupture_personne');
+  liberer(monde, p, c, initiateur === 'employeur' ? 'rupture_employeur' : 'rupture_personne', causes);
 }
 
 /** Démission : départ sans indemnité, non-concurrence, trahison ressentie par le team principal. */
@@ -60,12 +61,13 @@ export function demissionner(monde: Monde, p: Personne, c: Contrat, causes: stri
   const ecurie = p.ecurie;
   const evt = ajouterEvenement(monde, {
     type: 'contrat.demission', acteurs: [{ id: p.id, role: 'auteur' }, { id: ecurie, role: 'organisation' }, ...(tp ? [{ id: tp.id, role: 'cible' }] : [])],
-    importance: 3, visibilite: 'public', causes, contexte: { contrat: c.id, envie: Math.round(envieDePartir(monde, p).envie * 100) / 100 },
+    importance: 3, visibilite: 'public', causes: causesConnues(monde, ...causes, c.demandeDepart?.refus, p.dernierFaitDepart), contexte: { contrat: c.id, envie: Math.round(envieDePartir(monde, p).envie * 100) / 100 },
     texte: `${nom(p)} démissionne de ${(table(monde, TABLES.ecuries)[ecurie] as unknown as Ecurie | undefined)?.nom ?? ecurie}.`,
   });
   delete c.demandeDepart;
   c.clauses.indemniteRuptureMEUR = 0;
-  liberer(monde, p, c, 'demission');
+  liberer(monde, p, c, 'demission', [evt.id]);
+  noterFaitDepart(p, evt.id);
   const fin = rang(monde.date) + DEMANDES_DEPART.nonConcurrenceSemaines;
   p.nonConcurrenceJusqua = { annee: Math.floor((fin - 1) / 52), semaine: ((fin - 1) % 52) + 1 };
   if (tp) lireEvenement(monde, tp.id, p.id, 'trahison', evt.id, { facteur: SOUVENIRS_DEPARTS.trahisonDemission });
@@ -83,12 +85,13 @@ export function repondreDepart(monde: Monde, tp: Personne, p: Personne, accepter
   const demande = c.demandeDepart!;
   const evt = ajouterEvenement(monde, {
     type: accepter ? 'contrat.depart_accepte' : 'contrat.depart_refuse', acteurs: [{ id: tp.id, role: 'auteur' }, { id: p.id, role: 'cible' }, { id: p.ecurie, role: 'organisation' }],
-    importance: 2, visibilite: 'prive', contexte: { indemnite: demande.indemnite },
+    importance: 2, visibilite: 'prive', causes: causesConnues(monde, demande.evenement), contexte: { indemnite: demande.indemnite },
     texte: accepter ? `${nom(tp)} accepte de laisser partir ${nom(p)}.` : `${nom(tp)} refuse de laisser partir ${nom(p)}.`,
   });
-  if (accepter) rompreALAmiable(monde, p, c, demande.indemnite, 'personne');
+  if (accepter) rompreALAmiable(monde, p, c, demande.indemnite, 'personne', [evt.id]);
   else {
-    c.demandeDepart = { ...demande, refusee: true };
+    c.demandeDepart = { ...demande, refusee: true, refus: evt.id };
+    noterFaitDepart(p, evt.id);
     lireEvenement(monde, p.id, tp.id, 'conflit', evt.id, { facteur: SOUVENIRS_DEPARTS.conflitRefusDepart });
   }
 }
@@ -106,7 +109,7 @@ export function proposerRupture(monde: Monde, tp: Personne, p: Personne, indemni
   });
   if (accepte) {
     if (indemnite >= plein) lireEvenement(monde, p.id, tp.id, 'reconnaissance', evt.id, { facteur: SOUVENIRS_DEPARTS.reconnaissanceRupture });
-    rompreALAmiable(monde, p, c, indemnite, 'employeur');
+    rompreALAmiable(monde, p, c, indemnite, 'employeur', [evt.id]);
   } else lireEvenement(monde, p.id, tp.id, 'conflit', evt.id, { facteur: SOUVENIRS_DEPARTS.conflitRuptureRefusee });
   return accepte;
 }
@@ -198,11 +201,13 @@ export const systemeDeparts: Systeme = {
       if (envie >= DEMANDES_DEPART.seuilDemande && f.chance(DEMANDES_DEPART.probaDemande)) {
         c.demandeDepart = { indemnite: r1(DEMANDES_DEPART.partIndemniteDemandee * indemniteRupture(c)), depuis: { ...date } };
         const raisons = envieDePartir(monde, p, ctx).raisons;
-        ajouterEvenement(monde, {
-          type: 'contrat.demande_depart', acteurs: [{ id: p.id, role: 'auteur' }, { id: dirigeant.id, role: 'cible' }, { id: p.ecurie, role: 'organisation' }],
+        const evtDemande = ajouterEvenement(monde, {
+          type: 'contrat.demande_depart', causes: causesConnues(monde, p.dernierFaitDepart), acteurs: [{ id: p.id, role: 'auteur' }, { id: dirigeant.id, role: 'cible' }, { id: p.ecurie, role: 'organisation' }],
           importance: 2, visibilite: 'prive', contexte: { envie: Math.round(envie * 100) / 100, indemnite: c.demandeDepart.indemnite, raisons },
           texte: `${nom(p)} demande à ${nom(dirigeant)} de pouvoir partir à l'amiable.`,
         });
+        c.demandeDepart.evenement = evtDemande.id;
+        noterFaitDepart(p, evtDemande.id);
         continue;
       }
       // IA employeur : rupture négociée pour une personne insuffisante qui a déjà envie de partir (une fois par saison).

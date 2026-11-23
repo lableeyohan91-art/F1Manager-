@@ -10,6 +10,7 @@
  * Aucune formule de course ne lit ces données avant la phase 13 (exception temporaire documentée, balance/stands.ts).
  */
 
+import { causesConnues, dernierFait } from '../humain/causes';
 import {
   CREATION_STANDS, COHESION_STANDS, ENCADREMENT_STANDS, ENTRAINEMENT_STANDS, EXPERIENCE_STANDS, FATIGUE_STANDS, HISTORIQUE_STANDS, IA_STANDS,
   ORIENTATIONS_STANDS, RECRUTEMENT_STANDS, RENOUVELLEMENT_STANDS, type IntensiteStands, type OrientationStands,
@@ -137,7 +138,7 @@ export function semaineStands(monde: Monde, eq: EquipeStands, gps: Set<number>):
     eq.cohesion = r2(eq.cohesion - perte);
     ajouterEvenement(monde, {
       type: 'stands.changement_chef', acteurs: [{ id: eq.ecurie, role: 'ecurie' }, { id: eq.chef, role: 'ancien' }, ...(chef ? [{ id: chef, role: 'nouveau' }] : [])],
-      importance: 2, visibilite: 'prive', contexte: { pertePoints: r2(perte), cohesion: eq.cohesion },
+      importance: 2, visibilite: 'prive', causes: causesConnues(monde, dernierFait(monde, (x) => x.type === 'contrat.fin' && x.acteurs.some((a) => a.id === eq.chef))), contexte: { pertePoints: r2(perte), cohesion: eq.cohesion },
       texte: `L'équipe des stands perd son chef : la cohésion en souffre (−${r2(perte)} points).`,
     });
   }

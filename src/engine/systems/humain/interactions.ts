@@ -134,7 +134,7 @@ export function licencier(monde: Monde, auteur: Personne, cible: Personne): Even
     const r = relation(monde, autre.id, cible.id);
     if (r.affinite > 0.2) lireEvenement(monde, autre.id, auteur.id, 'injustice', evt.id, { facteur: r.affinite * 2 * (justifie ? 0.4 : 1) });
   }
-  liberer(monde, cible, c, 'licenciement');
+  liberer(monde, cible, c, 'licenciement', [evt.id]);
   return evt;
 }
 

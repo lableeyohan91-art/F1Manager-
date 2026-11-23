@@ -9,6 +9,7 @@
  * - Candidatures spontanées : une personne ambitieuse et lassée propose ses services (commande dont elle est l'auteur).
  */
 
+import { causesConnues, noterFaitDepart } from '../humain/causes';
 import { CANDIDATURES, FENETRE, OFFRE_MARCHE, PERSONNEL_MARCHE, PLAN_MARCHE, RANG_POSTE, REMPLACEMENT } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
@@ -156,9 +157,10 @@ export const commandeCandidature: DefinitionCommande = {
     table(monde, TABLES.candidatures)[cand.id] = cand as unknown as Entite;
     const evt = ajouterEvenement(monde, {
       type: 'marche.candidature', acteurs: [{ id: p.id, role: 'personne' }, { id: cand.ecurie, role: 'organisation' }, ...(p.ecurie ? [{ id: p.ecurie, role: 'employeur' }] : [])],
-      importance: 2, visibilite: 'prive', contexte: { candidature: cand.id, poste: cand.poste },
+      importance: 2, visibilite: 'prive', causes: causesConnues(monde, p.dernierFaitDepart), contexte: { candidature: cand.id, poste: cand.poste },
       texte: `${p.prenom} ${p.nom} propose ses services à ${(table(monde, TABLES.ecuries)[cand.ecurie] as unknown as Ecurie).nom} (${cand.poste.replace(/_/g, ' ')}).`,
     });
+    noterFaitDepart(p, evt.id);
     // Son employeur peut l'apprendre : la confiance du team principal s'en ressent.
     const tp = p.ecurie ? teamPrincipal(monde, p.ecurie) : undefined;
     if (tp && tirageLocal(monde, 'marche.candidature.fuite', cand.id).chance(0.3)) lireEvenement(monde, tp.id, p.id, 'trahison', evt.id, { facteur: 0.3 });

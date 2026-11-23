@@ -11,6 +11,7 @@
  * Le remplacement provisoire D-066 (pourvoirPostes) ne sert plus que de filet de sécurité en semaine 50.
  */
 
+import { causesConnues, dernierFait } from '../humain/causes';
 import { AGE_MINIMAL_F1 } from '../../balance/carriere';
 import { PRIME_CONTINUITE, SEMAINE_FIN_CONTRATS } from '../../balance/contrats';
 import { CANDIDATURES, DEPART_GROUPE, PERSONNEL_MARCHE, RACHAT, CONTRE_ATTAQUE, FENETRE, HORIZON, INERTIE_CONTRAT, OFFRE_MARCHE, PLAN_MARCHE, PREDATEUR, TOURS_MARCHE } from '../../balance/marche';
@@ -232,11 +233,13 @@ function enregistrerOffre(monde: Monde, auteur: string, prm: Record<string, unkn
   o.statut = 'en_attente';
   delete o.salaireDemande;
   table(monde, TABLES.offres)[o.id] = o as unknown as Entite;
-  ajouterEvenement(monde, {
-    type: 'marche.offre', acteurs: [{ id: p.id, role: 'personne' }, { id: auteur, role: 'auteur' }, { id: e.id, role: 'organisation' }],
+  // Jalon A : une offre répond souvent à une candidature spontanée de la personne auprès de cette écurie.
+  const candidature = dernierFait(monde, (x) => x.type === 'marche.candidature' && x.acteurs.some((a) => a.id === p.id) && x.acteurs.some((a) => a.id === e.id && a.role === 'organisation'), 0);
+  o.evenement = ajouterEvenement(monde, {
+    type: 'marche.offre', acteurs: [{ id: p.id, role: 'personne' }, { id: auteur, role: 'auteur' }, { id: e.id, role: 'organisation' }], causes: causesConnues(monde, candidature),
     importance: d.debauchage ? 2 : 1, visibilite: 'prive',
     contexte: { offre: o.id, salaire: o.salaireMEUR, duree: o.dureeAnnees, debut, indemnite: o.indemniteMEUR, tour: o.tour },
-  });
+  }).id;
   return o;
 }
 
@@ -295,7 +298,8 @@ function signer(monde: Monde, o: OffreMarche, p: Personne, raisons: string[], nb
   o.raisons = raisons;
   const evt = ajouterEvenement(monde, {
     type: 'marche.signature', acteurs: [{ id: p.id, role: 'personne' }, { id: o.decideur, role: 'auteur' }, { id: e.id, role: 'organisation' }, ...(o.beneficiaireIndemnite ? [{ id: o.beneficiaireIndemnite, role: 'cedant' }] : [])],
-    importance: 3, visibilite: 'public',
+    // Jalon A : une signature ailleurs s'explique par ce qui poussait la personne à partir (nouveau défi, départ refusé, leader suivi…).
+    importance: 3, visibilite: 'public', causes: causesConnues(monde, o.evenement, p.ecurie && p.ecurie !== e.id ? p.dernierFaitDepart : undefined),
     contexte: {
       contrat: c.id, offre: o.id, salaire: o.salaireMEUR, debut: o.debut, fin: c.fin, indemnite: o.indemniteMEUR, debauchage: debauche, offresConcurrentes: nbOffres, raisons,
       // D-131 : apport commercial net attendu par l'écurie au moment de la signature (mesure des recrutements motivés par l'argent).
@@ -597,7 +601,9 @@ export function activerContratsSignes(monde: Monde): void {
     if (c.poste === POSTE_MARCHE) transfererSponsors(monde, p); // phase 7c : le sponsor accompagnant suit son pilote
     ajouterEvenement(monde, {
       type: 'recrutement', acteurs: [{ id: p.id, role: 'personne' }, { id: e.id, role: 'organisation' }, ...(ancienne ? [{ id: ancienne, role: 'ancienne' }] : [])],
-      importance: 3, visibilite: 'public', contexte: { contrat: c.id, poste: c.poste, salaire: c.salaireMEUR, marche: true, ancienneEcurie: ancienne || null },
+      // Jalon A : l'arrivée s'explique par la signature conclue pendant la fenêtre du marché.
+      importance: 3, visibilite: 'public', causes: causesConnues(monde, dernierFait(monde, (x) => x.type === 'marche.signature' && x.contexte['contrat'] === c.id, 3)),
+      contexte: { contrat: c.id, poste: c.poste, salaire: c.salaireMEUR, marche: true, ancienneEcurie: ancienne || null },
       texte: `${nom(monde, p.id)} rejoint ${e.nom}${ancienne && ancienne !== e.id ? ` (en provenance de ${nom(monde, ancienne)})` : ''}.`,
     });
   }

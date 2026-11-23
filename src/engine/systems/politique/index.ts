@@ -10,6 +10,7 @@
  * Mêmes commandes pour le joueur et l'IA.
  */
 
+import { causesConnues } from '../humain/causes';
 import { AUTRES_VOTES, ALLIANCES, FEDERATION, INFLUENCE, LOBBYING } from '../../balance/politique';
 import { RESTRICTIONS_AERO } from '../../balance/finances';
 import { PLAFOND_BUDGETAIRE_MEUR } from '../../balance/reglement';
@@ -238,7 +239,7 @@ function proposerVote(monde: Monde, f: Federation): void {
     texte = `écart des restrictions aérodynamiques ${valeur > ecart ? 'élargi' : 'resserré'} à ${valeur}`;
   }
   f.vote = { annee: monde.date.annee, sujet, valeur, votes: {} };
-  ajouterEvenement(monde, { type: 'federation.proposition', acteurs: [], importance: 2, visibilite: 'public', contexte: { sujet, valeur }, texte: `La fédération soumet au vote : ${texte}, pour la saison prochaine.` });
+  f.vote.evenement = ajouterEvenement(monde, { type: 'federation.proposition', acteurs: [], importance: 2, visibilite: 'public', contexte: { sujet, valeur }, texte: `La fédération soumet au vote : ${texte}, pour la saison prochaine.` }).id;
 }
 
 function decompterVote(monde: Monde, f: Federation): void {
@@ -267,7 +268,7 @@ function decompterVote(monde: Monde, f: Federation): void {
   }
   f.historique = [...f.historique, { annee: monde.date.annee, type: v.sujet, resultat: `${adopte ? 'adopté' : 'rejeté'} (${pour} pour, ${contre} contre)` }].slice(-10);
   ajouterEvenement(monde, {
-    type: 'federation.vote', acteurs: [], importance: 3, visibilite: 'public', contexte: { sujet: v.sujet, valeur: v.valeur, pour, contre, adopte },
+    type: 'federation.vote', acteurs: [], importance: 3, visibilite: 'public', causes: causesConnues(monde, v.evenement), contexte: { sujet: v.sujet, valeur: v.valeur, pour, contre, adopte },
     texte: `Vote des écuries (${v.sujet === 'plafondMEUR' ? 'plafond budgétaire' : v.sujet === 'grandsPrix' ? 'nombre de Grands Prix' : 'restrictions aérodynamiques'}) : ${adopte ? 'adopté' : 'rejeté'}, ${pour} voix pour et ${contre} contre.`,
   });
 }

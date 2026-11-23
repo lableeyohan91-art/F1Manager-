@@ -25,7 +25,7 @@ export interface Federation {
   reglesAVenir?: Record<string, number>;
   /** Élection ou vote en cours (candidats, bulletins des écuries). */
   election?: { annee: number; candidats: string[]; votes: Record<string, string> };
-  vote?: { annee: number; sujet: string; valeur: number; votes: Record<string, boolean> };
+  vote?: { annee: number; sujet: string; valeur: number; votes: Record<string, boolean>; evenement?: string };
   historique: { annee: number; type: string; resultat: string }[];
 }
 

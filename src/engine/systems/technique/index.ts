@@ -15,6 +15,7 @@
  * La conversion du savoir en performance est PROVISOIRE et isolée dans `conception.ts` (remplacée par la phase 12).
  */
 
+import { causesConnues } from '../humain/causes';
 import {
   CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
@@ -98,6 +99,8 @@ export function preparerReformes(monde: Monde): void {
     const r: Reglement = {
       id, generation, orientation: o, debut, fin: debut + f.entier(CALENDRIER_REGLEMENT.dureeMin, CALENDRIER_REGLEMENT.dureeMax) - 1,
       statut: 'brouillon', intensites, pneus, votes: {}, prolongation, connuPar: [],
+      // Jalon A : le lobbying de l'année a pesé sur ces propositions (chaîne de causes).
+      causes: { lobbying: Object.values(monde.evenements).filter((x) => x.type === 'politique.lobbying' && x.date.annee === monde.date.annee).map((x) => x.id).sort() },
     };
     table(monde, TABLES.reglements)[r.id] = r as unknown as Entite;
   });
@@ -112,11 +115,12 @@ export function publierReformes(monde: Monde): void {
   const n = projets.length;
   const prolongation = projets[0]!.prolongation ?? 1;
   const choisies = projets.map((r) => r.orientation as Orientation);
-  ajouterEvenement(monde, {
-    type: 'reglement.propositions', acteurs: [], importance: 3, visibilite: 'public',
+  const evtPropositions = ajouterEvenement(monde, {
+    type: 'reglement.propositions', acteurs: [], importance: 3, visibilite: 'public', causes: causesConnues(monde, ...projets.flatMap((r) => r.causes?.lobbying ?? [])),
     contexte: { propositions: propositions(monde).map((r) => ({ id: r.id, orientation: r.orientation, debut: r.debut })), prolongation },
     texte: `La fédération propose ${n} réformes pour ${actuel.fin + 1} (${choisies.map((o) => ORIENTATIONS[o].libelle.toLowerCase()).join(', ')}), ou la prolongation du règlement actuel de ${prolongation} saison${prolongation > 1 ? 's' : ''}.`,
   });
+  for (const r of projets) r.causes = { ...r.causes, propositions: evtPropositions.id };
 }
 
 /** Intérêt calculé d'une écurie pour une option (IA ; même information que le joueur). */
@@ -205,11 +209,12 @@ export function voterReforme(monde: Monde): void {
     else rejeter(monde, r);
   }
   const adopte = table(monde, TABLES.reglements)[t2.gagnant] as unknown as Reglement;
-  ajouterEvenement(monde, {
-    type: 'reglement.annonce', acteurs: [], importance: 4, visibilite: 'public',
+  const evtAnnonce = ajouterEvenement(monde, {
+    type: 'reglement.annonce', acteurs: [], importance: 4, visibilite: 'public', causes: causesConnues(monde, adopte.causes?.propositions),
     contexte: { reglement: t2.gagnant, orientation: adopte.orientation, debut: adopte.debut, tour1: Object.fromEntries(tour1), tour2: Object.fromEntries(tour2), egalite: t1.egalite || t2.egalite, bulletins },
     texte: `Nouveau règlement adopté (${ORIENTATIONS[adopte.orientation as Orientation]?.libelle ?? adopte.orientation}, ${tour1.get('reforme')} voix pour un changement contre ${tour1.get('prolongation')}) : il entrera en vigueur en ${adopte.debut}.`,
   });
+  adopte.causes = { ...adopte.causes, annonce: evtAnnonce.id };
 }
 
 /** Une proposition rejetée : seule la part fondamentale du savoir accumulé pour elle reste utile (D-132, question 5). */
@@ -244,7 +249,7 @@ export function entreeEnVigueur(monde: Monde): boolean {
   reconcevoirGrille(monde, ecuriesActives(monde), nouveau.intensites, nouveau.id, `reglement-${nouveau.id}`);
   for (const p of programmes(monde)) if (p.horizon === nouveau.id) p.horizon = 'actuelle';
   ajouterEvenement(monde, {
-    type: 'reglement.entree_en_vigueur', acteurs: [], importance: 4, visibilite: 'public', contexte: { reglement: nouveau.id, orientation: nouveau.orientation, pneus: nouveau.pneus },
+    type: 'reglement.entree_en_vigueur', acteurs: [], importance: 4, visibilite: 'public', causes: causesConnues(monde, nouveau.causes?.annonce), contexte: { reglement: nouveau.id, orientation: nouveau.orientation, pneus: nouveau.pneus },
     texte: `Le nouveau règlement (${ORIENTATIONS[nouveau.orientation as Orientation]?.libelle ?? nouveau.orientation}) entre en vigueur : les voitures sont reconçues.`,
   });
   return true;

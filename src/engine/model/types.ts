@@ -134,6 +134,8 @@ export interface Personne {
   nonConcurrenceJusqua?: { annee: number; semaine: number };
   /** D-140 : écurie où la personne a déjà dit avoir besoin d'un nouveau défi (signal précurseur donné une fois par séjour). */
   nouveauDefiDemande?: string;
+  /** Jalon A : dernier fait qui explique qu'elle veuille partir (cause citée par la suite : demande, démission, signature ailleurs). */
+  dernierFaitDepart?: string;
   /** Phase 7c : popularité (0–100), nationale et internationale ; lue par la valeur commerciale, les sponsors et l'attrait des sponsors. */
   popularite?: { nationale: number; internationale: number };
   /** Phase 7c : agent (table « agents ») et commission négociée (fraction du salaire). Lus par la négociation et les offres. */
@@ -318,7 +320,9 @@ export interface Contrat {
   /** Phase 7b : période de non-concurrence (semaines) à servir au début du contrat, après un débauchage de personnel technique. */
   nonConcurrenceSemaines?: number;
   /** Phase 8d-2 : demande de départ à l'amiable (indemnité demandée, date ; refusée = en attente d'une éventuelle démission). */
-  demandeDepart?: { indemnite: number; depuis: { annee: number; semaine: number }; refusee?: boolean };
+  demandeDepart?: { indemnite: number; depuis: { annee: number; semaine: number }; refusee?: boolean; evenement?: string; refus?: string };
+  /** Jalon A : fait qui explique la fin prochaine de ce contrat (décision de ne pas prolonger), cité par la fin du contrat. */
+  causeFin?: string;
   /** Phase 8d-2 : saison où l'employeur de l'IA a déjà proposé une rupture négociée (une fois par saison). */
   ruptureProposee?: number;
   verification: string;
@@ -656,6 +660,8 @@ export interface Finances {
 /** Phase 7a : offre faite pendant la fenêtre de transferts (bornée : effacée en fin de saison). */
 export interface OffreMarche {
   id: string;
+  /** Jalon A : événement de l'offre (cause de la signature). */
+  evenement?: string;
   ecurie: string;
   /** Team principal qui fait l'offre. */
   decideur: string;
@@ -733,6 +739,8 @@ export interface Reglement {
   statut: 'brouillon' | 'en_vigueur' | 'annonce' | 'propose' | 'rejete' | 'termine';
   /** Phase 8c : écuries qui ont eu vent de l'avant-projet. */
   connuPar?: string[];
+  /** Jalon A : faits qui expliquent ce règlement (lobbying, propositions, annonce), pour les chaînes de causes. */
+  causes?: { propositions?: string; annonce?: string; lobbying?: string[] };
   /** Intensité du changement par domaine technique, de 0 (inchangé) à 1 (entièrement nouveau), par rapport au règlement précédent. */
   intensites: Record<string, number>;
   /** Version de la spécification des pneumatiques du manufacturier commun. */

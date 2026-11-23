@@ -13,6 +13,7 @@ import { RESILIENCE_ETAT } from '../../balance/personnages';
 import { USURE_SUCCES } from '../../balance/marche';
 import { ajouterEvenement } from '../../core/evenements';
 import { indexAnciennete, indexerAnciennete, usureSucces } from './decision';
+import { noterFaitDepart } from './causes';
 import { idsTries, table, type Monde } from '../../core/monde';
 import type { Systeme } from '../../core/moteur';
 import { TABLES, type Ecurie, type Personne } from '../../model/types';
@@ -82,9 +83,10 @@ function signalerNouveauDefi(monde: Monde, p: Personne, titres: number): void {
   p.nouveauDefiDemande = p.ecurie;
   const posteSuperieur = ['responsable_aero', 'responsable_conception', 'chef_stands'].includes(p.poste) ? 'directeur_technique' : 'team_principal';
   const sup = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((x) => x.statut === 'actif' && x.ecurie === p.ecurie && x.poste === posteSuperieur && x.id !== p.id);
-  ajouterEvenement(monde, {
+  const evt = ajouterEvenement(monde, {
     type: 'personnel.besoin_defi', acteurs: [{ id: p.id, role: 'auteur' }, ...(sup ? [{ id: sup.id, role: 'cible' }] : []), { id: p.ecurie, role: 'organisation' }],
     importance: 2, visibilite: 'prive', contexte: { titres },
     texte: `${p.prenom} ${p.nom} ${sup ? `vient voir ${sup.prenom} ${sup.nom}` : 'se confie au conseil d’administration'} : après ${titres} titre${titres > 1 ? 's' : ''}, il lui faut un nouveau défi.`,
   });
+  noterFaitDepart(p, evt.id); // jalon A : la suite (demande, départ, signature ailleurs) citera ce signal
 }

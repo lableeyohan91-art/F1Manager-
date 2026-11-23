@@ -3,6 +3,7 @@
  * renouvellement du réservoir. Toutes les actions passent par des commandes (mêmes règles pour le joueur et l'IA).
  */
 
+import { causesConnues, dernierFait, noterFaitDepart } from './causes';
 import {
   INDEMNITE_RUPTURE, OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
 } from '../../balance/contrats';
@@ -159,6 +160,9 @@ export function nePasProlonger(monde: Monde, c: Contrat, auteur: string, motif: 
     texte: `${nomDe(monde, c.organisation)} ne prolonge pas ${nomDe(monde, c.personne)}.`,
   });
   c.nonProlonge = true;
+  c.causeFin = evt.id; // jalon A : la fin du contrat citera cette décision
+  const p = personneDe(monde, c.personne);
+  if (p) noterFaitDepart(p, evt.id); // … et une signature ailleurs aussi
   lireEvenement(monde, c.personne, auteur, 'manque_reconnaissance', evt.id, { facteur: 1.1 });
   return evt;
 }
@@ -286,7 +290,7 @@ function payerIndemniteRupture(monde: Monde, c: Contrat): number {
   return montant;
 }
 
-function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin']): Evenement {
+function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin'], causes: string[] = []): Evenement {
   // Phase 8d-2 : une rupture négociée verse l'indemnité convenue (inscrite dans les clauses) ; une démission, aucune.
   if (motif === 'licenciement' || motif === 'rupture_employeur' || motif === 'rupture_personne') payerIndemniteRupture(monde, c);
   c.statut = motif === 'licenciement' || motif === 'rupture_employeur' || motif === 'rupture_personne' || motif === 'demission' ? 'rompu' : 'termine';
@@ -297,7 +301,7 @@ function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin
   p.libreDepuis = monde.date.annee;
   const evt = ajouterEvenement(monde, {
     type: 'contrat.fin', acteurs: [{ id: p.id, role: 'personne' }, { id: ancienne, role: 'organisation' }],
-    importance: 2, visibilite: 'public', contexte: { contrat: c.id, motif, ...(c.indemniteVerseeMEUR !== undefined ? { indemnite: c.indemniteVerseeMEUR } : {}) },
+    importance: 2, visibilite: 'public', causes: causes.filter((x) => monde.evenements[x]), contexte: { contrat: c.id, motif, ...(c.indemniteVerseeMEUR !== undefined ? { indemnite: c.indemniteVerseeMEUR } : {}) },
     texte: `${nomDe(monde, p.id)} quitte ${nomDe(monde, ancienne)}.`,
   });
   // Départ d'un proche : ceux qui l'apprécient s'en souviennent.
@@ -437,6 +441,9 @@ export function recruter(monde: Monde, c: Personne, e: Ecurie, poste: Poste, sal
   delete c.libreDepuis;
   const evt = ajouterEvenement(monde, {
     type: 'recrutement', acteurs: [{ id: c.id, role: 'personne' }, { id: decideur, role: 'auteur' }, { id: e.id, role: 'organisation' }],
+    // Jalon A : un recrutement s'explique par le départ du précédent titulaire du poste.
+    causes: causesConnues(monde, dernierFait(monde, (x) => x.type === 'contrat.fin' && x.acteurs.some((a) => a.id === e.id)
+      && (table(monde, TABLES.contrats)[String(x.contexte['contrat'])] as unknown as Contrat | undefined)?.poste === poste && x.acteurs.some((a) => a.id !== c.id && a.role === 'personne'))),
     importance: poste === 'pilote_titulaire' || poste === 'team_principal' || poste === 'directeur_technique' ? 3 : 2,
     visibilite: 'public', contexte: { contrat: contrat.id, poste, salaire: arrondi(salaire), offresConcurrentes: nbOffres },
     texte: `${nomDe(monde, c.id)} rejoint ${e.nom} (${poste.replace(/_/g, ' ')})${nbOffres > 1 ? `, préféré à ${nbOffres - 1} autre(s) offre(s)` : ''}.`,
@@ -473,7 +480,7 @@ export const systemeFinsDeContrat: Systeme = {
       const c = table(monde, TABLES.contrats)[id] as unknown as Contrat;
       if (c.statut !== 'actif' || c.type !== 'emploi' || c.fin > date.annee) continue;
       const p = personneDe(monde, c.personne);
-      if (p) liberer(monde, p, c, c.nonProlonge ? 'non_prolonge' : 'echeance');
+      if (p) liberer(monde, p, c, c.nonProlonge ? 'non_prolonge' : 'echeance', c.causeFin ? [c.causeFin] : []);
     }
     // Phase 7a : les contrats signés pendant la fenêtre prennent effet ; le remplacement provisoire n'est plus qu'un filet de sécurité.
     activerContratsSignes(monde);

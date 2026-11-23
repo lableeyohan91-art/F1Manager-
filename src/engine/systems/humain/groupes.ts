@@ -16,6 +16,7 @@ import type { Systeme } from '../../core/moteur';
 import { TABLES, type Personne, type Poste } from '../../model/types';
 import { indexSouvenirs, relation, TABLE_RELATIONS, type Relation, type Souvenir } from '../memoire';
 import { teamPrincipal } from './decision';
+import { causesConnues, dernierFait, noterFaitDepart } from './causes';
 
 export type TypeGroupe = 'clan' | 'opposants' | 'mentor' | 'anciens_collaborateurs' | 'collegues';
 
@@ -140,11 +141,17 @@ export function suivreLesLeaders(monde: Monde, commander: Commander): void {
         - SUIVRE_LEADER.poidsConfianceTP * (tp && tp.id !== m.id ? relation(monde, m.id, tp.id).confiance : 0);
       if (envie < SUIVRE_LEADER.seuil) continue;
       const r = commander({ type: 'marche.candidature', auteur: m.id, parametres: { ecurie: leader.ecurie, poste: m.poste } }) as { ok: boolean } | undefined;
-      if (r?.ok) ajouterEvenement(monde, {
+      if (!r?.ok) continue;
+      // Jalon A : le départ du leader explique que le membre veuille le suivre ; ce choix explique sa candidature.
+      const signatureLeader = dernierFait(monde, (x) => (x.type === 'marche.signature' || x.type === 'recrutement') && x.acteurs.some((a) => a.id === leader.id && a.role === 'personne'), 2);
+      const suit = ajouterEvenement(monde, {
         type: 'groupe.suit_leader', acteurs: [{ id: m.id, role: 'membre' }, { id: leader.id, role: 'leader' }, { id: leader.ecurie, role: 'organisation' }], importance: 2, visibilite: 'prive',
-        contexte: { groupe: g.id, envie: r2(envie) },
+        causes: causesConnues(monde, signatureLeader), contexte: { groupe: g.id, envie: r2(envie) },
         texte: `${m.prenom} ${m.nom} veut suivre ${leader.prenom} ${leader.nom} et propose ses services à sa nouvelle écurie.`,
       });
+      const candidature = dernierFait(monde, (x) => x.type === 'marche.candidature' && x.acteurs.some((a) => a.id === m.id), 0);
+      if (candidature) monde.evenements[candidature]!.causes = causesConnues(monde, ...monde.evenements[candidature]!.causes, suit.id);
+      noterFaitDepart(m, suit.id);
     }
   }
 }

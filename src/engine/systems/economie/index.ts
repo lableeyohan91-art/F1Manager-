@@ -334,7 +334,7 @@ function evaluerTeamPrincipal(monde: Monde, e: Ecurie): void {
   const c = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.personne === tp.id && x.statut === 'actif' && x.type === 'emploi');
   if (!c) return;
   const joueur = !!e.pilotee;
-  ajouterEvenement(monde, {
+  const evtConseil = ajouterEvenement(monde, {
     type: joueur ? 'conseil.licenciement_joueur' : 'conseil.licenciement_tp', acteurs: [{ id: e.id, role: 'auteur' }, { id: tp.id, role: 'cible' }],
     importance: joueur ? 5 : 4, visibilite: 'public', contexte: { ecarts, attendu, joueur },
     texte: joueur
@@ -342,7 +342,7 @@ function evaluerTeamPrincipal(monde: Monde, e: Ecurie): void {
       : `Le conseil de ${e.nom} se sépare de son team principal, ${tp.prenom} ${tp.nom}.`,
   });
   if (joueur) e.pilotee = false; // le joueur perd la main ; l'IA reprend l'écurie et recrute un successeur
-  liberer(monde, tp, c, 'licenciement');
+  liberer(monde, tp, c, 'licenciement', [evtConseil.id]);
 }
 
 /** Prolongation du team principal décidée par le conseil (semaine des négociations), joueur compris (D-089). */

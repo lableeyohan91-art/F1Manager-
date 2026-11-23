@@ -152,13 +152,13 @@ export function racheter(monde: Monde, e: Ecurie, fi: Finances, motif: 'administ
   if (tp && f.chance(RACHAT.probabiliteChangementTP)) {
     const c = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.personne === tp.id && x.statut === 'actif' && x.type === 'emploi');
     if (c) {
-      ajouterEvenement(monde, {
+      const evtTp = ajouterEvenement(monde, {
         type: e.pilotee ? 'conseil.licenciement_joueur' : 'conseil.licenciement_tp', acteurs: [{ id: e.id, role: 'auteur' }, { id: tp.id, role: 'cible' }],
         importance: e.pilotee ? 5 : 3, visibilite: 'public', causes: [ev.id], contexte: { motif: 'nouveau_proprietaire' },
         texte: `Le nouveau propriétaire de ${e.nom} remplace le team principal.`,
       });
       if (e.pilotee) e.pilotee = false;
-      liberer(monde, tp, c, 'licenciement');
+      liberer(monde, tp, c, 'licenciement', [evtTp.id]);
       pourvoirPostes(monde);
     }
   }

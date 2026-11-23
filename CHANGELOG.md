@@ -430,3 +430,8 @@ Aucun code à ce stade.
 - Chronique : phrases pour les demandes de départ, groupes, alliances et lobbying ; révélations de presse qui citent le fait ; transferts avec le poste.
 - Test de cohérence semaine par semaine (`tests/jalon-a.test.ts`). 194 tests.
 - Rapport du jalon A : `docs/rapports/2026-11-23-jalon-a.md` (critères, dilemmes, chronique de la graine 42 à lire).
+
+## [Jalon A — chaînes de causes] — 23/11/2026
+
+### Ajouté (D-144)
+- Liens directs entre faits : départs, décisions de l'employeur, marché (candidature, offre, signature, arrivée), recrutements de secours, groupes, stands, règlement et votes (`systems/humain/causes.ts`). 27 % des faits importants ont au moins 3 maillons (0 % avant). Résultats de simulation inchangés.
