@@ -203,3 +203,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Histoire réelle** | Rivalité ou histoire publiquement connue entre personnages inspirés de personnes réelles, saisie dans `histoires.csv` ; elle laisse des souvenirs au départ de 2027 (D-143). |
 | **Ère** | Série d'au moins trois titres constructeurs consécutifs d'une écurie, inscrite dans la Chronique (phase 9). |
 | **Date d'arrivée** | Année où un dirigeant a rejoint son écurie, saisie dans `carrieres.csv` ; elle fixe son ancienneté au départ (D-143). |
+| **Manager (du joueur)** | Personne incarnée par le joueur : team principal de son écurie, aux traits et valeurs neutres, jamais décidée par l'IA (ni marché, ni retraite) ; le conseil la juge comme les autres (phase 10, D-147). |
+| **Délégation** | Domaine de décision (pilotes, personnel, recherche, stands, académie, politique) que le joueur confie à son équipe : elle décide avec exactement les règles de l'IA (phase 10). |
+| **Décision en attente** | Ce qui attend une réponse du joueur (contre-proposition, demande d'augmentation ou de départ, fin de contrat, place à pourvoir, vote), avec son échéance et la conséquence d'une absence de réponse (phase 10). |
+| **Filet de sécurité** | Recrutement d'office d'un remplaçant pour un poste encore vacant, la même règle pour toutes les écuries : une écurie n'est jamais sans directeur ni sans pilote (phase 10). |

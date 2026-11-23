@@ -436,3 +436,23 @@ Aucun code à ce stade.
 ### Ajouté (D-144)
 - Liens directs entre faits : départs, décisions de l'employeur, marché (candidature, offre, signature, arrivée), recrutements de secours, groupes, stands, règlement et votes (`systems/humain/causes.ts`). 27 % des faits importants ont au moins 3 maillons (0 % avant). Résultats de simulation inchangés.
 - Corrigé : les saisons de F1 courues avant 2027 (données) comptent dans la carrière des pilotes (ancienneté, popularité, statistiques). Carrière moyenne mesurée : 10,6 saisons (cible 6 à 10).
+
+## [Jalon A bis] — 23/11/2026
+
+### Modifié (D-146)
+- Groupes sociaux plus fréquents : 0,59 → 0,95 groupe par écurie (seuils de détection abaissés, 5 membres au plus). Comparaison sur les mêmes graines : `docs/rapports/jalon-a/groupes-avant-apres.md`. Leurs effets restent rares (suivre son leader, opposants).
+- Trois dilemmes de plus (accepter un départ, licencier un directeur technique décevant, prolonger un vétéran). Campagne de 20 graines : `docs/rapports/jalon-a/dilemmes-6-dilemmes-20-graines.md` ; rapport du jalon A mis à jour (§2 quater).
+
+## [Phase 10 : le joueur] — 23/11/2026 (nuit, délégation D-147)
+
+### Ajouté
+- Fiche `docs/systemes/phase-10-joueur.md` (validée par délégation du porteur).
+- Moteur (`systems/joueur/`, `balance/joueur.ts`) : prise de fonction (`joueur.prendre_ecurie`), délégations par domaine (`joueur.deleguer`), budget de développement (`budget.developpement`), décisions en attente (consultation), fin de partie si le conseil remplace le joueur, commandes du joueur exécutées tout de suite et journalisées (`executerCommandeJoueur`).
+- Le manager du joueur n'est jamais sur le marché ni mis à la retraite par l'IA ; son contrat reste jugé par le conseil (D-089).
+- Filet de sécurité commun : un poste vacant de l'écurie du joueur est pourvu par le recrutement d'urgence, comme pour l'IA.
+- Format de sauvegarde 25 (champ `joueur`, délégations) et migration 24 → 25.
+- Interface du joueur (`src/ui/jeu/`), mobile d'abord : accueil (nouvelle partie, reprise), tableau de bord, messages, équipe et fiches, marché, technique, finances, championnat, direction (délégations, votes, lobbying), réglages (sauvegarde, téléchargement, mesure des performances). Avance par tranches (« Continuer » s'arrête sur une nouvelle décision, une échéance proche, l'ouverture du marché, la fin de saison). Le diagnostic reste à l'adresse `#diagnostic`.
+- Tests : `tests/joueur.test.ts` (11 tests), parcours complet dans un navigateur sur téléphone et ordinateur (`tools/parcours-joueur.mjs`), mesure joueur passif contre IA (`tools/diagnostic-joueur.mts`).
+
+### Corrigé
+- Des prolongations successives pouvaient porter un contrat très au-delà de 5 saisons (jusqu'en 2045 dans un test) : borne commune au joueur et à l'IA.

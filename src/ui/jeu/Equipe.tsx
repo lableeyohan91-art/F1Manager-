@@ -16,7 +16,7 @@ const LIB_COMPETENCES: Record<string, string> = {
   organisationStands: 'Organisation des stands', strategie: 'Stratégie', reglement: 'Règlement', gestionPilotes: 'Gestion des pilotes', gestionBudgetaire: 'Gestion budgétaire',
   maitrisePlafond: 'Maîtrise du plafond', aerodynamique: 'Aérodynamique', rigueur: 'Rigueur', innovation: 'Innovation', correlation: 'Corrélation', conception: 'Conception', specialite: 'Spécialité',
 };
-const poste = (x: string) => LIBELLES_POSTES[x] ?? x.replace(/_/g, ' ');
+const poste = (x: string) => (x === 'chef_stands' ? 'Chef des stands' : LIBELLES_POSTES[x] ?? x.replace(/_/g, ' '));
 const age = (p: Partie, x: Personne) => p.monde.date.annee - x.anneeNaissance;
 
 function Jauge({ libelle, v, max = 20 }: { libelle: string; v: number; max?: number }) {
@@ -257,6 +257,7 @@ export function EcranMarche({ partie, nav }: { partie: Partie; nav: Navigation }
       {mesOffres.length > 0 && (
         <div class="carte">
           <h3>Mes offres</h3>
+          <p class="muted petit">Y compris celles faites par votre équipe dans les domaines que vous lui déléguez.</p>
           <ul class="liste-personnes">
             {mesOffres.map((o) => (
               <li key={o.id} onClick={() => nav.ouvrirPersonne(o.personne)}>
