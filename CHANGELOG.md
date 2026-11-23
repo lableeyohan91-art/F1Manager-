@@ -429,3 +429,4 @@ Aucun code à ce stade.
 - Retraite d'un dirigeant en fin de saison : poste pourvu aussitôt (écurie sans team principal pendant une semaine).
 - Chronique : phrases pour les demandes de départ, groupes, alliances et lobbying ; révélations de presse qui citent le fait ; transferts avec le poste.
 - Test de cohérence semaine par semaine (`tests/jalon-a.test.ts`). 194 tests.
+- Rapport du jalon A : `docs/rapports/2026-11-23-jalon-a.md` (critères, dilemmes, chronique de la graine 42 à lire).
