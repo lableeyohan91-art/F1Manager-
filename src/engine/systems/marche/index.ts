@@ -32,7 +32,7 @@ import {
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, nombrePlaces, occupantsPour } from '../humain/effectifs';
 import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer, nePasProlonger, proposerProlongation } from '../humain/contrats';
 import { candidaturesSpontanees, commandeCandidature, planPersonnel } from './personnel';
-import { bonusPilotePayant, systemeCommercial } from './commercial';
+import { bonusPilotePayant, systemeCommercial, transfererSponsors } from './commercial';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 const POSTE_MARCHE: Poste = 'pilote_titulaire';
@@ -578,6 +578,7 @@ export function activerContratsSignes(monde: Monde): void {
     delete p.libreDepuis;
     if (ancienPoste !== c.poste) changerMetier(p, c.poste, tirageLocal(monde, 'carriere.metier', p.id, annee), age(monde, p));
     c.statut = 'actif';
+    if (c.poste === POSTE_MARCHE) transfererSponsors(monde, p); // phase 7c : le sponsor accompagnant suit son pilote
     ajouterEvenement(monde, {
       type: 'recrutement', acteurs: [{ id: p.id, role: 'personne' }, { id: e.id, role: 'organisation' }, ...(ancienne ? [{ id: ancienne, role: 'ancienne' }] : [])],
       importance: 3, visibilite: 'public', contexte: { contrat: c.id, poste: c.poste, salaire: c.salaireMEUR, marche: true, ancienneEcurie: ancienne || null },

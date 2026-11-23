@@ -95,3 +95,20 @@ describe('Phase 7b — personnel technique', () => {
     void contrats;
   });
 });
+
+describe('Phase 7b — remplacement par calcul coût/bénéfice', () => {
+  it('une indemnité plus lourde et une non-concurrence rendent le remplacement moins intéressant', async () => {
+    const { bilanRemplacement } = await import('../src/engine');
+    const m = sc.creerMonde(1);
+    const e = ecurie(m, 'eq_haas');
+    const tp = teamPrincipal(m, e.id)!;
+    const enPlace = personnes(m).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'responsable_aero')!;
+    const candidat = personnes(m).find((p) => p.statut === 'libre' && p.poste === 'responsable_aero')!;
+    const base = { p: candidat, d: { indemniteMEUR: 0, debauchage: false }, salaire: 2, duree: 2, score: 0.8 };
+    const simple = bilanRemplacement(m, e, tp, enPlace, base);
+    const debauche = bilanRemplacement(m, e, tp, enPlace, { ...base, d: { indemniteMEUR: 5, debauchage: true } });
+    expect(debauche.couts).toBeGreaterThan(simple.couts); // non-concurrence de 6 mois
+    contratEmploi(m, enPlace.id)!.clauses.indemniteRuptureMEUR = 40;
+    expect(bilanRemplacement(m, e, tp, enPlace, base).couts).toBeGreaterThan(simple.couts); // indemnité de licenciement plus lourde
+  });
+});

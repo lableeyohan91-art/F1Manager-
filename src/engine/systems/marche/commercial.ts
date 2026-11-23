@@ -206,6 +206,11 @@ function suivreLePilote(monde: Monde, c: ContratSponsoring, p: Personne | undefi
   ajouterEvenement(monde, { type: 'sponsor.depart_avec_pilote', acteurs: [{ id: c.sponsor, role: 'sponsor' }, { id: ancienne, role: 'ecurie' }, ...(p ? [{ id: p.id, role: 'pilote' }] : [])], importance: 1, visibilite: 'public', contexte: { contrat: c.id } });
 }
 
+/** Prise d'effet d'un transfert (semaine 50) : les sponsors accompagnants du pilote le suivent tout de suite, ou s'arrêtent. */
+export function transfererSponsors(monde: Monde, p: Personne): void {
+  for (const c of sponsorsDuPilote(monde, p.id)) if (c.ecurie !== p.ecurie) suivreLePilote(monde, c, p, monde.date.annee + 1);
+}
+
 /** Attrait supplémentaire d'une écurie pour les sponsors (D-096) : popularité de ses pilotes, jeune espoir. */
 export function attraitPilotes(monde: Monde, e: Ecurie): number {
   const ps = titulaires(monde).filter((p) => p.ecurie === e.id);

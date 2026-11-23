@@ -63,15 +63,11 @@ export const PREDATEUR = { parDebauchage: 1, inertie: 0.6, malusParPoint: 0.04, 
  * - postes : postes ouverts au marché (le team principal reste nommé par le conseil) ;
  * - nonConcurrenceSemaines : période de non-concurrence d'une personne débauchée (D-117 : 6 mois), pendant laquelle elle ne contribue pas
  *   au développement de sa nouvelle écurie ;
- * - ecartAmelioration : avance de niveau (points /20) exigée pour remplacer un responsable en place (il est alors libéré, avec indemnité) ;
- *   au plus `ameliorationsParSaison` par écurie ;
  * - partBudgetPoste : part du budget de l'écurie qui sert de référence de coût pour un poste de personnel (score de recrutement).
  */
 export const PERSONNEL_MARCHE = {
   postes: ['directeur_technique', 'responsable_aero', 'responsable_conception', 'directeur_sportif', 'directeur_financier'] as const,
   nonConcurrenceSemaines: 26,
-  ecartAmelioration: 2,
-  ameliorationsParSaison: 1,
   partBudgetPoste: 0.015,
 };
 
@@ -102,3 +98,14 @@ export const CANDIDATURES = { semaine: 28, ambitionMin: 13, lassitudeMin: 0.06, 
  * de son département : son ancien département perd jusqu'à `niveauMax` points de niveau moyen, le nouveau en gagne la moitié.
  */
 export const DEPART_GROUPE = { niveauMax: 1, seuilInfluence: 0.6 };
+
+/**
+ * Remplacement d'une personne en place (phase 7b, décision coût/bénéfice demandée par le porteur le 23/11/2026, à la place de seuils fixes).
+ * Une fois par saison, l'IA compare, en unités du score de recrutement (≈ niveau/20) :
+ * - gain : score de la recrue − score de la personne en place (même grille : niveau, potentiel, âge, salaire, entente avec le team principal) ;
+ * - coûts : indemnité de licenciement (poidsIndemnite × montant / référence de coût du poste sur la durée) ; non-concurrence d'une recrue débauchée
+ *   (poste sans contribution : (niveau en place − niveauVacant)/20 × semaines/52, réparti sur la durée) ; perte de continuité (continuite) ;
+ *   instabilité (instabiliteParRemplacement × remplacements déjà décidés cette saison dans l'écurie).
+ * Remplacement si gain − coûts > seuil − audace × (risque du team principal − 10)/10 + aléa de jugement (écart type alea).
+ */
+export const REMPLACEMENT = { poidsIndemnite: 0.4, niveauVacant: 10, continuite: 0.075, instabiliteParRemplacement: 0.04, seuil: 0.03, audace: 0.02, alea: 0.015 };

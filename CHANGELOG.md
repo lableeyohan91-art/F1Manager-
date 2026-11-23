@@ -316,3 +316,9 @@ Aucun code à ce stade.
 ### Ajouté (D-124)
 - `systems/marche/commercial.ts`, coefficients `balance/commercial.ts` : popularité, valeur commerciale, sponsors personnels (accompagnant, personnel, familial, national), pilotes payants, motivations des sponsors, agents (commission négociée, surenchère, poussée au transfert, démarchage).
 - Format de sauvegarde 17 (agents), migration et test. Tests `tests/commercial.test.ts`. 141 tests.
+
+## [Remplacements par calcul] — 23/11/2026
+
+### Modifié (D-126)
+- Le remplacement d'une personne en place n'obéit plus à des seuils fixes : décision coût/bénéfice de l'IA (gain comparé aux indemnités, à la non-concurrence, à la continuité et à l'instabilité ; goût du risque du team principal). Tous les postes du personnel sont concernés.
+- Le sponsor accompagnant suit son pilote dès la prise d'effet du transfert (semaine 50).
