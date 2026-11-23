@@ -1,0 +1,73 @@
+/* Phase 10 — interface du joueur : mobile d'abord (barre de navigation en bas), barre latérale sur ordinateur. */
+.jeu { min-height: 100vh; padding-bottom: 72px; }
+.jeu-entete { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); z-index: 20; }
+.jeu-titre { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; flex: 1; }
+.jeu-titre strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jeu-titre .muted { font-size: .8rem; }
+.jeu-avance { display: flex; gap: 6px; }
+.jeu-avance .btn { padding: 8px 10px; white-space: nowrap; }
+.jeu-bandeau { padding: 6px 12px; background: var(--panel-2); border-bottom: 1px solid var(--line); font-size: .9rem; position: sticky; top: 52px; z-index: 19; }
+.jeu-bandeau.calcul { color: var(--yellow); }
+.jeu-page { max-width: 960px; margin: 0 auto; padding: 8px 16px 16px; }
+.jeu-page h3 { margin: 0 0 8px; font-size: 1rem; }
+.jeu-page h4 { margin: 12px 0 6px; font-size: .95rem; }
+.jeu-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; overflow-x: auto; background: var(--panel); border-top: 1px solid var(--line); z-index: 30; padding-bottom: env(safe-area-inset-bottom); }
+.jeu-nav button { flex: 1 0 64px; background: none; border: 0; padding: 6px 2px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--muted); cursor: pointer; min-height: 52px; }
+.jeu-nav button .ic { font-size: 1.15rem; line-height: 1.2; }
+.jeu-nav button .lib { font-size: .68rem; }
+.jeu-nav button.actif { color: var(--text); box-shadow: inset 0 2px 0 var(--accent); }
+/* Téléphone : 4 écrans + « Plus », qui déplie les autres au-dessus de la barre. */
+.jeu-nav { flex-wrap: wrap; overflow: visible; }
+.jeu-nav button { flex: 1 0 20%; }
+.jeu-nav button.secondaire { display: none; }
+.jeu-nav.ouvert button.secondaire { display: flex; order: -1; flex-basis: 20%; border-bottom: 1px solid var(--line); }
+@media (min-width: 900px) {
+  .jeu { padding-bottom: 0; padding-left: 170px; }
+  .jeu-nav { top: 0; bottom: 0; right: auto; width: 170px; flex-direction: column; flex-wrap: nowrap; border-top: 0; border-right: 1px solid var(--line); padding-top: 60px; }
+  .jeu-nav button { flex: 0 0 auto; flex-direction: row; justify-content: flex-start; gap: 10px; padding: 10px 16px; min-height: 0; }
+  .jeu-nav button .lib { font-size: .9rem; }
+  .jeu-nav button.actif { box-shadow: inset 3px 0 0 var(--accent); }
+  .jeu-nav button.secondaire { display: flex; }
+  .jeu-nav button.plus { display: none; }
+}
+.grand { font-size: 1.6rem; font-weight: 800; margin: 4px 0; }
+.petit { font-size: .8rem; }
+.badge { display: inline-block; background: var(--accent); color: #fff; border-radius: 10px; padding: 0 7px; font-size: .75rem; margin-left: 6px; vertical-align: middle; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.actions .btn, a.btn { text-decoration: none; display: inline-block; min-height: 40px; }
+.actions.collant { position: sticky; bottom: 64px; background: var(--bg); padding: 8px 0; }
+.btn.danger { border-color: #ff8a80; color: #ff8a80; }
+.btn.actif { border-color: var(--accent); }
+.champ { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; color: var(--muted); margin: 6px 0; }
+.champ input, .champ select { color: var(--text); font-size: 1rem; min-height: 40px; }
+.ligne-champs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.case, .interrupteur { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; cursor: pointer; }
+.case input, .interrupteur input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+.liste-cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+.carte-choix { text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+.carte-choix.actif { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.liste-decisions, .liste-personnes, .liste-faits { list-style: none; margin: 0; padding: 0; }
+.liste-decisions li { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.liste-decisions li.urgente strong { color: var(--yellow); }
+.etiquette { flex: none; font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; height: fit-content; }
+.liste-personnes li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; min-height: 48px; }
+.liste-personnes .droite { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.liste-faits li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+.liste-faits li.fort { border-left: 3px solid var(--accent); padding-left: 8px; }
+.point-alerte { width: 10px; height: 10px; border-radius: 50%; background: var(--yellow); display: inline-block; }
+.carte.attention { border-color: var(--yellow); }
+.retour { color: var(--green); }
+.jauge { display: grid; grid-template-columns: minmax(90px, 40%) 1fr 30px; gap: 8px; align-items: center; margin: 4px 0; font-size: .9rem; }
+.jauge .piste { background: var(--panel-2); border-radius: 6px; height: 10px; overflow: hidden; }
+.jauge .piste span { display: block; height: 100%; }
+.etat-offre { font-size: .8rem; white-space: nowrap; }
+.etat-offre.acceptee { color: var(--green); }
+.etat-offre.refusee, .etat-offre.expiree { color: #ff8a80; }
+.etat-offre.contre_offre { color: var(--yellow); }
+tr.moi td { color: var(--text); font-weight: 700; background: rgba(225,6,0,.12); }
+.ligne-rang { display: flex; justify-content: space-between; gap: 8px; }
+.rang.bon { color: var(--green); font-weight: 700; }
+.rang.faible { color: #ff8a80; }
+.jeu-page { overflow-x: hidden; }
+.jeu-page table.compact td { white-space: normal; }
+.carte.retour[role="status"] { position: sticky; top: 96px; z-index: 15; box-shadow: 0 4px 12px rgba(0,0,0,.5); }
