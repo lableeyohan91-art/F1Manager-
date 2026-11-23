@@ -189,3 +189,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Plan d'entraînement (stands)** | Orientation (rapidité, précision, coordination, récupération) et intensité (légère, normale, intensive) de l'entraînement de l'équipe des stands, modifiable à tout moment (D-132, phase 8d). |
 | **Fatigue (stands)** | Charge accumulée par l'équipe des stands (entraînement, Grands Prix, enchaînements), réduite par la récupération ; elle freine les progrès et, en phase 13, augmentera les erreurs (phase 8d). |
 | **Encadrement (stands)** | Qualité de la direction de l'équipe des stands : chef d'équipe, directeur sportif et leur relation ; il fixe le plafond de cohésion (phase 8d). |
+| **Envie de partir** | Désir d'une personne de quitter son poste, calculé à partir de sa motivation, de sa méfiance envers le team principal, de sa rancœur envers l'écurie et de sa lassitude (phase 8d). |
+| **Demande de départ** | Demande d'une personne de quitter son poste à l'amiable, contre une partie de son indemnité ; l'employeur accepte ou refuse (phase 8d). |
+| **Rupture négociée** | Fin de contrat d'un commun accord, avec une indemnité convenue, proposée par l'employeur ou demandée par la personne (D-077, phase 8d). |
+| **Démission** | Départ unilatéral d'une personne, sans indemnité, suivi d'une période de non-concurrence (phase 8d). |

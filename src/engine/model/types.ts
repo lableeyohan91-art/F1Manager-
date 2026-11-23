@@ -285,7 +285,8 @@ export interface Clauses {
   note?: string;
 }
 
-export type MotifFinContrat = 'echeance' | 'non_prolonge' | 'licenciement' | 'demission' | 'rachat';
+/** Phase 8d-2 : rupture négociée à l'initiative de l'employeur ou de la personne. */
+export type MotifFinContrat = 'echeance' | 'non_prolonge' | 'licenciement' | 'demission' | 'rachat' | 'rupture_employeur' | 'rupture_personne';
 
 export interface Contrat {
   id: string;
@@ -311,6 +312,10 @@ export interface Contrat {
   remplace?: string;
   /** Phase 7b : période de non-concurrence (semaines) à servir au début du contrat, après un débauchage de personnel technique. */
   nonConcurrenceSemaines?: number;
+  /** Phase 8d-2 : demande de départ à l'amiable (indemnité demandée, date ; refusée = en attente d'une éventuelle démission). */
+  demandeDepart?: { indemnite: number; depuis: { annee: number; semaine: number }; refusee?: boolean };
+  /** Phase 8d-2 : saison où l'employeur de l'IA a déjà proposé une rupture négociée (une fois par saison). */
+  ruptureProposee?: number;
   verification: string;
 }
 

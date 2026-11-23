@@ -85,7 +85,7 @@ export function departProvoque(monde: Monde, personne: string, organisation: str
     .filter((c) => c.personne === personne && c.organisation === organisation && c.type === 'emploi' && c.statut !== 'actif' && c.statut !== 'signe')
     .sort((a, b) => b.fin - a.fin || (a.id < b.id ? 1 : -1));
   const m = derniers[0]?.motifFin;
-  return m === 'licenciement' || m === 'non_prolonge';
+  return m === 'licenciement' || m === 'non_prolonge' || m === 'rupture_employeur';
 }
 
 /** La promesse est-elle respectée à cet instant ? (null = pas encore vérifiable) */

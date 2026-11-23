@@ -287,8 +287,9 @@ function payerIndemniteRupture(monde: Monde, c: Contrat): number {
 }
 
 function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin']): Evenement {
-  if (motif === 'licenciement') payerIndemniteRupture(monde, c);
-  c.statut = motif === 'licenciement' ? 'rompu' : 'termine';
+  // Phase 8d-2 : une rupture négociée verse l'indemnité convenue (inscrite dans les clauses) ; une démission, aucune.
+  if (motif === 'licenciement' || motif === 'rupture_employeur' || motif === 'rupture_personne') payerIndemniteRupture(monde, c);
+  c.statut = motif === 'licenciement' || motif === 'rupture_employeur' || motif === 'rupture_personne' || motif === 'demission' ? 'rompu' : 'termine';
   c.motifFin = motif;
   const ancienne = p.ecurie;
   p.statut = 'libre';

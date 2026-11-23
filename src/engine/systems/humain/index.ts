@@ -7,6 +7,7 @@ import { installerMarche } from '../marche';
 import { systemeEtat } from './etat';
 import { installerInteractions } from './interactions';
 import { systemePromesses } from './promesses';
+import { commandeRepondreDepart, commandeRuptureNegociee, systemeDeparts } from './departs';
 
 /**
  * Ordre dans la semaine (après les systèmes de la saison) : promesses, négociations, fins de contrat et recrutements,
@@ -17,6 +18,9 @@ export function installerHumain(moteur: Moteur): Moteur {
   installerContrats(moteur);
   installerMarche(moteur); // phase 7a : marché des transferts des pilotes
   installerInteractions(moteur);
+  // Phase 8d-2 : demandes de départ, démissions, ruptures négociées.
+  moteur.ajouterSysteme(systemeDeparts);
+  moteur.commandes.enregistrer(commandeRuptureNegociee).enregistrer(commandeRepondreDepart);
   moteur.ajouterSysteme(systemeEtat).ajouterSysteme(systemeOubli);
   moteur.ajouterProtecteur(evenementsProteges);
   return moteur;
@@ -28,3 +32,4 @@ export * from './etat';
 export * from './interactions';
 export * from './promesses';
 export * from './effectifs';
+export * from './departs';

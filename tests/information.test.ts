@@ -44,13 +44,13 @@ describe('Phase 8c — fuites et rumeurs', () => {
     const base = sc.creerMonde(2);
     const moteur = sc.creerMoteur();
     moteur.avancer(base, 30);
-    const { e } = promesseRompue(base);
+    const faits = [promesseRompue(base).e, promesseRompue(base).e, promesseRompue(base).e];
     moteur.avancer(base, 1);
     const etendue = (discretion: number) => {
       const m = copierMonde(base);
       for (const p of personnes(m)) p.traits['discretion'] = discretion;
-      moteur.avancer(m, 20);
-      return m.evenements[e.id]?.connuPar.length ?? 0;
+      moteur.avancer(m, 26);
+      return faits.reduce((a, e) => a + (m.evenements[e.id]?.connuPar.length ?? 0), 0);
     };
     expect(etendue(2)).toBeGreaterThan(etendue(19));
   }, 60_000);

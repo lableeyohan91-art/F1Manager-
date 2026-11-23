@@ -18,6 +18,10 @@ export const FAITS_DIFFUSABLES: Record<string, number> = {
   'negociation.refus': 0.4,
   'personnel.soutien': 0.3,
   'augmentation.demandee': 0.3,
+  // Phase 8d-2
+  'contrat.demande_depart': 0.7,
+  'contrat.depart_refuse': 0.5,
+  'contrat.rupture_refusee': 0.5,
 };
 
 /**

@@ -373,3 +373,10 @@ Aucun code à ce stade.
 ### Corrigé
 - Un sponsor accompagnant ne reste plus lié à un pilote qui a quitté l'écurie hors marché : il le suit ou prend fin.
 - Limite de taille de sauvegarde (10 saisons) relevée de 4 à 4,5 Mo, mesures à l'appui (données de la phase 8).
+
+## [Phase 8d-2 : démissions et ruptures négociées] — 23/11/2026
+
+### Ajouté (D-077, D-136)
+- Envie de partir, demandes de départ à l'amiable, démissions (non-concurrence, trahison ressentie), ruptures négociées proposées par l'employeur (`systems/humain/departs.ts`, `balance/departs.ts`).
+- Commandes `contrat.rupture_negociee` et `contrat.repondre_depart` ; décisions de l'IA ; postes libérés pourvus par le recrutement habituel.
+- Demandes de départ et refus suivis par la diffusion de l'information (8c). Tests `tests/departs.test.ts`. 174 tests.
