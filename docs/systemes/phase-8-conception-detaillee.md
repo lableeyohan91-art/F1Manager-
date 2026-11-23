@@ -114,7 +114,8 @@ Les ordres de grandeur sont **provisoires** ; ils seront rangés dans `balance/r
 - **Détection** chaque saison : des ensembles de personnes reliées par une forte affinité et un respect mutuel (au-dessus d'un seuil), à partir de passés communs (mêmes écuries, mentorat, académie). Aucun groupe n'est créé à la main.
 - **Leader** : le membre le plus respecté par les autres.
 - **Effets** :
-  - quand le leader part, chaque membre est davantage tenté de le suivre : cela enrichit les départs en groupe de la 7b avec de vraies personnes ;
+  - quand le leader part, chaque membre est davantage tenté de le suivre : cela enrichit les départs en groupe de la 7b avec de vraies personnes. Limite actuelle : les ingénieurs ne sont pas individualisés, et le départ en groupe ne fait que déplacer du niveau de département (`phase-7-marche-du-travail.md` §16) ;
+  - **démissions et ruptures négociées** (D-077), via une clause de départ et une indemnité négociée, même commande pour le joueur et l'IA ;
   - un groupe opposé à la direction abaisse la cohésion et la motivation de son département ;
   - un groupe soudé autour d'un pilote pèse dans le choix du n°1.
 
@@ -164,3 +165,4 @@ Les ordres de grandeur sont **provisoires** ; ils seront rangés dans `balance/r
 5. **Anticipation** : le joueur choisit lui-même la part de son budget consacrée à la voiture suivante. Faut-il aussi permettre de la confier au directeur technique (délégation) ?
 6. **Autres sujets de vote** (plafond budgétaire, restrictions aéro, nombre de Grands Prix) : dès la 8c, ou plus tard ?
 7. **Président de la fédération** élu tous les 4 ans, avec des préférences qui pèsent sur les propositions : d'accord ?
+8. **Ingénieurs clés individualisés** (3 à 5 par département, environ 130 personnes de plus) pour de vrais départs en cascade en 8c, ou garder l'approximation par département ?

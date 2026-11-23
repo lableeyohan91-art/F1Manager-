@@ -259,3 +259,19 @@ La réputation ne bloque **jamais** un débauchage. Elle le rend plus **cher** e
 - les autres écuries sont moins enclines à lui céder quelqu'un à l'amiable.
 
 Elle **s'efface avec le temps**. Une écurie peut donc débaucher souvent si elle accepte d'en payer le prix. Le laboratoire vérifiera seulement que ce n'est pas la stratégie gagnante dans tous les cas.
+
+## 16. Audit de la phase 7 — limites des conséquences humaines (priorité 5) et préparation
+
+**Ce que fait aujourd'hui le « départ en groupe » (7b).** Les ingénieurs ne sont pas individualisés : ils existent seulement comme départements, avec un effectif et un niveau moyen. Quand un responsable technique influent est débauché, son ancien département perd jusqu'à 1 point de niveau moyen et le nouveau en gagne la moitié. **Aucune personne ne se déplace réellement.** C'est une approximation, signalée comme telle.
+
+**Ce qui manque encore par rapport à D-077 :**
+
+| Conséquence humaine | État | Où elle viendra |
+| --- | --- | --- |
+| Départs en cascade de personnes réelles (un leader entraîne des collaborateurs individualisés) | Approximé par le niveau des départements | **8c** : groupes sociaux émergents ; les membres d'un groupe ont davantage envie de suivre leur leader (utilité d'une offre de l'écurie du leader). Une vraie cascade suppose des ingénieurs individualisés : à décider (voir ci-dessous) |
+| Candidatures spontanées | **Fait** (7b) | — |
+| Démission à l'initiative de la personne (forte lassitude ou démotivation, offre en main) | Non fait | 8c, avec une **clause de départ** et une **rupture négociée** : la personne ou son agent négocie une indemnité réduite ; l'employeur accepte ou refuse selon le coût de son remplacement. Même commande pour le joueur et l'IA |
+| Rupture négociée par l'employeur (au lieu d'un licenciement sec) | Non fait | 8c, même mécanisme que ci-dessus, dans l'autre sens |
+| Tensions entre coéquipiers (statut de n°1, favoritisme) | Partiel (phase 4 : promesses, injustice ressentie) | 8b et 8c : la réputation perçue et les groupes autour d'un pilote |
+
+**Point à trancher par le porteur.** Des départs en cascade vraiment individuels demandent d'**individualiser une partie des ingénieurs**, par exemple les 3 à 5 ingénieurs clés de chaque département. Cela augmente le nombre de personnes simulées (≈ 11 × 3 × 4 = 130 de plus) et le coût de calcul. Je propose de le décider avec la conception de la 8c.
