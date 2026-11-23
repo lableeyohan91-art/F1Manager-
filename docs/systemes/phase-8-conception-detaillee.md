@@ -1,6 +1,6 @@
 # Phase 8 — Conception détaillée : règlements, recherche, mémoire v2, groupes sociaux, politique
 
-> Statut : **PROPOSITION — À VALIDER**. Version 2 du 23/11/2026, qui intègre la réponse du porteur à la question 2 et ses décisions sur la recherche et développement (D-128). **Aucun code avant validation.**
+> Statut : **VALIDÉE** (D-132, 23/11/2026 : toutes les recommandations du §10 retenues). Version 2, qui intègre la réponse du porteur à la question 2 et ses décisions sur la R&D (D-128) et l'équipe des stands (D-129).
 >
 > Cadre :
 > - D-090 et `phase-8-cycles-reglementaires.md` : orientations des changements de règlement. **Partiellement remplacé par D-128**, voir §8 ;
