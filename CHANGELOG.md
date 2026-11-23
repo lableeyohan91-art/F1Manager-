@@ -327,3 +327,11 @@ Aucun code à ce stade.
 
 ### Modifié (D-127)
 - Une personne débauchée travaille dès son arrivée, à 50 % de son efficacité pendant 6 mois (au lieu de ne pas contribuer du tout). Les secrets de l'ancienne écurie viendront en phase 12.
+
+## [Audit de la phase 7] — 23/11/2026
+
+### Corrigé (D-130)
+- Engagements uniques des sponsors (`sponsorsEngages`), apport commercial réel par écurie (`apportCommercialPour`), entreprises liées plafonnées (format de sauvegarde 18).
+- Outils de démographie et d'équilibrage fiables malgré l'archivage des retraités.
+- Délais explicites pour les tests de simulation ; performances du marché améliorées sans changer les résultats.
+- Rapport : `docs/rapports/2026-11-23-audit-p7.md` ; références `p7-complete-*`. 146 tests.
