@@ -1,5 +1,7 @@
 # Rapport court — Fin de la phase 7 (7b, 7c) et archivage
 
+> **Erratum (audit de la phase 7)** : plusieurs indicateurs de ce rapport étaient faussés par l'archivage. Les mesures corrigées sont dans `docs/rapports/2026-11-23-audit-p7.md`.
+
 > Date : 23/11/2026. Mesures **indicatives** (D-120). Code mesuré : commit 95f96b2, comparé à la référence 7a (mêmes graines).
 > Références : `docs/rapports/reference/p7-reference.*` (100 graines × 10 saisons).
 
@@ -17,7 +19,7 @@
 
 | Indicateur | 7a | **Fin de la phase 7** | Lecture |
 | --- | --- | --- | --- |
-| Âge des champions | 31,3 | **30,4** | favorable, objectif D-111 encore non atteint |
+| Âge des champions | 31,3 | ~~30,4~~ **31,4** (erratum) | stable ; le 30,4 venait de l'outil non corrigé, voir `2026-11-23-audit-p7.md` |
 | Âge des débutants | 22,8 | 22,8 | stable |
 | Champions pilotes / 10 saisons | 4,6 | 4,5 | ≈ |
 | Champions constructeurs / 10 saisons | 2,6 | 2,8 | favorable |
