@@ -1,6 +1,6 @@
 # Rapport d’équilibrage — 100 graines × 10 saisons
 
-Scénario grille-2026, graines 1 à 100, 1000 saisons simulées en 979,9 s. Généré par `npm run equilibrage`.
+Scénario grille-2026, graines 1 à 100, 1000 saisons simulées en 861,2 s. Généré par `npm run equilibrage`.
 
 > Rappel (D-040) : ce sont des **objectifs statistiques**, pas des limites. Le moteur ne lit aucun de ces indicateurs.
 
@@ -8,16 +8,16 @@ Scénario grille-2026, graines 1 à 100, 1000 saisons simulées en 979,9 s. Gén
 
 | Indicateur | Moyenne | 10 % – 90 % | Objectif | Dans l’objectif | Référence P3 |
 | --- | --- | --- | --- | --- | --- |
-| Vainqueurs de Grand Prix différents par saison | 5,9 | 4,0 – 8,0 | 3,0 – 8,0 | 90 % | 6,0 |
-| Écuries victorieuses par saison | 4,1 | 3,0 – 6,0 | 2,0 – 5,0 | 86 % | 4,1 |
+| Vainqueurs de Grand Prix différents par saison | 6,0 | 4,0 – 8,0 | 3,0 – 8,0 | 91 % | 6,0 |
+| Écuries victorieuses par saison | 4,0 | 3,0 – 6,0 | 2,0 – 5,0 | 85 % | 4,1 |
 | Part des victoires de l'écurie dominante | 59 % | 38 % – 83 % | 35 % – 80 % | 79 % | 59 % |
-| Taux d’abandon par départ | 7 % | 4 % – 10 % | 5 % – 15 % | 77 % | 7 % |
-| Écart de performance 1re–dernière voiture (% temps au tour) | 1,52 | 0,90 – 2,24 | 1,50 – 4,00 | 48 % | 1,52 |
-| Écart de points entre les deux premiers | 66 | 9 – 144 | — | — | 65 |
+| Taux d’abandon par départ | 7 % | 4 % – 10 % | 5 % – 15 % | 78 % | 7 % |
+| Écart de performance 1re–dernière voiture (% temps au tour) | 1,51 | 0,90 – 2,24 | 1,50 – 4,00 | 48 % | 1,52 |
+| Écart de points entre les deux premiers | 67 | 10 – 144 | — | — | 65 |
 | Changements de leader du championnat | 2,9 | 0,0 – 7,0 | — | — | 3,0 |
-| Doublés par saison (toutes écuries) | 5,7 | 1,0 – 11,0 | — | — | 5,6 |
-| Corrélation voiture ↔ points constructeurs (Spearman) | 0,90 | 0,80 – 0,97 | — | — | 0,90 |
-| Plus forte progression d’une voiture dans la saison (points d’indice) | 1,02 | 0,66 – 1,40 | — | — | 1,02 |
+| Doublés par saison (toutes écuries) | 5,8 | 1,0 – 11,0 | — | — | 5,6 |
+| Corrélation voiture ↔ points constructeurs (Spearman) | 0,90 | 0,79 – 0,97 | — | — | 0,90 |
+| Plus forte progression d’une voiture dans la saison (points d’indice) | 1,02 | 0,67 – 1,40 | — | — | 1,02 |
 | Victoires inattendues par saison | 2,4 | 0,0 – 6,0 | — | — | 2,4 |
 | Courses sous la pluie par saison | 2,7 | 1,0 – 5,0 | — | — | 2,7 |
 
@@ -25,78 +25,78 @@ Scénario grille-2026, graines 1 à 100, 1000 saisons simulées en 979,9 s. Gén
 
 | Indicateur | Moyenne | 10 % – 90 % | Objectif | Dans l’objectif | Référence P3 |
 | --- | --- | --- | --- | --- | --- |
-| Champions pilotes différents sur 10 saisons | 4,5 | 3,0 – 6,0 | 3,0 – 7,0 | 97 % | 4,6 |
-| Champions constructeurs différents sur 10 saisons | 2,8 | 2,0 – 4,0 | — | — | 2,7 |
+| Champions pilotes différents sur 10 saisons | 4,5 | 3,0 – 6,0 | 3,0 – 7,0 | 96 % | 4,6 |
+| Champions constructeurs différents sur 10 saisons | 2,7 | 2,0 – 4,0 | — | — | 2,7 |
 | Plus longue série de titres constructeurs consécutifs | 5,3 | 3,0 – 8,0 | — | — | 5,4 |
-| Écuries sans aucune victoire sur 10 saisons | 2,9 | 1,0 – 5,0 | — | — | 2,8 |
-| Remontées (+3 places ou plus d’une saison à l’autre) | 6,1 | 3,0 – 10,0 | — | — | 6,0 |
-| Écuries changeant d’étage par saison (étages 1–4 / 5–8 / 9+, D-081) | 2,6 | 2,0 – 3,4 | — | — | 2,5 |
+| Écuries sans aucune victoire sur 10 saisons | 3,0 | 1,0 – 5,0 | — | — | 2,8 |
+| Remontées (+3 places ou plus d’une saison à l’autre) | 6,0 | 3,0 – 9,0 | — | — | 6,0 |
+| Écuries changeant d’étage par saison (étages 1–4 / 5–8 / 9+, D-081) | 2,6 | 1,8 – 3,3 | — | — | 2,5 |
 | Transitions de saison sans aucun changement d’étage (D-081) | 15 % | 0 % – 33 % | — | — | 16 % |
 
 ## Proportions, luttes pour le titre et coéquipiers
 
 | Indicateur | Moyenne | 10 % – 90 % | Objectif | Dans l’objectif | Référence P3 |
 | --- | --- | --- | --- | --- | --- |
-| Saisons où la dernière écurie marque au moins 1 point | 62 % | — | 40 % – 90 % | — | 66 % |
-| Séries de 10 saisons avec 5 titres constructeurs consécutifs ou plus | 57 % | — | 0 % – 25 % | — | 62 % |
-| Titre encore ouvert avant la dernière manche (définition exacte) | 28 % | — | — | — | 28 % |
+| Saisons où la dernière écurie marque au moins 1 point | 61 % | — | 40 % – 90 % | — | 66 % |
+| Séries de 10 saisons avec 5 titres constructeurs consécutifs ou plus | 59 % | — | 0 % – 25 % | — | 62 % |
+| Titre encore ouvert avant la dernière manche (définition exacte) | 27 % | — | — | — | 28 % |
 | Retournement à la dernière manche (le leader perd le titre) | 6 % | — | — | — | 7 % |
-| Champion et vice-champion coéquipiers | 41 % | — | — | — | 40 % |
+| Champion et vice-champion coéquipiers | 42 % | — | — | — | 40 % |
 | Lutte jusqu’à la dernière manche entre coéquipiers | 12 % | — | — | — | 11 % |
 | Lutte jusqu’à la dernière manche entre écuries différentes | 16 % | — | — | — | 16 % |
-| Saisons très serrées (≤ 10 points d’écart) | 12 % | — | — | — | 11 % |
+| Saisons très serrées (≤ 10 points d’écart) | 11 % | — | — | — | 11 % |
 | Dominations (≥ 120 points d’écart) | 16 % | — | — | — | 15 % |
-| Coéquipiers : écart moyen à l’arrivée (% temps au tour) | 0,44 | 0,39 – 0,49 | — | — | 0,44 |
-| Coéquipiers : écart moyen dû aux compétences | 0,24 | 0,16 – 0,31 | — | — | 0,24 |
+| Coéquipiers : écart moyen à l’arrivée (% temps au tour) | 0,45 | 0,40 – 0,50 | — | — | 0,44 |
+| Coéquipiers : écart moyen dû aux compétences | 0,24 | 0,17 – 0,32 | — | — | 0,24 |
 | Coéquipiers : écart moyen dû à la forme | 0,01 | 0,01 – 0,01 | — | — | 0,01 |
-| Coéquipiers : écart moyen dû à l’aléa | 0,36 | 0,34 – 0,40 | — | — | 0,36 |
-| Coéquipiers : part de l’écart quadratique due aux compétences | 30 % | 18 % – 43 % | — | — | 29 % |
+| Coéquipiers : écart moyen dû à l’aléa | 0,36 | 0,33 – 0,40 | — | — | 0,36 |
+| Coéquipiers : part de l’écart quadratique due aux compétences | 31 % | 19 % – 44 % | — | — | 29 % |
 | Coéquipiers : part de l’écart quadratique due à la forme | 0 % | 0 % – 0 % | — | — | 0 % |
-| Coéquipiers : part de l’écart quadratique due à l’aléa | 70 % | 56 % – 83 % | — | — | 71 % |
+| Coéquipiers : part de l’écart quadratique due à l’aléa | 69 % | 55 % – 83 % | — | — | 71 % |
 
 ## Compétitivité à toutes les positions (D-113)
 
 | Indicateur | Moyenne | 10 % – 90 % | Objectif | Dans l’objectif | Référence P3 |
 | --- | --- | --- | --- | --- | --- |
-| Pilotes : mobilité — corrélation classement à 25 % ↔ final | 0,91 | 0,86 – 0,96 | — | — | 0,92 |
-| Pilotes : mobilité — corrélation classement à 50 % ↔ final | 0,96 | 0,93 – 0,99 | — | — | 0,96 |
-| Pilotes : mobilité — corrélation classement à 75 % ↔ final | 0,98 | 0,96 – 1,00 | — | — | 0,98 |
-| Pilotes : déplacement moyen entre la mi-saison et la fin (places) | 1,18 | 0,73 – 1,73 | — | — | 1,17 |
-| Pilotes : part gagnant ou perdant ≥ 2 places en seconde moitié | 30 % | 14 % – 45 % | — | — | 30 % |
-| Pilotes : changements de position par concurrent sur la saison | 7,4 | 5,5 – 9,5 | — | — | 7,4 |
-| Pilotes : écart moyen entre voisins (points) — haut | 49,9 | 32,4 – 69,0 | — | — | 49,4 |
-| Pilotes : écart moyen entre voisins (points) — milieu | 21,5 | 12,1 – 31,9 | — | — | 21,8 |
-| Pilotes : écart moyen entre voisins (points) — bas | 3,7 | 1,2 – 6,4 | — | — | 3,6 |
-| Pilotes : frontières mathématiquement disputées à 3 manches de la fin | 94 % | 90 % – 100 % | — | — | 95 % |
-| Pilotes : frontières raisonnablement disputées à 3 manches — toutes | 72 % | 67 % – 81 % | — | — | 72 % |
+| Pilotes : mobilité — corrélation classement à 25 % ↔ final | 0,92 | 0,87 – 0,96 | — | — | 0,92 |
+| Pilotes : mobilité — corrélation classement à 50 % ↔ final | 0,96 | 0,93 – 0,98 | — | — | 0,96 |
+| Pilotes : mobilité — corrélation classement à 75 % ↔ final | 0,98 | 0,97 – 1,00 | — | — | 0,98 |
+| Pilotes : déplacement moyen entre la mi-saison et la fin (places) | 1,16 | 0,73 – 1,64 | — | — | 1,17 |
+| Pilotes : part gagnant ou perdant ≥ 2 places en seconde moitié | 29 % | 14 % – 45 % | — | — | 30 % |
+| Pilotes : changements de position par concurrent sur la saison | 7,3 | 5,4 – 9,4 | — | — | 7,4 |
+| Pilotes : écart moyen entre voisins (points) — haut | 49,8 | 31,8 – 68,6 | — | — | 49,4 |
+| Pilotes : écart moyen entre voisins (points) — milieu | 21,8 | 12,3 – 32,0 | — | — | 21,8 |
+| Pilotes : écart moyen entre voisins (points) — bas | 3,6 | 1,2 – 6,3 | — | — | 3,6 |
+| Pilotes : frontières mathématiquement disputées à 3 manches de la fin | 95 % | 90 % – 100 % | — | — | 95 % |
+| Pilotes : frontières raisonnablement disputées à 3 manches — toutes | 72 % | 62 % – 81 % | — | — | 72 % |
 | Pilotes : frontières raisonnablement disputées — haut | 32 % | 0 % – 60 % | — | — | 32 % |
-| Pilotes : frontières raisonnablement disputées — milieu | 66 % | 43 % – 86 % | — | — | 65 % |
+| Pilotes : frontières raisonnablement disputées — milieu | 65 % | 43 % – 86 % | — | — | 65 % |
 | Pilotes : frontières raisonnablement disputées — bas | 98 % | 89 % – 100 % | — | — | 98 % |
 | Pilotes : positions déjà acquises à 3 manches de la fin | 2 % | 0 % – 5 % | — | — | 2 % |
 | Pilotes : positions déjà acquises — haut | 8 % | 0 % – 20 % | — | — | 8 % |
 | Pilotes : positions déjà acquises — milieu | 0 % | 0 % – 0 % | — | — | 0 % |
 | Pilotes : positions déjà acquises — bas | 0 % | — | — | — | 0 % |
-| Pilotes : positions stables mais disputées (voisin à moins d’une victoire) | 42 % | 23 % – 59 % | — | — | 42 % |
+| Pilotes : positions stables mais disputées (voisin à moins d’une victoire) | 42 % | 23 % – 64 % | — | — | 42 % |
 | Pilotes : positions isolées (voisins à plus de 3 victoires) | 2 % | 0 % – 5 % | — | — | 2 % |
 | Constructeurs : mobilité — corrélation classement à 25 % ↔ final | 0,93 | 0,87 – 0,98 | — | — | 0,94 |
-| Constructeurs : mobilité — corrélation classement à 50 % ↔ final | 0,96 | 0,93 – 0,99 | — | — | 0,97 |
+| Constructeurs : mobilité — corrélation classement à 50 % ↔ final | 0,97 | 0,93 – 0,99 | — | — | 0,97 |
 | Constructeurs : mobilité — corrélation classement à 75 % ↔ final | 0,98 | 0,96 – 1,00 | — | — | 0,98 |
-| Constructeurs : déplacement moyen entre la mi-saison et la fin (places) | 0,47 | 0,18 – 0,91 | — | — | 0,45 |
+| Constructeurs : déplacement moyen entre la mi-saison et la fin (places) | 0,45 | 0,18 – 0,91 | — | — | 0,45 |
 | Constructeurs : part gagnant ou perdant ≥ 2 places en seconde moitié | 8 % | 0 % – 18 % | — | — | 8 % |
-| Constructeurs : changements de position par concurrent sur la saison | 4,2 | 2,5 – 6,1 | — | — | 4,1 |
-| Constructeurs : écart moyen entre voisins (points) — haut | 144,7 | 89,3 – 190,8 | — | — | 144,8 |
-| Constructeurs : écart moyen entre voisins (points) — milieu | 34,2 | 17,5 – 54,8 | — | — | 34,1 |
-| Constructeurs : écart moyen entre voisins (points) — bas | 11,2 | 2,0 – 26,0 | — | — | 10,9 |
+| Constructeurs : changements de position par concurrent sur la saison | 4,1 | 2,5 – 5,9 | — | — | 4,1 |
+| Constructeurs : écart moyen entre voisins (points) — haut | 145,3 | 89,8 – 190,8 | — | — | 144,8 |
+| Constructeurs : écart moyen entre voisins (points) — milieu | 34,2 | 17,8 – 54,0 | — | — | 34,1 |
+| Constructeurs : écart moyen entre voisins (points) — bas | 10,9 | 2,0 – 25,5 | — | — | 10,9 |
 | Constructeurs : frontières mathématiquement disputées à 3 manches de la fin | 83 % | 70 % – 90 % | — | — | 83 % |
 | Constructeurs : frontières raisonnablement disputées à 3 manches — toutes | 54 % | 40 % – 70 % | — | — | 54 % |
 | Constructeurs : frontières raisonnablement disputées — haut | 21 % | 0 % – 50 % | — | — | 20 % |
-| Constructeurs : frontières raisonnablement disputées — milieu | 68 % | 50 % – 100 % | — | — | 67 % |
+| Constructeurs : frontières raisonnablement disputées — milieu | 67 % | 50 % – 100 % | — | — | 67 % |
 | Constructeurs : frontières raisonnablement disputées — bas | 94 % | 50 % – 100 % | — | — | 94 % |
 | Constructeurs : positions déjà acquises à 3 manches de la fin | 8 % | 0 % – 18 % | — | — | 8 % |
-| Constructeurs : positions déjà acquises — haut | 22 % | 0 % – 50 % | — | — | 23 % |
+| Constructeurs : positions déjà acquises — haut | 23 % | 0 % – 50 % | — | — | 23 % |
 | Constructeurs : positions déjà acquises — milieu | 0 % | 0 % – 0 % | — | — | 0 % |
 | Constructeurs : positions déjà acquises — bas | 0 % | — | — | — | 0 % |
-| Constructeurs : positions stables mais disputées (voisin à moins d’une victoire) | 48 % | 27 % – 73 % | — | — | 49 % |
+| Constructeurs : positions stables mais disputées (voisin à moins d’une victoire) | 49 % | 27 % – 73 % | — | — | 49 % |
 | Constructeurs : positions isolées (voisins à plus de 3 victoires) | 10 % | 0 % – 18 % | — | — | 10 % |
 
 ## Chronique d’exemple (graine 1)

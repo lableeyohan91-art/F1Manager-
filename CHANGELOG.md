@@ -335,3 +335,10 @@ Aucun code à ce stade.
 - Outils de démographie et d'équilibrage fiables malgré l'archivage des retraités.
 - Délais explicites pour les tests de simulation ; performances du marché améliorées sans changer les résultats.
 - Rapport : `docs/rapports/2026-11-23-audit-p7.md` ; références `p7-complete-*`. 146 tests.
+
+## [Pilotes payants réels] — 23/11/2026
+
+### Ajouté (D-131)
+- Remplacement rentable d'un sponsor par celui qui suit un pilote (indemnité de rupture payée, exclusivités respectées).
+- Engagements conditionnels de partenaires réels dès les juniors, déclenchés à l'arrivée en F1 (format de sauvegarde 19).
+- Le marché examine aussi les pilotes au soutien commercial réel (niveau minimal). Mesures dans `docs/rapports/2026-11-23-d131-pilotes-payants.md`. 147 tests.
