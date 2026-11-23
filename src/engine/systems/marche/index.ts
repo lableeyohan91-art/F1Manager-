@@ -301,7 +301,7 @@ function signer(monde: Monde, o: OffreMarche, p: Personne, raisons: string[], nb
       // D-131 : apport commercial net attendu par l'écurie au moment de la signature (mesure des recrutements motivés par l'argent).
       ...(estPilote(o.poste) ? { apportNet: Math.round(apportCommercialPour(monde, e, p, o.debut).netNouveau * 10) / 10 } : {}),
     },
-    texte: `${nom(monde, p.id)} signe avec ${e.nom} à partir de ${o.debut} (${o.salaireMEUR} M€/an, jusqu'en ${c.fin})${o.indemniteMEUR > 0 ? ` ; indemnité de ${o.indemniteMEUR} M€ versée à ${nom(monde, o.beneficiaireIndemnite ?? '')}` : ''}.`,
+    texte: `${nom(monde, p.id)} signe avec ${e.nom} comme ${o.poste.replace(/_/g, ' ')} à partir de ${o.debut} (${o.salaireMEUR} M€/an, jusqu'en ${c.fin})${o.indemniteMEUR > 0 ? ` ; indemnité de ${o.indemniteMEUR} M€ versée à ${nom(monde, o.beneficiaireIndemnite ?? '')}` : ''}.`,
   });
   // Un débauchage abîme les relations entre l'ancien employeur et l'acheteur, et avec le partant.
   if (debauche && ancien) {

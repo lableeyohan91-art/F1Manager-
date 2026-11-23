@@ -144,9 +144,10 @@ function reveler(monde: Monde, e: Evenement, f: FaitSuivi, motif: 'presse' | 'tr
     type: 'information.revelee', acteurs: e.acteurs.filter((a) => a.role === 'auteur' || a.role === 'organisation' || a.role === 'ecurie'),
     importance: f.interet >= REVELATION.seuilImportanceNotable ? 3 : 2, visibilite: 'public', causes: [e.id],
     contexte: { fait: e.id, type: e.type, motif, connaisseurs: e.connuPar.length, rumeurs: f.rumeur.length },
+    // Le fait révélé est cité tel quel quand il a une phrase ; sinon, son type.
     texte: motif === 'presse'
-      ? `La presse révèle une information jusque-là confidentielle (${e.type.replace('.', ' : ').replace(/_/g, ' ')}).`
-      : `L'information (${e.type.replace('.', ' : ').replace(/_/g, ' ')}) circulait tant dans le paddock qu'elle est devenue publique.`,
+      ? `La presse révèle ${e.texte ? `: « ${e.texte.replace(/\.$/, '')} »` : `une information jusque-là confidentielle (${e.type.replace('.', ' : ').replace(/_/g, ' ')})`}.`
+      : `Le paddock en parlait tant que c'est devenu public : ${e.texte ? `« ${e.texte.replace(/\.$/, '')} »` : e.type.replace('.', ' : ').replace(/_/g, ' ')}.`,
   });
 }
 

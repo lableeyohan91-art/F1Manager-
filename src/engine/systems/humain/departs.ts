@@ -84,6 +84,7 @@ export function repondreDepart(monde: Monde, tp: Personne, p: Personne, accepter
   const evt = ajouterEvenement(monde, {
     type: accepter ? 'contrat.depart_accepte' : 'contrat.depart_refuse', acteurs: [{ id: tp.id, role: 'auteur' }, { id: p.id, role: 'cible' }, { id: p.ecurie, role: 'organisation' }],
     importance: 2, visibilite: 'prive', contexte: { indemnite: demande.indemnite },
+    texte: accepter ? `${nom(tp)} accepte de laisser partir ${nom(p)}.` : `${nom(tp)} refuse de laisser partir ${nom(p)}.`,
   });
   if (accepter) rompreALAmiable(monde, p, c, demande.indemnite, 'personne');
   else {
@@ -200,11 +201,14 @@ export const systemeDeparts: Systeme = {
         ajouterEvenement(monde, {
           type: 'contrat.demande_depart', acteurs: [{ id: p.id, role: 'auteur' }, { id: dirigeant.id, role: 'cible' }, { id: p.ecurie, role: 'organisation' }],
           importance: 2, visibilite: 'prive', contexte: { envie: Math.round(envie * 100) / 100, indemnite: c.demandeDepart.indemnite, raisons },
+          texte: `${nom(p)} demande à ${nom(dirigeant)} de pouvoir partir à l'amiable.`,
         });
         continue;
       }
       // IA employeur : rupture négociée pour une personne insuffisante qui a déjà envie de partir (une fois par saison).
-      if (!e.pilotee && envie >= RUPTURE_NEGOCIEE.seuilIA && performanceInsuffisante(monde, p) && c.ruptureProposee !== date.annee) {
+      // Jalon A (correction) : pas de rupture pour quelqu'un qui part déjà (non prolongé, ou dont le successeur a signé).
+      const partDeja = c.nonProlonge || (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).some((x) => x.statut === 'signe' && x.organisation === p.ecurie && x.poste === p.poste);
+      if (!e.pilotee && !partDeja && envie >= RUPTURE_NEGOCIEE.seuilIA && performanceInsuffisante(monde, p) && c.ruptureProposee !== date.annee) {
         c.ruptureProposee = date.annee;
         const indemnite = r1(RUPTURE_NEGOCIEE.exigence * indemniteRupture(c) * (1 - envie) + RUPTURE_NEGOCIEE.margeIA);
         commanderIA({ type: 'contrat.rupture_negociee', auteur: dirigeant.id, parametres: { personne: p.id, indemnite: Math.min(indemnite, RUPTURE_NEGOCIEE.indemniteMax * indemniteRupture(c)) } });

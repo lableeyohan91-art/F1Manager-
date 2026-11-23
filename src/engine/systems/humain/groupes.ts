@@ -32,6 +32,10 @@ export interface Groupe {
 }
 
 const r2 = (x: number) => Math.round(x * 100) / 100;
+const LIBELLES_GROUPES: Record<TypeGroupe, string> = {
+  clan: 'Un clan', opposants: 'Un groupe d’opposants à la direction', mentor: 'Un cercle de protégés', anciens_collaborateurs: 'Un réseau d’anciens collaborateurs', collegues: 'Un groupe de collègues soudés',
+};
+const nomPersonne = (monde: Monde, id: string) => { const p = table(monde, TABLES.personnes)[id] as unknown as Personne | undefined; return p ? `${p.prenom} ${p.nom}` : id; };
 const POSTES_SUIVEURS = PERSONNEL_MARCHE.postes as readonly Poste[];
 
 export const groupes = (monde: Monde) => idsTries(table(monde, TABLES.groupes)).map((id) => table(monde, TABLES.groupes)[id] as unknown as Groupe);
@@ -115,6 +119,7 @@ function mettreAJour(monde: Monde): void {
     else ajouterEvenement(monde, {
       type: 'groupe.forme', acteurs: [{ id: g.leader, role: 'leader' }, ...g.membres.map((m) => ({ id: m, role: 'membre' }))], importance: g.type === 'opposants' ? 3 : 2, visibilite: 'prive',
       connuPar: [g.leader, ...g.membres].sort(), contexte: { groupe: g.id, type: g.type, taille: g.membres.length + 1 },
+      texte: `${LIBELLES_GROUPES[g.type]} se forme autour de ${nomPersonne(monde, g.leader)} (${g.membres.length + 1} personnes).`,
     });
     t[g.id] = g as unknown as Entite;
   }
@@ -138,6 +143,7 @@ export function suivreLesLeaders(monde: Monde, commander: Commander): void {
       if (r?.ok) ajouterEvenement(monde, {
         type: 'groupe.suit_leader', acteurs: [{ id: m.id, role: 'membre' }, { id: leader.id, role: 'leader' }, { id: leader.ecurie, role: 'organisation' }], importance: 2, visibilite: 'prive',
         contexte: { groupe: g.id, envie: r2(envie) },
+        texte: `${m.prenom} ${m.nom} veut suivre ${leader.prenom} ${leader.nom} et propose ses services à sa nouvelle écurie.`,
       });
     }
   }

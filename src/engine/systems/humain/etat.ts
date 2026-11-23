@@ -85,6 +85,6 @@ function signalerNouveauDefi(monde: Monde, p: Personne, titres: number): void {
   ajouterEvenement(monde, {
     type: 'personnel.besoin_defi', acteurs: [{ id: p.id, role: 'auteur' }, ...(sup ? [{ id: sup.id, role: 'cible' }] : []), { id: p.ecurie, role: 'organisation' }],
     importance: 2, visibilite: 'prive', contexte: { titres },
-    texte: `${p.prenom} ${p.nom} vient voir ${sup ? `${sup.prenom} ${sup.nom}` : 'sa direction'} : après ${titres} titre${titres > 1 ? 's' : ''}, il lui faut un nouveau défi.`,
+    texte: `${p.prenom} ${p.nom} ${sup ? `vient voir ${sup.prenom} ${sup.nom}` : 'se confie au conseil d’administration'} : après ${titres} titre${titres > 1 ? 's' : ''}, il lui faut un nouveau défi.`,
   });
 }

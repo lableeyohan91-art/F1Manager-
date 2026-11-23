@@ -21,7 +21,8 @@ import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { genererCohorte } from '../../generation/construction';
 import { TABLES, type Contrat, type EcurieJunior, type Installation, type Palmares, type Personne, type PersonneArchivee, type Poste } from '../../model/types';
 import { relation } from '../memoire';
-import { liberer } from '../humain/contrats';
+import { liberer, postesVacants, pourvoirPostes } from '../humain/contrats';
+import { ecuriesActives } from '../saison/performance';
 import { niveauEffectif } from '../economie/infrastructures';
 import { changerMetier, competencesMetier, niveauCarriere, plafondCompetence } from './profil';
 import { facteurExperience } from './performance';
@@ -273,7 +274,10 @@ export const systemeProgression: Systeme = {
 export const systemeBilanCarrieres: Systeme = {
   nom: 'carriere.bilan',
   executer({ monde, date }) {
-    if (date.semaine === SEMAINE_BILAN_CARRIERE) bilanCarrieres(monde);
+    if (date.semaine !== SEMAINE_BILAN_CARRIERE) return;
+    bilanCarrieres(monde);
+    // Jalon A (correction) : un poste libéré par une retraite (un team principal, par exemple) est pourvu tout de suite.
+    if (ecuriesActives(monde).some((e) => !e.pilotee && postesVacants(monde, e).some((x) => !x.startsWith('pilote')))) pourvoirPostes(monde, true);
   },
 };
 

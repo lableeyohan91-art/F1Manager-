@@ -331,7 +331,8 @@ interface Proposition { ecurie: Ecurie; poste: Poste; salaire: number; decideur:
  * (ou les refuse toutes). Plusieurs écuries peuvent viser la même personne : c'est le candidat qui tranche.
  * En dernier recours, une personne est générée (réservoir provisoire, avant la phase 6a).
  */
-export function pourvoirPostes(monde: Monde): void {
+/** `seulementPersonnel` : ne pourvoit que les postes hors pilotes (les baquets passent par le marché, qui connaît les pré-accords). */
+export function pourvoirPostes(monde: Monde, seulementPersonnel = false): void {
   const refusesPar = new Map<string, Set<string>>(); // écurie+poste → candidats qui ont refusé
   const debut = monde.date.semaine >= SEMAINE_FIN_CONTRATS ? monde.date.annee + 1 : monde.date.annee;
   // Phase 7a : une personne qui a signé un pré-accord ailleurs n'est plus disponible.
@@ -345,6 +346,7 @@ export function pourvoirPostes(monde: Monde): void {
       const decideur = tp?.id ?? e.id;
       const dejaVise = new Set<string>();
       for (const poste of postesVacants(monde, e)) {
+        if (seulementPersonnel && poste.startsWith('pilote')) continue;
         vacants++;
         // Promesse d'académie à tenir (6b-2) : le jeune promis prend le baquet libéré pour lui, s'il est toujours disponible.
         if (poste === 'pilote_titulaire') {
@@ -413,8 +415,10 @@ export function pourvoirPostes(monde: Monde): void {
   for (const e of ecuriesActives(monde)) {
     if (e.pilotee) continue;
     for (const poste of postesVacants(monde, e)) {
+      if (seulementPersonnel && poste.startsWith('pilote')) continue;
       const p = genererPersonne(monde, poste, e, 'actif');
-      creerContrat(monde, p, e.id, poste, debut, 2, valeurMarche(monde, p), false);
+      // Jalon A (correction) : même règle d'effectif que les recrutements ordinaires (un successeur déjà signé borne l'intérim).
+      creerContrat(monde, p, e.id, poste, debut, Math.max(1, Math.min(2, dureeMaxEffectif(monde, e.id, p.id, poste, debut - 1))), valeurMarche(monde, p), false);
       ajouterEvenement(monde, { type: 'recrutement.genere', acteurs: [{ id: p.id, role: 'personne' }, { id: e.id, role: 'organisation' }], importance: 1, contexte: { poste } });
     }
   }
@@ -449,7 +453,10 @@ export function titulariser(monde: Monde, p: Personne, decideur: string): void {
     c.poste = 'pilote_titulaire';
     c.salaireMEUR = arrondi(Math.max(c.salaireMEUR, valeurMarche(monde, p)));
     // Audit n°3 : la titularisation ne prolonge pas au-delà des saisons où un baquet reste libre.
-    c.fin = Math.max(c.fin, Math.min(monde.date.annee + 2, monde.date.annee + dureeMaxEffectif(monde, c.organisation, p.id, 'pilote_titulaire', monde.date.annee)));
+    // Jalon A (correction) : ni au-delà, ni en conservant un contrat de réserve plus long qu'une place de titulaire réellement libre
+    // (un pilote déjà signé pour une saison future occupe sa place).
+    const libre = dureeMaxEffectif(monde, c.organisation, p.id, 'pilote_titulaire', monde.date.annee);
+    c.fin = Math.max(monde.date.annee, Math.min(Math.max(c.fin, monde.date.annee + Math.min(2, libre)), monde.date.annee + libre));
   }
   const evt = ajouterEvenement(monde, {
     type: 'pilote.titularisation', acteurs: [{ id: p.id, role: 'pilote' }, { id: decideur, role: 'auteur' }, { id: p.ecurie, role: 'organisation' }],

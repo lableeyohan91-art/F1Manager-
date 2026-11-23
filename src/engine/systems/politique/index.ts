@@ -174,6 +174,7 @@ export const commandeLobbying: DefinitionCommande = {
     ajouterEvenement(monde, {
       type: 'politique.lobbying', acteurs: [{ id: tp.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'prive',
       contexte: { orientation, montant, pression: r2(pression), sensibilitePresident: f.sensibiliteLobbying },
+      texte: `${e.nom} dépense ${montant} M€ pour peser sur les futures réformes (${ORIENTATIONS[orientation as Orientation].libelle.toLowerCase()}).`,
     });
   },
 };
@@ -330,7 +331,10 @@ function mettreAJourAlliances(monde: Monde): void {
   for (const a of detecterAlliances(monde)) {
     const ancienne = anciennes.get(a.ecuries.join('|'));
     if (ancienne) a.depuis = ancienne.depuis;
-    else ajouterEvenement(monde, { type: 'politique.alliance', acteurs: a.ecuries.map((id) => ({ id, role: 'ecurie' })), importance: 2, visibilite: 'public', contexte: { motif: a.motif } });
+    else ajouterEvenement(monde, {
+      type: 'politique.alliance', acteurs: a.ecuries.map((id) => ({ id, role: 'ecurie' })), importance: 2, visibilite: 'public', contexte: { motif: a.motif },
+      texte: `Alliance politique entre ${a.ecuries.map((id) => (table(monde, TABLES.ecuries)[id] as unknown as Ecurie).nom).join(', ')} (${a.motif === 'motoriste' ? 'même motoriste' : a.motif === 'partenaire' ? 'écuries partenaires' : 'dirigeants proches'}).`,
+    });
     t[a.id] = a as unknown as Entite;
   }
 }

@@ -419,3 +419,13 @@ Aucun code à ce stade.
 - Chronique du passé : titres 2010–2026 et grandes ères.
 - La grille, les contrats et les voitures de 2027 restent ceux des données (test). Tests `tests/histoire.test.ts`. 193 tests.
 - Rapport court : `docs/rapports/2026-11-23-p9-histoire-ancree.md` ; références `p9-*`.
+
+## [Jalon A — corrections] — 23/11/2026
+
+### Corrigé
+- Recrutement de dernier recours : durée bornée par un successeur déjà signé (deux directeurs au même poste).
+- Rupture négociée : jamais proposée à une personne qui part déjà.
+- Titularisation d'un réserviste : contrat borné par les places réellement libres (trois titulaires prévus).
+- Retraite d'un dirigeant en fin de saison : poste pourvu aussitôt (écurie sans team principal pendant une semaine).
+- Chronique : phrases pour les demandes de départ, groupes, alliances et lobbying ; révélations de presse qui citent le fait ; transferts avec le poste.
+- Test de cohérence semaine par semaine (`tests/jalon-a.test.ts`). 194 tests.
