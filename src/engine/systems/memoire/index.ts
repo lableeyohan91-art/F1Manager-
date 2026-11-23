@@ -91,10 +91,11 @@ export function relationBrute(monde: Monde, de: string, vers: string, creer = fa
 }
 
 /** Relation de « de » vers « vers » : base durable + effet des souvenirs actifs envers la cible. */
-export function relation(monde: Monde, de: string, vers: string): RelationCalculee {
+export function relation(monde: Monde, de: string, vers: string, souvenirsDuPorteur?: Souvenir[]): RelationCalculee {
   const r = relationBrute(monde, de, vers);
   const res: RelationCalculee = { confiance: r?.base.confiance ?? 0, respect: r?.base.respect ?? 0, affinite: r?.base.affinite ?? 0, familiarite: r?.familiarite ?? 0 };
-  for (const s of souvenirsDe(monde, de)) {
+  // Performance : les souvenirs du porteur peuvent être fournis par l'appelant (mêmes souvenirs, même ordre, pour toute une série de calculs).
+  for (const s of souvenirsDuPorteur ?? souvenirsDe(monde, de)) {
     if (s.cible !== vers || s.cible === s.porteur) continue;
     const def = ETIQUETTES[s.etiquette];
     if (!def) continue;

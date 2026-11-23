@@ -259,7 +259,20 @@ export function repondre(monde: Monde, p: Personne, o: Offre, cle: string, contr
 }
 
 /** Score d'un candidat pour une écurie (IA du team principal) : niveau, potentiel, coût, relations, compatibilité. */
-export function scoreCandidat(monde: Monde, e: Ecurie, decideur: string, c: Personne, salaireMEUR: number): { score: number; raisons: Raison[] } {
+/**
+ * Performance (audit de la phase 7, mesuré) : ce qui est commun à tous les candidats d'une écurie (affiliations, promesses dues,
+ * souvenirs du décideur) est préparé une seule fois. Mêmes données, mêmes résultats ; à reconstruire si l'état change.
+ */
+export interface ContexteScore { affiliation: Map<string, Contrat>; promessesDues: Set<string>; souvenirsDecideur: ReturnType<typeof souvenirsDe> }
+export function contexteScore(monde: Monde, e: Ecurie, decideur: string): ContexteScore {
+  const affiliation = new Map<string, Contrat>();
+  for (const x of Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]) if (x.type === 'affiliation' && x.statut === 'actif') affiliation.set(x.personne, x);
+  const promessesDues = new Set((Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[])
+    .filter((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.organisation === e.id && x.echeance.annee <= monde.date.annee + 1).map((x) => x.beneficiaire));
+  return { affiliation, promessesDues, souvenirsDecideur: souvenirsDe(monde, decideur) };
+}
+
+export function scoreCandidat(monde: Monde, e: Ecurie, decideur: string, c: Personne, salaireMEUR: number, ctx?: ContexteScore): { score: number; raisons: Raison[] } {
   const raisons: Raison[] = [];
   const ajouter = (libelle: string, x: number) => { raisons.push({ libelle, contribution: x }); return x; };
   const jeunesse = /jeune|junior|filière/i.test(e.politiqueRecrutement) ? 1 : 0;
@@ -270,15 +283,15 @@ export function scoreCandidat(monde: Monde, e: Ecurie, decideur: string, c: Pers
   // Phase 6b : la réputation sportive des jeunes (karting, Apex 4, Apex 3, Apex 2) compte pour les recruteurs.
   if (c.reputationJeune) s += ajouter('réputation junior', REPUTATION_RECRUTEMENT_F1 * c.reputationJeune);
   // Phase 6b-2 : préférence pour ses propres affiliés (et ceux de l'écurie partenaire), surtout si une promesse arrive à échéance.
-  const aff = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.type === 'affiliation' && x.statut === 'actif' && x.personne === c.id);
+  const aff = ctx ? ctx.affiliation.get(c.id) : (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.type === 'affiliation' && x.statut === 'actif' && x.personne === c.id);
   if (aff && (aff.organisation === e.id || aff.organisation === e.ecuriePartenaire)) s += ajouter('affilié de l’académie', aff.organisation === e.id ? PROMOTION_AFFILIE.propre : PROMOTION_AFFILIE.partenaire);
-  const promesseEchue = (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[]).some((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.beneficiaire === c.id && x.organisation === e.id && x.echeance.annee <= monde.date.annee + 1);
+  const promesseEchue = ctx ? ctx.promessesDues.has(c.id) : (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[]).some((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.beneficiaire === c.id && x.organisation === e.id && x.echeance.annee <= monde.date.annee + 1);
   if (promesseEchue) s += ajouter('promesse de titularisation', PROMOTION_AFFILIE.promesseEchue);
   const declin = Math.max(0, age(monde, c) - courbeAge(c.poste).declinApres);
   if (declin > 0) s += ajouter('âge', -PENALITE_AGE_RECRUTEMENT * declin);
   const budgetPoste = e.budgetMEUR * (c.poste.startsWith('pilote') ? 0.05 : 0.015);
   s += ajouter('coût', -0.4 * Math.max(0, salaireMEUR / budgetPoste - 1));
-  const r = relation(monde, decideur, c.id);
+  const r = relation(monde, decideur, c.id, ctx?.souvenirsDecideur);
   s += ajouter('relation avec le team principal', 0.25 * (r.respect + r.affinite) / 2);
   const force = forceEcurie(monde, e.id);
   s += ajouter('compatibilité avec le projet', 0.08 * (((c.valeurs['victoire'] ?? 10) - 10) / 10) * (2 * force - 1) + 0.05 * (((c.valeurs['defi'] ?? 10) - 10) / 10) * (1 - 2 * force));

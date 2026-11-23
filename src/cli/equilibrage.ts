@@ -52,7 +52,8 @@ function campagne(parametres: Record<string, number>): Campagne {
     const { saisons: _, ...serie } = indicateursSerie(m);
     series.push(serie);
     if (g === 1) {
-      const nom = (id: string) => { const p = m.tables['personnes']![id] as unknown as Personne; return `${p.prenom} ${p.nom}`; };
+      // D-121 : un ancien champion peut être archivé ; son nom reste dans la fiche d'archive.
+      const nom = (id: string) => { const p = (m.tables['personnes']![id] ?? m.tables['archives']?.[id]) as unknown as Personne | undefined; return p ? `${p.prenom} ${p.nom}` : id; };
       chroniqueExemple = (Object.values(m.tables['saisons']!) as unknown as Saison[])
         .sort((a, b) => a.annee - b.annee)
         .flatMap((s) => [`**${s.annee}** — champion : ${nom(s.pilotes[0]!.pilote)}`, ...s.chronique.map((l) => `- ${l}`), '']);

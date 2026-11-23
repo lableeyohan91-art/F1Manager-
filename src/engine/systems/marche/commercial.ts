@@ -354,6 +354,13 @@ export function demarchageAgents(monde: Monde): void {
   const tc = table(monde, TABLES.candidatures);
   const contrats = Object.values(table(monde, TABLES.contrats)) as unknown as { personne: string; statut: string; type: string; fin: number; nonProlonge?: boolean }[];
   const sousContrat = new Set(contrats.filter((c) => c.type === 'emploi' && (c.statut === 'signe' || (c.statut === 'actif' && c.fin >= debut))).map((c) => c.personne));
+  // Performance (audit de la phase 7, mesuré) : places libres calculées une fois par écurie et par poste (rien n'est signé ici).
+  const cache = new Map<string, boolean>();
+  const libre = (idEcurie: string, poste: Personne['poste']) => {
+    const k = `${idEcurie}|${poste}`;
+    if (!cache.has(k)) cache.set(k, placesLibres(monde, idEcurie, poste, debut) > 0);
+    return cache.get(k)!;
+  };
   for (const a of agents(monde)) {
     const n = Math.max(1, Math.round((AGENTS.demarchages * a.reseau) / 20));
     const mesClients = personnes(monde).filter((p) => p.agent === a.id && !sousContrat.has(p.id) && p.statut !== 'retraite');
@@ -361,7 +368,7 @@ export function demarchageAgents(monde: Monde): void {
     for (const p of mesClients) {
       if (faits >= n) break;
       const poste = p.poste === 'pilote_junior' || p.poste === 'pilote_reserve' ? 'pilote_titulaire' : p.poste;
-      const ouvertes = ecuriesActives(monde).filter((x) => x.id !== p.ecurie && placesLibres(monde, x.id, poste, debut) > 0).sort((x, y) => (x.id < y.id ? -1 : 1));
+      const ouvertes = ecuriesActives(monde).filter((x) => x.id !== p.ecurie && libre(x.id, poste)).sort((x, y) => (x.id < y.id ? -1 : 1));
       const e = ouvertes.length ? ouvertes[tirageLocal(monde, 'agents.demarchage', a.id, p.id, monde.date.annee).entier(0, ouvertes.length - 1)] : undefined;
       if (!e) continue;
       const cand: Candidature = { id: nouvelIdentifiant(monde, 'cnd'), personne: p.id, ecurie: e.id, poste, annee: monde.date.annee, semaine: monde.date.semaine };

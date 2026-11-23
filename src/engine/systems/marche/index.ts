@@ -27,7 +27,7 @@ import { ecuriesActives } from '../saison/performance';
 import { affiliationDe } from '../juniors/academies';
 import { TABLE_PROMESSES, type Promesse } from '../humain/promesses';
 import {
-  age, ecurie, evaluerOffre, niveauMetier, repondre, scoreCandidat, teamPrincipal, texteRaisons, valeurMarche, type Offre,
+  age, contexteScore, ecurie, evaluerOffre, type ContexteScore, niveauMetier, repondre, scoreCandidat, teamPrincipal, texteRaisons, valeurMarche, type Offre,
 } from '../humain/decision';
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, nombrePlaces, occupantsPour } from '../humain/effectifs';
 import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer, nePasProlonger, proposerProlongation } from '../humain/contrats';
@@ -436,8 +436,8 @@ function vivier(monde: Monde): Personne[] {
 }
 
 /** Score de marché : score de recrutement (phase 4/6) + pari sur la progression pendant le contrat − coût de l'indemnité. */
-export function scoreMarche(monde: Monde, e: Ecurie, decideur: string, p: Personne, salaire: number, duree: number, indemnite: number, poste: Poste = POSTE_MARCHE): number {
-  const base = scoreCandidat(monde, e, decideur, p, salaire).score;
+export function scoreMarche(monde: Monde, e: Ecurie, decideur: string, p: Personne, salaire: number, duree: number, indemnite: number, poste: Poste = POSTE_MARCHE, ctx?: ContexteScore): number {
+  const base = scoreCandidat(monde, e, decideur, p, salaire, ctx).score;
   const progression = Math.max(0, Math.min(potentielEstime(monde, e.id, p).centre - niveauMetier(p), HORIZON.progressionParAn * duree));
   const budgetPoste = e.budgetMEUR * (estPilote(poste) ? 0.05 : PERSONNEL_MARCHE.partBudgetPoste);
   // Phase 7c : apport commercial d'un pilote (sponsors qui le suivent, budget familial d'un débutant) — pilotes payants (D-098).
@@ -457,6 +457,7 @@ function ciblesPour(monde: Monde, e: Ecurie, tp: Personne, debut: number, liste:
   // Places libres de l'écurie : identiques pour tous les candidats (aucun n'en occupe encore), calculées une fois.
   const libres = anneesLibres(monde, e.id, debut - 1);
   if (libres < 1) return res;
+  const ctx = contexteScore(monde, e, tp.id);
   for (const p of liste) {
     const d = disponibilite(monde, p, e, debut, idx);
     if (typeof d === 'string') continue;
@@ -465,7 +466,7 @@ function ciblesPour(monde: Monde, e: Ecurie, tp: Personne, debut: number, liste:
     if (duree < 1) continue;
     // Phase 7c : un client proposé par son agent (ou une candidature) retient l'attention de l'écurie.
     const propose = recues.some((c) => c.personne === p.id && c.ecurie === e.id) ? CANDIDATURES.bonusScore : 0;
-    res.push({ p, salaire, duree, indemnite: d.indemniteMEUR, debauchage: d.debauchage, score: scoreMarche(monde, e, tp.id, p, salaire, duree, d.indemniteMEUR) + propose });
+    res.push({ p, salaire, duree, indemnite: d.indemniteMEUR, debauchage: d.debauchage, score: scoreMarche(monde, e, tp.id, p, salaire, duree, d.indemniteMEUR, POSTE_MARCHE, ctx) + propose });
   }
   const f = tirageLocal(monde, 'marche.plan', e.id, monde.date.annee, monde.date.semaine);
   return res.map((c) => ({ ...c, score: c.score + f.normale(0, 0.02 + ((tp.traits['temperament'] ?? 10) / 20) * 0.03) })).sort((a, b) => b.score - a.score || (a.p.id < b.p.id ? -1 : 1));
@@ -492,21 +493,23 @@ function planIA(monde: Monde, liste: Personne[], commander: Commander): void {
     const annees = monde.date.semaine >= PLAN_MARCHE.preAccordSemaineMin ? [annee + 1, annee + 2] : [annee + 1];
     for (const debut of annees) {
       const enCours = () => offresMarche(monde).filter((o) => o.ecurie === e.id && o.debut === debut && (o.statut === 'en_attente' || o.statut === 'contre_offre')).length;
-      if (besoinsPour(monde, e.id, debut) - enCours() <= 0) continue;
+      // Performance (audit de la phase 7, mesuré) : aucune signature n'a lieu pendant le plan, les places libres ne changent donc pas.
+      const besoins = besoinsPour(monde, e.id, debut);
+      if (besoins - enCours() <= 0) continue;
       // Promesse d'académie en cours : le jeune promis d'abord, dès qu'un baquet se libère avant l'échéance (6b-2).
       const promis = (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[])
         .filter((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.organisation === e.id && debut <= x.echeance.annee)
         .map((x) => table(monde, TABLES.personnes)[x.beneficiaire] as unknown as Personne | undefined)
         .filter((p): p is Personne => !!p);
       for (const p of promis) {
-        if (besoinsPour(monde, e.id, debut) - enCours() <= 0) break;
+        if (besoins - enCours() <= 0) break;
         const duree = Math.min(Math.max(2, dureeContrat(monde, p)), anneesLibres(monde, e.id, debut - 1));
         if (duree >= 1) commander({ type: 'marche.offre', auteur: tp.id, parametres: { ecurie: e.id, personne: p.id, salaire: arrondi(salaireOffert(monde, e, tp, p)), duree, debut } });
       }
       const cibles = ciblesPour(monde, e, tp, debut, liste);
       const meilleurLibre = cibles.find((c) => !c.debauchage)?.score ?? -Infinity;
       for (const c of cibles) {
-        if (besoinsPour(monde, e.id, debut) - enCours() <= 0) break;
+        if (besoins - enCours() <= 0) break;
         if (c.debauchage && c.score < meilleurLibre + PLAN_MARCHE.ecartDebauchage) continue;
         if (debut === annee + 2) {
           // Pré-accord à deux saisons : réservé aux candidats d'exception, et rare.

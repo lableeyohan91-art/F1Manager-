@@ -19,7 +19,7 @@ import { TABLES, type Candidature, type Ecurie, type Personne, type Poste } from
 import { lireEvenement } from '../memoire';
 import { ecuriesActives } from '../saison/performance';
 import { candidatPour, contratEmploi, dureeContrat, indemniteRupture } from '../humain/contrats';
-import { forceEcurie, lassitude, niveauMetier, teamPrincipal } from '../humain/decision';
+import { contexteScore, forceEcurie, lassitude, niveauMetier, teamPrincipal, type ContexteScore } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
 import { disponibilite, indexerContrats, offresMarche, scoreMarche, valeurAuPoste } from './index';
 
@@ -62,6 +62,7 @@ export function planPersonnel(monde: Monde, commander: Commander): void {
     if (e.pilotee) continue;
     const tp = teamPrincipal(monde, e.id);
     if (!tp) continue;
+    let ctx: ContexteScore | undefined; // préparé au premier poste examiné (performance)
     for (const poste of POSTES) {
       const enCours = offresMarche(monde).some((o) => o.ecurie === e.id && o.poste === poste && (o.statut === 'en_attente' || o.statut === 'contre_offre' || o.statut === 'acceptee'));
       if (enCours) continue;
@@ -70,6 +71,7 @@ export function planPersonnel(monde: Monde, commander: Commander): void {
       // Révision annuelle de l'effectif, au tour qui suit les candidatures spontanées : faut-il remplacer quelqu'un ? (coût/bénéfice)
       const amelioration = !libre && !!enPlace && monde.date.semaine === FENETRE.debut + 2 * FENETRE.pas;
       if (!libre && !amelioration) continue;
+      ctx ??= contexteScore(monde, e, tp.id);
       const notes = (viviers.get(poste) ?? [])
         .filter((p) => p.id !== enPlace?.id)
         .map((p) => {
@@ -78,7 +80,7 @@ export function planPersonnel(monde: Monde, commander: Commander): void {
           const salaire = salaireOffert(monde, e, tp, p, poste);
           const duree = Math.max(2, dureeContrat(monde, p));
           const bonus = recues.some((c) => c.personne === p.id && c.ecurie === e.id) ? CANDIDATURES.bonusScore : 0;
-          return { p, d, salaire, duree, score: scoreMarche(monde, e, tp.id, p, salaire, duree, d.indemniteMEUR, poste) + bonus };
+          return { p, d, salaire, duree, score: scoreMarche(monde, e, tp.id, p, salaire, duree, d.indemniteMEUR, poste, ctx) + bonus };
         })
         .filter((x): x is NonNullable<typeof x> => x !== null)
         .sort((a, b) => b.score - a.score || (a.p.id < b.p.id ? -1 : 1));
