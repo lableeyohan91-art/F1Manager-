@@ -435,3 +435,4 @@ Aucun code à ce stade.
 
 ### Ajouté (D-144)
 - Liens directs entre faits : départs, décisions de l'employeur, marché (candidature, offre, signature, arrivée), recrutements de secours, groupes, stands, règlement et votes (`systems/humain/causes.ts`). 27 % des faits importants ont au moins 3 maillons (0 % avant). Résultats de simulation inchangés.
+- Corrigé : les saisons de F1 courues avant 2027 (données) comptent dans la carrière des pilotes (ancienneté, popularité, statistiques). Carrière moyenne mesurée : 10,6 saisons (cible 6 à 10).

@@ -1,0 +1,36 @@
+
+> f1manager@0.1.0 demographie
+> tsx tools/demographie.mts 8 30
+
+Répartition (graine 1, fin) : chef_stands/actif 11 · chef_stands/libre 2 · directeur_financier/actif 11 · directeur_financier/libre 4 · directeur_sportif/actif 11 · directeur_sportif/libre 4 · directeur_technique/actif 11 · directeur_technique/libre 3 · ingenieur/libre 38 · pilote_junior/libre 151 · pilote_reserve/actif 11 · pilote_reserve/libre 1 · pilote_titulaire/actif 22 · pilote_titulaire/libre 1 · responsable_aero/actif 11 · responsable_aero/libre 7 · responsable_conception/actif 11 · responsable_conception/libre 4 · team_principal/actif 11 · team_principal/libre 8
+8 graines × 30 saisons
+Débutants en F1 par saison : 2.41 (cible D-072 : 2 à 4)
+Carrière en F1 à la retraite (saisons) : moyenne 9.8, 10 % 3, 90 % 18, max 32 (cible : 6 à 10)
+Âge de retraite des pilotes de F1 : moyenne 34.2, 10 % 25, 90 % 42
+Âge de retraite du personnel : moyenne 41.6, 10 % 27, 90 % 61
+Âge des champions (titres simulés) : moyenne 31.1, 10 % 23, 90 % 39
+Niveau moyen des titulaires (dérive) : 2027 15.66 · 2031 16.41 · 2036 16.55 · 2041 16.36 · 2046 16.11 · 2051 16.19 · 2056 15.91
+Âge moyen des titulaires : 2027 26.1 · 2031 26.7 · 2036 28.8 · 2041 30.0 · 2046 30.1 · 2051 29.7 · 2056 29.7
+Population (hors retraités) : 2027 351 · 2031 357 · 2036 354 · 2041 335 · 2046 324 · 2051 325 · 2056 321
+abandon : 12.40 par saison
+personne.retraite : 39.35 par saison
+personne.retour : 0.38 par saison
+personne.reconversion : 5.17 par saison
+personne.declic : 9.01 par saison
+personne.stagnation : 6.14 par saison
+recrutement.genere : 0.01 par saison
+pilote.titularisation : 0.13 par saison
+Âge des débutants en F1 : moyenne 23.1, 10 % 19, 90 % 28
+Débutants passés par le top 5 de l'Apex 2 : 55 %
+Champions Apex 2 promus en F1 : 96/146 (66 %)
+Talents (potentiel ≥ 17, carrière finie) jamais arrivés en F1 : 31/243 (13 %)
+  dont causes probables (audit 6b n°2) : financière 17 · sportive 2 · contractuelle (affilié) 1 · manque d’opportunités 9 · indéterminée 2
+Pilotes payants moyens (budget ≥ 3 M€, potentiel ≤ 14) arrivés en F1 : 2/131 (2 %)
+Baquets juniors subventionnés (obtenus sans pouvoir payer le prix demandé) : 0 % ; prix moyen réellement payé : 1.09 M€
+Débutants passés par une académie : 90 %
+Promesses de titularisation tenues / rompues (fin de partie) : 47 / 0
+Mécènes trouvés : 0.62 par saison ; écart de réputation entre la meilleure et la moins bonne académie : 88 points
+Marché (7a) : 21.75 signatures par saison, dont 31 % face à des offres concurrentes ; pré-accords à deux saisons 2.41 ; débauchages 0.21 par saison (indemnités 1.5 M€/saison) ; contre-attaques 1.65 ; signatures à moins de 23 ans au début du contrat 6 %
+Salaire moyen des 5 pilotes les mieux payés (M€, inflation) : 2027 30.2 · 2031 32.4 · 2036 32.9 · 2041 30.5 · 2046 23.0 · 2051 23.3 · 2056 25.0
+Pilotes payants (D-131) : 25 % des signatures de pilotes avec un apport commercial net (moyenne 6.0 M€) ; niveau des recrues avec apport 16.05 contre 16.23 ; engagements juniors 0.71 par saison, tenus à l'arrivée en F1 0.15 ; sponsors remplacés 1.21 par saison
+Pépites générées (potentiel ≥ 18) : 11.5 par partie (dont 2.21 par décennie issues des cohortes annuelles ; cible D-102 : ≈ 2), championnes : 35

@@ -56,6 +56,15 @@ export function construirePasse(monde: Monde, histoires: HistoireDonnees[]): voi
   const age = (id: string, annee: number) => annee - ((personnes[id] as unknown as Personne | undefined)?.anneeNaissance ?? annee);
 
   const reelles: { h: HistoireDonnees; evt: string }[] = [];
+  // Jalon A (correction) : les saisons de F1 déjà courues (données) comptent dans la carrière (ancienneté, popularité, statistiques).
+  for (const id of Object.keys(personnes).sort()) {
+    const p = personnes[id] as unknown as Personne;
+    if (!p.carriere) continue;
+    const annees = new Set<number>();
+    for (const c of carrieres) if (c.personne === id && c.poste === 'pilote_titulaire') for (let y = c.de; y <= Math.min(c.a, fin); y++) annees.add(y);
+    if (annees.size > p.carriere.saisonsF1) p.carriere.saisonsF1 = annees.size;
+  }
+
   for (let annee = debut; annee <= fin; annee++) {
     monde.date = { annee, semaine: PASSE.semaine };
     const parEcurie = presents(carrieres, annee);
