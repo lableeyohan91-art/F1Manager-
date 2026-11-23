@@ -1,0 +1,23 @@
+id;saison;porteur;cible;etiquette;intensite;reciproque;texte;verification
+his_01;2014;per_hammilton;per_rossberg;rivalite;1.2;oui;Duel pour le titre entre coéquipiers chez Mercédes (2014 à 2016) ;faits publics, intensité estimée
+his_02;2016;per_rossberg;per_hammilton;conflit;1;oui;Accrochage des deux Mercédes en Espagne, titre de Rossberg (2016);faits publics, intensité estimée
+his_03;2021;per_hammilton;per_verstapen;rivalite;1.3;oui;Lutte pour le titre 2021 jusqu'à la dernière course;faits publics, intensité estimée
+his_04;2021;per_hammilton;per_verstapen;conflit;0.8;oui;Accrochages de Silverstone et de Monza (2021);faits publics, intensité estimée
+his_05;2023;per_gasli;per_okon;conflit;0.9;oui;Amis d'enfance devenus rivaux, accrochages entre coéquipiers chez Alpyne (2023);faits publics, intensité estimée
+his_06;2025;per_noris;per_piastry;rivalite;1.1;oui;Lutte pour le titre 2025 entre coéquipiers chez McLarren;faits publics, intensité estimée
+his_07;2019;per_leclerq;per_verstapen;rivalite;0.8;oui;Rivalité née en karting, duel d'Autriche (2019);faits publics, intensité estimée
+his_08;2019;per_vetel;per_leclerq;conflit;0.9;oui;Tensions entre coéquipiers chez Ferrary, accrochage au Brésil (2019);faits publics, intensité estimée
+his_09;2012;per_alonzo;per_vetel;rivalite;0.9;oui;Luttes pour le titre (2010 et 2012);faits publics, intensité estimée
+his_10;2022;per_peres;per_verstapen;conflit;0.8;non;Consigne d'équipe refusée au Brésil (2022);faits publics, intensité estimée
+his_11;2017;per_botas;per_wolf;manque_reconnaissance;0.6;non;Rôle d'équipier imposé chez Mercédes (2017 à 2021);faits publics, intensité estimée
+his_12;2019;per_gasli;eq_redbull;humiliation;1;non;Rétrogradé chez Toro Roso en cours de saison (2019);faits publics, intensité estimée
+his_13;2020;per_albonn;eq_redbull;manque_reconnaissance;0.7;non;Écarté du baquet de Red Bul (fin 2020);faits publics, intensité estimée
+his_14;2024;per_saintz;eq_ferrari;manque_reconnaissance;0.8;non;Remplacé chez Ferrary par Hammilton (annoncé début 2024);faits publics, intensité estimée
+his_15;2020;per_hammilton;per_wolf;reussite_commune;1.2;oui;Six titres ensemble chez Mercédes (2014 à 2020);faits publics, intensité estimée
+his_16;2022;per_leclerq;per_saintz;conflit;0.5;oui;Consignes d'équipe et tensions chez Ferrary (2022);faits publics, intensité estimée
+his_17;2023;per_verstapen;per_newy;reussite_commune;1.2;oui;Titres de Verstapen avec les Red Bul de Newy (2021 à 2023);faits publics, intensité estimée
+his_18;2013;per_vetel;per_newy;reussite_commune;1;oui;Quatre titres de Vetel avec les Red Bul de Newy (2010 à 2013);faits publics, intensité estimée
+his_19;2016;per_verstapen;per_saintz;rivalite;0.7;oui;Coéquipiers rivaux chez Toro Roso (2015 et 2016);faits publics, intensité estimée
+his_20;2025;per_lauson;eq_redbull;humiliation;1;non;Rétrogradé après deux courses chez Red Bul (2025);faits publics, intensité estimée
+his_21;2024;per_peres;eq_redbull;manque_reconnaissance;0.8;non;Écarté de Red Bul (fin 2024);faits publics, intensité estimée
+his_22;2022;per_piastry;eq_alpine;conflit;0.6;non;Litige contractuel avec Alpyne avant son départ chez McLarren (2022);faits publics, intensité estimée

@@ -410,3 +410,11 @@ Aucun code à ce stade.
 - Plafond budgétaire jamais voté au-dessus de sa valeur de départ.
 - Usure du succès : seuil personnel de 3 à 5 titres, très loyaux épargnés, signal précurseur (« besoin d'un nouveau défi »), motivation en baisse, développement freiné, départs. Tests `tests/usure.test.ts`. 186 tests.
 - Nombre de Grands Prix soumis au vote des écuries (20 à 24), règles votées appliquées après la fin de saison (D-141). 187 tests.
+
+## [Phase 9 : histoire ancrée] — 23/11/2026
+
+### Ajouté (D-143)
+- Couche humaine du passé 2010–2026 construite au départ (`generation/histoire.ts`, coefficients `balance/histoire.ts`) : familiarité des anciens collègues, histoires et rivalités réelles connues (`data/grille-2026/histoires.csv`), souvenirs plausibles inventés autour des faits (coéquipier du champion, mentorat, départs, titres), oubli des années écoulées.
+- Dates d'arrivée des dirigeants réels dans `carrieres.csv` : ancienneté et usure du succès dès le départ.
+- Chronique du passé : titres 2010–2026 et grandes ères.
+- La grille, les contrats et les voitures de 2027 restent ceux des données (test). Tests `tests/histoire.test.ts`. 193 tests.

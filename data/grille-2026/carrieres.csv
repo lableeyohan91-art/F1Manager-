@@ -64,3 +64,26 @@ per_vetel;eq_redbull;Red Bul;pilote_titulaire;2010;2014;
 per_vetel;eq_ferrari;Ferrary;pilote_titulaire;2015;2020;
 per_vetel;eq_aston;Aston Martyn;pilote_titulaire;2021;2022;
 per_rossberg;eq_mercedes;Mercédes;pilote_titulaire;2010;2016;
+per_stela;eq_mclaren;McLarren;team_principal;2015;2026;arrivée chez McLarren en 2015 (team principal depuis 2023) : date estimée, à vérifier
+per_vaseur;eq_ferrari;Ferrary;team_principal;2023;2026;arrivée : date estimée, à vérifier
+per_mekies;eq_redbull;Red Bul;team_principal;2025;2026;arrivée en cours de saison 2025 : date estimée, à vérifier
+per_wolf;eq_mercedes;Mercédes;team_principal;2013;2026;arrivée : date estimée, à vérifier
+per_newy;eq_aston;Aston Martyn;team_principal;2025;2026;arrivée : date estimée, à vérifier
+per_newy;eq_redbull;Red Bul;directeur_technique;2010;2024;passé chez Red Bul (depuis 2006) : date estimée, à vérifier
+per_briattore;eq_alpine;Alpyne;team_principal;2024;2026;arrivée : date estimée, à vérifier
+per_vowless;eq_williams;Wiliams;team_principal;2023;2026;arrivée : date estimée, à vérifier
+per_permanne;eq_racingbulls;Racing Buls;team_principal;2025;2026;arrivée : date estimée, à vérifier
+per_binoto;eq_audi;Sauberr / Audy;team_principal;2024;2026;arrivée : date estimée, à vérifier
+per_binoto;eq_ferrari;Ferrary;team_principal;2010;2022;passé chez Ferrary (team principal 2019–2022) : date estimée, à vérifier
+per_komatzu;eq_haas;Haass;team_principal;2016;2026;arrivée chez Haass en 2016 (team principal depuis 2024) : date estimée, à vérifier
+per_lowden;eq_cadillac;Cadilac;team_principal;2025;2026;arrivée : date estimée, à vérifier
+per_wachet;eq_redbull;Red Bul;directeur_technique;2010;2026;arrivée en 2006, présence comptée depuis 2010 : date estimée, à vérifier
+per_alison;eq_mercedes;Mercédes;directeur_technique;2017;2026;arrivée : date estimée, à vérifier
+per_sera;eq_ferrari;Ferrary;directeur_technique;2024;2026;arrivée : date estimée, à vérifier
+per_kay;eq_audi;Sauberr / Audy;directeur_technique;2023;2026;arrivée : date estimée, à vérifier
+per_falows;eq_racingbulls;Racing Buls;directeur_technique;2025;2026;arrivée : date estimée, à vérifier
+per_falows;eq_aston;Aston Martyn;directeur_technique;2022;2024;passé chez Aston Martyn : date estimée, à vérifier
+per_smets;eq_williams;Wiliams;directeur_sportif;2024;2026;arrivée : date estimée, à vérifier
+per_perone;eq_racingbulls;Racing Buls;directeur_sportif;2022;2026;arrivée : date estimée, à vérifier
+per_medows;eq_mercedes;Mercédes;directeur_sportif;2010;2026;arrivée : date estimée, à vérifier
+per_ioverrno;eq_ferrari;Ferrary;directeur_sportif;2010;2026;arrivée avant 2010, présence comptée depuis 2010 : date estimée, à vérifier

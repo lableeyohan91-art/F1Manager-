@@ -252,6 +252,12 @@ function multiplicateurOubli(p: Personne, s: Souvenir): number {
 
 /** Oubli mensuel, effacement avec résidu, retour lent des bases vers zéro, familiarité entre collègues. */
 export function passerUnMois(monde: Monde): void {
+  oublierUnMois(monde);
+  familiariserUnMois(monde);
+}
+
+/** Oubli d'un mois : intensité des souvenirs (avec résidu) et retour lent des bases durables vers zéro. */
+export function oublierUnMois(monde: Monde): void {
   const ts = table(monde, TABLE_SOUVENIRS);
   for (const id of idsTries(ts)) {
     const s = ts[id] as unknown as Souvenir;
@@ -271,6 +277,10 @@ export function passerUnMois(monde: Monde): void {
     const r = tr[id] as unknown as Relation;
     for (const axe of ['confiance', 'respect', 'affinite'] as const) r.base[axe] *= 1 - RETOUR_BASE_MENSUEL;
   }
+}
+
+/** Familiarité d'un mois entre collègues individualisés d'une même écurie (et chacun envers son écurie). */
+function familiariserUnMois(monde: Monde): void {
   // Familiarité : collègues individualisés d'une même écurie (et chacun envers son écurie).
   const tp = table(monde, TABLES.personnes);
   const parEcurie = new Map<string, string[]>();

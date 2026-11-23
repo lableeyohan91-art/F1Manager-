@@ -14,9 +14,10 @@ Séparateur `;` et encodage UTF-8 : ils s'ouvrent dans Excel (Données → À pa
 | `motoristes.csv` | 5 motoristes | 5 |
 | `personnes.csv` | 22 pilotes, 2 anciens champions (palmarès), 11 team principals, quelques directeurs techniques et sportifs | 46 |
 | `contrats.csv` | Contrats des pilotes au départ de 2027 | 22 |
-| `carrieres.csv` | Carrières des pilotes depuis 2010 (D-046) | ~65 |
+| `carrieres.csv` | Carrières des pilotes depuis 2010 (D-046), et **dates d'arrivée des dirigeants** (une ligne par passage dans une écurie, D-143) | ~88 |
 | `palmares.csv` | Champions pilotes et constructeurs de 2010 à 2026 | 17 |
 | `circuits.csv` | 24 circuits réels, noms altérés (D-045) | 24 |
+| `histoires.csv` | Rivalités et histoires réelles publiquement connues (2010–2026) : porteur, cible (personne ou écurie), type de souvenir, intensité (0,2 à 2), réciproque ou non (D-143) | 22 |
 
 Les postes non renseignés (directeur financier, responsables aéro et conception, pilote de réserve, certains directeurs techniques et sportifs) seront **générés** au chargement, sous forme de personnages fictifs.
 

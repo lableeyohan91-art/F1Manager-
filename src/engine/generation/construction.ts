@@ -37,6 +37,7 @@ import { comptesVides } from '../model/finances';
 import { TABLES } from '../model/types';
 import { moyenne, type DonneesInitiales, type PersonneDonnees } from './chargement';
 import { plafondCompetence, tirerCarriere } from '../systems/carriere/profil';
+import { construirePasse } from './histoire';
 import { initialiserExperienceDonnees } from '../systems/carriere/performance';
 import { simulerPasseJunior } from '../systems/juniors';
 
@@ -433,6 +434,8 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
   initialiserExperienceDonnees(monde);
   // Phase 6b : écuries juniors et passé junior simulé (sans effet sur la grille de F1 de 2027).
   simulerPasseJunior(monde);
+  // Phase 9 (D-143) : couche humaine du passé 2010–2026, construite sur les faits des données (la grille de 2027 n'est pas touchée).
+  construirePasse(monde, d.histoires);
 
   return monde;
 }

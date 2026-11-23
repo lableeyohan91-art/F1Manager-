@@ -200,3 +200,6 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Lobbying** | Argent dépensé par une écurie pour que la fédération retienne une orientation parmi ses propositions de réforme ; il ne touche jamais au décompte des voix (phase 8d). |
 | **Alliance** | Rapprochement d'écuries (même motoriste, écuries partenaires, dirigeants qui s'entendent) ; dans les votes, chacune tient compte de l'intérêt de ses alliées (phase 8d). |
 | **Usure du succès** | Lassitude d'une personne qui gagne depuis longtemps avec la même écurie, à partir d'un seuil personnel de 3 à 5 titres (jamais chez les très loyaux) ; elle annonce son besoin d'un nouveau défi, sa motivation baisse, puis elle cherche à partir. Équilibrage volontaire (D-140). |
+| **Histoire réelle** | Rivalité ou histoire publiquement connue entre personnages inspirés de personnes réelles, saisie dans `histoires.csv` ; elle laisse des souvenirs au départ de 2027 (D-143). |
+| **Ère** | Série d'au moins trois titres constructeurs consécutifs d'une écurie, inscrite dans la Chronique (phase 9). |
+| **Date d'arrivée** | Année où un dirigeant a rejoint son écurie, saisie dans `carrieres.csv` ; elle fixe son ancienneté au départ (D-143). |

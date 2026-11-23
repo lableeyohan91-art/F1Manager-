@@ -8,11 +8,12 @@ import { COMPETENCES_PILOTE } from '../balance/personnages';
 import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, TypeProprietaire, Voiture } from '../model/types';
 import { CHAMPS_EXIGENCES, type ExigencesCircuit } from '../model/types';
 import { ErreurDonnees, Lecteur, lireCsv } from './csv';
+import { ETIQUETTES } from '../balance/memoire';
 
 /** Texte des fichiers, indexé par nom de fichier. */
 export type FichiersDonnees = Record<string, string>;
 
-export const FICHIERS_GRILLE = ['finances.csv', 'voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
+export const FICHIERS_GRILLE = ['histoires.csv', 'finances.csv', 'voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
 export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv', 'secteurs.csv', 'entreprises.csv', 'ecuries-juniors.csv'] as const;
 
 const POSTES_DONNEES: readonly Poste[] = [
@@ -44,6 +45,21 @@ export interface Nationalite {
   poids: number;
 }
 
+/** Phase 9 : une histoire du passé (rivalité, réussite commune, humiliation…) entre deux personnes, ou d'une personne envers une écurie. */
+export interface HistoireDonnees {
+  id: string;
+  saison: number;
+  porteur: string;
+  cible: string;
+  etiquette: string;
+  /** Multiplicateur de l'intensité du souvenir (0,2 à 2). */
+  intensite: number;
+  /** Le souvenir existe dans les deux sens (cible personne seulement). */
+  reciproque: boolean;
+  texte: string;
+  verification: string;
+}
+
 export interface DonneesInitiales {
   motoristes: Motoriste[];
   ecuries: Ecurie[];
@@ -51,6 +67,8 @@ export interface DonneesInitiales {
   contrats: Omit<Contrat, 'statut'>[];
   carrieres: Omit<Carriere, 'id'>[];
   palmares: Omit<Palmares, 'id'>[];
+  /** Phase 9 (D-143) : histoires et rivalités réelles, publiquement connues (faits publics, intensités estimées). */
+  histoires: HistoireDonnees[];
   circuits: Circuit[];
   voitures: Voiture[];
   finances: { ecurie: string; tresorerieMEUR: number; typeProprietaire: TypeProprietaire; apportAnnuelMEUR: number; revenusCommerciauxMEUR: number; verification: string }[];
@@ -265,6 +283,24 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     note: l.valeurs['note'] ?? '',
   }));
 
+  // Phase 9 : histoires réelles (porteur : une personne ; cible : une personne ou une écurie).
+  const lhis = lireCsv('histoires.csv', fichier(f, 'histoires.csv'), ['id', 'saison', 'porteur', 'cible', 'etiquette', 'intensite', 'reciproque', 'texte']);
+  const rh = new Lecteur('histoires.csv');
+  const idsPerEq = new Set([...idsPer, ...idsEq]);
+  const histoires: HistoireDonnees[] = lhis.map((l) => ({
+    id: rh.texte(l, 'id'),
+    saison: rh.entier(l, 'saison', 1950, anneeMax),
+    porteur: rh.reference(l, 'porteur', idsPer),
+    cible: rh.reference(l, 'cible', idsPerEq),
+    etiquette: rh.parmi(l, 'etiquette', Object.keys(ETIQUETTES) as readonly string[]),
+    intensite: rh.decimal(l, 'intensite', 0.2, 2),
+    reciproque: rh.parmi(l, 'reciproque', ['oui', 'non'] as const) === 'oui',
+    texte: rh.texte(l, 'texte'),
+    verification: l.valeurs['verification'] ?? '',
+  }));
+  verifierIdsUniques('histoires.csv', lhis.map((l, i) => ({ id: histoires[i]!.id, numero: l.numero })), problemes);
+  for (const h of histoires) if (h.reciproque && idsEq.has(h.cible)) problemes.push(`histoires.csv : ${h.id} est réciproque mais sa cible est une écurie`);
+
   // Circuits.
   const lcir = lireCsv('circuits.csv', fichier(f, 'circuits.csv'), ['id', 'nom', 'ville', 'pays', 'type', 'altitudeM', 'climatPluie', ...CHAMPS_EXIGENCES]);
   const rci = new Lecteur('circuits.csv');
@@ -319,7 +355,7 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     if (n !== 1) problemes.push(`finances.csv : ${n} ligne(s) pour l'écurie ${e.id} (il en faut exactement 1)`);
   }
 
-  problemes.push(...rf.problemes, ...rv.problemes, ...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes);
+  problemes.push(...rf.problemes, ...rv.problemes, ...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes, ...rh.problemes);
   if (problemes.length > 0) throw new ErreurDonnees(problemes);
 
   // Sponsors fictifs (phase 5b).
@@ -339,5 +375,5 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   const ecuriesJuniors = ljun.map((l) => ({ nom: rj.texte(l, 'nom'), nationalite: rj.reference(l, 'nationalite', codesNat) }));
   if (ecuriesJuniors.length < 21) problemes.push('ecuries-juniors.csv : il faut au moins 21 noms (10 écuries Apex 3 + 11 écuries Apex 2)');
 
-  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises, ecuriesJuniors };
+  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, histoires, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises, ecuriesJuniors };
 }

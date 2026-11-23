@@ -1,6 +1,6 @@
 # Phase 9 — Histoire ancrée : un passé partagé au départ de 2027
 
-> Statut : **PROPOSITION, à valider** (aucun code avant validation). Principes déjà validés : D-042, D-046, D-048.
+> Statut : **VALIDÉE** (D-143), avec deux modifications du porteur : les rivalités et histoires réelles connues sont reprises (fichier `histoires.csv`) en plus des souvenirs inventés ; les dirigeants ont une **date d'arrivée** saisie dans `carrieres.csv` (rien n'est inventé pour les personnages générés). Principes déjà validés : D-042, D-046, D-048.
 > Objectif de la feuille de route : « démarrage en 2027 avec la grille voulue, et des personnages qui partagent déjà un passé ». Puis le **jalon A** : 10 saisons observées après un historique, chronique lisible, rapport de diagnostic.
 
 ## 1. Constat : ce qui existe, ce qui manque

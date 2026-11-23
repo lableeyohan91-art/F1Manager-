@@ -28,7 +28,8 @@ describe('Phase 8c — fuites et rumeurs', () => {
     moteur.avancer(m, 1);
     const f = faitsSuivis(m)[e.id] as unknown as FaitSuivi;
     expect(f).toBeDefined();
-    expect(e.connuPar).toEqual([tp.id, pilote.id].sort());
+    // Les participants savent (phase 9 : avec les relations du passé, le fait peut déjà fuiter dès sa première semaine).
+    expect(e.connuPar).toEqual(expect.arrayContaining([tp.id, pilote.id]));
     moteur.avancer(m, DIFFUSION.dureeDiffusion);
     expect(e.connuPar.length).toBeGreaterThan(2); // ça a fuité
     expect(e.connuPar.length).toBeLessThanOrEqual(DIFFUSION.connaisseursMax);

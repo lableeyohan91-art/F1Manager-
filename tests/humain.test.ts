@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  relationBrute,
   ajouterEvenement, contratEmploi, copierMonde, creerScenarioGrille2026, deserialiser, empreinte, lireEvenement, passerUnMois,
   personneDe, promesses, proposerProlongation, relation, serialiser, souvenirsDe, soumettreCommande, teamPrincipal, valeurMarche,
   verifierCoherence, VERSION_FORMAT, type Monde, type Personne,
@@ -31,6 +32,8 @@ describe('Phase 4 — mémoire v1', () => {
     a.traits['rancune'] = 20; b.traits['rancune'] = 1;
     for (const x of [a, b]) for (const k of Object.keys(x.traits)) if (k !== 'rancune') x.traits[k] = 10;
     for (const x of [a, b]) for (const k of Object.keys(x.valeurs)) x.valeurs[k] = 10;
+    // Phase 9 : le passé donne des familiarités différentes avec l'écurie ; on les égalise (seule la rancune doit différer).
+    for (const x of [a, b]) relationBrute(m, x.id, 'eq_ferrari', true)!.familiarite = 0.5;
     const e = evt(m);
     const sa = lireEvenement(m, a.id, 'eq_ferrari', 'humiliation', e)!;
     const sb = lireEvenement(m, b.id, 'eq_ferrari', 'humiliation', e)!;
