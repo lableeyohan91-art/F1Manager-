@@ -17,9 +17,9 @@ import type { DefinitionCommande } from '../../core/commandes';
 import { idsTries, table, type Monde } from '../../core/monde';
 import { tirageLocal, type Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Ecurie, type Personne, type Poste } from '../../model/types';
-import { lireEvenement, relation } from '../memoire';
+import { indexSouvenirs, lireEvenement, relation, type Souvenir } from '../memoire';
 import { candidatPour, contratEmploi, indemniteRupture, liberer, personneDe, pourvoirPostes } from './contrats';
-import { lassitude, niveauMetier, teamPrincipal } from './decision';
+import { indexAnciennete, indexerAnciennete, lassitude, niveauMetier, teamPrincipal } from './decision';
 import { performanceInsuffisante } from './interactions';
 
 const r1 = (x: number) => Math.round(x * 10) / 10;
@@ -27,14 +27,18 @@ const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(m
 const nom = (p: Personne) => `${p.prenom} ${p.nom}`;
 const rang = (d: { annee: number; semaine: number }) => d.annee * 52 + d.semaine;
 
+/** Contexte d'un passage de masse (performance) : souvenirs indexés et team principals, sans changer les résultats. */
+interface ContexteDeparts { souvenirs?: Map<string, Souvenir[]>; tp: Map<string, Personne | undefined> }
+
 /** Envie de partir (0 à 1), calculée : les raisons sont rendues pour les explications. */
-export function envieDePartir(monde: Monde, p: Personne): { envie: number; raisons: Record<string, number> } {
+export function envieDePartir(monde: Monde, p: Personne, ctx?: ContexteDeparts): { envie: number; raisons: Record<string, number> } {
   if (p.statut !== 'actif' || !p.ecurie) return { envie: 0, raisons: {} };
-  const tp = teamPrincipal(monde, p.ecurie);
+  const tp = ctx ? (ctx.tp.has(p.ecurie) ? ctx.tp.get(p.ecurie) : ctx.tp.set(p.ecurie, teamPrincipal(monde, p.ecurie)).get(p.ecurie)) : teamPrincipal(monde, p.ecurie);
+  const souv = ctx ? (ctx.souvenirs ??= indexSouvenirs(monde)).get(p.id) ?? [] : undefined;
   const raisons = {
     motivation: ENVIE_DE_PARTIR.poidsMotivation * (1 - p.etat.motivation / 100),
-    mefiance: tp && tp.id !== p.id ? ENVIE_DE_PARTIR.poidsMefiance * Math.max(0, -relation(monde, p.id, tp.id).confiance) : 0,
-    rancoeur: ENVIE_DE_PARTIR.poidsRancoeur * Math.max(0, -relation(monde, p.id, p.ecurie).confiance),
+    mefiance: tp && tp.id !== p.id ? ENVIE_DE_PARTIR.poidsMefiance * Math.max(0, -relation(monde, p.id, tp.id, souv).confiance) : 0,
+    rancoeur: ENVIE_DE_PARTIR.poidsRancoeur * Math.max(0, -relation(monde, p.id, p.ecurie, souv).confiance),
     lassitude: ENVIE_DE_PARTIR.poidsLassitude * Math.min(1, lassitude(monde, p).niveau / ENVIE_DE_PARTIR.lassitudeMax),
   };
   return { envie: borner(Object.values(raisons).reduce((a, b) => a + b, 0), 0, 1), raisons };
@@ -156,21 +160,29 @@ export const systemeDeparts: Systeme = {
     if (date.semaine % 4 !== 3) return;
     const tp = table(monde, TABLES.personnes);
     const actifsAvant = Object.values(tp).filter((x) => (x as unknown as Personne).statut === 'actif').length;
+    // Performance : index des contrats d'emploi, des souvenirs et de l'ancienneté, invalidés après toute décision qui change l'état.
+    let contrats: Map<string, Contrat> | undefined;
+    const ctx: ContexteDeparts = { tp: new Map() };
+    const invalider = () => { contrats = undefined; delete ctx.souvenirs; ctx.tp.clear(); indexerAnciennete(monde); };
+    const contratDe = (id: string) => (contrats ??= new Map((Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).filter((c) => c.statut === 'actif' && c.type === 'emploi').map((c) => [c.personne, c]))).get(id);
+    indexerAnciennete(monde);
+    try {
     for (const id of idsTries(tp)) {
       const p = tp[id] as unknown as Personne;
       if (!concerne(p)) continue;
-      const c = contratEmploi(monde, p.id);
+      const c = contratDe(p.id);
       const e = table(monde, TABLES.ecuries)[p.ecurie] as unknown as Ecurie | undefined;
-      const dirigeant = teamPrincipal(monde, p.ecurie);
+      const dirigeant = ctx.tp.has(p.ecurie) ? ctx.tp.get(p.ecurie) : ctx.tp.set(p.ecurie, teamPrincipal(monde, p.ecurie)).get(p.ecurie);
       if (!c || !e || !dirigeant) continue;
       const f = tirageLocal(monde, 'humain.departs', p.id, date.annee, date.semaine);
-      const { envie } = envieDePartir(monde, p);
+      const { envie } = envieDePartir(monde, p, ctx);
       const d = c.demandeDepart;
       if (d && !d.refusee) {
         // Demande en attente : l'IA répond tout de suite ; le joueur a un délai, au-delà la demande vaut refus.
         if (!e.pilotee) {
           const accepter = remplacable(monde, p) || relation(monde, dirigeant.id, p.id).confiance < REPONSE_EMPLOYEUR.seuilMefiance;
           repondreDepart(monde, dirigeant, p, accepter && d.indemnite <= REPONSE_EMPLOYEUR.partBudgetMax * e.budgetMEUR);
+          invalider();
         } else if (rang(date) - rang(d.depuis) >= DEMANDES_DEPART.delaiReponseSemaines) {
           c.demandeDepart = { ...d, refusee: true };
         }
@@ -178,15 +190,16 @@ export const systemeDeparts: Systeme = {
       }
       if (d?.refusee) {
         // Refus : une envie très forte peut mener à la démission ; sinon la demande s'efface quand l'envie retombe.
-        if (envie >= DEMANDES_DEPART.seuilDemission && f.chance(DEMANDES_DEPART.probaDemission)) demissionner(monde, p, c);
+        if (envie >= DEMANDES_DEPART.seuilDemission && f.chance(DEMANDES_DEPART.probaDemission)) { demissionner(monde, p, c); invalider(); }
         else if (envie < DEMANDES_DEPART.seuilDemande) delete c.demandeDepart;
         continue;
       }
       if (envie >= DEMANDES_DEPART.seuilDemande && f.chance(DEMANDES_DEPART.probaDemande)) {
         c.demandeDepart = { indemnite: r1(DEMANDES_DEPART.partIndemniteDemandee * indemniteRupture(c)), depuis: { ...date } };
+        const raisons = envieDePartir(monde, p, ctx).raisons;
         ajouterEvenement(monde, {
           type: 'contrat.demande_depart', acteurs: [{ id: p.id, role: 'auteur' }, { id: dirigeant.id, role: 'cible' }, { id: p.ecurie, role: 'organisation' }],
-          importance: 2, visibilite: 'prive', contexte: { envie: Math.round(envie * 100) / 100, indemnite: c.demandeDepart.indemnite, raisons: envieDePartir(monde, p).raisons },
+          importance: 2, visibilite: 'prive', contexte: { envie: Math.round(envie * 100) / 100, indemnite: c.demandeDepart.indemnite, raisons },
         });
         continue;
       }
@@ -195,7 +208,11 @@ export const systemeDeparts: Systeme = {
         c.ruptureProposee = date.annee;
         const indemnite = r1(RUPTURE_NEGOCIEE.exigence * indemniteRupture(c) * (1 - envie) + RUPTURE_NEGOCIEE.margeIA);
         commanderIA({ type: 'contrat.rupture_negociee', auteur: dirigeant.id, parametres: { personne: p.id, indemnite: Math.min(indemnite, RUPTURE_NEGOCIEE.indemniteMax * indemniteRupture(c)) } });
+        invalider();
       }
+    }
+    } finally {
+      indexAnciennete.delete(monde);
     }
     // Postes laissés vacants par un départ : recrutement habituel (les écuries du joueur recrutent elles-mêmes).
     if (Object.values(tp).filter((x) => (x as unknown as Personne).statut === 'actif').length < actifsAvant) pourvoirPostes(monde);

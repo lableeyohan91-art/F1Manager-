@@ -257,6 +257,13 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['groupes'] ??= {};
     return { ...m, versionFormat: 23 };
   },
+  // v23 → v24 (phase 8d-4) : fédération (président nommé à la semaine suivante, règles de départ) et alliances.
+  23: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['federation'] ??= {};
+    tables['alliances'] ??= {};
+    return { ...m, versionFormat: 24 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

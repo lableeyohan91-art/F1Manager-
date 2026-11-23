@@ -387,3 +387,13 @@ Aucun code à ce stade.
 - Groupes sociaux émergents (`systems/humain/groupes.ts`, `balance/groupes.ts`) : lien social, détection annuelle, leader, types déduits (clan, opposants, mentor, anciens collaborateurs, collègues).
 - Effets : membres qui suivent leur leader (candidatures), climat dégradé par un groupe d'opposants.
 - Format de sauvegarde 23, migration et test. Tests `tests/groupes.test.ts`. 179 tests.
+
+## [Phase 8d-4 : politique] — 23/11/2026
+
+### Ajouté (D-138)
+- Fédération et président élu tous les 4 ans (intérim si le président est recruté), profil politique déduit de la personne (`systems/politique/`, `balance/politique.ts`).
+- Lobbying sur les propositions de réforme, autres votes (plafond budgétaire, restrictions aérodynamiques), alliances d'écuries pesant dans les votes.
+- Commandes `politique.lobbying` et `federation.vote`. Format de sauvegarde 24, migration et test. Tests `tests/politique.test.ts`. 184 tests.
+
+### Performances
+- Démissions et ruptures : index des souvenirs, contrats et anciennetés pendant le passage mensuel (29 s → 5,8 s sur 50 saisons), résultats identiques (empreintes vérifiées).

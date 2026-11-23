@@ -42,6 +42,8 @@ export const TABLES = {
   // Phase 8d
   equipesStands: 'equipesStands',
   groupes: 'groupes',
+  federation: 'federation',
+  alliances: 'alliances',
   archives: 'archives',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',

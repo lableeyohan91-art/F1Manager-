@@ -37,6 +37,7 @@ import { coutAnnuelAcademie } from '../juniors/academies';
 
 export * from './sponsors';
 export * from './crises';
+import { regleVotee } from '../politique/acces';
 export * from './infrastructures';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
@@ -52,7 +53,8 @@ export function proprietaireDe(monde: Monde, idEcurie: string): Proprietaire | u
 
 /** Plafond budgétaire en vigueur (paramètre du règlement, modifiable par vote en phase 8). */
 export function plafond(monde: Monde): number {
-  return parametre(monde, 'reglement.plafondMEUR', PLAFOND_BUDGETAIRE_MEUR);
+  // Phase 8d-4 : la valeur votée sert de valeur par défaut ; un réglage d'expérience la remplace.
+  return parametre(monde, 'reglement.plafondMEUR', regleVotee(monde, 'plafondMEUR', PLAFOND_BUDGETAIRE_MEUR));
 }
 
 /** Rang au dernier classement constructeurs terminé (1 = premier) ; à défaut, rang de l'indice voiture. */
@@ -71,8 +73,8 @@ export function rangPrecedent(monde: Monde, idEcurie: string): { rang: number; n
 export function restrictionAero(monde: Monde, idEcurie: string): number {
   const { rang, n } = rangPrecedent(monde, idEcurie);
   const t = n > 1 ? (rang - 1) / (n - 1) : 0.5;
-  const premier = parametre(monde, 'reglement.restrictionAeroPremier', RESTRICTIONS_AERO.premier);
-  const dernier = parametre(monde, 'reglement.restrictionAeroDernier', RESTRICTIONS_AERO.dernier);
+  const premier = parametre(monde, 'reglement.restrictionAeroPremier', regleVotee(monde, 'restrictionAeroPremier', RESTRICTIONS_AERO.premier));
+  const dernier = parametre(monde, 'reglement.restrictionAeroDernier', regleVotee(monde, 'restrictionAeroDernier', RESTRICTIONS_AERO.dernier));
   return premier + t * (dernier - premier);
 }
 

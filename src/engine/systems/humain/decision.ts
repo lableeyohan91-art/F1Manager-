@@ -70,9 +70,22 @@ export function ecurie(monde: Monde, id: string): Ecurie | undefined {
 }
 
 /** Années passées sous contrat avec une organisation (contrats + carrière des données). */
+/**
+ * Index des contrats et des carrières par personne, posé seulement pendant un passage de masse (performance, phase 8d) ; mêmes éléments,
+ * même ordre que le parcours de la table. Les appelants le retirent à la fin de leur passage.
+ */
+export const indexAnciennete = new WeakMap<Monde, { contrats: Map<string, Contrat[]>; carrieres: Map<string, Carriere[]> }>();
+export function indexerAnciennete(monde: Monde): void {
+  const contrats = new Map<string, Contrat[]>(), carrieres = new Map<string, Carriere[]>();
+  for (const c of Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]) (contrats.get(c.personne) ?? contrats.set(c.personne, []).get(c.personne)!).push(c);
+  for (const c of Object.values(table(monde, TABLES.carrieres)) as unknown as Carriere[]) (carrieres.get(c.personne) ?? carrieres.set(c.personne, []).get(c.personne)!).push(c);
+  indexAnciennete.set(monde, { contrats, carrieres });
+}
+
 export function anneesDans(monde: Monde, p: Personne, organisation: string): number {
-  const contrats = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).filter((c) => c.personne === p.id && c.organisation === organisation);
-  const carriere = (Object.values(table(monde, TABLES.carrieres)) as unknown as Carriere[]).filter((c) => c.personne === p.id && c.ecurieLignee === organisation);
+  const idx = indexAnciennete.get(monde);
+  const contrats = (idx ? idx.contrats.get(p.id) ?? [] : (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[])).filter((c) => c.personne === p.id && c.organisation === organisation);
+  const carriere = (idx ? idx.carrieres.get(p.id) ?? [] : (Object.values(table(monde, TABLES.carrieres)) as unknown as Carriere[])).filter((c) => c.personne === p.id && c.ecurieLignee === organisation);
   const annees = new Set<number>();
   for (const c of contrats) for (let y = c.debut; y <= Math.min(c.fin, monde.date.annee); y++) annees.add(y);
   for (const c of carriere) for (let y = c.de; y <= c.a; y++) annees.add(y);

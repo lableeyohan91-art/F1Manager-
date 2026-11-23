@@ -25,6 +25,8 @@ export const FAITS_DIFFUSABLES: Record<string, number> = {
   // Phase 8d-3
   'groupe.forme': 0.4,
   'groupe.suit_leader': 0.6,
+  // Phase 8d-4
+  'politique.lobbying': 0.9,
 };
 
 /**

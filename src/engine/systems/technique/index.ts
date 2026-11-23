@@ -20,6 +20,8 @@ import {
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
+import { ALLIANCES, INFLUENCE } from '../../balance/politique';
+import { allies, poidsOrientation } from '../politique/acces';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
@@ -76,7 +78,14 @@ export function preparerReformes(monde: Monde): void {
   const n = f.entier(CALENDRIER_REGLEMENT.propositionsMin, CALENDRIER_REGLEMENT.propositionsMax);
   const orientations = [...(Object.keys(ORIENTATIONS) as Orientation[])];
   const choisies: Orientation[] = [];
-  while (choisies.length < n && orientations.length) choisies.push(orientations.splice(f.entier(0, orientations.length - 1), 1)[0]!);
+  // Phase 8d-4 : tirage pondéré par l'orientation préférée du président de la fédération et le lobbying des écuries (1 par défaut).
+  while (choisies.length < n && orientations.length) {
+    const poids = orientations.map((o) => poidsOrientation(monde, o, INFLUENCE.bonusPresident));
+    let x = f.suivant() * poids.reduce((a, b) => a + b, 0);
+    let k = 0;
+    while (k < orientations.length - 1 && (x -= poids[k]!) > 0) k++;
+    choisies.push(orientations.splice(k, 1)[0]!);
+  }
   const generation = Math.max(...reglements(monde).map((r) => r.generation)) + 1;
   const prolongation = f.entier(1, CALENDRIER_REGLEMENT.prolongationMax);
   choisies.forEach((o, i) => {
@@ -133,8 +142,12 @@ export function interetOption(monde: Monde, e: Ecurie, option: Reglement | 'prol
 /** Choix d'une écurie de l'IA : la réforme qu'elle préfère, et si elle la préfère à la prolongation. */
 function choixIA(monde: Monde, e: Ecurie, props: Reglement[]): { reforme: string; changer: boolean } {
   const f = tirageLocal(monde, 'reglement.vote', e.id, monde.date.annee);
-  const notes = props.map((r) => ({ id: r.id, u: interetOption(monde, e, r) + f.normale(0, VOTE_IA.aleaVote) })).sort((a, b) => b.u - a.u || (a.id < b.id ? -1 : 1));
-  const prolonger = interetOption(monde, e, 'prolongation') + f.normale(0, VOTE_IA.aleaVote);
+  // Phase 8d-4 : une écurie tient compte de l'intérêt de ses alliés (jamais un vote imposé).
+  const ids = allies(monde, e.id);
+  const autres = ids.map((id) => table(monde, TABLES.ecuries)[id] as unknown as Ecurie).filter((x) => x?.statut === 'active');
+  const interet = (o: Reglement | 'prolongation') => interetOption(monde, e, o) + (autres.length ? ALLIANCES.poidsAllies * autres.reduce((a, x) => a + interetOption(monde, x, o), 0) / autres.length : 0);
+  const notes = props.map((r) => ({ id: r.id, u: interet(r) + f.normale(0, VOTE_IA.aleaVote) })).sort((a, b) => b.u - a.u || (a.id < b.id ? -1 : 1));
+  const prolonger = interet('prolongation') + f.normale(0, VOTE_IA.aleaVote);
   return { reforme: notes[0]!.id, changer: notes[0]!.u > prolonger };
 }
 

@@ -196,3 +196,6 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Groupe social** | Ensemble de personnes liées par l'affinité ou le respect et une expérience commune, détecté chaque saison autour d'un leader, jamais créé à la main (memoire.md §4, phase 8d). |
 | **Lien social** | Relation de la mémoire v1, plus une affinité née de valeurs proches et un respect né de la compétence, en proportion de la familiarité ; lu seulement par les groupes (D-137). |
 | **Leader (groupe)** | Membre d'un groupe social qui reçoit le plus de respect ; quand il change d'écurie, certains membres veulent le suivre (phase 8d). |
+| **Président de la fédération** | Personnalité élue tous les 4 ans par les écuries ; son orientation préférée, sa rigueur budgétaire et sa sensibilité au lobbying pèsent sur les propositions (D-132, phase 8d). |
+| **Lobbying** | Argent dépensé par une écurie pour que la fédération retienne une orientation parmi ses propositions de réforme ; il ne touche jamais au décompte des voix (phase 8d). |
+| **Alliance** | Rapprochement d'écuries (même motoriste, écuries partenaires, dirigeants qui s'entendent) ; dans les votes, chacune tient compte de l'intérêt de ses alliées (phase 8d). |
