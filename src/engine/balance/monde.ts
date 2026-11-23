@@ -8,6 +8,8 @@ export const POSTES_INDIVIDUALISES: { poste: string; nombre: number }[] = [
   { poste: 'directeur_financier', nombre: 1 },
   { poste: 'responsable_aero', nombre: 1 },
   { poste: 'responsable_conception', nombre: 1 },
+  // Phase 8d (D-129) : chef d'équipe des stands.
+  { poste: 'chef_stands', nombre: 1 },
   { poste: 'pilote_titulaire', nombre: 2 },
   { poste: 'pilote_reserve', nombre: 1 },
 ];
@@ -30,6 +32,7 @@ export const SALAIRES_GENERES: Record<string, { min: number; max: number }> = {
   directeur_financier: { min: 0.8, max: 2.5 },
   responsable_aero: { min: 0.8, max: 3 },
   responsable_conception: { min: 0.8, max: 3 },
+  chef_stands: { min: 0.3, max: 0.9 },
   pilote_reserve: { min: 0.3, max: 1.5 },
 };
 

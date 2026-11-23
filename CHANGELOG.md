@@ -361,3 +361,15 @@ Aucun code à ce stade.
 - Avant-projets de règlement : préparés dès la semaine 2, connus approximativement des écuries qui en ont vent, recherche exploratoire possible avant la publication.
 - Format de sauvegarde 21, migration et test. Tests `tests/information.test.ts`. 163 tests. Diagnostic `tools/diagnostic-reglements.mts` étendu.
 - Rapport : `docs/rapports/2026-11-23-p8c-qui-sait-quoi.md` ; références `p8c-*`.
+
+## [Phase 8d-1 : équipe des stands] — 23/11/2026
+
+### Ajouté (D-129, D-135)
+- Équipe des stands par écurie (`systems/stands/`, coefficients `balance/stands.ts`) : rapidité et précision avec plafond, cohésion, fatigue, expérience collective, part de mécaniciens expérimentés, plan d'entraînement, recrutement par vagues, départs naturels chaque hiver, historique borné.
+- Nouveau poste de chef d'équipe des stands (génération, recrutement, marché du personnel).
+- Commandes `stands.plan`, `stands.recrutement`, `stands.deleguer` ; décisions de l'IA.
+- Format de sauvegarde 22, migration et test. Tests `tests/stands.test.ts`. 170 tests.
+
+### Corrigé
+- Un sponsor accompagnant ne reste plus lié à un pilote qui a quitté l'écurie hors marché : il le suit ou prend fin.
+- Limite de taille de sauvegarde (10 saisons) relevée de 4 à 4,5 Mo, mesures à l'appui (données de la phase 8).

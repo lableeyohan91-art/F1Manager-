@@ -31,3 +31,4 @@ export * from './systems/marche/commercial';
 export * from './systems/marche/personnel';
 export * from './systems/technique';
 export * from './systems/information';
+export * from './systems/stands';

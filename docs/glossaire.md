@@ -185,3 +185,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Révélation** | Passage d'un fait privé au public, par la presse ou parce que trop de monde est au courant (phase 8c). |
 | **Réputation perçue** | Réputation d'un acteur aux yeux d'un observateur : faits publics, plus les faits privés qu'il connaît, pondérés par ce qu'il en croit (phase 8c). |
 | **Avant-projet** | Réforme préparée par la fédération avant sa publication ; seules les écuries qui en ont vent le connaissent, et approximativement (phase 8c). |
+| **Chef d'équipe des stands** | Seul mécanicien individualisé de l'équipe des stands, sous l'autorité du directeur sportif ; son encadrement fixe le plafond de cohésion et l'efficacité de l'entraînement (D-129, phase 8d). |
+| **Plan d'entraînement (stands)** | Orientation (rapidité, précision, coordination, récupération) et intensité (légère, normale, intensive) de l'entraînement de l'équipe des stands, modifiable à tout moment (D-132, phase 8d). |
+| **Fatigue (stands)** | Charge accumulée par l'équipe des stands (entraînement, Grands Prix, enchaînements), réduite par la récupération ; elle freine les progrès et, en phase 13, augmentera les erreurs (phase 8d). |
+| **Encadrement (stands)** | Qualité de la direction de l'équipe des stands : chef d'équipe, directeur sportif et leur relation ; il fixe le plafond de cohésion (phase 8d). |

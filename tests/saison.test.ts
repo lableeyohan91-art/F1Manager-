@@ -61,7 +61,9 @@ describe('Phase 3 — saison abstraite', () => {
     expect(vieux.every((g) => g.resultats.every((r) => r.explication === undefined))).toBe(true);
     // Phase 6b : +≈ 0,2 Mo (juniors). Le plus lourd reste le détail des Grands Prix de F1 (≈ 1 Mo), optimisation à prévoir avant la version mobile.
     // Phase 6b-2 : relations et souvenirs nés des académies. Limite à 30 saisons inchangée (12 Mo, test humain).
-    expect(serialiser(m).length).toBeLessThan(4_000_000);
+    // Phase 8 : règlements, savoir, historique de recherche, faits suivis, équipes des stands (≈ 0,15 Mo) et relations des 11 chefs
+    // d'équipe des stands : limite relevée de 4 à 4,5 Mo (mesuré : 4,17 Mo).
+    expect(serialiser(m).length).toBeLessThan(4_500_000);
   }, 90_000); // référence locale ≈ 4 à 7 s
 
   it('tirages locaux : changer la météo d’une course ne change pas l’aléa des autres courses', () => {

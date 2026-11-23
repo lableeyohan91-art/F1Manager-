@@ -499,5 +499,22 @@ export const systemeCommercial: Systeme = {
     }
     if (date.semaine === AGENTS.semaineDemarchage) demarchageAgents(monde);
     if (date.semaine === SEMAINE_POPULARITE) evoluerPopularites(monde, date.annee);
+    sponsorsOrphelins(monde);
   },
 };
+
+/**
+ * Correction (phase 8d) : un sponsor accompagnant reste lié à son pilote. Si le pilote n'est plus dans l'écurie du contrat par un autre
+ * chemin que le marché (fin de contrat sans nouveau baquet, recrutement de secours, retraite…), le sponsor le suit s'il court ailleurs,
+ * sinon le partenariat prend fin. Avant, il restait chez l'ancienne écurie, lié à un pilote absent.
+ */
+export function sponsorsOrphelins(monde: Monde): void {
+  const t = table(monde, TABLES.contratsSponsoring);
+  for (const id of idsTries(t)) {
+    const c = t[id] as unknown as ContratSponsoring;
+    if (!c.pilote || c.statut !== 'actif') continue;
+    const p = table(monde, TABLES.personnes)[c.pilote] as unknown as Personne | undefined;
+    if (p?.ecurie === c.ecurie && p.statut === 'actif') continue;
+    suivreLePilote(monde, c, p, monde.date.annee + 1);
+  }
+}

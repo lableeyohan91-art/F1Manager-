@@ -39,6 +39,8 @@ export const TABLES = {
   // Phase 8c
   faitsSuivis: 'faitsSuivis',
   information: 'information',
+  // Phase 8d
+  equipesStands: 'equipesStands',
   archives: 'archives',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
@@ -54,6 +56,8 @@ export type Poste =
   | 'directeur_financier'
   | 'responsable_aero'
   | 'responsable_conception'
+  /** Phase 8d (D-129) : chef d'équipe des stands, sous l'autorité du directeur sportif. */
+  | 'chef_stands'
   | 'pilote_titulaire'
   | 'pilote_reserve'
   | 'pilote_junior'

@@ -244,6 +244,13 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['information']['etat'] ??= { id: 'etat', dernier };
     return { ...m, versionFormat: 21 };
   },
+  // v21 → v22 (phase 8d, D-129) : équipes des stands (créées par leur système à la semaine suivante, à partir du département
+  // « stands ») ; le poste de chef d'équipe est pourvu par le recrutement habituel des postes vacants.
+  21: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['equipesStands'] ??= {};
+    return { ...m, versionFormat: 22 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

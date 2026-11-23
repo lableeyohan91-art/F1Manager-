@@ -84,6 +84,8 @@ export const COMPETENCES_PAR_POSTE: Record<string, readonly string[]> = {
   directeur_financier: ['gestionBudgetaire', 'negociation', 'maitrisePlafond'],
   responsable_aero: ['aerodynamique', 'rigueur', 'innovation', 'correlation'],
   responsable_conception: ['conception', 'rigueur', 'innovation', 'correlation'],
+  // Phase 8d : lues par l'encadrement de l'équipe des stands (organisation) et l'entraînement à la précision (rigueur).
+  chef_stands: ['organisationStands', 'rigueur'],
   ingenieur: ['specialite', 'rigueur', 'innovation'],
 };
 
@@ -108,6 +110,7 @@ export const COURBES_AGE: Record<string, { progressionJusqua: number; declinApre
   directeur_financier: { progressionJusqua: 50, declinApres: 65, margeParAnnee: 0.2, margeMax: 3 },
   responsable_aero: { progressionJusqua: 48, declinApres: 62, margeParAnnee: 0.3, margeMax: 4 },
   responsable_conception: { progressionJusqua: 48, declinApres: 62, margeParAnnee: 0.3, margeMax: 4 },
+  chef_stands: { progressionJusqua: 45, declinApres: 58, margeParAnnee: 0.3, margeMax: 4 },
   ingenieur: { progressionJusqua: 45, declinApres: 60, margeParAnnee: 0.3, margeMax: 4 },
 };
 
@@ -131,6 +134,7 @@ export const AGES_PAR_POSTE: Record<string, { min: number; max: number }> = {
   directeur_financier: { min: 38, max: 60 },
   responsable_aero: { min: 34, max: 55 },
   responsable_conception: { min: 34, max: 55 },
+  chef_stands: { min: 32, max: 55 },
   pilote_titulaire: { min: 21, max: 29 },
   pilote_reserve: { min: 20, max: 28 },
   pilote_junior: { min: 16, max: 22 },

@@ -66,7 +66,7 @@ export const PREDATEUR = { parDebauchage: 1, inertie: 0.6, malusParPoint: 0.04, 
  * - partBudgetPoste : part du budget de l'écurie qui sert de référence de coût pour un poste de personnel (score de recrutement).
  */
 export const PERSONNEL_MARCHE = {
-  postes: ['directeur_technique', 'responsable_aero', 'responsable_conception', 'directeur_sportif', 'directeur_financier'] as const,
+  postes: ['directeur_technique', 'responsable_aero', 'responsable_conception', 'directeur_sportif', 'directeur_financier', 'chef_stands'] as const,
   nonConcurrenceSemaines: 26,
   /**
    * D-127 (choix du porteur, option 3) : pendant sa non-concurrence, la recrue travaille déjà, mais à cette fraction de son efficacité
@@ -78,7 +78,7 @@ export const PERSONNEL_MARCHE = {
 
 /** Rang hiérarchique des postes (pour l'attrait d'un poste plus élevé, la lassitude et les candidatures spontanées). */
 export const RANG_POSTE: Record<string, number> = {
-  pilote_junior: 0, pilote_reserve: 0, pilote_titulaire: 0, ingenieur: 0,
+  pilote_junior: 0, pilote_reserve: 0, pilote_titulaire: 0, ingenieur: 0, chef_stands: 0.5,
   responsable_aero: 1, responsable_conception: 1, directeur_sportif: 1, directeur_financier: 1,
   directeur_technique: 2, team_principal: 3,
 };

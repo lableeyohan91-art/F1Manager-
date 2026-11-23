@@ -13,6 +13,7 @@ export const SALAIRE_REFERENCE_MEUR: Record<string, number> = {
   directeur_financier: 1.6,
   responsable_aero: 2,
   responsable_conception: 2,
+  chef_stands: 0.6,
   ingenieur: 0.5,
 };
 
@@ -104,6 +105,7 @@ export const RESERVOIR_MINIMUM: Record<string, number> = {
   directeur_financier: 5,
   responsable_aero: 6,
   responsable_conception: 6,
+  chef_stands: 5,
   ingenieur: 30,
 };
 
