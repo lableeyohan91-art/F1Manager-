@@ -221,6 +221,96 @@ Format de sauvegarde, migrations et tests comme d'habitude. Le seul élément **
   - autres sujets de vote (question 6) ;
   - élection du président de la fédération (question 7).
 
+## 9 bis. Phase 8d — Équipe des stands (décision du porteur, D-129)
+
+> Partage des rôles : **la phase 8d prépare la dimension humaine** (composition, compétences, cohésion, entraînement, fatigue, recrutement, relations) ; **la phase 13 simule les arrêts** (temps réels, variabilité, erreurs et leurs conséquences) et **équilibre** temps et probabilités. Aucun temps d'arrêt ni aucune probabilité définitive n'est programmé en phase 8.
+
+### Gestion collective, quelques personnes clés
+
+- Une **équipe des stands par écurie**, gérée **collectivement** : environ 20 mécaniciens qui ne sont pas individualisés un par un.
+- Une seule personne individualisée au départ : le **chef d'équipe des stands**. C'est un personnage, avec ses relations, sur le marché du travail de la 7b. Il est placé sous l'autorité du **directeur sportif**, dont la compétence « organisation des stands », déjà existante, sert enfin.
+- D'autres spécialistes pourront être individualisés plus tard si le jeu le demande (question 15).
+
+### Trois caractéristiques, des effets différents
+
+| Caractéristique | Ce qu'elle représente | Ce qu'elle déterminera (phase 13) |
+| --- | --- | --- |
+| **Rapidité technique** | Vitesse des gestes de chaque mécanicien | Temps habituel d'un arrêt réussi, avec la cohésion |
+| **Précision** | Maîtrise technique, gestes sûrs | Risque d'erreur, principalement, avec la fatigue et les circonstances |
+| **Cohésion** | Synchronisation, connaissance des habitudes de chacun | Part du potentiel réellement exprimée en vitesse ; elle réduit un peu les erreurs de coordination |
+
+S'y ajoutent la **fatigue** (charge récente) et l'**expérience collective** (arrêts réalisés ensemble).
+
+### Principe : la cohésion ne remplace pas la compétence
+
+Forme proposée, avec des **valeurs d'illustration seulement** :
+- **vitesse exprimée** = rapidité × (part de base + part liée à la cohésion). La cohésion permet d'exprimer son potentiel, jamais de le dépasser ;
+- **risque d'erreur** : il dépend surtout de la précision et de la fatigue ; la cohésion n'en retire qu'une petite part.
+
+Vérification sur l'exemple du porteur :
+- **Équipe A** (compétence 70, cohésion 95) exprime environ 70 × 0,98 ≈ 69 : elle est plus rapide aujourd'hui, mais son risque d'erreur est plus élevé, car sa précision est plus faible.
+- **Équipe B** (compétence 90, cohésion 35) exprime environ 90 × 0,74 ≈ 67 : elle est un peu plus lente aujourd'hui, mais plus fiable.
+- **Équipe B soudée** (cohésion 95) exprime environ 90 × 0,98 ≈ 88 : elle dépasse nettement A.
+
+**Pas de stratégie dominante « mécaniciens médiocres et dix ans d'attente »** : la rapidité et la précision ont un **plafond**, fixé par la qualité des mécaniciens recrutés. Ni l'entraînement ni la cohésion ne le dépassent. La cohésion ne fait que libérer le potentiel existant.
+
+### Comment la cohésion se construit et se perd
+
+- **Elle monte**, avec des rendements décroissants, grâce :
+  - aux **entraînements communs** (orientation « coordination ») ;
+  - à l'**expérience collective** des arrêts en course ;
+  - à la **stabilité** des membres ;
+  - à la **qualité de l'encadrement** : leadership et gestion humaine du chef d'équipe, compétence « organisation des stands » du directeur sportif ;
+  - aux **bonnes relations** (relation entre le chef et le directeur sportif, et tensions éventuelles).
+- **L'ancienneté seule ne suffit pas** : sans entraînement ni expérience, la cohésion stagne sous un plafond fixé par l'encadrement.
+- **Renouvellement** :
+  - remplacer une part des mécaniciens retire une part proportionnelle de la cohésion. Un remplacement isolé coûte peu ; remplacer une grande partie de l'équipe impose une vraie période d'adaptation ;
+  - le **départ du chef** ou du **noyau expérimenté** coûte davantage. La part de mécaniciens expérimentés est suivie à cet effet.
+
+### Entraînement : de vraies décisions de management
+
+- **Plan d'entraînement** révisable à tout moment. Une **orientation** au choix : rapidité, précision, coordination ou récupération. Une **intensité** au choix : légère, normale ou intensive.
+- **Progrès** : plus rapides avec une intensité forte, avec des rendements décroissants vers les plafonds. L'efficacité dépend de l'encadrement et des installations de l'écurie.
+- **Fatigue** : elle augmente avec l'intensité de l'entraînement **et avec le calendrier** (week-ends consécutifs, déplacements lointains), et diminue avec la récupération et les semaines sans course. Une équipe fatiguée progresse moins et, en phase 13, commettra plus d'erreurs.
+- **Aucune règle artificielle « plus vite rend moins précis »** : c'est la fatigue, les capacités et les choix d'entraînement qui expliquent le risque.
+- **Les dilemmes** que cela crée :
+  - s'entraîner fort avant un enchaînement de Grands Prix, au risque d'arriver fatigué ;
+  - travailler la vitesse ou la précision ;
+  - recruter de meilleurs mécaniciens en hiver, puis reconstruire la cohésion avant la reprise ;
+  - payer plus cher une équipe de qualité, sous le plafond budgétaire, au détriment d'autre chose.
+
+### Recrutement et renouvellement
+
+- **Recrutement par vagues** : remplacer un certain nombre de mécaniciens par des mécaniciens d'un niveau choisi. Un niveau plus élevé coûte plus cher et relève les plafonds, mais réduit la cohésion. C'est une commande, la même pour le joueur et l'IA.
+- **Départs naturels chaque saison** : retraites, offres d'autres écuries, démotivation. Ils dépendent de la motivation, du salaire et des relations ; un mauvais climat fait partir plus de monde.
+- **Débauchage du chef d'équipe** par le marché (7b), avec ses conséquences sur la cohésion.
+
+### Relations humaines (articulation avec l'existant)
+
+- Le chef d'équipe a des **souvenirs et des relations** comme tout personnage. Les événements existants (reconnaissance, injustice, conflit) agissent sur lui et, à travers lui, sur la cohésion.
+- **Une erreur grave aux stands** (en phase 13) laissera des traces : déception du pilote, tension avec le chef, et parfois un « soutien » qui renforce l'équipe, selon les personnalités.
+- La **motivation** collective suit les résultats, l'encadrement et la charge de travail.
+
+### Ce qui est stocké dès la phase 8d (pour la phase 13)
+
+| Donnée | Contenu |
+| --- | --- |
+| Équipe des stands (une par écurie) | Effectif ; rapidité et précision (niveau actuel et plafond) ; cohésion ; fatigue ; part de mécaniciens expérimentés ; expérience collective ; plan d'entraînement (orientation, intensité) ; chef d'équipe |
+| Historique borné | Par saison : moyennes des caractéristiques, renouvellement, charge d'entraînement |
+
+**Exception temporaire, à signaler** : jusqu'à la phase 13, aucune formule de course ne lit la rapidité, la précision ni la cohésion (le modèle de course actuel ne simule pas les arrêts). Il faut donc soit accepter une **exception documentée** à la règle « un attribut non lu n'existe pas » (comme pour la discrétion en phase 4), soit **attendre la phase 13** pour créer ces données (question 13).
+
+### Phase 13 (réservé)
+
+- Temps réel d'un arrêt : base réglementaire du moment, vitesse exprimée, variabilité.
+- Erreurs (écrou, cric, départ prématuré) : probabilité selon la précision, la fatigue, l'expérience et les circonstances (pluie, pression, arrêt imprévu), et leurs conséquences en temps, voire en pénalité.
+- **Mesure statistique** : temps moyen réel sur une saison, erreurs comprises. On vérifiera qu'une équipe très rapide mais moins fiable peut perdre face à une équipe un peu plus lente et plus sûre, sans garantir artificiellement qu'une stratégie d'entraînement soit toujours gagnante.
+- **Équilibrage** des temps et des probabilités.
+
+### IA
+
+Les écuries de l'IA suivent les mêmes règles et les mêmes commandes. Elles choisissent leur plan d'entraînement selon le calendrier (fatigue à venir), leurs faiblesses, leur ambition et le style de leur directeur sportif. Elles recrutent par vagues de préférence en hiver.
+
 ## 10. Questions pour toi
 
 **Nouvelles questions (recherche et règlements)**
@@ -238,3 +328,9 @@ Format de sauvegarde, migrations et tests comme d'habitude. Le seul élément **
 10. **Ingénieurs clés individualisés** (3 à 5 par département) pour de vrais départs en cascade en 8d, ou garder l'approximation par département ?
 11. Autres sujets de vote (plafond budgétaire, restrictions aéro, nombre de Grands Prix) : en 8d, ou plus tard ?
 12. Président de la fédération élu tous les 4 ans : d'accord ?
+
+**Équipe des stands (D-129)**
+13. **Données dès la phase 8d avec une exception temporaire** (rapidité, précision et cohésion ne sont lues par aucune formule de course avant la phase 13), ou tout créer en phase 13 ? Je recommande la phase 8d avec l'exception : la cohésion a besoin de temps pour avoir une histoire.
+14. **Numérotation** : la dimension humaine est en **8d** dans la version 2 de la fiche (la 8c est devenue « qui sait quoi »). Ton message parlait de 8c : je l'ai placée en 8d. D'accord ?
+15. **Personnes individualisées** : seulement le chef d'équipe des stands (sous le directeur sportif), ou aussi un ou deux spécialistes ?
+16. **Rythme du plan d'entraînement** : modifiable chaque semaine (fin), ou fixé pour une période entre deux blocs de courses (plus simple, moins de micro-gestion) ?

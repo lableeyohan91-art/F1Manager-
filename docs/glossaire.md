@@ -162,3 +162,5 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Sponsor personnel** | Sponsor lié à un pilote : il l'accompagne dans son écurie (dans un emplacement existant) ou le paie lui-même (phase 7c). |
 | **Pilote payant** | Pilote dont l'apport commercial (sponsors, famille) compte dans son recrutement ; le marché le régule, aucune règle (D-099, phase 7c). |
 | **Agent** | Représentant d'un pilote ou d'un cadre : négocie, prend une commission négociée, pousse parfois au transfert, démarche les écuries (phase 7c). |
+| **Équipe des stands** | Mécaniciens d'une écurie gérés collectivement (rapidité, précision, cohésion, fatigue), avec un chef d'équipe individualisé sous le directeur sportif (D-129 ; humain en phase 8, arrêts simulés en phase 13). |
+| **Cohésion (équipe des stands)** | Synchronisation collective : elle libère la part du potentiel de rapidité réellement exprimée, sans jamais le dépasser (D-129). |
