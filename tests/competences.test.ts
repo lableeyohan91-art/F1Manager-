@@ -99,7 +99,7 @@ describe('Phase 6a complémentaire — compétences, circuits, mental, expérien
         expect(Math.abs(modificateurNiveau(m, x, c).affinite)).toBeLessThanOrEqual(2 * AFFINITE.parCran + 1e-9);
       }
     }
-  });
+  }, 60_000); // simulation de plusieurs saisons : ≈ 1,8 s ici
 
   it('mode développeur : la commande modifie une note, refuse une valeur hors bornes, et reste réservée aux outils', () => {
     const m = sc.creerMonde(1);

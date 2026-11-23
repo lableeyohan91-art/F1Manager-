@@ -37,7 +37,7 @@ describe('Phase 5a — économie', () => {
     sc.creerMoteur().avancer(m2, 2 * S + 1);
     expect(empreinte(m2)).toBe(empreinte(m));
     expect(verifierCoherence(m, { ages: false })).toEqual([]);
-  });
+  }, 60_000); // deux simulations de 2 saisons : ≈ 4 s ici, ≈ 2× plus sur les machines d'intégration (audit de la phase 7, CI n°72)
 
   it('un dépassement du plafond est sanctionné : amende et réduction du développement aéro', () => {
     const m = sc.creerMonde(1);
@@ -127,7 +127,7 @@ describe('Phase 5b — sponsors, dette, crises, infrastructures', () => {
     const livres = Object.values(m.evenements).filter((e) => e.type === 'infrastructure.livraison');
     expect(livres.length).toBeGreaterThan(0);
     for (const e of ecuries(m)) for (const h of (financesDe(m, e.id) as Finances).historique) expect(h.investissements).toBeLessThanOrEqual(25 + 0.01);
-  });
+  }, 60_000); // 3 saisons simulées : ≈ 2,8 s ici
 
   it('une sauvegarde au format 5 est migrée au format 6 et tourne', () => {
     const m = sc.creerMonde(1);

@@ -35,6 +35,10 @@ let debutantsTop5Apex2 = 0, debutantsTotal = 0, championsApex2 = 0, championsApe
 for (let g = 1; g <= N; g++) {
   const m = sc.creerMonde(g);
   const mo = sc.creerMoteur();
+  // Audit de la phase 7 (priorité 4) : les retraités sont archivés au bout de 5 ans (D-121). On garde ici une copie de chaque pilote
+  // et de chaque promesse telle que vue en dernier, pour mesurer aussi les carrières terminées et archivées.
+  const vus7 = new Map<string, any>();
+  const promesses7 = new Map<string, any>();
   const vus = new Set<string>();
   const dejaTitulaires = new Set<string>(Object.values(m.tables['personnes']).filter((p: any) => p.poste === 'pilote_titulaire' && p.statut === 'actif').map((p: any) => p.id));
   for (let s = 0; s < S; s++) {
@@ -74,6 +78,8 @@ for (let g = 1; g <= N; g++) {
     for (const p of Object.values(m.tables['personnes']) as any[]) if (p.junior && p.junior.annee >= m.date.annee - 1) { baquetsJuniors++; if (p.junior.subventionne) baquetsSubventionnes++; if (typeof p.junior.prixMEUR === 'number') prixPayes.push(p.junior.prixMEUR); }
     const sal = (Object.values(m.tables['contrats']) as any[]).filter((c) => c.statut === 'actif' && c.type === 'emploi' && c.poste === 'pilote_titulaire').map((c) => c.salaireMEUR).sort((a, b) => b - a);
     (salaireTop5[s] ??= []).push(moy(sal.slice(0, 5)));
+    for (const p of Object.values(m.tables['personnes']) as any[]) if (p.poste.startsWith('pilote') || p.statut === 'retraite') vus7.set(p.id, structuredClone(p));
+    for (const pr of Object.values(m.tables['promesses'] ?? {}) as any[]) if (pr.type === 'titularisation') promesses7.set(pr.id, { ...pr });
     (population[s] ??= []).push(Object.values(m.tables['personnes']).filter((p: any) => p.statut !== 'retraite').length);
     if (s === S - 1 && g === 1) {
       const rep: Record<string, number> = {};
@@ -81,11 +87,14 @@ for (let g = 1; g <= N; g++) {
       console.log('Répartition (graine 1, fin) : ' + Object.entries(rep).sort().map(([k, v]) => `${k} ${v}`).join(' · '));
     }
   }
-  for (const pr of Object.values(m.tables['promesses'] ?? {}) as any[]) { if (pr.type === 'titularisation' && pr.statut === 'tenue') promessesTenues++; if (pr.type === 'titularisation' && pr.statut === 'rompue') promessesRompues++; }
+  for (const pr of Object.values(m.tables['promesses'] ?? {}) as any[]) if (pr.type === 'titularisation') promesses7.set(pr.id, { ...pr });
+  for (const pr of promesses7.values()) { if (pr.statut === 'tenue') promessesTenues++; if (pr.statut === 'rompue') promessesRompues++; }
+  for (const p of Object.values(m.tables['personnes']) as any[]) vus7.set(p.id, p);
+  const tousPilotes = [...vus7.values()];
   const reps = (Object.values(m.tables['academies'] ?? {}) as any[]).map((a) => a.reputation);
   if (reps.length) ecartsReputationAcademies.push(Math.max(...reps) - Math.min(...reps));
-  // Phase 6b : champions Apex 2 promus en F1 ; talents bloqués ; pilotes payants moyens qui atteignent la F1.
-  for (const p of Object.values(m.tables['personnes']) as any[]) {
+  // Phase 6b : champions Apex 2 promus en F1 ; talents bloqués ; pilotes payants moyens qui atteignent la F1 (archivés compris).
+  for (const p of tousPilotes) {
     if (!p.poste.startsWith('pilote') || p.origine !== 'generee') continue;
     const auF1 = (p.carriere?.saisonsF1 ?? 0) > 0 || (p.poste === 'pilote_titulaire' && p.statut === 'actif');
     if ((p.carriere?.juniors ?? []).some((r: any) => r.categorie === 'apex2' && r.titre)) { championsApex2++; if (auF1) championsApex2Promus++; }
@@ -117,14 +126,14 @@ for (let g = 1; g <= N; g++) {
   }
   // Pépites (potentiel ≥ 18) nées dans les cohortes générées, et titres.
   const pal = Object.values(m.tables['palmares']) as any[];
-  for (const p of Object.values(m.tables['personnes']) as any[]) {
+  for (const p of tousPilotes) {
     if (p.origine !== 'generee' || !p.poste.startsWith('pilote') || p.potentiel < 18) continue;
     championsPepites.pepites++;
     if (p.anneeNaissance >= 2027 - 14) championsPepites.nesCohortes++; // nés dans les cohortes annuelles (hors population de départ)
     if (pal.some((x) => x.championPilote === p.id)) championsPepites.championnes++;
   }
   for (const x of pal) {
-    const p = m.tables['personnes'][x.championPilote] as any;
+    const p = (m.tables['personnes'][x.championPilote] ?? m.tables['archives']?.[x.championPilote] ?? vus7.get(x.championPilote)) as any;
     if (p && x.saison >= 2027) ageTitre.push(x.saison - p.anneeNaissance);
   }
 }

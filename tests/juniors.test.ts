@@ -43,7 +43,7 @@ describe('Phase 6b-1 — filières juniors', () => {
     expect(juniors.every((p) => p.statut !== 'actif')).toBe(true); // un pilote de F1 n'occupe pas de baquet junior
     expect(juniors.some((p) => Object.keys(p.carriere?.experience?.circuits ?? {}).length >= 8)).toBe(true);
     expect(verifierCoherence(m, { ages: true })).toEqual([]);
-  });
+  }, 60_000); // une saison simulée : ≈ 1,5 s ici
 
   it('marché des baquets : l’argent compte, mais les grands talents trouvent une place même sans moyens', () => {
     const m = sc.creerMonde(3);
