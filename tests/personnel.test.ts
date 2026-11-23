@@ -51,14 +51,15 @@ describe('Phase 7b — personnel technique', () => {
     // (Pas de contrôle de cohérence complet ici : l'écurie du joueur n'est pas complétée automatiquement par l'IA.)
   }, 60_000);
 
-  it('non-concurrence : une personne débauchée ne contribue pas au développement pendant 6 mois', () => {
+  it('non-concurrence (D-127) : une personne débauchée travaille à efficacité réduite pendant 6 mois', () => {
     const m = sc.creerMonde(1);
     const e = ecurie(m, 'eq_ferrari');
     const dt = personnes(m).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'directeur_technique')!;
     const normale = capaciteDeveloppement(m, e);
     dt.nonConcurrenceJusqua = { annee: m.date.annee, semaine: 26 };
     const pendant = capaciteDeveloppement(m, e);
-    expect(pendant).not.toBe(normale);
+    expect(pendant).toBeLessThan(normale);
+    expect(pendant).toBeGreaterThan(0);
     m.date = { annee: m.date.annee, semaine: 27 };
     expect(capaciteDeveloppement(m, e)).toBe(normale);
   });
@@ -103,7 +104,7 @@ describe('Phase 7b — remplacement par calcul coût/bénéfice', () => {
     const e = ecurie(m, 'eq_haas');
     const tp = teamPrincipal(m, e.id)!;
     const enPlace = personnes(m).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'responsable_aero')!;
-    const candidat = personnes(m).find((p) => p.statut === 'libre' && p.poste === 'responsable_aero')!;
+    const candidat = personnes(m).find((p) => p.id !== enPlace.id && (p.poste === 'responsable_aero' || p.poste === 'ingenieur'))!;
     const base = { p: candidat, d: { indemniteMEUR: 0, debauchage: false }, salaire: 2, duree: 2, score: 0.8 };
     const simple = bilanRemplacement(m, e, tp, enPlace, base);
     const debauche = bilanRemplacement(m, e, tp, enPlace, { ...base, d: { indemniteMEUR: 5, debauchage: true } });

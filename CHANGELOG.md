@@ -322,3 +322,8 @@ Aucun code à ce stade.
 ### Modifié (D-126)
 - Le remplacement d'une personne en place n'obéit plus à des seuils fixes : décision coût/bénéfice de l'IA (gain comparé aux indemnités, à la non-concurrence, à la continuité et à l'instabilité ; goût du risque du team principal). Tous les postes du personnel sont concernés.
 - Le sponsor accompagnant suit son pilote dès la prise d'effet du transfert (semaine 50).
+
+## [Non-concurrence revue] — 23/11/2026
+
+### Modifié (D-127)
+- Une personne débauchée travaille dès son arrivée, à 50 % de son efficacité pendant 6 mois (au lieu de ne pas contribuer du tout). Les secrets de l'ancienne écurie viendront en phase 12.

@@ -118,7 +118,7 @@ export function bilanRemplacement(monde: Monde, e: Ecurie, tp: Personne, enPlace
   const reference = Math.max(1, e.budgetMEUR * PERSONNEL_MARCHE.partBudgetPoste * c.duree);
   const indemnite = contrat ? (REMPLACEMENT.poidsIndemnite * indemniteRupture(contrat)) / reference : 0;
   const nonConcurrence = c.d.debauchage
-    ? (Math.max(0, niveauMetier(enPlace) - REMPLACEMENT.niveauVacant) / 20) * (PERSONNEL_MARCHE.nonConcurrenceSemaines / 52) / c.duree : 0;
+    ? (niveauMetier(c.p) / 20) * (1 - PERSONNEL_MARCHE.efficaciteNonConcurrence) * (PERSONNEL_MARCHE.nonConcurrenceSemaines / 52) / c.duree : 0;
   const dejaCetteSaison = offresMarche(monde).filter((o) => o.ecurie === e.id && o.remplace && o.annee === monde.date.annee && o.statut !== 'retiree' && o.statut !== 'expiree').length;
   const couts = indemnite + nonConcurrence + REMPLACEMENT.continuite + REMPLACEMENT.instabiliteParRemplacement * dejaCetteSaison;
   const seuil = REMPLACEMENT.seuil - REMPLACEMENT.audace * (((tp.traits['risque'] ?? 10) - 10) / 10);

@@ -8,6 +8,7 @@
  *   saison.finDeSaison   (semaine 49)       : titres, palmarès, primes, chronique
  */
 
+import { PERSONNEL_MARCHE } from '../../balance/marche';
 import { SEMAINES_PAR_AN } from '../../balance/calendrier';
 import { PHASES_SAISON } from '../../balance/calendrier';
 import { CARACTERISTIQUES_VITESSE, PROBABILITE_PLUIE } from '../../balance/circuits';
@@ -252,12 +253,14 @@ function moyenne(v: number[]): number {
 export function capaciteDeveloppement(monde: Monde, e: Ecurie): number {
   const equipe = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).filter((p) => p.ecurie === e.id && p.statut === 'actif');
   // La motivation du personnel technique module son efficacité (phase 4 : cascade « DT démotivé → développement plus lent »).
-  // Phase 7b : une personne en période de non-concurrence ne contribue pas encore (le poste est traité comme vacant).
-  const enActivite = (x: Personne) => !x.nonConcurrenceJusqua || x.nonConcurrenceJusqua.annee < monde.date.annee
-    || (x.nonConcurrenceJusqua.annee === monde.date.annee && x.nonConcurrenceJusqua.semaine < monde.date.semaine);
+  // Phase 7b (D-127) : une personne en période de non-concurrence travaille déjà, mais à efficacité réduite.
+  const enNonConcurrence = (x: Personne) => !!x.nonConcurrenceJusqua && (x.nonConcurrenceJusqua.annee > monde.date.annee
+    || (x.nonConcurrenceJusqua.annee === monde.date.annee && x.nonConcurrenceJusqua.semaine >= monde.date.semaine));
   const c = (poste: string, comp: string) => {
-    const p = equipe.find((x) => x.poste === poste && enActivite(x));
-    return p ? (p.competences[comp] ?? 10) * (0.7 + 0.6 * (p.etat.motivation / 100)) : 10;
+    const p = equipe.find((x) => x.poste === poste);
+    if (!p) return 10;
+    const efficacite = enNonConcurrence(p) ? PERSONNEL_MARCHE.efficaciteNonConcurrence : 1;
+    return (p.competences[comp] ?? 10) * (0.7 + 0.6 * (p.etat.motivation / 100)) * efficacite;
   };
   const competences = moyenne([
     c('directeur_technique', 'visionTechnique'), c('directeur_technique', 'gestionProjet'),

@@ -153,7 +153,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Contre-attaque** | Réaction d'un employeur à une offre extérieure faite à son pilote : il le prolonge et l'augmente pour le garder (phase 7a). |
 | **Lassitude** | Envie d'un nouveau défi d'une personne installée depuis longtemps (et titrée) au même endroit ; calculée, modérée, jamais un départ automatique (D-117 ; pilotes en 7a, personnel en 7b). |
 | **Réputation de prédatrice** | Réputation d'une écurie qui débauche souvent : un coût (méfiance, indemnités plus chères), jamais une interdiction ; elle s'efface avec le temps (D-117). |
-| **Non-concurrence** | Période (6 mois) pendant laquelle une personne débauchée ne contribue pas encore au développement de sa nouvelle écurie (D-117, phase 7b). |
+| **Non-concurrence** | Période (6 mois) pendant laquelle une personne débauchée travaille à efficacité réduite (50 %) dans sa nouvelle écurie, sans pouvoir utiliser ce qu'elle savait de l'ancienne (D-117, D-127). |
 | **Remplacement (marché)** | Recrutement d'un responsable nettement meilleur que celui en place, qui est alors libéré avec indemnité (phase 7b). |
 | **Départ en groupe** | Une partie du niveau d'un département suit un responsable technique influent débauché (D-077, phase 7b). |
 | **Candidature spontanée** | Proposition de services d'une personne ambitieuse et lassée à une autre écurie, pour un poste égal ou supérieur (D-117, phase 7b). |
