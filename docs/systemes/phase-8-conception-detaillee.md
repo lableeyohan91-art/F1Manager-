@@ -1,168 +1,240 @@
-# Phase 8 — Conception détaillée : règlements, mémoire v2, groupes sociaux, politique
+# Phase 8 — Conception détaillée : règlements, recherche, mémoire v2, groupes sociaux, politique
 
-> Statut : **PROPOSITION — À VALIDER** (23/11/2026). **Aucun code avant validation** (règle du projet).
-> Cadre déjà validé :
-> - D-090 et `phase-8-cycles-reglementaires.md` : grands changements de règlement, orientations ;
-> - `memoire.md` §3 et §4 : diffusion de l'information, réputation perçue, groupes sociaux (principes) ;
-> - D-012 : sujets de vote envisagés ;
-> - D-081 et D-082 : récompenser les choix, pas le hasard ;
-> - D-095 et D-120 : la grande campagne d'équilibrage suit la phase 8.
+> Statut : **PROPOSITION — À VALIDER**. Version 2 du 23/11/2026, qui intègre la réponse du porteur à la question 2 et ses décisions sur la recherche et développement (D-128). **Aucun code avant validation.**
 >
-> Déséquilibres que cette phase doit pouvoir résoudre (sans les forcer) :
-> - dynasties (57 % des séries de 10 saisons après la 7a) ;
-> - convergence des voitures vers le plafond ;
-> - dominations par la meilleure voiture ;
-> - hiérarchie figée.
+> Cadre :
+> - D-090 et `phase-8-cycles-reglementaires.md` : orientations des changements de règlement. **Partiellement remplacé par D-128**, voir §8 ;
+> - D-095 et D-120 : coefficients provisoires, mesures indicatives jusqu'aux phases 12 et 13 ;
+> - D-109 et `phase-12-monoplaces.md` : conception, fabrication, pièces, révolutions, délégation ;
+> - D-114 et `fondations-techniques-monoplaces.md` : frontière de compromis, identités techniques ;
+> - `memoire.md` §3 et §4 : diffusion de l'information, groupes sociaux.
 
-## 1. Découpage proposé
+## 1. Découpage proposé (révisé)
 
-| Sous-phase | Contenu | Pourquoi dans cet ordre |
+| Sous-phase | Contenu |
+| --- | --- |
+| **8a** | Règlements : fédération, manufacturier de pneus, évolutions mineures annuelles, grandes réformes (propositions, vote, annonce, prolongations) |
+| **8b** | Recherche : domaines techniques, connaissances accumulées, **deux programmes de recherche**, horizons (voiture actuelle, saison suivante, futur règlement), allocation des moyens, décisions de l'IA, historique et explications |
+| **8c** | Mémoire v2 : qui sait quoi, fuites, rumeurs, réputation perçue |
+| **8d** | Groupes sociaux émergents, politique (alliances, lobbying, autres votes, élection du président), démissions et ruptures négociées |
+
+La **8a et la 8b sont indissociables** : un règlement sans recherche ne ferait que secouer les voitures, et une recherche sans règlement n'aurait pas d'horizon. Je propose de les livrer l'une après l'autre, mais de les concevoir ensemble (ce document).
+
+## 2. Phase 8a — Règlements
+
+### 2.1 Deux échelles de changement
+
+| | Évolutions mineures | Grandes réformes |
 | --- | --- | --- |
-| **8a** | Cycles réglementaires : fédération, propositions, votes, annonce, anticipation, entrée en vigueur, convergence, coups de génie, motoristes | Le levier le plus fort contre les dynasties et la convergence ; il ne dépend pas du reste |
-| **8b** | Mémoire v2 : connaissances (qui sait quoi), fuites et rumeurs, réputation perçue | Prépare la politique : on ne vote, on ne s'allie et on ne se méfie que d'après ce que l'on sait |
-| **8c** | Groupes sociaux (émergents) et politique : alliances d'écuries, lobbying, votes sur d'autres sujets | S'appuie sur 8a (les votes) et 8b (l'information) |
+| Fréquence | Possibles chaque saison | Pas de date fixe : selon les décisions politiques et les prolongations votées |
+| Décision | La fédération, après une consultation simple (sans grand vote) | Propositions, discussion, **vote** |
+| Annonce | Avant l'intersaison, pour la saison suivante | Environ **deux saisons complètes** de préparation après l'annonce définitive |
+| Ampleur | Limitée à un ou deux domaines (sécurité, dimensions, une contrainte aéro ou technique) | Plusieurs domaines, éventuellement une **nouvelle génération** de voitures |
+| Effet | Rend obsolète une petite part du savoir propre au règlement dans les domaines touchés. Une écurie mieux préparée s'adapte plus vite | Rend obsolète une large part du savoir propre au règlement. Les voitures sont reconçues à partir des connaissances de chaque écurie |
 
-Ensuite viendra la **grande campagne d'équilibrage d'après la phase 8**, en partie plafonnée par D-120 tant que le moteur de course reste abstrait.
+### 2.2 Le contenu d'une réforme : des contraintes, jamais un résultat
 
-## 2. Phase 8a — Cycles réglementaires
+Une réforme est décrite par **l'intensité du changement dans chaque domaine technique** (de 0, inchangé, à 1, entièrement nouveau). Elle ne dit jamais qui doit progresser ou régresser.
 
-### 2.1 Modèle
+| Orientation | Domaines principalement touchés |
+| --- | --- |
+| **A. Aérodynamique** | Ailerons avant et arrière, fond plat et diffuseur, efficacité et traînée, dispositifs aérodynamiques |
+| **B. Motorisation et énergie** | Architecture du groupe propulseur, puissance thermique et électrique, récupération, stockage et déploiement, consommation, rendement et fiabilité |
+| **C. Châssis et mécanique** | Dimensions et masse, suspensions et architecture mécanique, répartition des masses, motricité, comportement et équilibre |
+| **D. Refonte technique majeure** | Plusieurs domaines à la fois, nouvelle génération : les architectures et les philosophies peuvent être revues en profondeur |
 
-- **Règlement** (nouvelle table) : identifiant, années de début et de fin, **accent** (aéro, moteur, mécanique et pneus, ou équilibré), multiplicateurs de poids par caractéristique, part de savoir conservée, statut (en vigueur, annoncé, proposé).
-- **Fédération** : une organisation (type « instance » déjà réservé, D-063), avec un président (un personnage) dont les traits pèsent sur les propositions. Le président changera par élection en 8c.
-- **Calendrier** :
-  - le règlement en vigueur fixe sa durée prévue, de 4 à 6 ans ;
-  - **3 ans avant sa fin**, la fédération propose 2 ou 3 options ;
-  - les écuries votent à la mi-saison ;
-  - le règlement adopté est **annoncé 2 ans avant** son entrée en vigueur (D-090) ;
-  - une option « prolonger le règlement actuel de 1 ou 2 ans » existe : la fréquence est donc bien votée.
+- **Pas d'orientation « équilibrée »** et pas de rapprochement artificiel des performances (décision du porteur). L'ancienne « convergence partielle » de D-090 est **remplacée** par deux effets logiques : l'obsolescence d'une partie du savoir et la reconception des voitures à partir des connaissances de chacun.
+- **Les pneumatiques** sont fournis par un **manufacturier commun** (nouvelle organisation). Leur réglementation (dimensions, construction, spécifications, contraintes d'utilisation) peut accompagner une réforme ou évoluer seule. L'effet est commun à toutes les écuries : il touche le domaine « interface pneus » et, en phase 13, le comportement réel des pneus. Il ne donne d'avantage à personne d'office. Une écurie qui maîtrise mieux ce domaine s'adapte simplement mieux.
+- Chaque réforme tire ses intensités autour de son orientation. Deux réformes « aéro » ne sont donc jamais identiques.
 
-### 2.2 Options proposées et effets
+### 2.3 Calendrier, vote et prolongations
 
-| Accent | Caractéristiques renforcées (poids) | Affaiblies | Qui en profite a priori |
-| --- | --- | --- | --- |
-| Aéro | virages rapides, efficacité aéro (+40 %) | vitesse de pointe (−20 %) | soufflerie, CFD, responsable aéro forts |
-| Moteur | vitesse de pointe, fiabilité moteur (+40 %) ; poids du motoriste dans l'indice (+50 %) | efficacité aéro (−20 %) | motoristes forts et leurs écuries clientes |
-| Mécanique et pneus | virages lents, gestion des pneus (+40 %) | efficacité aéro (−20 %) | conception, simulateur, pilotes gestionnaires |
-| Équilibré | aucun changement de poids, seulement la convergence | — | les écuries en retard (remise en jeu partielle) |
+- La fédération ouvre les discussions quand le règlement en vigueur vieillit, en général après 4 à 6 saisons (D-090). Elle propose **2 ou 3 réformes**, chacune décrite par ses intensités par domaine, **et la prolongation** du règlement actuel.
+- Les écuries votent (règle de vote encore à trancher, question 3). L'annonce définitive suit le vote. Une réforme adoptée entre en vigueur **après environ deux saisons complètes**.
+- **Recherche exploratoire avant le vote** : une écurie peut orienter un programme vers une **proposition** encore en discussion. Si cette proposition est adoptée, elle prend de l'avance. Sinon, seule la part **fondamentale** de ce savoir reste utile (voir §3.3).
 
-Les ordres de grandeur sont **provisoires** ; ils seront rangés dans `balance/reglement.ts` et réglés en laboratoire.
+## 3. Phase 8b — Recherche
 
-### 2.3 Vote
+### 3.1 Trois notions distinctes
 
-- **Une voix par écurie** ; la fédération tranche les égalités selon l'accent préféré de son président.
-- **L'IA vote par intérêt calculé** :
-  - estimation de sa position relative sous chaque option : forces dans les caractéristiques renforcées, installations, responsables, motoriste ;
-  - le leader actuel préfère souvent le statu quo ou la prolongation ;
-  - les écuries distancées préfèrent la remise en jeu.
-- **Le joueur vote** par une commande, avec la même information que l'IA.
-- En 8c, les alliances et le lobbying modifieront les votes ; en 8a, chacun vote seul.
+| Notion | Définition | Où elle vit |
+| --- | --- | --- |
+| **Recherche** | Acquérir des connaissances | **Phase 8** |
+| **Conception** | Exploiter ces connaissances pour imaginer une solution technique | Provisoire en phase 8 (§3.7), définitive en **phase 12** |
+| **Développement** | Transformer cette solution en pièce ou en évolution concrète | Le développement actuel (phase 3 et 5) continue, puis la **phase 12** le remplace |
 
-### 2.4 Anticipation (le vrai dilemme)
+Le joueur ne développe jamais un aileron pendant deux ans. Il **accumule du savoir** dans différents domaines, puis l'utilise quand il conçoit sa voiture.
 
-- **Nouvelle ligne de budget « voiture suivante »**, ouverte dès l'annonce : une part de l'effort technique va à la future voiture, au détriment de la saison en cours. Migration de sauvegarde prévue.
-- **L'IA décide par utilité** : un prétendant au titre investit moins, une écurie distancée investit plus. Le goût du risque du team principal et les attentes du conseil comptent.
-- **Le joueur décide** par une commande.
-- La part investie est mémorisée, car elle détermine l'avantage de départ.
+### 3.2 Domaines techniques (liste stable, partagée avec la phase 12)
 
-### 2.5 Entrée en vigueur
+Proposition de 12 domaines. Chacun a un identifiant stable, des **voisins** (interactions entre domaines) et, provisoirement, un lien avec les caractéristiques actuelles des voitures :
 
-- **Convergence** : chaque caractéristique se rapproche d'une base commune, et l'écurie conserve une part de son savoir (de 30 à 50 %, à régler en laboratoire).
-- **Avantage de départ** : un bonus aux caractéristiques mises en avant, selon :
-  - l'investissement anticipé ;
-  - les compétences des responsables du domaine ;
-  - les installations.
-- **Motoristes** : dans un cycle moteur, leur niveau évolue selon leurs investissements ; cela peut provoquer des changements de fournisseur.
+| Domaine | Voisins (exemples) | Lien provisoire (phase 8) |
+| --- | --- | --- |
+| Aérodynamique avant | arrière, fond plat, refroidissement | virages rapides, efficacité aéro |
+| Aérodynamique arrière | avant, fond plat | efficacité aéro, vitesse de pointe |
+| Fond plat et diffuseur | aéro avant et arrière, suspensions | virages rapides et lents |
+| Châssis et structure | suspensions, masse | virages lents, fiabilité |
+| Suspensions | châssis, interface pneus | virages lents, gestion des pneus |
+| Masse et répartition | châssis, groupe propulseur | virages lents et rapides |
+| Refroidissement | aéro avant, gestion thermique | fiabilité, efficacité aéro |
+| Gestion thermique | refroidissement, énergie | fiabilité, gestion des pneus |
+| Architecture du groupe propulseur | énergie, masse | vitesse de pointe (avec le motoriste) |
+| Récupération et déploiement d'énergie | groupe propulseur, gestion thermique | vitesse de pointe |
+| Interface pneus | suspensions, gestion thermique | gestion des pneus |
+| Fiabilité et matériaux | tous | fiabilité |
 
-### 2.6 Coups de génie
+La phase 12 réutilisera les **mêmes identifiants** pour ses pièces. Seule la colonne « lien provisoire » disparaîtra.
 
-- **Rares et mérités** :
-  - la probabilité grandit avec un directeur technique visionnaire, un fort investissement anticipé et un bon département conception ;
-  - plafonnée, par exemple à 1 ou 2 par cycle dans toute la grille.
-- **L'effet** est un bonus temporaire sur une caractéristique, qui s'érode quand les autres copient (en 1 à 2 saisons).
-- **Événement public** : les autres écuries peuvent réclamer, puis la fédération tranche : astuce légale ou interdite pour la saison suivante.
+### 3.3 Les connaissances
 
-### 2.7 Laboratoire
+Pour chaque écurie et chaque domaine, deux stocks :
 
-À mesurer :
-- dynasties qui survivent à un changement de règlement ;
-- titres qui changent de mains dans les 2 saisons suivantes ;
-- valeur de l'anticipation (D-082) ;
-- convergence des voitures ;
-- fréquence et effet des coups de génie ;
-- fréquence des prolongations votées.
+- **Savoir fondamental** : la compréhension générale du domaine. Il survit en grande partie aux réformes et à l'abandon d'une proposition.
+- **Savoir réglementaire** : la maîtrise du domaine **sous un règlement précis** (en vigueur, annoncé ou seulement proposé). Il devient obsolète, en proportion de l'intensité du changement dans ce domaine, quand ce règlement change.
 
-## 3. Phase 8b — Mémoire v2 : qui sait quoi
+Principes, tous respectés par construction :
+- **Une recherche suspendue n'efface rien.** Le savoir reste acquis. L'érosion ne vient que du règlement (obsolescence), et éventuellement d'un très lent vieillissement à discuter.
+- **Rendements décroissants** : plus un domaine est maîtrisé, plus il est difficile de progresser encore.
+- **Interactions** : une petite part de ce qu'on apprend profite aux domaines voisins.
+- **Aucune conversion automatique et linéaire en performance** : le savoir agit sur la qualité, la précision des estimations et le risque d'une conception, jamais comme un bonus direct de points (§3.7).
+
+### 3.4 Les deux programmes de recherche
+
+**Deux emplacements** de programmes prioritaires par écurie. Ce ne sont pas deux ingénieurs : ce sont deux priorités de l'écurie.
+
+| Élément d'un programme | Contenu |
+| --- | --- |
+| **Sujet** | Un domaine, choisi librement |
+| **Horizon** | Voiture actuelle, saison suivante, ou un règlement précis (en vigueur, annoncé ou proposé) |
+| **Moyens** | Une part de la capacité de recherche de l'écurie (ingénieurs et départements, installations) et une part du budget. Les deux programmes peuvent recevoir des moyens différents, et avancent donc à des vitesses différentes |
+| **Durée** | Libre : trois mois, six mois, un an ou plus. Aucune durée imposée |
+| **État** | Actif ou suspendu. Reprendre un sujet ne coûte que la remise en route |
+| **Réorientation** | Changer de sujet coûte une **remise en route réaliste** : quelques semaines à efficacité réduite le temps de réorganiser les équipes. Rien n'est perdu |
+
+**Progression** (forme provisoire, coefficients à régler, D-120) : savoir gagné par période = moyens affectés × compétences des responsables du domaine × installations utiles au domaine × rendement décroissant selon le savoir déjà acquis × efficacité (remise en route, motivation). Une part de ce gain s'étend aux domaines voisins.
+
+**Combinaisons libres** : deux programmes sur la voiture actuelle, un actuel et un futur, deux sur la future réglementation, etc. C'est le dilemme voulu : gagner maintenant ou préparer l'avenir.
+
+### 3.5 Ce que produit chaque horizon (en phase 8, provisoirement)
+
+| Horizon | Effet en phase 8 | Effet définitif (phase 12) |
+| --- | --- | --- |
+| Voiture actuelle | Le développement de la saison (système actuel) est plus efficace sur les caractéristiques liées au domaine | Conception et développement de pièces pour la voiture en cours |
+| Saison suivante | Savoir utilisé à l'intersaison, quand la voiture de l'année suivante est préparée | Conception de la voiture suivante |
+| Règlement futur | Savoir réglementaire propre à ce règlement, utilisé à son entrée en vigueur | Conception de la nouvelle génération |
+
+### 3.6 Moyens, budget et plafond
+
+- La recherche consomme du **budget de développement**, qui est soumis au **plafond** (phase 5). Le budget de développement se partage donc entre le développement de la voiture actuelle et les deux programmes. C'est le même arbitrage que celui de la phase 5, plus fin.
+- Elle mobilise aussi les **départements techniques**, déjà existants (aéro, conception, etc.), selon leur effectif et leur niveau, ainsi que les **installations** (soufflerie, CFD, simulateur, bureau d'études).
+- Une même commande sert au joueur et à l'IA : fixer le sujet, l'horizon et la part des moyens de chaque programme, ou le suspendre.
+
+### 3.7 Le savoir n'est pas une garantie (conception provisoire en phase 8)
+
+À l'entrée en vigueur d'un règlement, ou à l'intersaison pour la saison suivante, la voiture est **reconçue**. En phase 8, faute de pièces (phase 12), cette conception reste volontairement simple et isolée dans une seule fonction, qui sera remplacée par la phase 12 :
+- **qualité attendue** de chaque caractéristique : savoir applicable des domaines liés, compétences des responsables, installations ;
+- **exécution incertaine** : l'écart entre attendu et réel se resserre quand le savoir et la corrélation des responsables sont bons, sans jamais disparaître. Une bonne stratégie peut échouer, et une équipe modeste peut réussir ;
+- **découvertes** : une percée est possible quand le savoir d'un domaine est profond, le directeur technique visionnaire et la recherche exploratoire engagée tôt. Elle est rare, toujours expliquée (domaine, raisons) et **sans quota**. Les autres écuries la copient progressivement (en 1 à 2 saisons).
+
+### 3.8 Décisions de l'IA (mêmes mécanismes que le joueur)
+
+Chaque saison, et à chaque événement réglementaire (proposition, vote, annonce, évolution mineure), l'IA décide par **utilité** :
+- **horizon** : sa position sportive (un prétendant au titre garde des moyens pour la voiture actuelle, une écurie distancée prépare l'avenir), son ambition et celle du conseil, le goût du risque de son directeur technique et de son directeur d'écurie ;
+- **domaines** : sa philosophie technique, ses faiblesses relatives, son savoir actuel (rendements décroissants), les intensités du futur règlement tel qu'elle le perçoit (en 8c, sa perception dépendra de ce qu'elle sait) ;
+- **moyens** : son budget, le plafond, ses départements et ses installations ;
+- une **part de jugement** (aléa à graine) pour que deux écuries semblables ne fassent pas les mêmes choix.
+
+Garde-fou contre l'uniformité : la philosophie technique de chaque écurie, déjà dans les données, oriente ses domaines préférés. On mesurera la diversité des profils de savoir en laboratoire.
+
+### 3.9 Historique et explications
+
+Pour chaque écurie, un **historique borné** : par saison et par domaine, l'effort consacré, le savoir gagné et le savoir perdu par obsolescence. Il permet d'expliquer au joueur : « vous êtes en avance en aérodynamique avant, en retard en énergie, parce que… ». Même information pour l'IA.
+
+## 4. Données à stocker dès la phase 8 (pour ne rien refaire en phase 12)
+
+| Donnée | Contenu | Repris par la phase 12 |
+| --- | --- | --- |
+| **Domaines techniques** (fichier de coefficients) | Identifiants stables, voisins, lien provisoire avec les caractéristiques | Identifiants et voisins réutilisés ; lien provisoire supprimé |
+| **Règlement** (table) | Identifiant, génération, dates, statut (proposé, annoncé, en vigueur, abandonné), intensité par domaine, spécification des pneus | Intégralement : les bornes de la frontière de compromis (D-114) s'y ajouteront |
+| **Évolution mineure** (table, bornée) | Saison, domaines touchés, intensité | Intégralement |
+| **Manufacturier de pneus** (organisation) | Spécification en vigueur | Intégralement (comportement des pneus en phase 13) |
+| **Connaissances** (table) | Écurie × domaine : savoir fondamental, savoir réglementaire par règlement (en vigueur, annoncé, proposé) | **Intégralement : c'est la matière première de la conception** |
+| **Programmes de recherche** (table) | Écurie, emplacement (1 ou 2), domaine, horizon, part des moyens, état, début, remise en route restante | Intégralement ; la phase 12 ajoutera les projets de conception et de fabrication à côté |
+| **Historique de recherche** (borné) | Écurie × saison × domaine : effort, gain, obsolescence | Intégralement |
+| **Découvertes** (table, bornée) | Écurie, domaine, saison, ampleur, diffusion aux autres | Intégralement |
+| **Ligne budgétaire** (finances) | Part du budget de développement affectée à chaque programme | Intégralement |
+
+Format de sauvegarde, migrations et tests comme d'habitude. Le seul élément **jetable** est la conception provisoire (§3.7), isolée dans une fonction.
+
+## 5. Architecture et performances
+
+- Les volumes sont petits : 11 écuries × 12 domaines × quelques règlements suivis donnent quelques centaines de nombres. Les programmes se limitent à 2 par écurie. L'historique est borné (par exemple 10 saisons).
+- **Mise à jour toutes les 4 semaines**, comme la comptabilité. Aucun calcul par course.
+- Toutes les décisions passent par des **commandes**, les mêmes pour le joueur et l'IA, et chaque changement important produit un événement avec ses causes.
+- Coût attendu négligeable devant le marché et la saison. Il sera mesuré avec `npm run performance` dès la 8b.
+
+## 6. Cohérence avec les décisions validées
+
+| Décision | Cohérence | Conséquence |
+| --- | --- | --- |
+| **D-090** (orientations des règlements) | **Partiellement remplacée** | Les accents « mécanique et pneus » et « statu quo / équilibré » sont retirés. La « convergence partielle » est remplacée par l'obsolescence du savoir et la reconception. Le quota de 1 à 2 coups de génie est remplacé par des découvertes rares, expliquées et sans quota. Restent valables : vote, fédération, annonce anticipée (désormais environ deux saisons complètes), fréquence non fixe, récompense des choix plutôt que du hasard |
+| **D-095, D-120** | Cohérente | Tous les coefficients sont provisoires. On ne fige aucune conversion du savoir en performance |
+| **D-109** (phase 12) | Cohérente | La phase 8 apporte la recherche et le savoir ; la phase 12 la conception, la fabrication et les pièces. La délégation par domaine (D-109 §9) s'applique aussi aux programmes (question 9) |
+| **D-114** (fondations techniques) | Cohérente | Le savoir élargit la frontière de compromis de la phase 12, et le règlement en fixe les bornes. Les identités techniques naissent des profils de savoir |
+| **Phase 5** (plafond, budget) | Cohérente | La recherche est financée sur le budget de développement, sous le plafond |
+| **Fiche de la phase 8, v1** | Remplacée | Questions 2 (réponse du porteur) et 4 (coups de génie) devenues sans objet |
+
+## 7. Risques d'équilibrage et points de vigilance
+
+1. **Effet boule de neige** : une écurie riche, avec de meilleures installations, apprend plus vite et domine durablement. Les contrepoids naturels sont les rendements décroissants, le plafond budgétaire, l'obsolescence lors des réformes et le dilemme présent ou avenir. À mesurer sur 30 saisons.
+2. **Uniformité** : si l'utilité de l'IA est trop simple, toutes les écuries étudieront les mêmes domaines. Les contrepoids sont les philosophies techniques, les traits des directeurs et l'aléa de jugement. Il faudra mesurer la diversité des profils.
+3. **Pas d'effet visible avant la phase 12** : si la conception provisoire est trop prudente, la recherche paraîtra inutile ; trop forte, elle figera des coefficients que la phase 12 remplacera. Je propose un effet **modéré et isolé** (question 1).
+4. **Micro-gestion** : deux programmes à surveiller sur des dizaines de saisons peuvent lasser. La délégation au directeur technique est la parade (question 9).
+5. **Lien avec le développement actuel** : l'horizon « voiture actuelle » ne doit pas compter deux fois le budget. La part affectée à la recherche est retirée du développement courant (§3.6).
+
+## 8. Phase 8c — Mémoire v2 : qui sait quoi
 
 - **Connaissance d'un fait** : pour chaque événement privé, la liste bornée de ceux qui le connaissent. Les événements publics sont connus de tous.
 - **Fuites** (déjà prévues, `memoire.md` §3) :
   - chaque semaine, un fait privé peut se propager le long des relations ;
-  - la probabilité dépend de la discrétion de ceux qui le connaissent (le trait `discretion` sera enfin lu), de la familiarité et de l'intérêt du fait (importance) ;
-  - un fait connu de nombreuses personnes peut devenir public.
-- **Rumeurs** : une fuite peut être déformée (par exemple, une offre exagérée). La rumeur reste marquée comme telle ; ceux qui la connaissent peuvent la croire ou non selon leur confiance envers la source.
-- **Réputation perçue** : chacun juge un acteur sur ce qu'il sait de lui (faits publics, faits privés qui lui sont parvenus, expérience directe), et non plus sur les seuls faits publics.
-- **Règle d'or** : un personnage ne réagit qu'aux faits qu'il connaît. Les réactions déjà en place (souvenirs, relations) sont filtrées par la connaissance.
-- **Volumes bornés** :
-  - nombre de connaisseurs par fait ;
-  - nombre de faits privés suivis ;
-  - les faits anciens s'effacent comme les événements détaillés.
+  - la probabilité dépend de la discrétion des personnes qui le connaissent, de la familiarité et de l'importance du fait ;
+  - un fait que beaucoup connaissent peut devenir public.
+- **Rumeurs** : une fuite peut être déformée. Elle reste marquée comme rumeur, et chacun la croit ou non selon sa confiance envers la source.
+- **Réputation perçue** : chacun juge un acteur sur ce qu'il sait de lui, et non plus sur les seuls faits publics.
+- **Perception du futur règlement** (lien avec la 8b) : ce qu'une écurie sait des propositions en discussion guide sa recherche exploratoire.
+- **Volumes bornés** : nombre de personnes qui connaissent un fait, nombre de faits privés suivis, effacement des faits anciens.
 
-## 4. Phase 8c — Groupes sociaux et politique
+## 9. Phase 8d — Groupes sociaux, politique, conséquences humaines
 
-### 4.1 Groupes sociaux (émergents, `memoire.md` §4)
+- **Groupes émergents** (`memoire.md` §4) :
+  - ils sont détectés chaque saison, à partir de l'affinité et du respect mutuel ;
+  - leur leader est le membre le plus respecté ;
+  - les membres sont plus tentés de suivre leur leader quand il part ;
+  - un groupe opposé à la direction pèse sur la cohésion et la motivation.
 
-- **Détection** chaque saison : des ensembles de personnes reliées par une forte affinité et un respect mutuel (au-dessus d'un seuil), à partir de passés communs (mêmes écuries, mentorat, académie). Aucun groupe n'est créé à la main.
-- **Leader** : le membre le plus respecté par les autres.
-- **Effets** :
-  - quand le leader part, chaque membre est davantage tenté de le suivre : cela enrichit les départs en groupe de la 7b avec de vraies personnes. Limite actuelle : les ingénieurs ne sont pas individualisés, et le départ en groupe ne fait que déplacer du niveau de département (`phase-7-marche-du-travail.md` §16) ;
-  - **démissions et ruptures négociées** (D-077), via une clause de départ et une indemnité négociée, même commande pour le joueur et l'IA ;
-  - un groupe opposé à la direction abaisse la cohésion et la motivation de son département ;
-  - un groupe soudé autour d'un pilote pèse dans le choix du n°1.
+  Limite actuelle : les ingénieurs ne sont pas individualisés (`phase-7-marche-du-travail.md` §16, question 10).
+- **Démissions et ruptures négociées** (D-077) : clause de départ et indemnité négociée, même commande pour le joueur et l'IA.
+- **Politique** :
+  - alliances d'écuries, par affinité ou par motoriste commun ;
+  - lobbying : il pèse sur les **propositions** de la fédération, jamais sur le décompte des voix ;
+  - autres sujets de vote (question 6) ;
+  - élection du président de la fédération (question 7).
 
-### 4.2 Politique
+## 10. Questions pour toi
 
-- **Alliances d'écuries** :
-  - liens naturels : écuries clientes d'un même motoriste, écurie sœur (lien réel conservé, D-112), relations entre team principals ;
-  - elles votent souvent ensemble, sans obligation.
-- **Lobbying** : un team principal bien vu de la fédération, qui a de bonnes relations et du prestige, pèse sur le choix des options proposées (et non sur le décompte des voix).
-- **Autres sujets de vote** (D-012) :
-  - niveau du plafond budgétaire ;
-  - restrictions aéro selon le classement ;
-  - nombre de Grands Prix.
+**Nouvelles questions (recherche et règlements)**
+1. **Effet provisoire du savoir avant la phase 12** : un effet modéré et isolé (§3.5 et §3.7), pour que la recherche compte dès la phase 8 sans figer de coefficients. Ou aucun effet sur la performance avant la phase 12 ? Je recommande l'effet modéré.
+2. **Les 12 domaines techniques** proposés (§3.2) : à compléter ou modifier ?
+3. **Vote d'une grande réforme** : une voix par écurie, avec la fédération qui tranche les égalités, ou des voix pondérées ? (question 3 de la v1, toujours ouverte)
+4. **Évolutions mineures** : décidées par la fédération seule après consultation, chaque saison avec une probabilité, sur 1 ou 2 domaines. D'accord ?
+5. **Recherche exploratoire sur une proposition non retenue** : seule la part fondamentale du savoir reste utile. D'accord sur le principe ? La proportion sera réglée en laboratoire.
+6. **Vieillissement lent du savoir** sans changement de règlement (personnel qui part, méthodes qui datent) : à ajouter, ou le savoir ne bouge-t-il qu'avec le règlement ?
+7. **Coût d'une réorientation** : seulement une remise en route (quelques semaines à efficacité réduite), ou aussi un coût financier ?
 
-  Ils sont proposés par la fédération selon la conjoncture (par exemple une crise économique) et votés de la même façon.
-- **Élection du président de la fédération** tous les 4 ans : les écuries votent, et les candidats ont des préférences d'accent réglementaire.
-
-## 5. Attributs nouveaux et qui les lit
-
-| Attribut | Lu par |
-| --- | --- |
-| Règlement (accent, poids, savoir conservé) | Performance des voitures, convergence, votes |
-| Part « voiture suivante » du budget | Avantage de départ au nouveau règlement |
-| Coup de génie (caractéristique, bonus, érosion) | Performance des voitures, réclamations |
-| Connaisseurs d'un fait, rumeurs | Réactions des personnages, réputation perçue, fuites |
-| `discretion` (trait existant) | Fuites |
-| Groupe (membres, leader) | Départs en groupe, cohésion, motivation, statut de n°1 |
-| Alliances (liens entre écuries) | Votes |
-| Président de la fédération (préférences) | Propositions, égalités |
-
-## 6. Avis franc
-
-1. **La phase 8a est prioritaire et autonome.** Elle s'attaque directement aux dynasties et à la convergence. Je propose de la livrer seule, et de la mesurer, avant 8b et 8c.
-2. **La phase 8b est coûteuse en calcul et en volume.** Savoir qui connaît quoi peut exploser. Il faudra des bornes strictes et des mesures de performance dès le départ (outil `npm run performance`).
-3. **La phase 8c dépend fortement du réglage des relations.** Si les groupes n'émergent pas, la règle est de régler les relations, et non de créer des groupes à la main.
-4. **Effet attendu sur l'équilibrage :**
-   - fort pour la 8a ;
-   - faible et indirect pour la 8b et la 8c, qui enrichissent surtout la vie du paddock.
-5. **Le plafonnement des voitures** reste en partie un sujet de la phase 12. La 8a le corrige par la convergence à chaque cycle, mais ne remplace pas les compromis de conception.
-
-## 7. Questions pour toi
-
-1. **Découpage** : 8a (règlements), puis 8b (information), puis 8c (groupes et politique). D'accord ?
-2. **Options de règlement** : les quatre accents (aéro, moteur, mécanique et pneus, équilibré) et l'option « prolonger d'un ou deux ans ». Faut-il en ajouter, par exemple un accent « sécurité » ou « coûts » ?
-3. **Vote** : une voix par écurie, avec la fédération qui tranche les égalités, ou une pondération (par exemple selon l'ancienneté ou le palmarès, comme certains droits historiques) ?
-4. **Coups de génie** : 1 à 2 par cycle au plus dans toute la grille, avec une réclamation possible des autres écuries. D'accord ?
-5. **Anticipation** : le joueur choisit lui-même la part de son budget consacrée à la voiture suivante. Faut-il aussi permettre de la confier au directeur technique (délégation) ?
-6. **Autres sujets de vote** (plafond budgétaire, restrictions aéro, nombre de Grands Prix) : dès la 8c, ou plus tard ?
-7. **Président de la fédération** élu tous les 4 ans, avec des préférences qui pèsent sur les propositions : d'accord ?
-8. **Ingénieurs clés individualisés** (3 à 5 par département, environ 130 personnes de plus) pour de vrais départs en cascade en 8c, ou garder l'approximation par département ?
+**Questions de la v1 toujours ouvertes**
+8. Découpage en 8a, 8b, 8c et 8d : d'accord ?
+9. **Délégation** des programmes de recherche au directeur technique, pour le joueur qui le souhaite ?
+10. **Ingénieurs clés individualisés** (3 à 5 par département) pour de vrais départs en cascade en 8d, ou garder l'approximation par département ?
+11. Autres sujets de vote (plafond budgétaire, restrictions aéro, nombre de Grands Prix) : en 8d, ou plus tard ?
+12. Président de la fédération élu tous les 4 ans : d'accord ?
