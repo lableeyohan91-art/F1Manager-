@@ -402,3 +402,10 @@ Aucun code à ce stade.
 
 ### Mesures
 - Rapport court de fin de phase : `docs/rapports/2026-11-23-p8d-fin-de-phase-8.md` ; références `p8d-*` ; outil `tools/diagnostic-8d.mts`.
+
+## [Point de fin de phase 8] — 23/11/2026
+
+### Modifié (D-139, D-140)
+- Lien social étendu à toutes les relations (affinité naturelle et respect professionnel, selon la familiarité).
+- Plafond budgétaire jamais voté au-dessus de sa valeur de départ.
+- Usure du succès : seuil personnel de 3 à 5 titres, très loyaux épargnés, signal précurseur (« besoin d'un nouveau défi »), motivation en baisse, développement freiné, départs. Tests `tests/usure.test.ts`. 186 tests.

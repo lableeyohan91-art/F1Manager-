@@ -17,7 +17,7 @@ import { PROMOTION_AFFILIE, REPUTATION_RECRUTEMENT_F1 } from '../../balance/juni
 import { potentielEstime } from '../carriere/estimation';
 import { AGENTS } from '../../balance/commercial';
 import { agentDe } from '../marche/commercial';
-import { ATTRAIT_POSTE_SUPERIEUR, LASSITUDE_PERSONNEL, LASSITUDE_PILOTE, PREDATEUR, RANG_POSTE } from '../../balance/marche';
+import { ATTRAIT_POSTE_SUPERIEUR, LASSITUDE_PERSONNEL, LASSITUDE_PILOTE, PREDATEUR, RANG_POSTE, USURE_SUCCES } from '../../balance/marche';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
 
@@ -221,11 +221,12 @@ export function lassitude(monde: Monde, p: Personne): { niveau: number; ecurie?:
   const reglage = pilote ? LASSITUDE_PILOTE : LASSITUDE_PERSONNEL;
   if (!pilote && (RANG_POSTE[p.poste] ?? 0) === 0) return { niveau: 0 };
   const annees = anneesDans(monde, p, p.ecurie);
-  if (annees < reglage.anneesMin) return { niveau: 0, ecurie: p.ecurie };
   const pal = Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[];
   const titres = pilote
     ? pal.filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie).length
     : pal.filter((x) => x.championConstructeurs === p.ecurie && x.saison > monde.date.annee - annees).length;
+  const usure = usureSucces(monde, p, annees).usure;
+  if (annees < reglage.anneesMin) return { niveau: usure, ecurie: p.ecurie };
   let brut = reglage.parAnnee * (annees - reglage.anneesMin + 1) + reglage.parTitre * titres;
   if (!pilote) {
     const superieur = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[])
@@ -233,7 +234,31 @@ export function lassitude(monde: Monde, p: Personne): { niveau: number; ecurie?:
     if (superieur && niveauMetier(superieur) <= niveauMetier(p)) brut += LASSITUDE_PERSONNEL.blocage;
   }
   const temperament = (((p.valeurs['defi'] ?? 10) + (p.traits['ambition'] ?? 10)) / 20) * (1.5 - (p.traits['loyaute'] ?? 10) / 20);
-  return { niveau: Math.min(reglage.max, Math.max(0, brut * temperament)), ecurie: p.ecurie };
+  return { niveau: Math.min(reglage.max, Math.max(0, brut * temperament)) + usure, ecurie: p.ecurie };
+}
+
+/** Seuil personnel d'usure (3 à 5 titres) selon la patience : loyauté, attachement à la stabilité, peu de goût du défi et d'ambition. */
+export function seuilPersonnel(p: Personne): number {
+  const patience = ((p.traits['loyaute'] ?? 10) + (p.valeurs['stabilite'] ?? 10) + (20 - (p.valeurs['defi'] ?? 10)) + (20 - (p.traits['ambition'] ?? 10))) / 80;
+  return USURE_SUCCES.seuilMin + (USURE_SUCCES.seuilMax - USURE_SUCCES.seuilMin) * Math.min(1, Math.max(0, patience));
+}
+
+/**
+ * D-140 — usure du succès : titres vécus avec l'écurie, seuil personnel (3 à 5 titres selon le caractère), immunité des très loyaux.
+ * Renvoie aussi le signal précurseur (la personne a atteint seuil − anticipation : elle demande un nouveau défi).
+ */
+export function usureSucces(monde: Monde, p: Personne, anneesConnues?: number): { usure: number; titres: number; seuil: number; signal: boolean } {
+  if (p.statut !== 'actif' || !p.ecurie || (p.traits['loyaute'] ?? 10) >= USURE_SUCCES.loyauteImmunite) return { usure: 0, titres: 0, seuil: Infinity, signal: false };
+  const pilote = p.poste === 'pilote_titulaire';
+  if (!pilote && (RANG_POSTE[p.poste] ?? 0) === 0) return { usure: 0, titres: 0, seuil: Infinity, signal: false };
+  const annees = anneesConnues ?? anneesDans(monde, p, p.ecurie);
+  const pal = Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[];
+  const constructeurs = pal.filter((x) => x.championConstructeurs === p.ecurie && x.saison > monde.date.annee - annees).length;
+  const titres = pilote ? Math.max(constructeurs, pal.filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie && x.saison > monde.date.annee - annees).length) : constructeurs;
+  const seuil = seuilPersonnel(p);
+  const depart = seuil - USURE_SUCCES.anticipation;
+  const usure = Math.min(USURE_SUCCES.max, Math.max(0, USURE_SUCCES.parTitre * (titres - depart)));
+  return { usure, titres, seuil, signal: titres >= depart };
 }
 
 /** Lassitude d'un pilote titulaire (phase 7a) ; nulle pour les autres postes. */

@@ -132,6 +132,8 @@ export interface Personne {
   id: string;
   /** Phase 7b : en période de non-concurrence jusqu'à cette date (incluse) : ne contribue pas au développement de sa nouvelle écurie. */
   nonConcurrenceJusqua?: { annee: number; semaine: number };
+  /** D-140 : écurie où la personne a déjà dit avoir besoin d'un nouveau défi (signal précurseur donné une fois par séjour). */
+  nouveauDefiDemande?: string;
   /** Phase 7c : popularité (0–100), nationale et internationale ; lue par la valeur commerciale, les sponsors et l'attrait des sponsors. */
   popularite?: { nationale: number; internationale: number };
   /** Phase 7c : agent (table « agents ») et commission négociée (fraction du salaire). Lus par la négociation et les offres. */

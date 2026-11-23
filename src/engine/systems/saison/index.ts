@@ -8,7 +8,7 @@
  *   saison.finDeSaison   (semaine 49)       : titres, palmarès, primes, chronique
  */
 
-import { PERSONNEL_MARCHE } from '../../balance/marche';
+import { PERSONNEL_MARCHE, USURE_SUCCES } from '../../balance/marche';
 import { SEMAINES_PAR_AN } from '../../balance/calendrier';
 import { PHASES_SAISON } from '../../balance/calendrier';
 import { CARACTERISTIQUES_VITESSE, PROBABILITE_PLUIE } from '../../balance/circuits';
@@ -32,6 +32,7 @@ import { genererChronique } from './chronique';
 import { apresGrandPrix, erreurPression, modificateurNiveau, noterLuttesTitre, titreSurCircuit } from '../carriere/performance';
 import { facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero } from '../economie';
 import { bonusSavoirDeveloppement } from '../technique/conception';
+import { usureSucces } from '../humain/decision';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 
@@ -117,7 +118,9 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const mod = modificateurNiveau(monde, p, circuit);
     const pilote = (niveauPilote(p, gp.pluie, circuit.exigences) + mod.affinite + mod.nouveaute) * ecartPilote;
     const pression = erreurPression(monde, p, saison, gp.manche, gp.id);
-    const forme = EFFET_FORME_MAX * borner((p.etat.confiance - CONFIANCE_REFERENCE) / (100 - CONFIANCE_REFERENCE), -1, 1);
+    // D-140 : un pilote démotivé (usure du succès) perd un peu de rythme ; une motivation élevée n'apporte rien de plus.
+    const forme = EFFET_FORME_MAX * borner((p.etat.confiance - CONFIANCE_REFERENCE) / (100 - CONFIANCE_REFERENCE), -1, 1)
+      + USURE_SUCCES.effetCourse * borner((p.etat.motivation - USURE_SUCCES.motivationReference) / USURE_SUCCES.motivationReference, -1, 0);
     const alea = f.normale(0, sigma);
     const pMeca = ABANDON_MECANIQUE.base + (20 - voitureDe(monde, e.id).fiabilite) * ABANDON_MECANIQUE.parPoint;
     const pInc = (INCIDENT.base + (20 - (p.competences['regularite'] ?? 10)) * INCIDENT.parPoint)
@@ -274,7 +277,10 @@ export function capaciteDeveloppement(monde: Monde, e: Ecurie): number {
   const installations = moyenne(inst.map((i) => niveauEffectif(i))) / 10;
   // Phase 5a : le budget de développement réellement alloué (finances) remplace le budget indicatif de l'écurie.
   const budget = financesDe(monde, e.id) ? facteurBudgetDeveloppement(monde, e.id) : borner(e.budgetMEUR / BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET.min, FACTEUR_BUDGET.max);
-  return POIDS_CAPACITE.competences * competences + POIDS_CAPACITE.installations * installations + POIDS_CAPACITE.budget * budget;
+  // D-140 : usure du succès des cadres techniques en place (équilibrage volontaire, décidé par le porteur).
+  const cadres = equipe.filter((x) => x.poste === 'directeur_technique' || x.poste === 'responsable_aero' || x.poste === 'responsable_conception');
+  const usure = cadres.length ? cadres.reduce((a, x) => a + usureSucces(monde, x).usure, 0) / cadres.length : 0;
+  return (POIDS_CAPACITE.competences * competences + POIDS_CAPACITE.installations * installations + POIDS_CAPACITE.budget * budget) * (1 - USURE_SUCCES.effetDeveloppement * usure);
 }
 
 const CARACS_VOITURE = ['viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero', 'fiabilite', 'gestionPneus'] as const;

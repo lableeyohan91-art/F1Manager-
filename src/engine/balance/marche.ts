@@ -89,6 +89,23 @@ export const RANG_POSTE: Record<string, number> = {
  */
 export const LASSITUDE_PERSONNEL = { anneesMin: 4, parAnnee: 0.02, parTitre: 0.04, blocage: 0.05, max: 0.2 };
 
+/**
+ * D-140 — USURE DU SUCCÈS (équilibrage volontaire, décidé par le porteur : « on se l'autorise, il le faut »).
+ * Une personne (personnel ou pilote titulaire) qui gagne longtemps avec la même écurie finit par vouloir un nouveau défi, à son rythme :
+ * - titres vécus : titres constructeurs de l'écurie pendant sa présence (pour un pilote, le plus grand de ce nombre et de ses titres
+ *   pilotes avec elle) ;
+ * - seuil personnel = seuilMin + (seuilMax − seuilMin) × patience, où patience (0 à 1) = moyenne de la loyauté, de la valeur
+ *   « stabilité », et de l'inverse du goût du défi et de l'ambition (notes sur 20) : certains se lassent après 3 titres, d'autres après 5 ;
+ * - les très loyaux (trait loyauté ≥ loyauteImmunite, environ 3 % des gens) ne se lassent jamais du succès ;
+ * - signal précurseur : à `anticipation` titre du seuil, la personne vient dire à son supérieur qu'elle a besoin d'un nouveau défi ;
+ * - usure = parTitre × (titres − (seuil − anticipation)), ajoutée à la lassitude ordinaire, plafonnée à `max` ;
+ * - effets : la motivation visée baisse de motivationParPoint × usure (points sur 100) ; pour un pilote, une motivation basse
+ *   retire jusqu'à effetCourse (même échelle que la forme) ; l'envie de partir, les candidatures et les offres font le reste.
+ * - le développement de la voiture est multiplié par (1 − effetDeveloppement × usure moyenne des cadres techniques en place :
+ *   directeur technique, responsables aéro et conception).
+ */
+export const USURE_SUCCES = { seuilMin: 3, seuilMax: 5, loyauteImmunite: 17, anticipation: 1, parTitre: 0.15, max: 0.6, motivationParPoint: 50, effetCourse: 0.1, motivationReference: 60, effetDeveloppement: 0.7 };
+
 /** Attrait d'une offre pour un poste plus élevé (utilité × ambition/20). */
 export const ATTRAIT_POSTE_SUPERIEUR = 0.3;
 
