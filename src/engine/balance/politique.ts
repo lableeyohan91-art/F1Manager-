@@ -33,7 +33,8 @@ export const LOBBYING = { montantMin: 0.5, montantMax: 5, avanceMin: 3, tresorer
 
 /**
  * Autres votes (D-132, question 11), en semaine `semaine` une saison sur deux (années paires), pour la saison suivante :
- * - plafond budgétaire : ± pasPlafond (fraction) selon la rigueur du président, borné à [plafondMin ; plafondMax] × la valeur de départ ;
+ * - plafond budgétaire : ± pasPlafond (fraction) selon la rigueur du président, borné à [plafondMin ; plafondMax] × la valeur de départ
+ *   (porteur, 23/11/2026 : jamais au-dessus de la valeur de départ, variable d'ajustement de l'équilibrage) ;
  *   une écurie plus riche que la moyenne (budget au-delà du plafond, rapporté au plafond) vote pour une hausse, une plus pauvre pour une baisse ;
  * - restrictions aérodynamiques : écart entre la première et la dernière écurie élargi ou resserré de pasAero (de chaque côté),
  *   borné à [ecartAeroMin ; ecartAeroMax] ; une écurie de la seconde moitié du classement vote pour l'élargissement.
@@ -42,7 +43,7 @@ export const LOBBYING = { montantMin: 0.5, montantMax: 5, avanceMin: 3, tresorer
  * Majorité simple des écuries qui votent ; égalité : le choix du président l'emporte. Le nombre de Grands Prix n'est pas encore soumis
  * au vote (le calendrier en dépend partout).
  */
-export const AUTRES_VOTES = { probaPlafond: 0.5, probaSens: 0.5, semaine: 36, pasPlafond: 0.05, plafondMin: 0.8, plafondMax: 1.2, pasAero: 0.02, ecartAeroMin: 0.2, ecartAeroMax: 0.6, aleaVote: 0.1 };
+export const AUTRES_VOTES = { probaPlafond: 0.5, probaSens: 0.5, semaine: 36, pasPlafond: 0.05, plafondMin: 0.8, plafondMax: 1, pasAero: 0.02, ecartAeroMin: 0.2, ecartAeroMax: 0.6, aleaVote: 0.1 };
 
 /**
  * Alliances (détectées chaque saison, semaine `semaine`) : écuries au même motoriste, écuries partenaires, ou dont les team principals

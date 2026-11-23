@@ -34,9 +34,10 @@ describe('Phase 8d-3 — groupes sociaux', () => {
     expect(inconnu.respect).toBe(0);
     r.familiarite = 0.8;
     for (const k of Object.keys(a.valeurs)) b.valeurs[k] = a.valeurs[k]!;
-    expect(lienSocial(m, a, b).affinite).toBeGreaterThan(0);
+    const proches = lienSocial(m, a, b).affinite;
+    expect(proches).toBeGreaterThan(0);
     for (const k of Object.keys(a.valeurs)) b.valeurs[k] = 20 - a.valeurs[k]!;
-    expect(lienSocial(m, a, b).affinite).toBeLessThan(lienSocial(m, a, { ...b, valeurs: { ...a.valeurs } }).affinite);
+    expect(lienSocial(m, a, b).affinite).toBeLessThan(proches);
   });
 
   it('détection : un groupe soudé émerge autour de la personne la plus respectée ; type déduit', () => {

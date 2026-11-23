@@ -216,6 +216,7 @@ function proposerVote(monde: Monde, f: Federation): void {
   if (sujet === 'plafondMEUR') {
     const sens = f.rigueur > 0 ? -1 : f.rigueur < 0 ? 1 : (alea.chance(AUTRES_VOTES.probaSens) ? -1 : 1);
     valeur = r2(borner(plafond(monde) * (1 + sens * AUTRES_VOTES.pasPlafond), AUTRES_VOTES.plafondMin * PLAFOND_BUDGETAIRE_MEUR, AUTRES_VOTES.plafondMax * PLAFOND_BUDGETAIRE_MEUR));
+    if (Math.abs(valeur - plafond(monde)) < 0.01) return; // déjà à la borne : rien à soumettre au vote
     texte = `plafond budgétaire porté à ${valeur} M€`;
   } else {
     const ecart = regleVotee(monde, 'restrictionAeroDernier', RESTRICTIONS_AERO.dernier) - regleVotee(monde, 'restrictionAeroPremier', RESTRICTIONS_AERO.premier);

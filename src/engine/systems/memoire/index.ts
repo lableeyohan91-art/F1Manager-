@@ -8,6 +8,7 @@
  */
 
 import {
+  LIEN_SOCIAL,
   ETIQUETTES, FAMILIARITE_MENSUELLE, RECONCILIATION, RESIDU, RETOUR_BASE_MENSUEL, SATURATION, SEUIL_CREATION_SOUVENIR,
   SEUIL_EFFACEMENT_SOUVENIR, SOUVENIRS_MAX_PAR_PERSONNE, TRAIT_OUBLI,
 } from '../../balance/memoire';
@@ -16,6 +17,8 @@ import { nouvelIdentifiant } from '../../core/identifiants';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import type { Systeme } from '../../core/moteur';
 import { TABLES, type Personne } from '../../model/types';
+import { COMPETENCES_TRANSVERSALES, VALEURS } from '../../balance/personnages';
+import { niveauPilote } from '../saison/performance';
 
 export const TABLE_SOUVENIRS = 'souvenirs';
 export const TABLE_RELATIONS = 'relations';
@@ -104,10 +107,43 @@ export function relation(monde: Monde, de: string, vers: string, souvenirsDuPort
     res.respect += effet * def.axes.respect;
     res.affinite += effet * def.axes.affinite;
   }
+  // D-139 : lien social entre deux personnes (affinité naturelle et respect professionnel, en proportion de la familiarité).
+  if (res.familiarite > 0) {
+    const a = table(monde, TABLES.personnes)[de] as unknown as Personne | undefined;
+    const b = a ? (table(monde, TABLES.personnes)[vers] as unknown as Personne | undefined) : undefined;
+    if (a && b) {
+      const l = lienNaturel(a, b);
+      res.affinite += l.affinite * res.familiarite;
+      res.respect += l.respect * res.familiarite;
+    }
+  }
   res.confiance = borner(res.confiance);
   res.respect = borner(res.respect);
   res.affinite = borner(res.affinite);
   return res;
+}
+
+const CLES_VALEURS = Object.keys(VALEURS);
+const TRANSVERSALES = new Set<string>(COMPETENCES_TRANSVERSALES);
+
+/** Niveau de métier d'une personne (sans dépendre des systèmes humains) : pilote, niveau général ; autres, moyenne des compétences de métier. */
+function niveauDe(p: Personne): number {
+  if (p.poste.startsWith('pilote')) return niveauPilote(p, false);
+  let s = 0, n = 0;
+  for (const [c, v] of Object.entries(p.competences)) if (!TRANSVERSALES.has(c)) { s += v; n++; }
+  return n ? s / n : 10;
+}
+
+/** Affinité naturelle (valeurs proches, sociabilité) et respect professionnel de A envers B, avant familiarité (D-137, D-139). */
+export function lienNaturel(a: Personne, b: Personne): { affinite: number; respect: number } {
+  let ecart = 0;
+  for (const k of CLES_VALEURS) ecart += Math.abs((a.valeurs[k] ?? 10) - (b.valeurs[k] ?? 10));
+  const compat = 1 - ecart / CLES_VALEURS.length / 20;
+  const sociabilite = ((a.traits['sociabilite'] ?? 10) + (b.traits['sociabilite'] ?? 10)) / 40;
+  return {
+    affinite: LIEN_SOCIAL.poidsAffinite * (compat - LIEN_SOCIAL.compatibiliteNeutre) * (LIEN_SOCIAL.sociabiliteBase + sociabilite),
+    respect: borner((niveauDe(b) - LIEN_SOCIAL.niveauNeutre) / LIEN_SOCIAL.echelleNiveau),
+  };
 }
 
 function noteDe(p: Personne, cle: string): number {

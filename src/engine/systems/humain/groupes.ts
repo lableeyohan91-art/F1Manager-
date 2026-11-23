@@ -8,15 +8,14 @@
  *   un groupe d'opposants pèse sur la motivation de ses membres et de leurs collègues.
  */
 
-import { DETECTION_GROUPES, LIEN_SOCIAL, OPPOSANTS, SUIVRE_LEADER, TYPES_GROUPES } from '../../balance/groupes';
-import { VALEURS } from '../../balance/personnages';
+import { DETECTION_GROUPES, OPPOSANTS, SUIVRE_LEADER, TYPES_GROUPES } from '../../balance/groupes';
 import { PERSONNEL_MARCHE } from '../../balance/marche';
 import { ajouterEvenement } from '../../core/evenements';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import type { Systeme } from '../../core/moteur';
 import { TABLES, type Personne, type Poste } from '../../model/types';
 import { indexSouvenirs, relation, TABLE_RELATIONS, type Relation, type Souvenir } from '../memoire';
-import { niveauMetier, teamPrincipal } from './decision';
+import { teamPrincipal } from './decision';
 
 export type TypeGroupe = 'clan' | 'opposants' | 'mentor' | 'anciens_collaborateurs' | 'collegues';
 
@@ -42,24 +41,9 @@ interface Lien { autre: string; affinite: number; respect: number }
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 
-/**
- * Lien social de A envers B (D-137) : relation de la mémoire v1, plus une affinité naturelle (valeurs proches, sociabilité) et un respect
- * professionnel (niveau de B), en proportion de la familiarité. Lu seulement par les groupes (détection, envie de suivre le leader).
- */
+/** Lien social de A envers B : depuis D-139, c'est la relation elle-même (affinité naturelle et respect professionnel compris). */
 export function lienSocial(monde: Monde, a: Personne, b: Personne, souvenirsA?: Souvenir[]): { affinite: number; respect: number; confiance: number; familiarite: number } {
-  const r = relation(monde, a.id, b.id, souvenirsA);
-  const cles = Object.keys(VALEURS);
-  const ecart = cles.reduce((s, k) => s + Math.abs((a.valeurs[k] ?? 10) - (b.valeurs[k] ?? 10)), 0) / cles.length;
-  const compat = 1 - ecart / 20;
-  const sociabilite = ((a.traits['sociabilite'] ?? 10) + (b.traits['sociabilite'] ?? 10)) / 40;
-  const naturelle = LIEN_SOCIAL.poidsAffinite * (compat - LIEN_SOCIAL.compatibiliteNeutre) * (LIEN_SOCIAL.sociabiliteBase + sociabilite);
-  const estime = borner((niveauMetier(b) - LIEN_SOCIAL.niveauNeutre) / LIEN_SOCIAL.echelleNiveau, -1, 1);
-  return {
-    affinite: borner(r.affinite + naturelle * r.familiarite, -1, 1),
-    respect: borner(r.respect + estime * r.familiarite, -1, 1),
-    confiance: r.confiance,
-    familiarite: r.familiarite,
-  };
+  return relation(monde, a.id, b.id, souvenirsA);
 }
 
 /** Détection des groupes de la saison (déterministe : parcours trié, départage par identifiant). */

@@ -13,16 +13,6 @@
 export const DETECTION_GROUPES = { semaineDetection: 30, familiariteMin: 0.3, affiniteMin: 0.3, respectMin: 0.35, membresMin: 2, membresMax: 10 };
 
 /**
- * Lien social (utilisé par la détection des groupes et l'envie de suivre un leader seulement ; D-137) : la mémoire v1 ne produit
- * d'affinité et de respect qu'à partir d'événements marquants, presque jamais entre simples collègues. Le lien ajoute donc, en
- * proportion de la familiarité (avoir travaillé ensemble) :
- * - une affinité naturelle = poidsAffinite × (compatibilité des valeurs − compatibiliteNeutre) × (sociabiliteBase + sociabilité moyenne / 20),
- *   la compatibilité valant 1 − écart moyen des valeurs / 20 ;
- * - un respect professionnel envers l'autre = (niveau métier de l'autre − niveauNeutre) / echelleNiveau, borné entre −1 et 1.
- */
-export const LIEN_SOCIAL = { poidsAffinite: 2, compatibiliteNeutre: 0.75, sociabiliteBase: 0.5, niveauNeutre: 12, echelleNiveau: 8 };
-
-/**
  * Type d'un groupe (déduit, jamais imposé) :
  * - clan : le leader est un pilote titulaire ;
  * - opposants : au moins `partOpposants` des membres se méfient de leur team principal (confiance < seuilMefiance), qui n'en fait pas partie ;
