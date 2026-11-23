@@ -164,3 +164,5 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Agent** | Représentant d'un pilote ou d'un cadre : négocie, prend une commission négociée, pousse parfois au transfert, démarche les écuries (phase 7c). |
 | **Équipe des stands** | Mécaniciens d'une écurie gérés collectivement (rapidité, précision, cohésion, fatigue), avec un chef d'équipe individualisé sous le directeur sportif (D-129 ; humain en phase 8, arrêts simulés en phase 13). |
 | **Cohésion (équipe des stands)** | Synchronisation collective : elle libère la part du potentiel de rapidité réellement exprimée, sans jamais le dépasser (D-129). |
+| **Engagement conditionnel** | Promesse d'un partenaire réel (entreprise familiale ou nationale) de financer un jeune pilote s'il accède à la F1 ; le sponsor est réservé jusque-là (D-131). |
+| **Remplacement de sponsor** | Un sponsor qui suit un pilote prend la place d'un sponsor moins généreux de l'écurie, contre une indemnité de rupture ; seulement si le gain net est positif (D-131). |
