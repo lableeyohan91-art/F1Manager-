@@ -38,12 +38,15 @@ export const LOBBYING = { montantMin: 0.5, montantMax: 5, avanceMin: 3, tresorer
  *   une écurie plus riche que la moyenne (budget au-delà du plafond, rapporté au plafond) vote pour une hausse, une plus pauvre pour une baisse ;
  * - restrictions aérodynamiques : écart entre la première et la dernière écurie élargi ou resserré de pasAero (de chaque côté),
  *   borné à [ecartAeroMin ; ecartAeroMax] ; une écurie de la seconde moitié du classement vote pour l'élargissement.
- * Sujet : le plafond avec la probabilité probaPlafond, sinon les restrictions ; sens tiré à pile ou face (probaSens) quand le
- * président n'a pas de préférence (restrictions, ou rigueur nulle).
- * Majorité simple des écuries qui votent ; égalité : le choix du président l'emporte. Le nombre de Grands Prix n'est pas encore soumis
- * au vote (le calendrier en dépend partout).
+ * Sens tiré à pile ou face (probaSens) quand le président n'a pas de préférence (restrictions, Grands Prix, ou rigueur nulle).
+ * Les règles adoptées s'appliquent en semaine `semaineApplication`, après la fin de saison, pour la saison suivante.
+ * - nombre de Grands Prix (D-141) : ± pasGrandsPrix, borné à [grandsPrixMin ; grandsPrixMax] autour du calendrier de départ (24) ;
+ *   une écurie plus riche que la moyenne vote pour plus de courses, une plus pauvre pour moins (coûts d'opérations) ;
+ *   sujet tiré : plafond (probaPlafond), Grands Prix (probaGrandsPrix), sinon restrictions.
+ * Majorité simple des écuries qui votent ; égalité : le choix du président l'emporte.
+
  */
-export const AUTRES_VOTES = { probaPlafond: 0.5, probaSens: 0.5, semaine: 36, pasPlafond: 0.05, plafondMin: 0.8, plafondMax: 1, pasAero: 0.02, ecartAeroMin: 0.2, ecartAeroMax: 0.6, aleaVote: 0.1 };
+export const AUTRES_VOTES = { semaineApplication: 51, probaPlafond: 0.4, probaGrandsPrix: 0.3, pasGrandsPrix: 1, grandsPrixMin: 20, grandsPrixMax: 24, probaSens: 0.5, semaine: 36, pasPlafond: 0.05, plafondMin: 0.8, plafondMax: 1, pasAero: 0.02, ecartAeroMin: 0.2, ecartAeroMax: 0.6, aleaVote: 0.1 };
 
 /**
  * Alliances (détectées chaque saison, semaine `semaine`) : écuries au même motoriste, écuries partenaires, ou dont les team principals

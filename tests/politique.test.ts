@@ -109,3 +109,16 @@ describe('Phase 8d-4 — autres votes et alliances', () => {
     expect(federation(migre)?.president).toBeDefined();
   }, 60_000);
 });
+
+describe('Phase 8d-4 — nombre de Grands Prix (D-141)', () => {
+  it('un nombre voté (20 à 24) fixe le calendrier de la saison suivante', () => {
+    const m = sc.creerMonde(1);
+    const moteur = sc.creerMoteur();
+    moteur.avancer(m, 1);
+    initialiserFederation(m).reglesAVenir = { grandsPrix: 21 };
+    const annee = m.date.annee;
+    while (!(m.date.annee === annee + 1 && m.date.semaine === 2)) moteur.avancer(m, 1);
+    const s = table(m, TABLES.saisons)[`ssn_${annee + 1}`] as unknown as { calendrier: string[] };
+    expect(s.calendrier).toHaveLength(21);
+  }, 60_000);
+});

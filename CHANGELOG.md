@@ -409,3 +409,4 @@ Aucun code à ce stade.
 - Lien social étendu à toutes les relations (affinité naturelle et respect professionnel, selon la familiarité).
 - Plafond budgétaire jamais voté au-dessus de sa valeur de départ.
 - Usure du succès : seuil personnel de 3 à 5 titres, très loyaux épargnés, signal précurseur (« besoin d'un nouveau défi »), motivation en baisse, développement freiné, départs. Tests `tests/usure.test.ts`. 186 tests.
+- Nombre de Grands Prix soumis au vote des écuries (20 à 24), règles votées appliquées après la fin de saison (D-141). 187 tests.

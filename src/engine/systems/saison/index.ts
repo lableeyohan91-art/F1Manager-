@@ -33,6 +33,7 @@ import { apresGrandPrix, erreurPression, modificateurNiveau, noterLuttesTitre, t
 import { facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero } from '../economie';
 import { bonusSavoirDeveloppement } from '../technique/conception';
 import { usureSucces } from '../humain/decision';
+import { nombreGrandsPrix } from '../politique/acces';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 
@@ -56,7 +57,7 @@ export function grandPrix(monde: Monde, id: string): GrandPrix {
 export function creerSaison(monde: Monde, annee: number): Saison {
   const tc = table(monde, TABLES.circuits);
   const circuits = (Object.values(tc) as unknown as Circuit[]).sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0) || (a.id < b.id ? -1 : 1));
-  const retenus = circuits.slice(0, GRANDS_PRIX_PAR_SAISON);
+  const retenus = circuits.slice(0, nombreGrandsPrix(monde)); // D-141 : nombre voté par les écuries
   const { debut, fin } = PHASES_SAISON.saison;
   const calendrier: string[] = [];
   retenus.forEach((c, i) => {

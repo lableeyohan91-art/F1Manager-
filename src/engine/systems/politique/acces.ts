@@ -1,6 +1,7 @@
 /** Phase 8d-4 — accès à la fédération et aux alliances (module sans dépendance vers les autres systèmes). */
 
-import { table, type Monde } from '../../core/monde';
+import { GRANDS_PRIX_PAR_SAISON } from '../../balance/reglement';
+import { parametre, table, type Monde } from '../../core/monde';
 import { TABLES } from '../../model/types';
 
 export interface Federation {
@@ -40,6 +41,11 @@ export const federation = (monde: Monde) => table(monde, TABLES.federation)['fed
 /** Valeur votée d'une règle (ou la valeur par défaut). */
 export function regleVotee(monde: Monde, nom: string, defaut: number): number {
   return federation(monde)?.regles[nom] ?? defaut;
+}
+
+/** D-141 : nombre de Grands Prix de la saison (réglage d'expérience, sinon valeur votée, sinon valeur de départ). */
+export function nombreGrandsPrix(monde: Monde): number {
+  return parametre(monde, 'reglement.grandsPrix', regleVotee(monde, 'grandsPrix', GRANDS_PRIX_PAR_SAISON));
 }
 
 /** Poids de tirage des orientations des prochaines réformes : président et lobbying (1 par défaut). */

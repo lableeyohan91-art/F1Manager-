@@ -37,7 +37,7 @@ import { coutAnnuelAcademie } from '../juniors/academies';
 
 export * from './sponsors';
 export * from './crises';
-import { regleVotee } from '../politique/acces';
+import { nombreGrandsPrix, regleVotee } from '../politique/acces';
 export * from './infrastructures';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
@@ -163,7 +163,7 @@ export function depensesFixes(monde: Monde, e: Ecurie): { personnelPlafonne: num
   return {
     personnelPlafonne: plafonnes.reduce((a, c) => a + c.salaireMEUR, 0),
     departements: deps.reduce((a, d) => a + d.effectif * (COUT_EMPLOYE.base + COUT_EMPLOYE.parPointNiveau * d.niveauMoyen), 0),
-    operations: OPERATIONS_PAR_GP * parametre(monde, 'reglement.grandsPrix', GRANDS_PRIX_PAR_SAISON),
+    operations: OPERATIONS_PAR_GP * nombreGrandsPrix(monde),
     entretien: inst.reduce((a, i) => a + i.niveau * ENTRETIEN_PAR_NIVEAU * (1 + i.ageAnnees / 30), 0),
     salairesHorsPlafond: horsPlafond.reduce((a, c) => a + c.salaireMEUR, 0),
     marketing: fi ? PART_MARKETING * (commercialAnnuel(monde, e, fi) + revenusSponsors(monde, e.id, monde.date.annee)) : 0,

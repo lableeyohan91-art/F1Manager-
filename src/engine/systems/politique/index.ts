@@ -25,7 +25,7 @@ import { age, niveauMetier, teamPrincipal } from '../humain/decision';
 import { lienSocial } from '../humain/groupes';
 import { ecuriesActives } from '../saison/performance';
 import { reglementEnVigueur, savoirApplicable } from '../technique/acces';
-import { allies, federation, regleVotee, type Alliance, type Federation } from './acces';
+import { allies, federation, nombreGrandsPrix, regleVotee, type Alliance, type Federation } from './acces';
 
 export * from './acces';
 
@@ -196,6 +196,12 @@ function lobbyingIA(monde: Monde, commander: Commander): void {
 /* ------------------------------------------------------------------ Autres votes */
 
 function interetSujet(monde: Monde, e: Ecurie, sujet: string, valeur: number): number {
+  if (sujet === 'grandsPrix') {
+    // D-141 : plus de courses, plus de coûts d'opérations ; une écurie plus riche que la moyenne peut suivre et y gagne en visibilité.
+    const actives = ecuriesActives(monde);
+    const moyenne = actives.reduce((a, x) => a + x.budgetMEUR, 0) / Math.max(1, actives.length);
+    return (valeur > nombreGrandsPrix(monde) ? 1 : -1) * ((e.budgetMEUR - moyenne) / moyenne);
+  }
   if (sujet === 'plafondMEUR') {
     // Une écurie plus riche que la moyenne gagne à voir le plafond monter (elle peut suivre, les autres moins) ; une plus pauvre, à le voir baisser.
     const marge = (x: Ecurie) => (x.budgetMEUR - plafond(monde)) / plafond(monde);
@@ -211,9 +217,15 @@ function interetSujet(monde: Monde, e: Ecurie, sujet: string, valeur: number): n
 
 function proposerVote(monde: Monde, f: Federation): void {
   const alea = tirageLocal(monde, 'politique.sujet', monde.date.annee);
-  const sujet = alea.chance(AUTRES_VOTES.probaPlafond) ? 'plafondMEUR' : 'ecartAero';
+  const x = alea.suivant();
+  const sujet = x < AUTRES_VOTES.probaPlafond ? 'plafondMEUR' : x < AUTRES_VOTES.probaPlafond + AUTRES_VOTES.probaGrandsPrix ? 'grandsPrix' : 'ecartAero';
   let valeur: number, texte: string;
-  if (sujet === 'plafondMEUR') {
+  if (sujet === 'grandsPrix') {
+    const actuel = nombreGrandsPrix(monde);
+    valeur = Math.round(borner(actuel + (alea.chance(AUTRES_VOTES.probaSens) ? 1 : -1) * AUTRES_VOTES.pasGrandsPrix, AUTRES_VOTES.grandsPrixMin, AUTRES_VOTES.grandsPrixMax));
+    if (valeur === actuel) return;
+    texte = `calendrier porté à ${valeur} Grands Prix`;
+  } else if (sujet === 'plafondMEUR') {
     const sens = f.rigueur > 0 ? -1 : f.rigueur < 0 ? 1 : (alea.chance(AUTRES_VOTES.probaSens) ? -1 : 1);
     valeur = r2(borner(plafond(monde) * (1 + sens * AUTRES_VOTES.pasPlafond), AUTRES_VOTES.plafondMin * PLAFOND_BUDGETAIRE_MEUR, AUTRES_VOTES.plafondMax * PLAFOND_BUDGETAIRE_MEUR));
     if (Math.abs(valeur - plafond(monde)) < 0.01) return; // déjà à la borne : rien à soumettre au vote
@@ -245,7 +257,8 @@ function decompterVote(monde: Monde, f: Federation): void {
   if (adopte) {
     f.reglesAVenir ??= {};
     if (v.sujet === 'plafondMEUR') f.reglesAVenir['plafondMEUR'] = v.valeur;
-    else {
+    else if (v.sujet === 'grandsPrix') f.reglesAVenir['grandsPrix'] = v.valeur;
+    else if (v.sujet === 'ecartAero') {
       const centre = (regleVotee(monde, 'restrictionAeroPremier', RESTRICTIONS_AERO.premier) + regleVotee(monde, 'restrictionAeroDernier', RESTRICTIONS_AERO.dernier)) / 2;
       f.reglesAVenir['restrictionAeroPremier'] = r2(centre - v.valeur / 2);
       f.reglesAVenir['restrictionAeroDernier'] = r2(centre + v.valeur / 2);
@@ -254,7 +267,7 @@ function decompterVote(monde: Monde, f: Federation): void {
   f.historique = [...f.historique, { annee: monde.date.annee, type: v.sujet, resultat: `${adopte ? 'adopté' : 'rejeté'} (${pour} pour, ${contre} contre)` }].slice(-10);
   ajouterEvenement(monde, {
     type: 'federation.vote', acteurs: [], importance: 3, visibilite: 'public', contexte: { sujet: v.sujet, valeur: v.valeur, pour, contre, adopte },
-    texte: `Vote des écuries (${v.sujet === 'plafondMEUR' ? 'plafond budgétaire' : 'restrictions aérodynamiques'}) : ${adopte ? 'adopté' : 'rejeté'}, ${pour} voix pour et ${contre} contre.`,
+    texte: `Vote des écuries (${v.sujet === 'plafondMEUR' ? 'plafond budgétaire' : v.sujet === 'grandsPrix' ? 'nombre de Grands Prix' : 'restrictions aérodynamiques'}) : ${adopte ? 'adopté' : 'rejeté'}, ${pour} voix pour et ${contre} contre.`,
   });
 }
 
@@ -343,8 +356,8 @@ export const systemePolitique: Systeme = {
       });
       else { delete f.president; delete f.nomPresident; }
     }
-    if (date.semaine === 1 && f.reglesAVenir) {
-      // Règles votées la saison précédente : en vigueur.
+    if (date.semaine === AUTRES_VOTES.semaineApplication && f.reglesAVenir) {
+      // Règles votées pendant la saison : en vigueur pour la suivante (avant la création de son calendrier, en semaine 1).
       f.regles = { ...f.regles, ...f.reglesAVenir };
       delete f.reglesAVenir;
     }
