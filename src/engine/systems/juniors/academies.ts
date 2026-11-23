@@ -23,6 +23,7 @@ import { faireUnePromesse, TABLE_PROMESSES, type Promesse } from '../humain/prom
 import { teamPrincipal } from '../humain/decision';
 import { nePasProlonger } from '../humain/contrats';
 import { ecuriesActives } from '../saison/performance';
+import { domainePoste, iaDecide } from '../joueur/acces';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 const arrondi = (x: number) => Math.round(x * 100) / 100;
@@ -285,7 +286,7 @@ function missionsIA(monde: Monde, annee: number, pourF1: boolean, commander: (c:
     .sort((a, b) => b.v - a.v || (a.p.id < b.p.id ? -1 : 1))
     .slice(0, REPERAGE.vivierIA);
   for (const e of ecuriesActives(monde)) {
-    if (e.pilotee) continue;
+    if (!iaDecide(e, 'academie')) continue;
     const tp = teamPrincipal(monde, e.id);
     if (!tp) continue;
     let n = 0;

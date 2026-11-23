@@ -87,6 +87,8 @@ export function creerEquipe(monde: Monde, e: Ecurie): EquipeStands {
     cohesion: r2(borner(f.normale(CREATION_STANDS.cohesion, CREATION_STANDS.ecartCohesion), 0, 100)), fatigue: CREATION_STANDS.fatigue,
     experience: CREATION_STANDS.experience, partExperimentes: CREATION_STANDS.partExperimentes, plan: { orientation: 'coordination', intensite: 'normale' },
     chef: personneAuPoste(monde, e.id, 'chef_stands')?.id, historique: [], saison: { semaines: 0, fatigue: 0, charge: 0, renouvellement: 0 },
+    // Phase 10 : une équipe créée après la prise de fonction du joueur reprend le choix de délégation déjà fait.
+    ...(e.pilotee && e.delegations?.stands !== undefined ? { delegation: e.delegations.stands } : {}),
   };
   table(monde, TABLES.equipesStands)[eq.id] = eq as unknown as Entite;
   return eq;

@@ -5,7 +5,7 @@
 
 import { causesConnues, dernierFait, noterFaitDepart } from './causes';
 import {
-  INDEMNITE_RUPTURE, OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
+  BORNES_CONTRAT, INDEMNITE_RUPTURE, OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
 } from '../../balance/contrats';
 import { assezAgePourLaF1, changerMetier } from '../carriere/profil';
 import { engageablePar } from '../juniors/academies';
@@ -27,6 +27,7 @@ import {
 import { faireUnePromesse, motifPromesseInvalide, type TypePromesse } from './promesses';
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, motifRefusEffectif } from './effectifs';
 import { activerContratsSignes, clotureMarche } from '../marche';
+import { domainePoste, iaDecide } from '../joueur/acces';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 
@@ -81,7 +82,9 @@ export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, s
   const p = personneDe(monde, c.personne) as Personne;
   const finAvant = c.fin;
   // Audit n°3 : garde commune à toutes les prolongations (joueur, IA, conseil, contre-attaque) — pas de dépassement d'effectif.
-  const effectif = motifRefusEffectif(monde, c.organisation, c.personne, c.poste, c.fin + 1, Math.max(c.fin, monde.date.annee) + duree);
+  // Phase 10 (correction) : des prolongations successives ne cumulent pas leurs durées au-delà de la durée maximale d'un contrat.
+  const effectif = motifRefusEffectif(monde, c.organisation, c.personne, c.poste, c.fin + 1, Math.max(c.fin, monde.date.annee) + duree)
+    ?? (Math.max(c.fin, monde.date.annee) + duree > monde.date.annee + BORNES_CONTRAT.dureeMax ? `Un contrat ne peut pas aller au-delà de ${monde.date.annee + BORNES_CONTRAT.dureeMax}.` : null);
   if (effectif) {
     const evt = ajouterEvenement(monde, {
       type: 'negociation.impossible', acteurs: [{ id: p.id, role: 'personne' }, { id: auteur, role: 'auteur' }, { id: c.organisation, role: 'organisation' }],
@@ -252,9 +255,12 @@ export const systemeNegociations: Systeme = {
       const c = table(monde, TABLES.contrats)[id] as unknown as Contrat;
       if (c.statut !== 'actif' || c.type !== 'emploi' || c.fin !== date.annee || c.nonProlonge) continue;
       const e = ecurie(monde, c.organisation);
-      if (!e || e.pilotee) continue; // écurie pilotée par le joueur : il décide lui-même
+      if (!e) continue;
       const p = personneDe(monde, c.personne);
       if (!p) continue;
+      // Phase 10 : le contrat du team principal (le joueur compris, D-089) est toujours jugé par le conseil ; les autres
+      // contrats de l'écurie du joueur ne sont décidés par l'IA que si le domaine est délégué.
+      if (p.poste !== 'team_principal' && !iaDecide(e, domainePoste(p.poste))) continue;
       if (p.poste === 'team_principal') {
         // Phase 5a : avec un propriétaire, c'est le conseil du système économie qui décide (economie.conseil).
         const aProprietaire = Object.values(table(monde, TABLES.proprietaires)).some((x) => x['ecurie'] === c.organisation);
@@ -344,8 +350,9 @@ export function pourvoirPostes(monde: Monde, seulementPersonnel = false): void {
   for (let tour = 0; tour < TOURS_RECRUTEMENT; tour++) {
     const offres = new Map<string, Proposition[]>();
     let vacants = 0;
+    // Phase 10 : un poste vacant est pourvu aussi dans l'écurie du joueur (recrutement d'urgence, filet de sécurité) :
+    // le marché ne prépare que la saison suivante.
     for (const e of ecuriesActives(monde)) {
-      if (e.pilotee) continue;
       const tp = teamPrincipal(monde, e.id);
       const decideur = tp?.id ?? e.id;
       const dejaVise = new Set<string>();
@@ -417,7 +424,6 @@ export function pourvoirPostes(monde: Monde, seulementPersonnel = false): void {
   }
   // Dernier recours : générer une personne pour chaque poste encore vacant.
   for (const e of ecuriesActives(monde)) {
-    if (e.pilotee) continue;
     for (const poste of postesVacants(monde, e)) {
       if (seulementPersonnel && poste.startsWith('pilote')) continue;
       const p = genererPersonne(monde, poste, e, 'actif');
@@ -533,6 +539,7 @@ export const commandeProposerProlongation: DefinitionCommande = {
     if (!(typeof tour === 'number' && Number.isInteger(tour) && tour >= 0 && tour <= 2)) return 'Tour de négociation invalide (0 à 2).';
     const effectif = motifRefusEffectif(monde, contrat.organisation, contrat.personne, contrat.poste, contrat.fin + 1, Math.max(contrat.fin, monde.date.annee) + cond.duree);
     if (effectif) return effectif;
+    if (Math.max(contrat.fin, monde.date.annee) + cond.duree > monde.date.annee + BORNES_CONTRAT.dureeMax) return `Un contrat ne peut pas aller au-delà de ${monde.date.annee + BORNES_CONTRAT.dureeMax}.`;
     const promesses = c.parametres['promesses'] ?? [];
     if (!Array.isArray(promesses)) return 'Liste de promesses invalide.';
     const cibles = (c.parametres['cibles'] ?? {}) as Record<string, string>;

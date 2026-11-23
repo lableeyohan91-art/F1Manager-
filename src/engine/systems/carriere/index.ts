@@ -158,7 +158,7 @@ function titres(monde: Monde, p: Personne): number {
 /** Probabilité de prendre sa retraite cette année (décision de la personne, §7). */
 export function probabiliteRetraite(monde: Monde, p: Personne): number {
   const k = p.carriere;
-  if (!k) return 0;
+  if (!k || p.joueur) return 0; // Phase 10 : le joueur ne prend jamais sa retraite à sa place
   const age = monde.date.annee - p.anneeNaissance;
   if (age >= RETRAITE.ageMaximal) return 1;
   // L'âge minimal ne vaut que pour les personnes en poste : un sans-emploi finit par quitter le milieu, à tout âge.
@@ -277,7 +277,7 @@ export const systemeBilanCarrieres: Systeme = {
     if (date.semaine !== SEMAINE_BILAN_CARRIERE) return;
     bilanCarrieres(monde);
     // Jalon A (correction) : un poste libéré par une retraite (un team principal, par exemple) est pourvu tout de suite.
-    if (ecuriesActives(monde).some((e) => !e.pilotee && postesVacants(monde, e).some((x) => !x.startsWith('pilote')))) pourvoirPostes(monde, true);
+    if (ecuriesActives(monde).some((e) => postesVacants(monde, e).some((x) => !x.startsWith('pilote')))) pourvoirPostes(monde, true);
   },
 };
 

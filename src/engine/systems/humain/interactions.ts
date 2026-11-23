@@ -12,10 +12,11 @@ import { rangSemaine } from '../../core/calendrier';
 import { ajouterEvenement, type Evenement } from '../../core/evenements';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
-import { TABLES, type Contrat, type Personne, type Saison } from '../../model/types';
+import { TABLES, type Contrat, type Ecurie, type Personne, type Saison } from '../../model/types';
 import { lireEvenement, reconcilier, relation, relationBrute } from '../memoire';
 import { contratEmploi, indemniteRupture, liberer, personneDe } from './contrats';
 import { niveauMetier, teamPrincipal, valeurMarche } from './decision';
+import { domainePoste, iaDecide } from '../joueur/acces';
 
 const nom = (p: Personne) => `${p.prenom} ${p.nom}`;
 
@@ -205,7 +206,8 @@ export const systemeVieDuPersonnel: Systeme = {
       if (p.statut !== 'actif' || !p.ecurie || p.poste === 'team_principal') continue;
       const dirigeant = dirigeants.get(p.ecurie);
       if (!dirigeant) continue;
-      const ecuriePilotee = (table(monde, TABLES.ecuries)[p.ecurie] as unknown as { pilotee?: boolean }).pilotee;
+      // Phase 10 : dans l'écurie du joueur, l'IA ne répond et ne réagit que pour un domaine délégué (pilotes ou personnel).
+      const ecuriePilotee = !iaDecide(table(monde, TABLES.ecuries)[p.ecurie] as unknown as Ecurie, domainePoste(p.poste));
       const f = tirageLocal(monde, 'vie', p.id, date.annee, date.semaine);
       const c = contratEmploi(monde, p.id) as Contrat | undefined;
       // Demande d'augmentation : personne sous-payée, ambitieuse, pas déjà en demande.

@@ -18,6 +18,7 @@ import { installerTechnique } from './systems/technique';
 import { installerInformation } from './systems/information';
 import { installerStands } from './systems/stands';
 import { installerPolitique } from './systems/politique';
+import { installerJoueur } from './systems/joueur';
 
 export interface Scenario {
   nom: string;
@@ -66,6 +67,6 @@ export function creerScenarioGrille2026(fichiers: FichiersDonnees): Scenario {
     nom: 'grille-2026',
     description: 'Départ en 2027 avec la grille inspirée de 2026 (data/grille-2026).',
     creerMonde: (graine) => construireMonde(graine, donnees, 'grille-2026'),
-    creerMoteur: () => installerDeveloppeur(installerStands(installerInformation(installerJuniors(installerCarriere(installerHumain(installerPolitique(installerTechnique(installerSaison(installerEconomie(new Moteur())))))))))),
+    creerMoteur: () => installerJoueur(installerDeveloppeur(installerStands(installerInformation(installerJuniors(installerCarriere(installerHumain(installerPolitique(installerTechnique(installerSaison(installerEconomie(new Moteur()))))))))))),
   };
 }

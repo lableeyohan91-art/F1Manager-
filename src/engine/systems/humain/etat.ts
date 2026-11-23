@@ -66,7 +66,7 @@ export const systemeEtat: Systeme = {
       const p = t[id] as unknown as Personne;
       if (p.statut === 'retraite') continue;
       const u = p.statut === 'actif' ? usureSucces(monde, p) : { usure: 0, signal: false, titres: 0, seuil: Infinity };
-      if (u.signal && p.nouveauDefiDemande !== p.ecurie) signalerNouveauDefi(monde, p, u.titres);
+      if (u.signal && !p.joueur && p.nouveauDefiDemande !== p.ecurie) signalerNouveauDefi(monde, p, u.titres);
       mettreAJourEtat(monde, p, index.get(p.id) ?? [], u.usure);
     }
     } finally {

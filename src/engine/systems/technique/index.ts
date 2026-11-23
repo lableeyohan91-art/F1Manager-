@@ -36,6 +36,7 @@ import { niveauEffectif } from '../economie/infrastructures';
 import { forceEcurie, teamPrincipal } from '../humain/decision';
 import { avantProjets, intensitePercue, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
 import { appliquerPreparation, reconcevoirGrille } from './conception';
+import { domainePoste, iaDecide } from '../joueur/acces';
 
 const r3 = (x: number) => Math.round(x * 1000) / 1000;
 const liste = <T>(m: Monde, t: string) => idsTries(table(m, t)).map((id) => table(m, t)[id] as unknown as T);
@@ -179,7 +180,7 @@ export function voterReforme(monde: Monde): void {
     if (vote) {
       changer = vote !== 'prolongation';
       reforme = changer ? vote : undefined;
-    } else if (e.pilotee && !e.delegationRecherche) {
+    } else if (!iaDecide(e, 'politique')) {
       continue;
     } else {
       const c = choixIA(monde, e, props);

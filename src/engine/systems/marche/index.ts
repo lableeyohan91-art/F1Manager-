@@ -35,6 +35,7 @@ import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer
 import { candidaturesSpontanees, commandeCandidature, planPersonnel } from './personnel';
 import { apportCommercialPour, bonusPilotePayant, systemeCommercial, transfererSponsors } from './commercial';
 import { PILOTES_PAYANTS } from '../../balance/commercial';
+import { domainePoste, iaDecide } from '../joueur/acces';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 const POSTE_MARCHE: Poste = 'pilote_titulaire';
@@ -185,6 +186,7 @@ export function motifRefusOffre(monde: Monde, auteur: string, prm: Record<string
   if (!enFenetre(monde)) return `Le marché n’est ouvert que de la semaine ${FENETRE.debut} à la semaine ${FENETRE.fin}.`;
   const p = table(monde, TABLES.personnes)[String(prm['personne'] ?? '')] as unknown as Personne | undefined;
   if (!p) return 'Personne inconnue.';
+  if (p.joueur) return 'Le manager du joueur n’est pas sur le marché.';
   const debut = prm['debut'];
   if (debut !== monde.date.annee + 1 && debut !== monde.date.annee + 2) return 'Un contrat commence la saison suivante, ou celle d’après (pré-accord).';
   if (prm['statutN1'] !== undefined && typeof prm['statutN1'] !== 'boolean') return 'Statut de n°1 : vrai ou faux.';
@@ -337,7 +339,7 @@ function utiliteRester(monde: Monde, p: Personne, c: Contrat): number {
 /** Contre-attaque de l'employeur (IA) : il prolonge et augmente un pilote courtisé qu'il juge précieux. */
 function contreAttaque(monde: Monde, p: Personne, c: Contrat, offres: OffreMarche[]): boolean {
   const e = ecurie(monde, c.organisation);
-  if (!e || e.pilotee || !POSTES_MARCHE.includes(c.poste)) return false;
+  if (!e || !iaDecide(e, domainePoste(c.poste)) || !POSTES_MARCHE.includes(c.poste)) return false;
   const tp = teamPrincipal(monde, e.id);
   if (!tp) return false;
   if (estPilote(c.poste)) {
@@ -494,7 +496,7 @@ type Commander = (c: { type: string; auteur: string; parametres: Record<string, 
 function planIA(monde: Monde, liste: Personne[], commander: Commander): void {
   const annee = monde.date.annee;
   for (const e of ecuriesActives(monde)) {
-    if (e.pilotee) continue;
+    if (!iaDecide(e, 'pilotes')) continue;
     const tp = teamPrincipal(monde, e.id);
     if (!tp) continue;
     const audace = (tp.traits['risque'] ?? 10) / 20;
@@ -548,7 +550,7 @@ function prolongationsTitulaires(monde: Monde, liste: Personne[]): void {
   for (const c of contratsTries(monde)) {
     if (c.statut !== 'actif' || c.type !== 'emploi' || c.poste !== POSTE_MARCHE || c.fin !== monde.date.annee || c.nonProlonge) continue;
     const e = ecurie(monde, c.organisation);
-    if (!e || e.pilotee) continue;
+    if (!e || !iaDecide(e, 'pilotes')) continue;
     const tp = teamPrincipal(monde, e.id);
     if (!tp) continue;
     // Meilleur remplaçant accessible sur le marché (libres, fins de contrat, jeunes) : niveau, plus le pari sur sa progression.

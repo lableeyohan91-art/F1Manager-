@@ -27,6 +27,7 @@ import { lienSocial } from '../humain/groupes';
 import { ecuriesActives } from '../saison/performance';
 import { reglementEnVigueur, savoirApplicable } from '../technique/acces';
 import { allies, federation, nombreGrandsPrix, regleVotee, type Alliance, type Federation } from './acces';
+import { domainePoste, iaDecide } from '../joueur/acces';
 
 export * from './acces';
 
@@ -118,7 +119,7 @@ function election(monde: Monde, f: Federation): void {
   const voix = new Map(candidats.map((c) => [c.id, 0]));
   for (const e of ecuriesActives(monde)) {
     let choix = votes[e.id];
-    if (!choix && !e.pilotee) {
+    if (!choix && iaDecide(e, 'politique')) {
       const alea = tirageLocal(monde, 'politique.election', e.id, monde.date.annee);
       choix = candidats.map((c) => ({ c, u: avecAllies(monde, e, (x) => interetCandidat(monde, x, c)) + alea.normale(0, AUTRES_VOTES.aleaVote) })).sort((a, b) => b.u - a.u || (a.c.id < b.c.id ? -1 : 1))[0]!.c.id;
       votes[e.id] = choix;
@@ -184,7 +185,7 @@ type Commander = (c: { type: string; auteur: string; parametres: Record<string, 
 
 function lobbyingIA(monde: Monde, commander: Commander): void {
   for (const e of ecuriesActives(monde)) {
-    if (e.pilotee) continue;
+    if (!iaDecide(e, 'politique')) continue;
     const tp = teamPrincipal(monde, e.id);
     const fi = financesDe(monde, e.id);
     if (!tp || !fi || fi.tresorerieMEUR <= LOBBYING.tresorerieMin) continue;
@@ -248,7 +249,7 @@ function decompterVote(monde: Monde, f: Federation): void {
   let pour = 0, contre = 0;
   for (const e of ecuriesActives(monde)) {
     let choix = v.votes[e.id];
-    if (choix === undefined && !e.pilotee) {
+    if (choix === undefined && iaDecide(e, 'politique')) {
       choix = avecAllies(monde, e, (x) => interetSujet(monde, x, v.sujet, v.valeur)) + tirageLocal(monde, 'politique.vote', e.id, monde.date.annee).normale(0, AUTRES_VOTES.aleaVote) > 0;
       v.votes[e.id] = choix;
     }

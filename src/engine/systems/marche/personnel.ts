@@ -23,6 +23,7 @@ import { candidatPour, contratEmploi, dureeContrat, indemniteRupture } from '../
 import { contexteScore, forceEcurie, lassitude, niveauMetier, teamPrincipal, type ContexteScore } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
 import { disponibilite, indexerContrats, offresMarche, scoreMarche, valeurAuPoste } from './index';
+import { iaDecide } from '../joueur/acces';
 
 type Commander = (c: { type: string; auteur: string; parametres: Record<string, unknown> }) => { ok: true } | { ok: false; motif: string };
 const POSTES = PERSONNEL_MARCHE.postes as readonly Poste[];
@@ -60,7 +61,7 @@ export function planPersonnel(monde: Monde, commander: Commander): void {
   const recues = candidatures(monde);
   const viviers = new Map(POSTES.map((poste) => [poste, vivierPoste(monde, poste)]));
   for (const e of ecuriesActives(monde)) {
-    if (e.pilotee) continue;
+    if (!iaDecide(e, 'personnel')) continue;
     const tp = teamPrincipal(monde, e.id);
     if (!tp) continue;
     let ctx: ContexteScore | undefined; // préparé au premier poste examiné (performance)

@@ -264,6 +264,8 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['alliances'] ??= {};
     return { ...m, versionFormat: 24 };
   },
+  // v24 → v25 (phase 10) : joueur (champ facultatif `joueur`, délégations des écuries) ; rien à transformer.
+  24: (m) => ({ ...m, versionFormat: 25 }),
 };
 
 export function serialiser(monde: Monde): string {

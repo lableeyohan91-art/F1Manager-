@@ -105,6 +105,8 @@ export interface Ecurie {
   reputationPredateur?: number;
   /** Phase 8b (D-132, question 9) : le joueur confie ses programmes de recherche à son directeur technique (décisions de l'IA). */
   delegationRecherche?: boolean;
+  /** Phase 10 : domaines que le joueur confie à son équipe (règles de l'IA). Absent = le joueur décide (défauts inscrits à la prise de fonction). */
+  delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands', boolean>>;
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -130,6 +132,8 @@ export interface EtatEmotionnel {
 
 export interface Personne {
   id: string;
+  /** Phase 10 : le manager incarné par le joueur (ses décisions ne sont jamais prises par l'IA). */
+  joueur?: boolean;
   /** Phase 7b : en période de non-concurrence jusqu'à cette date (incluse) : ne contribue pas au développement de sa nouvelle écurie. */
   nonConcurrenceJusqua?: { annee: number; semaine: number };
   /** D-140 : écurie où la personne a déjà dit avoir besoin d'un nouveau défi (signal précurseur donné une fois par séjour). */

@@ -13,7 +13,7 @@ import type { Evenement } from './evenements';
 import type { Commande } from './commandes';
 
 /** Version actuelle du format de sauvegarde. Toute modification de structure l'incrémente (+ migration). */
-export const VERSION_FORMAT = 24;
+export const VERSION_FORMAT = 25;
 
 /** Version du jeu (informative). */
 export const VERSION_JEU = '0.1.0';
@@ -75,6 +75,19 @@ export interface Monde {
    * par ex. { 'course.aleaSigma': 0.2 }. Utilisés par les outils d'équilibrage ; vides dans une partie normale.
    */
   parametres: Record<string, number>;
+  /** Phase 10 (format 25) : le joueur, s'il dirige une écurie. Absent en mode observateur. */
+  joueur?: EtatJoueur;
+}
+
+/** Phase 10 : manager incarné par le joueur. */
+export interface EtatJoueur {
+  personne: string;
+  ecurie: string;
+  depuis: DateJeu;
+  /** « licencie » : le conseil l'a renvoyé (D-089), la partie est terminée (la suite viendra en phase 14). */
+  etat: 'actif' | 'licencie';
+  /** Événement de fin (licenciement), cité par l'écran de fin de partie. */
+  evenementFin?: string;
 }
 
 export function creerMondeVide(graine: number, scenario: string, dateDepart: DateJeu): Monde {

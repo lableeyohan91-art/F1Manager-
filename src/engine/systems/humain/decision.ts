@@ -278,6 +278,9 @@ export type Reponse = { type: 'accepte' | 'refuse'; raisons: Raison[]; ligneRoug
 
 /** Réponse d'une personne à une offre : accepter, contre-proposer, refuser. */
 export function repondre(monde: Monde, p: Personne, o: Offre, cle: string, contreOffrePossible: boolean): Reponse {
+  // Phase 10 : l'IA ne décide jamais à la place du joueur. Le manager accepte de prolonger avec son écurie (le conseil reste juge,
+  // D-089) et n'est pas sur le marché (offres d'emploi au joueur : phase 14).
+  if (p.joueur) return o.organisation === p.ecurie ? { type: 'accepte', raisons: [] } : { type: 'refuse', raisons: [], ligneRouge: 'Le manager du joueur n’est pas sur le marché.' };
   const ev = evaluerOffre(monde, p, o);
   const top = ev.raisons.slice(0, 3);
   if (ev.ligneRouge) return { type: ev.ligneRouge.sens === 'refus' ? 'refuse' : 'accepte', raisons: top, ligneRouge: ev.ligneRouge.libelle };
