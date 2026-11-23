@@ -29,6 +29,7 @@ export const TABLES = {
   connaissances: 'connaissances',
   offres: 'offres',
   candidatures: 'candidatures',
+  agents: 'agents',
   archives: 'archives',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
@@ -113,6 +114,13 @@ export interface Personne {
   id: string;
   /** Phase 7b : en période de non-concurrence jusqu'à cette date (incluse) : ne contribue pas au développement de sa nouvelle écurie. */
   nonConcurrenceJusqua?: { annee: number; semaine: number };
+  /** Phase 7c : popularité (0–100), nationale et internationale ; lue par la valeur commerciale, les sponsors et l'attrait des sponsors. */
+  popularite?: { nationale: number; internationale: number };
+  /** Phase 7c : agent (table « agents ») et commission négociée (fraction du salaire). Lus par la négociation et les offres. */
+  agent?: string;
+  commission?: number;
+  /** Phase 7c : sponsor personnel qui paie le pilote lui-même (M€/an, jusqu'à une année) ; lu par l'utilité des offres. */
+  sponsorPersonnel?: { sponsor: string; montantMEUR: number; jusqua: number };
   prenom: string;
   nom: string;
   nationalite: string;
@@ -537,6 +545,8 @@ export interface ContratSponsoring {
   statut: 'actif' | 'termine' | 'rompu';
   /** 0 à 100. */
   satisfaction: number;
+  /** Phase 7c : sponsor personnel qui accompagne ce pilote (contrat conditionné à sa présence ; occupe un emplacement existant). */
+  pilote?: string;
 }
 /** Projet d'infrastructure en cours (phase 5b). */
 export interface ProjetInfrastructure {
@@ -666,5 +676,18 @@ export interface PersonneArchivee {
   retraiteDepuis: number;
   saisonsF1: number;
   titres: number;
+}
+
+/** Phase 7c : agent (léger, D-117 §15.3) : compétence de négociation, deux traits, liste de clients bornée. */
+export interface Agent {
+  id: string;
+  prenom: string;
+  nom: string;
+  /** 1–20 : pousse les demandes salariales en contre-offre. */
+  negociation: number;
+  /** 1–20 : pousse ses clients vers les transferts (commission plus forte). */
+  ambition: number;
+  /** 1–20 : nombre et qualité des démarchages auprès des écuries. */
+  reseau: number;
 }
 

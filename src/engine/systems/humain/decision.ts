@@ -15,6 +15,8 @@ import { ecuriesActives, indiceMoyen, niveauPilote } from '../saison/performance
 import { reputation, TABLE_PROMESSES, type Promesse, type TypePromesse } from './promesses';
 import { PROMOTION_AFFILIE, REPUTATION_RECRUTEMENT_F1 } from '../../balance/juniors';
 import { potentielEstime } from '../carriere/estimation';
+import { AGENTS } from '../../balance/commercial';
+import { agentDe } from '../marche/commercial';
 import { ATTRAIT_POSTE_SUPERIEUR, LASSITUDE_PERSONNEL, LASSITUDE_PILOTE, PREDATEUR, RANG_POSTE } from '../../balance/marche';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
@@ -135,7 +137,9 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
   const eq = ecurie(monde, o.organisation);
   const force = forceEcurie(monde, o.organisation);
   const valeur = valeurMarche(monde, p);
-  const ratio = o.salaireMEUR / valeur;
+  // Phase 7c : la commission de l'agent (en partie ressentie) et un sponsor personnel qui paie le pilote modifient le salaire perçu.
+  const revenus = p.sponsorPersonnel && p.sponsorPersonnel.jusqua >= monde.date.annee ? p.sponsorPersonnel.montantMEUR : 0;
+  const ratio = (o.salaireMEUR * (1 - (p.commission ?? 0) * AGENTS.partCommissionRessentie) + revenus) / valeur;
   const anneesIci = anneesDans(monde, p, o.organisation);
   const norme = 3.5;
 
@@ -156,6 +160,9 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
   // Phase 7a : lassitude d'un pilote installé depuis longtemps (et titré) dans la même écurie : envie d'un nouveau défi.
   const l = lassitude(monde, p);
   if (l.niveau > 0) u += o.organisation === l.ecurie ? ajouter('lassitude après des années dans la même écurie', -l.niveau / 2) : ajouter('envie d’un nouveau défi', l.niveau);
+  // Phase 7c : l'agent touche une commission plus forte lors d'un transfert : il pousse parfois au mouvement.
+  const ag = agentDe(monde, p);
+  if (ag && !o.prolongation) u += ajouter('son agent pousse au transfert', AGENTS.pousseeTransfert * (ag.ambition / 20));
   // Phase 7b : un poste plus important attire les ambitieux.
   if ((RANG_POSTE[o.poste] ?? 0) > (RANG_POSTE[p.poste] ?? 0)) u += ajouter('poste plus important', ATTRAIT_POSTE_SUPERIEUR * ((p.traits['ambition'] ?? 10) / 20));
   // Phase 7a : une écurie réputée prédatrice inspire de la méfiance (un coût, jamais une interdiction).
@@ -243,7 +250,10 @@ export function repondre(monde: Monde, p: Personne, o: Offre, cle: string, contr
   const valeur = valeurMarche(monde, p);
   if (contreOffrePossible && ecart > -0.35 && o.salaireMEUR < valeur * 1.3) {
     const audace = ((p.traits['ambition'] ?? 10) + (p.traits['risque'] ?? 10)) / 40;
-    return { type: 'contre_offre', salaireDemande: Math.round(Math.max(o.salaireMEUR * (1 + 0.1 + 0.15 * audace), valeur) * 10) / 10, raisons: top };
+    // Phase 7c : un agent bon négociateur pousse la demande plus haut.
+    const agent = agentDe(monde, p);
+    const surenchere = agent ? 1 + AGENTS.surenchere * (agent.negociation / 20) : 1;
+    return { type: 'contre_offre', salaireDemande: Math.round(Math.max(o.salaireMEUR * (1 + 0.1 + 0.15 * audace), valeur) * surenchere * 10) / 10, raisons: top };
   }
   return { type: 'refuse', raisons: top };
 }

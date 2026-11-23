@@ -310,3 +310,9 @@ Aucun code à ce stade.
 - Marché du personnel technique et dirigeant (`systems/marche/personnel.ts`) : offres, contre-offres, indemnités, contre-attaques ; remplacement d'un responsable en place (libéré avec indemnité) ; non-concurrence de 6 mois ; départs en groupe ; lassitude du personnel ; attrait d'un poste plus important ; candidatures spontanées (`marche.candidature`).
 - Règle commune des effectifs : une personne remplacée libère sa place à la prise d'effet du contrat qui la remplace.
 - Format de sauvegarde 16 (candidatures), migration et test. Tests `tests/personnel.test.ts`. 136 tests.
+
+## [Phase 7c] — 23/11/2026
+
+### Ajouté (D-124)
+- `systems/marche/commercial.ts`, coefficients `balance/commercial.ts` : popularité, valeur commerciale, sponsors personnels (accompagnant, personnel, familial, national), pilotes payants, motivations des sponsors, agents (commission négociée, surenchère, poussée au transfert, démarchage).
+- Format de sauvegarde 17 (agents), migration et test. Tests `tests/commercial.test.ts`. 141 tests.

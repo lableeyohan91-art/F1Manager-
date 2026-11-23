@@ -32,6 +32,7 @@ import {
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, nombrePlaces, occupantsPour } from '../humain/effectifs';
 import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer, nePasProlonger, proposerProlongation } from '../humain/contrats';
 import { candidaturesSpontanees, commandeCandidature, planPersonnel } from './personnel';
+import { bonusPilotePayant, systemeCommercial } from './commercial';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 const POSTE_MARCHE: Poste = 'pilote_titulaire';
@@ -439,7 +440,8 @@ export function scoreMarche(monde: Monde, e: Ecurie, decideur: string, p: Person
   const base = scoreCandidat(monde, e, decideur, p, salaire).score;
   const progression = Math.max(0, Math.min(potentielEstime(monde, e.id, p).centre - niveauMetier(p), HORIZON.progressionParAn * duree));
   const budgetPoste = e.budgetMEUR * (estPilote(poste) ? 0.05 : PERSONNEL_MARCHE.partBudgetPoste);
-  return base + (HORIZON.poids * progression) / 20 - 0.4 * (indemnite / Math.max(1, budgetPoste * duree));
+  // Phase 7c : apport commercial d'un pilote (sponsors qui le suivent, budget familial d'un débutant) — pilotes payants (D-098).
+  return base + (HORIZON.poids * progression) / 20 - 0.4 * (indemnite / Math.max(1, budgetPoste * duree)) + (estPilote(poste) ? bonusPilotePayant(monde, e, p, duree) : 0);
 }
 
 function salaireOffert(monde: Monde, e: Ecurie, tp: Personne | undefined, p: Personne): number {
@@ -451,6 +453,7 @@ function salaireOffert(monde: Monde, e: Ecurie, tp: Personne | undefined, p: Per
 function ciblesPour(monde: Monde, e: Ecurie, tp: Personne, debut: number, liste: Personne[]): Cible[] {
   const res: Cible[] = [];
   const idx = indexerContrats(monde);
+  const recues = Object.values(table(monde, TABLES.candidatures)) as unknown as { personne: string; ecurie: string }[];
   // Places libres de l'écurie : identiques pour tous les candidats (aucun n'en occupe encore), calculées une fois.
   const libres = anneesLibres(monde, e.id, debut - 1);
   if (libres < 1) return res;
@@ -460,7 +463,9 @@ function ciblesPour(monde: Monde, e: Ecurie, tp: Personne, debut: number, liste:
     const salaire = salaireOffert(monde, e, tp, p);
     const duree = Math.min(Math.max(2, dureeContrat(monde, p)), libres);
     if (duree < 1) continue;
-    res.push({ p, salaire, duree, indemnite: d.indemniteMEUR, debauchage: d.debauchage, score: scoreMarche(monde, e, tp.id, p, salaire, duree, d.indemniteMEUR) });
+    // Phase 7c : un client proposé par son agent (ou une candidature) retient l'attention de l'écurie.
+    const propose = recues.some((c) => c.personne === p.id && c.ecurie === e.id) ? CANDIDATURES.bonusScore : 0;
+    res.push({ p, salaire, duree, indemnite: d.indemniteMEUR, debauchage: d.debauchage, score: scoreMarche(monde, e, tp.id, p, salaire, duree, d.indemniteMEUR) + propose });
   }
   const f = tirageLocal(monde, 'marche.plan', e.id, monde.date.annee, monde.date.semaine);
   return res.map((c) => ({ ...c, score: c.score + f.normale(0, 0.02 + ((tp.traits['temperament'] ?? 10) / 20) * 0.03) })).sort((a, b) => b.score - a.score || (a.p.id < b.p.id ? -1 : 1));
@@ -640,6 +645,7 @@ export const systemeMarche: Systeme = {
 
 export function installerMarche<M extends { ajouterSysteme(s: Systeme): M; commandes: { enregistrer(d: DefinitionCommande): unknown } }>(moteur: M): M {
   moteur.ajouterSysteme(systemeMarche);
+  moteur.ajouterSysteme(systemeCommercial); // phase 7c
   moteur.commandes.enregistrer(commandeOffre);
   moteur.commandes.enregistrer(commandeCandidature);
   moteur.commandes.enregistrer(commandeRetirerOffre);

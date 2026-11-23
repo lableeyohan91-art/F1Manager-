@@ -210,6 +210,12 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['candidatures'] ??= {};
     return { ...m, versionFormat: 16 };
   },
+  // v16 → v17 (phase 7c) : agents (créés à la première intersaison) ; popularité, agent, commission, sponsor personnel optionnels.
+  16: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['agents'] ??= {};
+    return { ...m, versionFormat: 17 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

@@ -153,3 +153,12 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Contre-attaque** | Réaction d'un employeur à une offre extérieure faite à son pilote : il le prolonge et l'augmente pour le garder (phase 7a). |
 | **Lassitude** | Envie d'un nouveau défi d'une personne installée depuis longtemps (et titrée) au même endroit ; calculée, modérée, jamais un départ automatique (D-117 ; pilotes en 7a, personnel en 7b). |
 | **Réputation de prédatrice** | Réputation d'une écurie qui débauche souvent : un coût (méfiance, indemnités plus chères), jamais une interdiction ; elle s'efface avec le temps (D-117). |
+| **Non-concurrence** | Période (6 mois) pendant laquelle une personne débauchée ne contribue pas encore au développement de sa nouvelle écurie (D-117, phase 7b). |
+| **Remplacement (marché)** | Recrutement d'un responsable nettement meilleur que celui en place, qui est alors libéré avec indemnité (phase 7b). |
+| **Départ en groupe** | Une partie du niveau d'un département suit un responsable technique influent débauché (D-077, phase 7b). |
+| **Candidature spontanée** | Proposition de services d'une personne ambitieuse et lassée à une autre écurie, pour un poste égal ou supérieur (D-117, phase 7b). |
+| **Popularité** | Notoriété d'un pilote (0 à 100), nationale et internationale ; base de sa valeur commerciale (phase 7c). |
+| **Valeur commerciale** | Ce qu'un pilote peut rapporter en sponsoring par an : popularité, taille du marché de sa nationalité, rareté de sa nationalité sur la grille (phase 7c). |
+| **Sponsor personnel** | Sponsor lié à un pilote : il l'accompagne dans son écurie (dans un emplacement existant) ou le paie lui-même (phase 7c). |
+| **Pilote payant** | Pilote dont l'apport commercial (sponsors, famille) compte dans son recrutement ; le marché le régule, aucune règle (D-099, phase 7c). |
+| **Agent** | Représentant d'un pilote ou d'un cadre : négocie, prend une commission négociée, pousse parfois au transfert, démarche les écuries (phase 7c). |

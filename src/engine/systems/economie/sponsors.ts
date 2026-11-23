@@ -12,6 +12,7 @@ import {
   ALEA_CHOIX_SPONSOR, CONJONCTURE, DUREE_CONTRAT_SPONSOR, EMPLACEMENTS_SPONSORS, OFFRE_SPONSOR, POIDS_ATTRAIT, RANCUNE_SPONSOR_ANNEES,
   SATISFACTION_SPONSOR, SEUILS_RANG_SPONSOR, VIVIER_SPONSORS,
 } from '../../balance/finances';
+import { attraitPilotes } from '../marche/commercial';
 import { ajouterEvenement } from '../../core/evenements';
 import { nouvelIdentifiant } from '../../core/identifiants';
 import { flux, tirageLocal } from '../../core/moteur';
@@ -137,7 +138,9 @@ export function attrait(monde: Monde, e: Ecurie, s: Sponsor): number {
   const nat = e.nationalite === s.nationalite || pilotes.some((p) => p.nationalite === s.nationalite) ? 1 : 0;
   return borner(
     w.popularite * (e.popularite / 20) + w.prestige * (e.prestige / 20) + w.resultats * forceEcurie(monde, e.id)
-      + w.marketing * ((marketing?.niveauMoyen ?? 10) / 20) + w.nationalite * nat,
+      + w.marketing * ((marketing?.niveauMoyen ?? 10) / 20) + w.nationalite * nat
+      // Phase 7c (D-096) : motivations diversifiées — popularité des pilotes, jeune espoir.
+      + attraitPilotes(monde, e),
     0, 1,
   );
 }
@@ -146,7 +149,7 @@ function rangPourMontant(montant: number): RangSponsor {
   return montant >= SEUILS_RANG_SPONSOR.titre ? 'titre' : montant >= SEUILS_RANG_SPONSOR.principal ? 'principal' : 'secondaire';
 }
 
-function emplacementsLibres(monde: Monde, idEcurie: string, annee: number): Record<RangSponsor, number> {
+export function emplacementsLibres(monde: Monde, idEcurie: string, annee: number): Record<RangSponsor, number> {
   const occ = contratsActifs(monde, annee, idEcurie);
   const libres = {} as Record<RangSponsor, number>;
   for (const r of RANGS) libres[r] = (EMPLACEMENTS_SPONSORS[r] ?? 0) - occ.filter((c) => c.rang === r).length;
@@ -157,7 +160,7 @@ function montantOffre(monde: Monde, s: Sponsor, a: number): number {
   return s.budgetMEUR * conjoncture(monde) * OFFRE_SPONSOR.partEngagee * (OFFRE_SPONSOR.min + OFFRE_SPONSOR.amplitude * a);
 }
 
-function signer(monde: Monde, s: Sponsor, e: Ecurie, rang: RangSponsor, montant: number, annee: number, renouvellement: boolean): void {
+export function signerSponsor(monde: Monde, s: Sponsor, e: Ecurie, rang: RangSponsor, montant: number, annee: number, renouvellement: boolean): ContratSponsoring {
   const f = tirageLocal(monde, 'sponsor.contrat', s.id, e.id, annee);
   const duree = borner(Math.round(DUREE_CONTRAT_SPONSOR.min + (s.fidelite / 20) * (DUREE_CONTRAT_SPONSOR.max - DUREE_CONTRAT_SPONSOR.min) + f.normale(0, 0.7)), DUREE_CONTRAT_SPONSOR.min, DUREE_CONTRAT_SPONSOR.max);
   const rangActuel = rangPrecedentClassement(monde, e.id, annee - 1) ?? Math.round(1 + (1 - forceEcurie(monde, e.id)) * (ecuriesActives(monde).length - 1));
@@ -175,6 +178,7 @@ function signer(monde: Monde, s: Sponsor, e: Ecurie, rang: RangSponsor, montant:
     contexte: { rang, montant: c.montantAnnuelMEUR, duree, objectifRang: c.objectifRang },
     texte: rang === 'titre' ? `${s.nom} devient le sponsor titre de ${e.nom} (${c.montantAnnuelMEUR} M€ par an, ${duree} an${duree > 1 ? 's' : ''}).` : undefined,
   });
+  return c;
 }
 
 /* ---------------------------------------------------------------- Bilan de saison (semaine 1, année écoulée) */
@@ -211,9 +215,10 @@ export function evaluerSponsors(monde: Monde, annee: number, financesDe: (id: st
     if (c.fin === annee) {
       c.statut = 'termine';
       const f = tirageLocal(monde, 'sponsor.renouvellement', c.id, annee);
-      if (c.satisfaction >= SATISFACTION_SPONSOR.seuilRenouvellement && f.chance(0.3 + s.fidelite / 30) && s.actif) {
+      // Phase 7c : un contrat lié à un pilote (sponsor personnel) n'est pas renouvelé ici : il suit le pilote (systems/marche/commercial).
+      if (!c.pilote && c.satisfaction >= SATISFACTION_SPONSOR.seuilRenouvellement && f.chance(0.3 + s.fidelite / 30) && s.actif) {
         const libres = emplacementsLibres(monde, e.id, annee + 1);
-        if (libres[c.rang] > 0) signer(monde, s, e, c.rang, montantOffre(monde, s, attrait(monde, e, s)), annee + 1, true);
+        if (libres[c.rang] > 0) signerSponsor(monde, s, e, c.rang, montantOffre(monde, s, attrait(monde, e, s)), annee + 1, true);
       } else if (c.satisfaction < SATISFACTION_SPONSOR.seuilRenouvellement) {
         s.rancunes.push({ ecurie: e.id, jusqua: annee + 1 });
       }
@@ -250,6 +255,6 @@ export function marcheSponsors(monde: Monde, annee: number): void {
       if (rang === 'secondaire') montant = Math.min(montant, SEUILS_RANG_SPONSOR.principal - 0.1);
       if (!meilleur || a > meilleur.a) meilleur = { e, a, rang, montant };
     }
-    if (meilleur) signer(monde, s, meilleur.e, meilleur.rang, meilleur.montant, annee, false);
+    if (meilleur) signerSponsor(monde, s, meilleur.e, meilleur.rang, meilleur.montant, annee, false);
   }
 }
