@@ -44,15 +44,21 @@ describe('Phase 7c — valeur commerciale et agents', () => {
     b!.nationalite = ancienne;
   });
 
-  it('pilote payant : un débutant dont la famille finance la carrière apporte un bonus au recrutement', () => {
+  it('pilote payant (D-131) : seul un engagement réel d’un partenaire compte, pas une simple supposition', () => {
     const m = sc.creerMonde(1);
+    sc.creerMoteur().avancer(m, 2); // vivier de sponsors créé
     const e = table(m, TABLES.ecuries)['eq_haas'] as unknown as Ecurie;
     const jeune = personnes(m).find((p) => p.poste === 'pilote_junior' && (p.carriere?.saisonsF1 ?? 0) === 0)!;
-    jeune.budgetFamilleMEUR = 0.2;
-    expect(bonusPilotePayant(m, e, jeune, 2)).toBe(0);
     jeune.budgetFamilleMEUR = 8;
-    expect(apportCommercial(m, jeune)).toBeGreaterThan(0);
+    expect(bonusPilotePayant(m, e, jeune, 2)).toBe(0); // un budget familial sans engagement ne suffit plus
+    const s = (Object.values(table(m, TABLES.sponsors)) as unknown as { id: string; actif: boolean }[]).find((x) => x.actif)!;
+    jeune.engagementF1 = { sponsor: s.id, montantMEUR: 8, jusqua: 2031 };
+    expect(apportCommercial(m, jeune)).toBe(8);
     expect(bonusPilotePayant(m, e, jeune, 2)).toBeGreaterThan(0);
+    // Un sponsor qui paie le pilote lui-même n'est jamais un revenu de l'écurie.
+    delete jeune.engagementF1;
+    jeune.sponsorPersonnel = { sponsor: s.id, montantMEUR: 8, jusqua: 2031 };
+    expect(bonusPilotePayant(m, e, jeune, 2)).toBe(0);
   });
 
   it('agent : commission plus faible pour un client de grande valeur, surenchère en contre-offre, poussée au transfert', () => {

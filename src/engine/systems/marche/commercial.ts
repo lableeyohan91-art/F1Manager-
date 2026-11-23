@@ -11,7 +11,7 @@
  */
 
 import {
-  AGENTS, ATTRAIT_PILOTES, ENTREPRISES_LIEES, PILOTES_PAYANTS, POPULARITE, SPONSORS_PERSONNELS, TAILLE_MARCHE, TAILLE_MARCHE_DEFAUT, VALEUR_COMMERCIALE,
+  AGENTS, ATTRAIT_PILOTES, ENGAGEMENT_JUNIOR, ENTREPRISES_LIEES, PILOTES_PAYANTS, REMPLACEMENT_SPONSOR, POPULARITE, SPONSORS_PERSONNELS, TAILLE_MARCHE, TAILLE_MARCHE_DEFAUT, VALEUR_COMMERCIALE,
 } from '../../balance/commercial';
 import { SEUILS_RANG_SPONSOR } from '../../balance/finances';
 import { ajouterEvenement } from '../../core/evenements';
@@ -118,34 +118,33 @@ export function apportCommercialPour(monde: Monde, e: Ecurie, p: Personne, annee
   if (!p.poste.startsWith('pilote')) return res;
   if (p.sponsorPersonnel && p.sponsorPersonnel.jusqua >= annee) res.verseAuPilote = p.sponsorPersonnel.montantMEUR;
   const ts = table(monde, TABLES.sponsors);
-  const libres = { ...emplacementsLibres(monde, e.id, annee) };
-  const secteurs = secteursEcurie(monde, e.id, annee);
   const flux: { sponsor?: Sponsor; montant: number; suit: boolean }[] = sponsorsDuPilote(monde, p.id).map((c) => {
     const sp = ts[c.sponsor] as unknown as Sponsor | undefined;
     return { sponsor: sp, montant: c.montantAnnuelMEUR, suit: !!sp && sp.nationalite === p.nationalite };
   });
-  // Débutant dont la famille finance la carrière : l'entreprise familiale suivra (si elle peut être créée).
-  if ((p.carriere?.saisonsF1 ?? 0) === 0 && (p.budgetFamilleMEUR ?? 0) >= SPONSORS_PERSONNELS.seuilFamilleMEUR && !flux.length) {
-    flux.push({ montant: (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille, suit: entreprisesLieesActives(monde) < ENTREPRISES_LIEES.maximum });
+  // D-131 : engagement conditionnel réel d'un partenaire (junior), et non plus une supposition d'après le budget familial.
+  if (p.engagementF1 && p.engagementF1.jusqua >= annee) {
+    flux.push({ sponsor: ts[p.engagementF1.sponsor] as unknown as Sponsor | undefined, montant: p.engagementF1.montantMEUR, suit: true });
   }
+  const exclus = new Set<string>();
   for (const f of flux) {
     res.potentiel += f.montant;
     if (p.ecurie === e.id && p.poste === 'pilote_titulaire') { res.dejaAcquis += f.montant; continue; }
-    if (!f.suit || (f.sponsor && secteurs.has(f.sponsor.secteur))) continue;
-    const rang = f.montant >= SEUILS_RANG_SPONSOR.principal && libres.principal > 0 ? 'principal' : libres.secondaire > 0 ? 'secondaire' : libres.principal > 0 ? 'principal' : null;
-    if (!rang) continue;
-    libres[rang]--;
-    res.transferable += rang === 'secondaire' ? Math.min(f.montant, SEUILS_RANG_SPONSOR.principal - 0.1) : f.montant;
+    if (!f.suit) continue;
+    // Place libre, ou remplacement rentable d'un sponsor moins généreux (gain net après indemnité de rupture).
+    const pl = placementSponsor(monde, e.id, annee, f.montant, f.sponsor, exclus);
+    if (!pl) continue;
+    if (pl.remplace) exclus.add(pl.remplace.id);
+    res.transferable += pl.montant;
+    res.netNouveau += pl.gainNet;
   }
-  res.netNouveau = res.transferable;
   return res;
 }
 
 /** Apport commercial potentiel d'un pilote, toutes écuries confondues (indicateur ; le recrutement lit apportCommercialPour). */
 export function apportCommercial(monde: Monde, p: Personne): number {
   const suivent = sponsorsDuPilote(monde, p.id).reduce((a, c) => a + c.montantAnnuelMEUR, 0);
-  const famille = (p.carriere?.saisonsF1 ?? 0) === 0 && (p.budgetFamilleMEUR ?? 0) >= SPONSORS_PERSONNELS.seuilFamilleMEUR ? (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille : 0;
-  return suivent + famille;
+  return suivent + (p.engagementF1 && p.engagementF1.jusqua >= monde.date.annee ? p.engagementF1.montantMEUR : 0);
 }
 
 /** Terme « apport commercial » du score de recrutement : revenus nouveaux et nets pour cette écurie, à l'échelle du coût salarial. */
@@ -200,7 +199,9 @@ export function sponsorsPersonnels(monde: Monde, annee: number): void {
     suivreLePilote(monde, c, p, annee);
   }
   fermerEntreprisesLiees(monde, annee);
-  // 2. Nouveaux sponsors personnels. Source commune des engagements : un sponsor déjà engagé (écurie ou pilote) ne l'est jamais deux fois.
+  // 2. D-131 : un engagement conditionnel se déclenche si le pilote est devenu titulaire (quel que soit le chemin : marché, secours, promotion).
+  for (const p of titulaires(monde)) if (p.engagementF1) convertirEngagement(monde, p, annee);
+  // 3. Nouveaux sponsors personnels. Source commune des engagements : un sponsor déjà engagé (écurie ou pilote) ne l'est jamais deux fois.
   const engages = sponsorsEngages(monde, annee);
   const libres = (Object.values(table(monde, TABLES.sponsors)) as unknown as Sponsor[]).filter((s) => s.actif && !s.lie && !engages.has(s.id)).sort((a, b) => (a.id < b.id ? -1 : 1));
   for (const p of titulaires(monde)) {
@@ -220,9 +221,11 @@ export function sponsorsPersonnels(monde: Monde, annee: number): void {
     if (montant <= 0) continue;
     engages.add(s.id);
     const e = table(monde, TABLES.ecuries)[p.ecurie] as unknown as Ecurie;
-    const rang = emplacementLibrePour(monde, e.id, annee, montant, s);
-    if (rang) {
-      const c = signerSponsor(monde, s, e, rang, Math.min(montant, rang === 'secondaire' ? SEUILS_RANG_SPONSOR.principal - 0.1 : rang === 'principal' ? SEUILS_RANG_SPONSOR.titre - 0.1 : montant), annee, false);
+    // D-131 : emplacement libre, ou remplacement rentable (rupture indemnisée) ; sinon le sponsor paie le pilote lui-même.
+    const pl = placementSponsor(monde, e.id, annee, montant, s);
+    if (pl) {
+      executerRemplacement(monde, e.id, pl, p.id);
+      const c = signerSponsor(monde, s, e, pl.rang, pl.montant, annee, false);
       c.pilote = p.id;
       c.fin = Math.min(c.fin, annee + SPONSORS_PERSONNELS.dureeAns - 1);
       s.derniereAnneeContrat = c.fin;
@@ -233,19 +236,94 @@ export function sponsorsPersonnels(monde: Monde, annee: number): void {
       ajouterEvenement(monde, { type: 'sponsor.personnel', acteurs: [{ id: p.id, role: 'pilote' }, { id: s.id, role: 'sponsor' }], importance: 1, visibilite: 'public', contexte: { montant, genre: 'personnel' }, texte: `${s.nom} devient le sponsor personnel de ${p.prenom} ${p.nom}.` });
     }
   }
+  // 4. D-131 : engagements conditionnels des juniors (partenaire réel, financé, plafonné ; déclenché seulement à l'arrivée en F1).
+  engagementsJuniors(monde, annee, engages);
 }
 
-function emplacementLibrePour(monde: Monde, idEcurie: string, annee: number, montant: number, s?: Sponsor): 'principal' | 'secondaire' | null {
-  // Exclusivité de secteur (phase 5b) : jamais deux sponsors du même secteur dans une écurie.
-  if (s) {
-    const ts = table(monde, TABLES.sponsors);
-    const secteurs = contratsSponsoring(monde).filter((c) => c.statut === 'actif' && c.ecurie === idEcurie && c.debut <= annee && c.fin >= annee)
-      .map((c) => (ts[c.sponsor] as unknown as Sponsor | undefined)?.secteur);
-    if (secteurs.includes(s.secteur)) return null;
+/** Jeunes pilotes qui obtiennent l'engagement d'un partenaire réel, conditionné à leur arrivée en F1 (D-131). */
+function engagementsJuniors(monde: Monde, annee: number, engages: Set<string>): void {
+  for (const p of personnes(monde)) {
+    if (!p.poste.startsWith('pilote') || p.poste === 'pilote_titulaire' || p.statut === 'retraite' || (p.carriere?.saisonsF1 ?? 0) > 0) continue;
+    const age = annee - p.anneeNaissance;
+    if (age < ENGAGEMENT_JUNIOR.ageMin || age > ENGAGEMENT_JUNIOR.ageMax) continue;
+    if (p.engagementF1 && p.engagementF1.jusqua >= annee) continue;
+    delete p.engagementF1;
+    const famille = (p.budgetFamilleMEUR ?? 0) >= SPONSORS_PERSONNELS.seuilFamilleMEUR;
+    const valeur = valeurCommerciale(monde, p);
+    if (!famille && valeur < ENGAGEMENT_JUNIOR.seuilValeurMEUR) continue;
+    if (!tirageLocal(monde, 'sponsor.engagement_junior', p.id, annee).chance(ENGAGEMENT_JUNIOR.probabilite)) continue;
+    const montantVise = arrondi(famille ? (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille : valeur * SPONSORS_PERSONNELS.part);
+    const s = entrepriseLiee(monde, p, famille ? 'fam' : 'nat', montantVise);
+    if (!s || engages.has(s.id)) continue;
+    const montant = arrondi(Math.min(montantVise, s.budgetMEUR * ENTREPRISES_LIEES.partMaxBudget));
+    if (montant <= 0) continue;
+    p.engagementF1 = { sponsor: s.id, montantMEUR: montant, jusqua: annee + ENGAGEMENT_JUNIOR.dureeAns - 1 };
+    s.derniereAnneeContrat = p.engagementF1.jusqua;
+    engages.add(s.id);
+    ajouterEvenement(monde, {
+      type: 'sponsor.engagement_junior', acteurs: [{ id: p.id, role: 'pilote' }, { id: s.id, role: 'sponsor' }], importance: 1, visibilite: 'public',
+      contexte: { montant, jusqua: p.engagementF1.jusqua, genre: famille ? 'familial' : 'national' },
+      texte: `${s.nom} s'engage à soutenir ${p.prenom} ${p.nom} (${montant} M€ par an) s'il accède à la F1.`,
+    });
   }
+}
+
+/** Montant ramené au plafond de son rang (un sponsor principal ou secondaire ne dépasse pas le seuil du rang supérieur). */
+function montantAuRang(montant: number, rang: 'principal' | 'secondaire'): number {
+  return Math.min(montant, rang === 'secondaire' ? SEUILS_RANG_SPONSOR.principal - 0.1 : SEUILS_RANG_SPONSOR.titre - 0.1);
+}
+
+export interface Placement {
+  rang: 'principal' | 'secondaire';
+  /** Montant effectivement perçu par l'écurie (ramené au rang). */
+  montant: number;
+  /** Contrat remplacé (D-131), avec son indemnité de rupture. */
+  remplace?: ContratSponsoring;
+  indemniteRupture: number;
+  /** Gain net pour l'écurie : montant − montant remplacé − indemnité. */
+  gainNet: number;
+}
+
+/**
+ * Où placer un sponsor qui suit un pilote (D-131) : emplacement libre d'abord ; sinon remplacement du contrat principal ou secondaire
+ * qui laisse le meilleur gain net (rupture jamais gratuite). Exclusivité de secteur respectée (le contrat remplacé ne compte plus).
+ * Les contrats liés à un autre pilote ne sont jamais remplacés. `exclus` : contrats déjà remplacés dans le même calcul.
+ */
+export function placementSponsor(monde: Monde, idEcurie: string, annee: number, montant: number, s?: Sponsor, exclus: Set<string> = new Set()): Placement | null {
+  const ts = table(monde, TABLES.sponsors);
+  const actifs = contratsSponsoring(monde).filter((c) => c.statut === 'actif' && c.ecurie === idEcurie && c.debut <= annee && c.fin >= annee && !exclus.has(c.id));
+  const secteurDe = (c: ContratSponsoring) => (ts[c.sponsor] as unknown as Sponsor | undefined)?.secteur;
+  const conflit = (sauf?: ContratSponsoring) => !!s && actifs.some((c) => c !== sauf && secteurDe(c) === s.secteur);
   const libres = emplacementsLibres(monde, idEcurie, annee);
-  if (montant >= SEUILS_RANG_SPONSOR.principal && libres.principal > 0) return 'principal';
-  return libres.secondaire > 0 ? 'secondaire' : libres.principal > 0 ? 'principal' : null;
+  const rangLibre = montant >= SEUILS_RANG_SPONSOR.principal && libres.principal > 0 ? 'principal' : libres.secondaire > 0 ? 'secondaire' : libres.principal > 0 ? 'principal' : null;
+  if (rangLibre && !conflit()) {
+    const m = montantAuRang(montant, rangLibre);
+    return { rang: rangLibre, montant: m, indemniteRupture: 0, gainNet: m };
+  }
+  let meilleur: Placement | null = null;
+  for (const c of actifs) {
+    if (c.rang === 'titre' || c.pilote || conflit(c)) continue;
+    const rang = c.rang as 'principal' | 'secondaire';
+    const m = montantAuRang(montant, rang);
+    const indemnite = c.montantAnnuelMEUR * Math.max(1, c.fin - annee + 1) * REMPLACEMENT_SPONSOR.indemniteParAnneeRestante;
+    const gainNet = m - c.montantAnnuelMEUR - indemnite;
+    if (gainNet > 0 && (!meilleur || gainNet > meilleur.gainNet || (gainNet === meilleur.gainNet && c.id < (meilleur.remplace?.id ?? '')))) {
+      meilleur = { rang, montant: m, remplace: c, indemniteRupture: arrondi(indemnite), gainNet };
+    }
+  }
+  return meilleur;
+}
+
+/** Applique un remplacement : le contrat remplacé est rompu, l'écurie verse l'indemnité (trésorerie, ligne « indemnités »). */
+function executerRemplacement(monde: Monde, idEcurie: string, pl: Placement, causePilote: string): void {
+  if (!pl.remplace) return;
+  pl.remplace.statut = 'rompu';
+  const fi = (Object.values(table(monde, TABLES.finances)) as unknown as { ecurie: string; tresorerieMEUR: number; comptes: { indemnites: number } }[]).find((f) => f.ecurie === idEcurie);
+  if (fi) { fi.tresorerieMEUR -= pl.indemniteRupture; fi.comptes.indemnites += pl.indemniteRupture; }
+  ajouterEvenement(monde, {
+    type: 'sponsor.remplace', acteurs: [{ id: idEcurie, role: 'ecurie' }, { id: pl.remplace.sponsor, role: 'sponsor' }, { id: causePilote, role: 'pilote' }],
+    importance: 2, visibilite: 'public', contexte: { contrat: pl.remplace.id, indemnite: pl.indemniteRupture, gainNet: arrondi(pl.gainNet) },
+  });
 }
 
 /**
@@ -256,12 +334,14 @@ function suivreLePilote(monde: Monde, c: ContratSponsoring, p: Personne | undefi
   const s = table(monde, TABLES.sponsors)[c.sponsor] as unknown as Sponsor | undefined;
   const ancienne = c.ecurie;
   if (p && s && p.statut === 'actif' && p.poste === 'pilote_titulaire' && s.nationalite === p.nationalite) {
-    const rang = emplacementLibrePour(monde, p.ecurie, annee, c.montantAnnuelMEUR, s);
-    if (rang) {
+    // D-131 : emplacement libre, ou remplacement rentable d'un sponsor moins généreux (rupture indemnisée).
+    const pl = placementSponsor(monde, p.ecurie, annee, c.montantAnnuelMEUR, s);
+    if (pl) {
+      executerRemplacement(monde, p.ecurie, pl, p.id);
       c.ecurie = p.ecurie;
-      c.rang = rang;
-      if (rang === 'secondaire') c.montantAnnuelMEUR = Math.min(c.montantAnnuelMEUR, SEUILS_RANG_SPONSOR.principal - 0.1);
-      ajouterEvenement(monde, { type: 'sponsor.suit_pilote', acteurs: [{ id: p.id, role: 'pilote' }, { id: c.sponsor, role: 'sponsor' }, { id: p.ecurie, role: 'ecurie' }, { id: ancienne, role: 'ancienne' }], importance: 2, visibilite: 'public', contexte: { contrat: c.id, montant: c.montantAnnuelMEUR } });
+      c.rang = pl.rang;
+      c.montantAnnuelMEUR = pl.montant;
+      ajouterEvenement(monde, { type: 'sponsor.suit_pilote', acteurs: [{ id: p.id, role: 'pilote' }, { id: c.sponsor, role: 'sponsor' }, { id: p.ecurie, role: 'ecurie' }, { id: ancienne, role: 'ancienne' }], importance: 2, visibilite: 'public', contexte: { contrat: c.id, montant: c.montantAnnuelMEUR, remplace: pl.remplace?.id ?? null } });
       return;
     }
   }
@@ -269,9 +349,36 @@ function suivreLePilote(monde: Monde, c: ContratSponsoring, p: Personne | undefi
   ajouterEvenement(monde, { type: 'sponsor.depart_avec_pilote', acteurs: [{ id: c.sponsor, role: 'sponsor' }, { id: ancienne, role: 'ecurie' }, ...(p ? [{ id: p.id, role: 'pilote' }] : [])], importance: 1, visibilite: 'public', contexte: { contrat: c.id } });
 }
 
+/**
+ * D-131 : un engagement conditionnel (junior) se déclenche à l'arrivée en F1 : sponsor accompagnant (place libre ou remplacement rentable),
+ * sinon sponsor personnel qui paie le pilote. Jamais compté deux fois.
+ */
+export function convertirEngagement(monde: Monde, p: Personne, annee: number): void {
+  const eng = p.engagementF1;
+  if (!eng || p.statut !== 'actif' || p.poste !== 'pilote_titulaire') return;
+  delete p.engagementF1;
+  const s = table(monde, TABLES.sponsors)[eng.sponsor] as unknown as Sponsor | undefined;
+  if (!s || eng.jusqua < annee) return;
+  const e = table(monde, TABLES.ecuries)[p.ecurie] as unknown as Ecurie;
+  const pl = placementSponsor(monde, e.id, annee, eng.montantMEUR, s);
+  if (pl) {
+    executerRemplacement(monde, e.id, pl, p.id);
+    const c = signerSponsor(monde, s, e, pl.rang, pl.montant, annee, false);
+    c.pilote = p.id;
+    c.fin = Math.min(c.fin, eng.jusqua);
+    s.derniereAnneeContrat = c.fin;
+    ajouterEvenement(monde, { type: 'sponsor.personnel', acteurs: [{ id: p.id, role: 'pilote' }, { id: s.id, role: 'sponsor' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'public', contexte: { contrat: c.id, montant: c.montantAnnuelMEUR, genre: 'accompagnant', origine: 'engagement_junior' }, texte: `${s.nom} tient son engagement et accompagne ${p.prenom} ${p.nom} chez ${e.nom}.` });
+  } else {
+    p.sponsorPersonnel = { sponsor: s.id, montantMEUR: eng.montantMEUR, jusqua: eng.jusqua };
+    s.derniereAnneeContrat = eng.jusqua;
+    ajouterEvenement(monde, { type: 'sponsor.personnel', acteurs: [{ id: p.id, role: 'pilote' }, { id: s.id, role: 'sponsor' }], importance: 1, visibilite: 'public', contexte: { montant: eng.montantMEUR, genre: 'personnel', origine: 'engagement_junior' } });
+  }
+}
+
 /** Prise d'effet d'un transfert (semaine 50) : les sponsors accompagnants du pilote le suivent tout de suite, ou s'arrêtent. */
 export function transfererSponsors(monde: Monde, p: Personne): void {
   for (const c of sponsorsDuPilote(monde, p.id)) if (c.ecurie !== p.ecurie) suivreLePilote(monde, c, p, monde.date.annee + 1);
+  convertirEngagement(monde, p, monde.date.annee + 1);
 }
 
 /** Attrait supplémentaire d'une écurie pour les sponsors (D-096) : popularité de ses pilotes, jeune espoir. */

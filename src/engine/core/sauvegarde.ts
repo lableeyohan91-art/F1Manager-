@@ -225,6 +225,8 @@ const MIGRATIONS: Record<number, Migration> = {
     }
     return { ...m, versionFormat: 18 };
   },
+  // v18 → v19 (D-131) : engagements conditionnels des juniors (champ optionnel, créé au début de saison suivante).
+  18: (m) => ({ ...m, versionFormat: 19 }),
 };
 
 export function serialiser(monde: Monde): string {

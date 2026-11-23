@@ -32,7 +32,7 @@ import {
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, nombrePlaces, occupantsPour } from '../humain/effectifs';
 import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer, nePasProlonger, proposerProlongation } from '../humain/contrats';
 import { candidaturesSpontanees, commandeCandidature, planPersonnel } from './personnel';
-import { bonusPilotePayant, systemeCommercial, transfererSponsors } from './commercial';
+import { apportCommercialPour, bonusPilotePayant, systemeCommercial, transfererSponsors } from './commercial';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 const POSTE_MARCHE: Poste = 'pilote_titulaire';
@@ -295,7 +295,11 @@ function signer(monde: Monde, o: OffreMarche, p: Personne, raisons: string[], nb
   const evt = ajouterEvenement(monde, {
     type: 'marche.signature', acteurs: [{ id: p.id, role: 'personne' }, { id: o.decideur, role: 'auteur' }, { id: e.id, role: 'organisation' }, ...(o.beneficiaireIndemnite ? [{ id: o.beneficiaireIndemnite, role: 'cedant' }] : [])],
     importance: 3, visibilite: 'public',
-    contexte: { contrat: c.id, offre: o.id, salaire: o.salaireMEUR, debut: o.debut, fin: c.fin, indemnite: o.indemniteMEUR, debauchage: debauche, offresConcurrentes: nbOffres, raisons },
+    contexte: {
+      contrat: c.id, offre: o.id, salaire: o.salaireMEUR, debut: o.debut, fin: c.fin, indemnite: o.indemniteMEUR, debauchage: debauche, offresConcurrentes: nbOffres, raisons,
+      // D-131 : apport commercial net attendu par l'écurie au moment de la signature (mesure des recrutements motivés par l'argent).
+      ...(estPilote(o.poste) ? { apportNet: Math.round(apportCommercialPour(monde, e, p, o.debut).netNouveau * 10) / 10 } : {}),
+    },
     texte: `${nom(monde, p.id)} signe avec ${e.nom} à partir de ${o.debut} (${o.salaireMEUR} M€/an, jusqu'en ${c.fin})${o.indemniteMEUR > 0 ? ` ; indemnité de ${o.indemniteMEUR} M€ versée à ${nom(monde, o.beneficiaireIndemnite ?? '')}` : ''}.`,
   });
   // Un débauchage abîme les relations entre l'ancien employeur et l'acheteur, et avec le partant.

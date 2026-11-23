@@ -121,6 +121,8 @@ export interface Personne {
   commission?: number;
   /** Phase 7c : sponsor personnel qui paie le pilote lui-même (M€/an, jusqu'à une année) ; lu par l'utilité des offres. */
   sponsorPersonnel?: { sponsor: string; montantMEUR: number; jusqua: number };
+  /** D-131 : engagement d'un partenaire réel, conditionné à l'arrivée en F1 (converti en sponsor accompagnant, ou personnel à défaut de place). */
+  engagementF1?: { sponsor: string; montantMEUR: number; jusqua: number };
   prenom: string;
   nom: string;
   nationalite: string;

@@ -68,3 +68,19 @@ export const AGENTS = {
  * plus de `anneesSansPilote` saisons (ou à sa retraite). Les sponsors du vivier engagés auprès d'un pilote respectent aussi partMaxBudget.
  */
 export const ENTREPRISES_LIEES = { maximum: 15, multipleBudget: 2, partMaxBudget: 0.5, anneesSansPilote: 1 };
+
+/**
+ * Pilotes payants (décision du porteur, D-131) — A. Remplacement d'un sponsor existant :
+ * un sponsor qui suit un pilote peut remplacer un sponsor principal ou secondaire moins généreux de l'écurie, même si tous les emplacements
+ * sont pris. Rupture jamais gratuite : indemnité = montant remplacé × années restantes (saison concernée comprise) × indemniteParAnneeRestante.
+ * Gain net = nouveau montant (ramené à son rang) − montant remplacé − indemnité ; remplacement seulement si le gain net est positif.
+ */
+export const REMPLACEMENT_SPONSOR = { indemniteParAnneeRestante: 0.5 };
+
+/**
+ * B. Engagements conditionnels dès les juniors : un jeune pilote (âge entre ageMin et ageMax, jamais titulaire en F1) dont la famille finance
+ * la carrière (budget ≥ SPONSORS_PERSONNELS.seuilFamilleMEUR) ou dont la valeur commerciale atteint seuilValeurMEUR peut obtenir, chaque année
+ * avec cette probabilité, l'engagement d'un véritable partenaire (entreprise familiale ou nationale, financée et plafonnée) : il ne se déclenche
+ * qu'à son arrivée en F1, pour une durée maximale de dureeAns. Montant : budget familial × partFamille, ou valeur × SPONSORS_PERSONNELS.part.
+ */
+export const ENGAGEMENT_JUNIOR = { ageMin: 16, ageMax: 23, probabilite: 0.5, dureeAns: 4, seuilValeurMEUR: 3 };

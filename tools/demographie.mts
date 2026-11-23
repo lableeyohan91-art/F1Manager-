@@ -30,6 +30,8 @@ let signatures = 0, debauchages = 0, preAccords = 0, concurrentes = 0, contreAtt
 // Audit 6b n°2 : causes probables des talents qui n'arrivent jamais en F1.
 const causesBlocage: Record<string, number> = { financier: 0, sportif: 0, contractuel: 0, opportunites: 0, indetermine: 0 };
 const { CATEGORIES_JUNIORS } = await import(`${racine}/src/engine/balance/juniors.ts`);
+// D-131 : pilotes payants.
+let signaturesApport = 0, signaturesPilotes = 0, engagementsJuniors = 0, engagementsTenus = 0, remplacementsSponsors = 0; const niveauxApport: number[] = [], niveauxAutres: number[] = [], apportsNets: number[] = [];
 let debutantsTop5Apex2 = 0, debutantsTotal = 0, championsApex2 = 0, championsApex2Promus = 0, talentsBloques = 0, talents = 0, payantsMoyensF1 = 0, payantsMoyens = 0;
 
 for (let g = 1; g <= N; g++) {
@@ -62,6 +64,15 @@ for (let g = 1; g <= N; g++) {
         const pp = m.tables['personnes'][e.acteurs[0].id] as any; if (pp && e.contexte.debut - pp.anneeNaissance < 23) signaturesMoins23++;
       }
       if (e.type === 'marche.contre_attaque') contreAttaques++;
+      if (e.type === 'marche.signature' && e.contexte?.apportNet !== undefined) {
+        signaturesPilotes++;
+        const pp = m.tables['personnes'][e.acteurs[0].id] as any;
+        const niv = pp ? eng.niveauPilote(pp, false) : NaN;
+        if (e.contexte.apportNet > 0) { signaturesApport++; apportsNets.push(e.contexte.apportNet); niveauxApport.push(niv); } else niveauxAutres.push(niv);
+      }
+      if (e.type === 'sponsor.engagement_junior') engagementsJuniors++;
+      if (e.type === 'sponsor.personnel' && e.contexte?.origine === 'engagement_junior') engagementsTenus++;
+      if (e.type === 'sponsor.remplace') remplacementsSponsors++;
     }
     const tit = Object.values(m.tables['personnes']).filter((p: any) => p.poste === 'pilote_titulaire' && p.statut === 'actif') as any[];
     let nouveaux = 0;
@@ -161,4 +172,5 @@ console.log(`Promesses de titularisation tenues / rompues (fin de partie) : ${pr
 console.log(`Mécènes trouvés : ${(mecenes / N / S).toFixed(2)} par saison ; écart de réputation entre la meilleure et la moins bonne académie : ${moy(ecartsReputationAcademies).toFixed(0)} points`);
 console.log(`Marché (7a) : ${(signatures / N / S).toFixed(2)} signatures par saison, dont ${(100 * concurrentes / Math.max(1, signatures)).toFixed(0)} % face à des offres concurrentes ; pré-accords à deux saisons ${(preAccords / N / S).toFixed(2)} ; débauchages ${(debauchages / N / S).toFixed(2)} par saison (indemnités ${(indemnitesMEUR / N / S).toFixed(1)} M€/saison) ; contre-attaques ${(contreAttaques / N / S).toFixed(2)} ; signatures à moins de 23 ans au début du contrat ${(100 * signaturesMoins23 / Math.max(1, signatures)).toFixed(0)} %`);
 console.log('Salaire moyen des 5 pilotes les mieux payés (M€, inflation) : ' + points.map((s) => `${2027 + s} ${moy(salaireTop5[s]!).toFixed(1)}`).join(' · '));
+console.log(`Pilotes payants (D-131) : ${(100 * signaturesApport / Math.max(1, signaturesPilotes)).toFixed(0)} % des signatures de pilotes avec un apport commercial net (moyenne ${moy(apportsNets).toFixed(1)} M€) ; niveau des recrues avec apport ${moy(niveauxApport.filter(Number.isFinite)).toFixed(2)} contre ${moy(niveauxAutres.filter(Number.isFinite)).toFixed(2)} ; engagements juniors ${(engagementsJuniors / N / S).toFixed(2)} par saison, tenus à l'arrivée en F1 ${(engagementsTenus / N / S).toFixed(2)} ; sponsors remplacés ${(remplacementsSponsors / N / S).toFixed(2)} par saison`);
 console.log(`Pépites générées (potentiel ≥ 18) : ${(championsPepites.pepites / N).toFixed(1)} par partie (dont ${((10 * championsPepites.nesCohortes) / N / S).toFixed(2)} par décennie issues des cohortes annuelles ; cible D-102 : ≈ 2), championnes : ${championsPepites.championnes}`);

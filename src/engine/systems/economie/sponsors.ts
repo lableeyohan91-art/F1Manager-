@@ -45,6 +45,9 @@ export function sponsorsEngages(monde: Monde, annee: number): Set<string> {
   const res = new Set(contratsActifs(monde, annee).map((c) => c.sponsor));
   for (const p of Object.values(table(monde, TABLES.personnes)) as unknown as { statut: string; sponsorPersonnel?: { sponsor: string; jusqua: number } }[]) {
     if (p.statut !== 'retraite' && p.sponsorPersonnel && p.sponsorPersonnel.jusqua >= annee) res.add(p.sponsorPersonnel.sponsor);
+    // D-131 : un engagement conditionnel (junior) réserve aussi le sponsor.
+    const eng = (p as { engagementF1?: { sponsor: string; jusqua: number } }).engagementF1;
+    if (p.statut !== 'retraite' && eng && eng.jusqua >= annee) res.add(eng.sponsor);
   }
   return res;
 }
