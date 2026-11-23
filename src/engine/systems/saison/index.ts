@@ -31,6 +31,8 @@ import {
 import { genererChronique } from './chronique';
 import { apresGrandPrix, erreurPression, modificateurNiveau, noterLuttesTitre, titreSurCircuit } from '../carriere/performance';
 import { facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero } from '../economie';
+import { bonusSavoirDeveloppement } from '../technique/conception';
+import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 
 /** Durée de conservation des explications détaillées des résultats, en saisons. */
@@ -284,9 +286,13 @@ function developper(monde: Monde, e: Ecurie, mois: number, alea: number, cle: st
   const cap = capaciteDeveloppement(monde, e);
   const fi = financesDe(monde, e.id);
   const aero = fi ? restrictionAero(monde, e.id) * (1 - fi.sanctionAero) : 1;
+  // Phase 8b : la part des moyens consacrée aux programmes de recherche est retirée du développement de la voiture ;
+  // en échange, le savoir accumulé rend ce développement plus efficace (effet PROVISOIRE, systems/technique/conception.ts).
+  const partDeveloppement = 1 - partRecherche(monde, e.id);
   for (const c of CARACS_VOITURE) {
     const f = tirageLocal(monde, 'developpement', e.id, cle, c);
-    const gain = TAUX_DEVELOPPEMENT_MENSUEL * mois * cap * (CARACS_AERO.has(c) ? aero : 1) * Math.max(0, 1 - v[c] / PLAFOND_TECHNIQUE);
+    const gain = TAUX_DEVELOPPEMENT_MENSUEL * mois * cap * partDeveloppement * bonusSavoirDeveloppement(monde, e.id, c)
+      * (CARACS_AERO.has(c) ? aero : 1) * Math.max(0, 1 - v[c] / PLAFOND_TECHNIQUE);
     v[c] = borner(v[c] + gain + f.normale(0, alea), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
   }
 }

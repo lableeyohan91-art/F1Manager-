@@ -30,6 +30,12 @@ export const TABLES = {
   offres: 'offres',
   candidatures: 'candidatures',
   agents: 'agents',
+  reglements: 'reglements',
+  evolutionsMineures: 'evolutionsMineures',
+  savoirs: 'savoirs',
+  programmes: 'programmes',
+  historiqueRecherche: 'historiqueRecherche',
+  decouvertes: 'decouvertes',
   archives: 'archives',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
@@ -87,6 +93,8 @@ export interface Ecurie {
   ecuriePartenaire?: string;
   /** Phase 7a : réputation de prédatrice (débauchages récents, s'efface avec le temps). Lue par l'utilité des offres et l'indemnité exigée. */
   reputationPredateur?: number;
+  /** Phase 8b (D-132, question 9) : le joueur confie ses programmes de recherche à son directeur technique (décisions de l'IA). */
+  delegationRecherche?: boolean;
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -694,4 +702,67 @@ export interface Agent {
   /** 1–20 : nombre et qualité des démarchages auprès des écuries. */
   reseau: number;
 }
+
+/** Phase 8a — règlement technique (en vigueur, annoncé, proposé, rejeté ou terminé). */
+export interface Reglement {
+  id: string;
+  generation: number;
+  /** Orientation de la réforme (aéro, motorisation, châssis, refonte), « initial » pour le règlement de départ. */
+  orientation: string;
+  debut: number;
+  /** Dernière saison prévue (peut être prolongée par un vote). */
+  fin: number;
+  statut: 'en_vigueur' | 'annonce' | 'propose' | 'rejete' | 'termine';
+  /** Intensité du changement par domaine technique, de 0 (inchangé) à 1 (entièrement nouveau), par rapport au règlement précédent. */
+  intensites: Record<string, number>;
+  /** Version de la spécification des pneumatiques du manufacturier commun. */
+  pneus: number;
+  /** Votes des écuries (identifiant d'option : règlement proposé ou « prolongation »). */
+  votes?: Record<string, string>;
+  /** Pour l'option de prolongation proposée en même temps : nombre de saisons. */
+  prolongation?: number;
+}
+
+/** Phase 8a — évolution mineure annuelle décidée par la fédération (bornée). */
+export interface EvolutionMineure { id: string; saison: number; intensites: Record<string, number>; appliquee: boolean }
+
+/** Phase 8b — savoir d'une écurie dans un domaine technique. */
+export interface Savoir {
+  id: string;
+  ecurie: string;
+  domaine: string;
+  /** Compréhension générale du domaine : survit en grande partie aux réformes. */
+  fondamental: number;
+  /** Maîtrise propre à chaque règlement (en vigueur, annoncé ou proposé). */
+  parReglement: Record<string, number>;
+  /** Savoir destiné à la voiture de la saison suivante (utilisé à l'intersaison). */
+  pourSaisonSuivante: number;
+}
+
+/** Phase 8b — programme de recherche (deux emplacements par écurie). */
+export interface ProgrammeRecherche {
+  id: string;
+  ecurie: string;
+  emplacement: number;
+  domaine: string;
+  /** « actuelle », « suivante » ou l'identifiant d'un règlement futur (annoncé ou proposé). */
+  horizon: string;
+  /** Part des moyens de développement affectée. */
+  part: number;
+  statut: 'actif' | 'suspendu';
+  /** Semaines de remise en route restantes (efficacité réduite) après une réorientation. */
+  remiseEnRoute: number;
+  debut: { annee: number; semaine: number };
+}
+
+/** Phase 8b — historique de recherche d'une écurie pour une saison (borné). */
+export interface HistoriqueRecherche {
+  id: string;
+  ecurie: string;
+  annee: number;
+  domaines: Record<string, { effort: number; gain: number; obsolescence: number }>;
+}
+
+/** Phase 8b — découverte (rare, expliquée, sans quota), copiée progressivement par les autres. */
+export interface Decouverte { id: string; ecurie: string; domaine: string; reglement: string; saison: number; ampleur: number; diffusee: number }
 

@@ -342,3 +342,13 @@ Aucun code à ce stade.
 - Remplacement rentable d'un sponsor par celui qui suit un pilote (indemnité de rupture payée, exclusivités respectées).
 - Engagements conditionnels de partenaires réels dès les juniors, déclenchés à l'arrivée en F1 (format de sauvegarde 19).
 - Le marché examine aussi les pilotes au soutien commercial réel (niveau minimal). Mesures dans `docs/rapports/2026-11-23-d131-pilotes-payants.md`. 147 tests.
+
+## [Phases 8a et 8b] — 23/11/2026
+
+### Ajouté (D-128, D-132, D-133)
+- Règlements (`systems/technique/`, coefficients `balance/technique.ts`) : règlement en vigueur, propositions de réformes (aéro, motorisation et énergie, châssis et mécanique, refonte), pneumatiques, prolongation, vote en deux tours, annonce, entrée en vigueur avec obsolescence partielle du savoir, évolutions mineures annuelles.
+- Recherche : savoir fondamental et propre à chaque règlement, 12 domaines techniques et leurs voisins, deux programmes par écurie (domaine, horizon, part des moyens), remise en route, suspension sans perte, découvertes rares et expliquées, historique borné, délégation au directeur technique.
+- Commandes `recherche.programme`, `recherche.suspendre`, `recherche.deleguer`, `reglement.vote` (mêmes règles pour le joueur et l'IA) ; décisions de l'IA.
+- Conversion PROVISOIRE du savoir en performance, isolée dans `systems/technique/conception.ts` : coût de la recherche sur le développement, bonus du savoir, préparation de la saison suivante, reconception relative au plateau.
+- Format de sauvegarde 20, migration et test. Tests `tests/technique.test.ts`. Outil `tools/diagnostic-reglements.mts`. 157 tests.
+- Rapport : `docs/rapports/2026-11-23-p8ab-reglements-recherche.md` ; références `p8ab-*`.

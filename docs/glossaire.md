@@ -166,3 +166,15 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Cohésion (équipe des stands)** | Synchronisation collective : elle libère la part du potentiel de rapidité réellement exprimée, sans jamais le dépasser (D-129). |
 | **Engagement conditionnel** | Promesse d'un partenaire réel (entreprise familiale ou nationale) de financer un jeune pilote s'il accède à la F1 ; le sponsor est réservé jusque-là (D-131). |
 | **Remplacement de sponsor** | Un sponsor qui suit un pilote prend la place d'un sponsor moins généreux de l'écurie, contre une indemnité de rupture ; seulement si le gain net est positif (D-131). |
+| **Grande réforme** | Nouveau règlement technique proposé par la fédération (aérodynamique, motorisation et énergie, châssis et mécanique, refonte majeure), voté par les écuries et appliqué environ deux saisons complètes après le vote (D-128, phase 8a). |
+| **Prolongation** | Option du vote d'une grande réforme : le règlement en vigueur est prolongé d'une ou deux saisons (phase 8a). |
+| **Évolution mineure** | Petite modification annuelle du règlement, sur 1 ou 2 domaines, décidée par la fédération seule (D-132, phase 8a). |
+| **Intensité (d'un changement)** | Part d'un domaine technique qui change avec un règlement, de 0 (inchangé) à 1 (entièrement nouveau) ; elle fixe la part du savoir qui devient obsolète et l'ampleur de la reconception (phase 8a). |
+| **Domaine technique** | L'un des 12 champs de connaissance des voitures (aérodynamique avant, fond plat, énergie, interface pneus…), avec ses voisins ; identifiants stables repris par la phase 12 (D-132). |
+| **Savoir** | Connaissance accumulée par une écurie dans un domaine technique : une part **fondamentale** (toujours utile) et une part **propre à un règlement** (en partie obsolète quand il change) (D-128, phase 8b). |
+| **Programme de recherche** | Effort de recherche d'une écurie : un domaine, un horizon et une part des moyens de développement ; deux au plus, suspendables sans perte (D-128, phase 8b). |
+| **Horizon (de recherche)** | Ce que vise un programme : la voiture actuelle, la saison suivante, ou un règlement futur (annoncé ou seulement proposé) (D-128, phase 8b). |
+| **Remise en route** | Semaines à efficacité réduite après la réorientation d'un programme vers un autre domaine ; coût en temps seulement (D-132). |
+| **Reconception** | Adaptation des voitures à l'entrée d'un règlement ou d'une évolution mineure : chaque caractéristique se rapproche de la moyenne du plateau selon l'intensité, puis s'en écarte selon le savoir, la compétence et l'exécution ; provisoire jusqu'à la phase 12 (phase 8). |
+| **Découverte** | Avancée rare et expliquée d'une écurie pour un règlement futur (savoir fondamental et vision technique de son DT), copiée peu à peu par les autres après l'entrée en vigueur ; sans quota (D-128). |
+| **Délégation de la recherche** | Le joueur confie ses programmes de recherche à son directeur technique, qui décide avec les règles de l'IA (D-132). |

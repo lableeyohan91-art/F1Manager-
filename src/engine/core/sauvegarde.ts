@@ -227,6 +227,13 @@ const MIGRATIONS: Record<number, Migration> = {
   },
   // v18 → v19 (D-131) : engagements conditionnels des juniors (champ optionnel, créé au début de saison suivante).
   18: (m) => ({ ...m, versionFormat: 19 }),
+  // v19 → v20 (phase 8a+8b, D-128, D-132) : règlements, évolutions mineures, savoir, programmes, historique et découvertes.
+  // Les tables sont créées vides ; le règlement de départ est créé à la semaine suivante par le système technique.
+  19: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    for (const t of ['reglements', 'evolutionsMineures', 'savoirs', 'programmes', 'historiqueRecherche', 'decouvertes']) tables[t] ??= {};
+    return { ...m, versionFormat: 20 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

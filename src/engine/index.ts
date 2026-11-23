@@ -29,3 +29,4 @@ export * from './systems/juniors';
 export * from './systems/marche';
 export * from './systems/marche/commercial';
 export * from './systems/marche/personnel';
+export * from './systems/technique';

@@ -14,6 +14,7 @@ import { installerEconomie } from './systems/economie';
 import { installerCarriere } from './systems/carriere';
 import { installerDeveloppeur } from './systems/developpeur';
 import { installerJuniors } from './systems/juniors';
+import { installerTechnique } from './systems/technique';
 
 export interface Scenario {
   nom: string;
@@ -62,6 +63,6 @@ export function creerScenarioGrille2026(fichiers: FichiersDonnees): Scenario {
     nom: 'grille-2026',
     description: 'Départ en 2027 avec la grille inspirée de 2026 (data/grille-2026).',
     creerMonde: (graine) => construireMonde(graine, donnees, 'grille-2026'),
-    creerMoteur: () => installerDeveloppeur(installerJuniors(installerCarriere(installerHumain(installerSaison(installerEconomie(new Moteur())))))),
+    creerMoteur: () => installerDeveloppeur(installerJuniors(installerCarriere(installerHumain(installerTechnique(installerSaison(installerEconomie(new Moteur()))))))),
   };
 }
