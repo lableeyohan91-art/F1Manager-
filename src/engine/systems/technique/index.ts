@@ -19,6 +19,7 @@ import {
   CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
+import { FUITES_REGLEMENT } from '../../balance/information';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
@@ -30,13 +31,13 @@ import { ecuriesActives } from '../saison/performance';
 import { capaciteDeveloppement } from '../saison';
 import { niveauEffectif } from '../economie/infrastructures';
 import { forceEcurie, teamPrincipal } from '../humain/decision';
-import { programmes, propositions, reglementAnnonce, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
+import { avantProjets, intensitePercue, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
 import { appliquerPreparation, reconcevoirGrille } from './conception';
 
 const r3 = (x: number) => Math.round(x * 1000) / 1000;
 const liste = <T>(m: Monde, t: string) => idsTries(table(m, t)).map((id) => table(m, t)[id] as unknown as T);
 
-export { partRecherche, programmes, propositions, reglementAnnonce, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
+export { avantProjets, intensitePercue, partRecherche, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
 
 /* ===================================================================== 8a — Règlements */
 
@@ -64,9 +65,13 @@ export function initialiserReglement(monde: Monde): void {
 }
 
 /** Propositions de la fédération : 2 ou 3 réformes d'orientations différentes, plus la prolongation. */
-export function proposerReformes(monde: Monde): void {
+/**
+ * Préparation des réformes par la fédération (phase 8c : en avant-projet, connues seulement des écuries qui en ont vent),
+ * publiées ensuite par `publierReformes`.
+ */
+export function preparerReformes(monde: Monde): void {
   const actuel = reglementEnVigueur(monde);
-  if (!actuel || propositions(monde).length || reglementAnnonce(monde)) return;
+  if (!actuel || propositions(monde).length || avantProjets(monde).length || reglementAnnonce(monde)) return;
   const f = tirageLocal(monde, 'reglement.propositions', actuel.id, monde.date.annee);
   const n = f.entier(CALENDRIER_REGLEMENT.propositionsMin, CALENDRIER_REGLEMENT.propositionsMax);
   const orientations = [...(Object.keys(ORIENTATIONS) as Orientation[])];
@@ -83,10 +88,21 @@ export function proposerReformes(monde: Monde): void {
     if (pneus !== actuel.pneus) intensites['interface_pneus'] = Math.max(intensites['interface_pneus'] ?? 0, PNEUS_REFORME.intensiteInterface);
     const r: Reglement = {
       id, generation, orientation: o, debut, fin: debut + f.entier(CALENDRIER_REGLEMENT.dureeMin, CALENDRIER_REGLEMENT.dureeMax) - 1,
-      statut: 'propose', intensites, pneus, votes: {}, prolongation,
+      statut: 'brouillon', intensites, pneus, votes: {}, prolongation, connuPar: [],
     };
     table(monde, TABLES.reglements)[r.id] = r as unknown as Entite;
   });
+}
+
+/** Publication des propositions (2 ou 3 réformes et la prolongation) : tout le monde connaît désormais les intensités exactes. */
+export function publierReformes(monde: Monde): void {
+  const actuel = reglementEnVigueur(monde);
+  const projets = avantProjets(monde);
+  if (!actuel || !projets.length) return;
+  for (const r of projets) r.statut = 'propose';
+  const n = projets.length;
+  const prolongation = projets[0]!.prolongation ?? 1;
+  const choisies = projets.map((r) => r.orientation as Orientation);
   ajouterEvenement(monde, {
     type: 'reglement.propositions', acteurs: [], importance: 3, visibilite: 'public',
     contexte: { propositions: propositions(monde).map((r) => ({ id: r.id, orientation: r.orientation, debut: r.debut })), prolongation },
@@ -399,7 +415,7 @@ export function motifRefusProgramme(monde: Monde, auteur: string, prm: Record<st
   const horizon = String(prm['horizon'] ?? '');
   if (horizon !== 'actuelle' && horizon !== 'suivante') {
     const r = table(monde, TABLES.reglements)[horizon] as unknown as Reglement | undefined;
-    if (!r || (r.statut !== 'propose' && r.statut !== 'annonce')) return 'Horizon : voiture actuelle, saison suivante, ou un règlement annoncé ou proposé.';
+    if (!r || (r.statut !== 'propose' && r.statut !== 'annonce' && r.statut !== 'brouillon') || !reglementConnu(r, e.id)) return 'Horizon : voiture actuelle, saison suivante, ou un règlement annoncé, proposé ou dont l’écurie a eu vent.';
   }
   const part = prm['part'];
   if (!(typeof part === 'number' && Number.isFinite(part) && part >= PROGRAMMES.partMin && part <= PROGRAMMES.partMax)) return `Part des moyens entre ${PROGRAMMES.partMin} et ${PROGRAMMES.partMax}.`;
@@ -485,11 +501,13 @@ export const commandeVote: DefinitionCommande = {
 type Commander = (c: { type: string; auteur: string; parametres: Record<string, unknown> }) => unknown;
 
 /** Les écuries de l'IA (et celles du joueur qui ont délégué) choisissent leurs programmes. */
-export function decisionsRecherche(monde: Monde, commander: Commander): void {
+export function decisionsRecherche(monde: Monde, commander: Commander, seulement?: string): void {
   const actuel = reglementEnVigueur(monde);
-  const futur = reglementAnnonce(monde) ?? propositions(monde)[0];
   for (const e of ecuriesActives(monde)) {
+    if (seulement && e.id !== seulement) continue;
     if (e.pilotee && !e.delegationRecherche) continue;
+    // Futur règlement visé : annoncé, sinon proposé, sinon un avant-projet dont l'écurie a eu vent (phase 8c).
+    const futur = reglementAnnonce(monde) ?? propositions(monde)[0] ?? avantProjets(monde).find((r) => reglementConnu(r, e.id));
     const tp = teamPrincipal(monde, e.id);
     const dt = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'directeur_technique');
     const auteur = tp?.id;
@@ -520,7 +538,7 @@ function choisirDomaine(monde: Monde, e: Ecurie, horizon: string, exclus: Set<st
   const notes = LISTE_DOMAINES.filter((d) => !exclus.has(d)).map((d) => {
     const s = savoir(monde, e.id, d);
     let u = 1 / (1 + (s.fondamental + Object.values(s.parReglement).reduce((a, b) => a + b, 0)) / SAVOIR.rendementK);
-    if (r) u *= CHOIX_DOMAINE_IA.intensiteBase + (r.intensites[d] ?? 0);
+    if (r) u *= CHOIX_DOMAINE_IA.intensiteBase + intensitePercue(monde, e.id, r, d); // approximative pour un avant-projet (8c)
     if (/aéro/.test(philosophie) && d.startsWith('aero')) u *= CHOIX_DOMAINE_IA.philosophieAero;
     if (/motoriste/.test(philosophie) && (d === 'groupe_propulseur' || d === 'energie')) u *= CHOIX_DOMAINE_IA.philosophieMoteur;
     // Jugement : une part de hasard propre à l'écurie, pour que deux écuries semblables ne fassent pas les mêmes choix.
@@ -547,8 +565,10 @@ export const systemeTechnique: Systeme = {
       decisionsRecherche(monde, (c) => commanderIA(c));
     }
     const actuel = reglementEnVigueur(monde);
+    if (actuel && date.annee === actuel.fin - CALENDRIER_REGLEMENT.anneesAvantFin && date.semaine === FUITES_REGLEMENT.semaineAvantProjet) preparerReformes(monde);
     if (actuel && date.annee === actuel.fin - CALENDRIER_REGLEMENT.anneesAvantFin && date.semaine === CALENDRIER_REGLEMENT.semaineProposition) {
-      proposerReformes(monde);
+      preparerReformes(monde); // au cas où (partie reprise après la semaine de préparation)
+      publierReformes(monde);
       decisionsRecherche(monde, (c) => commanderIA(c)); // recherche exploratoire possible avant le vote
     }
     if (date.semaine === CALENDRIER_REGLEMENT.semaineVote && propositions(monde).length) {

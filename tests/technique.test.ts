@@ -165,11 +165,11 @@ describe('Phase 8b — recherche', () => {
 describe('Phase 8 — format et déterminisme', () => {
   it('format 20 : migration depuis 19, tables créées ; sauvegarde relue à l’identique', () => {
     const { m } = mondeJoueur();
-    expect(VERSION_FORMAT).toBe(20);
+    expect(VERSION_FORMAT).toBeGreaterThanOrEqual(20);
     const ancien = copierMonde(m) as unknown as Record<string, unknown>;
     for (const t of ['reglements', 'evolutionsMineures', 'savoirs', 'programmes', 'historiqueRecherche', 'decouvertes']) delete (ancien['tables'] as Record<string, unknown>)[t];
     const migre = deserialiser(serialiser(ancien as unknown as Monde).replace(`"versionFormat":${VERSION_FORMAT}`, '"versionFormat":19'));
-    expect(migre.versionFormat).toBe(20);
+    expect(migre.versionFormat).toBe(VERSION_FORMAT);
     for (const t of ['reglements', 'evolutionsMineures', 'savoirs', 'programmes', 'historiqueRecherche', 'decouvertes']) expect(migre.tables[t]).toEqual({});
     expect(empreinte(deserialiser(serialiser(m)))).toBe(empreinte(m));
   });

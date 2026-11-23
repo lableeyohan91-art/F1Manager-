@@ -234,6 +234,16 @@ const MIGRATIONS: Record<number, Migration> = {
     for (const t of ['reglements', 'evolutionsMineures', 'savoirs', 'programmes', 'historiqueRecherche', 'decouvertes']) tables[t] ??= {};
     return { ...m, versionFormat: 20 };
   },
+  // v20 → v21 (phase 8c) : faits suivis (qui sait quoi) et état de la diffusion. Les faits antérieurs à la migration ne sont pas
+  // suivis rétroactivement : la diffusion commence avec les faits nouveaux.
+  20: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['faitsSuivis'] ??= {};
+    tables['information'] ??= {};
+    const dernier = ((m['compteurs'] ?? {}) as Record<string, number>)['evt'] ?? 0;
+    tables['information']['etat'] ??= { id: 'etat', dernier };
+    return { ...m, versionFormat: 21 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

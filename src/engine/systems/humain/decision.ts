@@ -174,7 +174,7 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
     u += ajouter(rd.confiance >= 0 ? 'confiance envers le team principal' : 'méfiance envers le team principal', UTILITE.confianceDecideur * rd.confiance);
     u += ajouter(rd.affinite >= 0 ? 'bonne entente avec le team principal' : 'mauvaise entente avec le team principal', UTILITE.affiniteDecideur * rd.affinite);
   } else {
-    const rep = reputation(monde, o.decideur);
+    const rep = reputation(monde, o.decideur, p.id); // phase 8c : ce que la personne sait (ou a entendu dire) du team principal
     u += ajouter('réputation du team principal', 0.3 * (rep.paroleTenue + rep.fideliteAuPersonnel) / 2);
   }
   const ro = relation(monde, p.id, o.organisation);

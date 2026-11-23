@@ -11,6 +11,7 @@ import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { planifier, type Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Personne } from '../../model/types';
 import { lireEvenement } from '../memoire';
+import { poidsPercu } from '../information/connaissance';
 
 export const TABLE_PROMESSES = 'promesses';
 
@@ -172,14 +173,17 @@ export interface Reputation {
 }
 
 /**
- * Réputation publique d'un acteur (−1 à +1 par facette), à partir des faits PUBLICS encore au journal,
- * les plus récents pesant plus lourd (−20 % par saison d'ancienneté).
+ * Réputation d'un acteur (−1 à +1 par facette), à partir des faits PUBLICS encore au journal, les plus récents pesant plus lourd
+ * (−20 % par saison d'ancienneté). Avec un observateur : réputation PERÇUE (phase 8c), qui ajoute les faits privés qu'il connaît.
  */
-export function reputation(monde: Monde, idActeur: string): Reputation {
+export function reputation(monde: Monde, idActeur: string, observateur?: string): Reputation {
   const r: Reputation = { paroleTenue: 0, fideliteAuPersonnel: 0, impitoyable: 0, formateur: 0 };
   for (const e of Object.values(monde.evenements)) {
-    if (e.visibilite !== 'public' || !e.acteurs.some((a) => a.id === idActeur && a.role === 'auteur')) continue;
-    const poids = Math.pow(0.8, monde.date.annee - e.date.annee);
+    if (!e.acteurs.some((a) => a.id === idActeur && a.role === 'auteur')) continue;
+    // Phase 8c (réputation perçue) : un observateur tient compte aussi des faits privés qu'il connaît, selon ce qu'il en croit.
+    const percu = e.visibilite === 'public' ? 1 : observateur ? poidsPercu(monde, e, observateur) : 0;
+    if (!percu) continue;
+    const poids = percu * Math.pow(0.8, monde.date.annee - e.date.annee);
     switch (e.type) {
       case 'promesse.tenue': r.paroleTenue += 0.25 * poids; break;
       case 'promesse.rompue': r.paroleTenue -= 0.4 * poids; break;

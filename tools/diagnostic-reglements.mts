@@ -1,7 +1,7 @@
 /**
  * Phase 8 — diagnostic des règlements et de la recherche (mesures indicatives, D-120).
  * Usage : npx tsx tools/diagnostic-reglements.mts <graines> <saisons>
- * Mesure : réformes et prolongations, votes, rebattage de la hiérarchie les années de réforme (contre les autres années),
+ * Mesure (8c aussi) : fuites, rumeurs, révélations ; réformes et prolongations, votes, rebattage de la hiérarchie les années de réforme (contre les autres années),
  * maintien du champion à travers une réforme, découvertes, parts et horizons de recherche, savoir moyen.
  */
 import { resolve } from 'node:path';
@@ -23,7 +23,8 @@ function spearman(a: string[], b: string[]): number {
   return 1 - (6 * d2) / (n * (n * n - 1));
 }
 
-let reformes = 0, prolongations = 0, entrees = 0, mineures = 0, decouvertes = 0;
+let reformes = 0, prolongations = 0, entrees = 0, mineures = 0, decouvertes = 0, revelations = 0, revelationsPresse = 0, fuitesReglement = 0;
+const connaisseurs: number[] = [], ouiDire: number[] = [], rumeurs: number[] = [];
 const pourChangement: number[] = [];
 const rhoReforme: number[] = [], rhoAutres: number[] = [];
 let championGardeReforme = 0, championReforme = 0, championGardeAutres = 0, championAutres = 0;
@@ -43,13 +44,15 @@ for (let g = 1; g <= N; g++) {
       mo.avancer(m, 1);
       for (const e of Object.values(m.evenements) as any[]) {
         if (vus.has(e.id)) continue;
-        if (!e.type.startsWith('reglement.') && e.type !== 'recherche.decouverte') continue;
+        if (!e.type.startsWith('reglement.') && e.type !== 'recherche.decouverte' && e.type !== 'information.revelee') continue;
         vus.add(e.id);
         if (e.type === 'reglement.annonce') { reformes++; orientations.set(e.contexte.orientation, (orientations.get(e.contexte.orientation) ?? 0) + 1); pourChangement.push(e.contexte.tour1.reforme / (e.contexte.tour1.reforme + e.contexte.tour1.prolongation)); }
         if (e.type === 'reglement.vote') { prolongations++; pourChangement.push(e.contexte.tour1.reforme / (e.contexte.tour1.reforme + e.contexte.tour1.prolongation)); }
         if (e.type === 'reglement.entree_en_vigueur') { entrees++; entreeCetteAnnee = true; }
         if (e.type === 'reglement.evolution_mineure') mineures++;
         if (e.type === 'recherche.decouverte') decouvertes++;
+        if (e.type === 'reglement.fuite') fuitesReglement++;
+        if (e.type === 'information.revelee') { revelations++; if (e.contexte.motif === 'presse') revelationsPresse++; }
       }
       if (m.date.semaine === 3) for (const p of eng.programmes(m) as any[]) {
         if (p.statut !== 'actif') continue;
@@ -58,6 +61,11 @@ for (let g = 1; g <= N; g++) {
         horizons.set(h, (horizons.get(h) ?? 0) + 1);
         domaines.set(p.domaine, (domaines.get(p.domaine) ?? 0) + 1);
       }
+    }
+    for (const f of Object.values(m.tables['faitsSuivis'] ?? {}) as any[]) {
+      const e = m.evenements[f.id];
+      if (!e) continue;
+      connaisseurs.push(e.connuPar.length); ouiDire.push(Object.keys(f.perception).length); rumeurs.push(f.rumeur.length);
     }
     const saison = (Object.values(m.tables['saisons']) as any[]).find((x) => x.annee === m.date.annee - 1);
     const classement: string[] = saison?.constructeurs.map((c: any) => c.ecurie) ?? [];
@@ -84,6 +92,10 @@ console.log(`| Même indicateur, autres années | ${moy(rhoAutres).toFixed(2)} (
 console.log(`| Le champion constructeurs garde son titre, année d'entrée en vigueur | ${pc(championGardeReforme / Math.max(1, championReforme))} |`);
 console.log(`| Même indicateur, autres années | ${pc(championGardeAutres / Math.max(1, championAutres))} |`);
 console.log(`| Découvertes par saison (toutes écuries) | ${(decouvertes / (N * S)).toFixed(2)} |`);
+console.log(`| Avant-projets : écuries qui en ont vent, par réforme préparée | ${(fuitesReglement / Math.max(1, reformes + prolongations)).toFixed(1)} sur 11 |`);
+console.log(`| Faits révélés publiquement par saison (dont par la presse) | ${(revelations / (N * S)).toFixed(2)} (${(revelationsPresse / (N * S)).toFixed(2)}) |`);
+console.log(`| Faits privés suivis : personnes au courant (moyenne, fin de saison) | ${moy(connaisseurs).toFixed(1)} |`);
+console.log(`| … dont informées par ouï-dire / par une rumeur | ${moy(ouiDire).toFixed(1)} / ${moy(rumeurs).toFixed(1)} |`);
 console.log(`| Part moyenne d'un programme actif | ${pc(moy(parts))} |`);
 console.log(`| Horizons des programmes | ${[...horizons].map(([h, n]) => `${h} ${pc(n / parts.length)}`).join(', ')} |`);
 console.log(`| Domaines les plus étudiés | ${[...domaines].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([d, n]) => `${d} ${pc(n / parts.length)}`).join(', ')} |`);

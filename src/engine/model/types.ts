@@ -36,6 +36,9 @@ export const TABLES = {
   programmes: 'programmes',
   historiqueRecherche: 'historiqueRecherche',
   decouvertes: 'decouvertes',
+  // Phase 8c
+  faitsSuivis: 'faitsSuivis',
+  information: 'information',
   archives: 'archives',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
@@ -712,7 +715,10 @@ export interface Reglement {
   debut: number;
   /** Dernière saison prévue (peut être prolongée par un vote). */
   fin: number;
-  statut: 'en_vigueur' | 'annonce' | 'propose' | 'rejete' | 'termine';
+  /** Phase 8c : « brouillon » = avant-projet de la fédération, pas encore publié (seules les écuries de `connuPar` en ont vent). */
+  statut: 'brouillon' | 'en_vigueur' | 'annonce' | 'propose' | 'rejete' | 'termine';
+  /** Phase 8c : écuries qui ont eu vent de l'avant-projet. */
+  connuPar?: string[];
   /** Intensité du changement par domaine technique, de 0 (inchangé) à 1 (entièrement nouveau), par rapport au règlement précédent. */
   intensites: Record<string, number>;
   /** Version de la spécification des pneumatiques du manufacturier commun. */

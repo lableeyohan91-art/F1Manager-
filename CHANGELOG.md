@@ -352,3 +352,12 @@ Aucun code à ce stade.
 - Conversion PROVISOIRE du savoir en performance, isolée dans `systems/technique/conception.ts` : coût de la recherche sur le développement, bonus du savoir, préparation de la saison suivante, reconception relative au plateau.
 - Format de sauvegarde 20, migration et test. Tests `tests/technique.test.ts`. Outil `tools/diagnostic-reglements.mts`. 157 tests.
 - Rapport : `docs/rapports/2026-11-23-p8ab-reglements-recherche.md` ; références `p8ab-*`.
+
+## [Phase 8c] — 23/11/2026
+
+### Ajouté (D-134)
+- Qui sait quoi (`systems/information/`, coefficients `balance/information.ts`) : faits privés suivis, fuites le long des relations freinées par la discrétion, rumeurs (récits déformés) crues selon la confiance envers la source, révélations par la presse, volumes bornés.
+- Réputation perçue : la réputation d'un dirigeant aux yeux d'une personne tient compte des faits privés qu'elle connaît (utilisée dans l'évaluation des offres).
+- Avant-projets de règlement : préparés dès la semaine 2, connus approximativement des écuries qui en ont vent, recherche exploratoire possible avant la publication.
+- Format de sauvegarde 21, migration et test. Tests `tests/information.test.ts`. 163 tests. Diagnostic `tools/diagnostic-reglements.mts` étendu.
+- Rapport : `docs/rapports/2026-11-23-p8c-qui-sait-quoi.md` ; références `p8c-*`.

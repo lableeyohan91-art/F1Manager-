@@ -55,7 +55,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Relation** (`Relationship`) | Lien orienté de A vers B, sur 4 axes : confiance, respect, affinité, familiarité. Pas forcément réciproque. |
 | **Base de relation** | Partie durable d'une relation, nourrie par les résidus. Bouge lentement. |
 | **Promesse** (`Promise`) | Engagement vérifiable par le moteur, avec une échéance. Produit un événement « tenue » ou « rompue ». |
-| **Réputation** | Image publique d'un acteur, par facette (formateur, fidèle, impitoyable…), calculée à partir des faits publics. |
+| **Réputation** | Image publique d'un acteur, par facette (formateur, fidèle, impitoyable…), calculée à partir des faits publics. Voir aussi **réputation perçue**. |
 | **Groupe social** | Ensemble de personnes liées par des relations fortes et une expérience commune, détecté automatiquement. Jamais prédéfini. |
 | **Influence** | Capacité d'une personne à entraîner les autres. Dépend du respect qu'on lui porte et de sa place dans les groupes. |
 | **Chronique** | Archive permanente des faits majeurs (titres, transferts marquants, crises). Ne s'efface jamais. |
@@ -178,3 +178,10 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Reconception** | Adaptation des voitures à l'entrée d'un règlement ou d'une évolution mineure : chaque caractéristique se rapproche de la moyenne du plateau selon l'intensité, puis s'en écarte selon le savoir, la compétence et l'exécution ; provisoire jusqu'à la phase 12 (phase 8). |
 | **Découverte** | Avancée rare et expliquée d'une écurie pour un règlement futur (savoir fondamental et vision technique de son DT), copiée peu à peu par les autres après l'entrée en vigueur ; sans quota (D-128). |
 | **Délégation de la recherche** | Le joueur confie ses programmes de recherche à son directeur technique, qui décide avec les règles de l'IA (D-132). |
+| **Fait suivi** | Événement privé qui intéresse les autres (promesse rompue, tension financière, débauchage…) et dont le moteur tient la liste de ceux qui le connaissent, bornée (phase 8c). |
+| **Fuite** | Transmission d'un fait privé par une personne qui le connaît à l'une de ses relations, parfois dans une autre écurie ; freinée par la discrétion (phase 8c). |
+| **Rumeur** | Version déformée (exagérée) d'un fait, reçue lors d'une fuite ; elle pèse plus qu'un fait exact, selon la croyance de celui qui l'entend (phase 8c). |
+| **Croyance** | Crédit qu'une personne accorde à ce qu'on lui rapporte, selon sa confiance envers la source (phase 8c). |
+| **Révélation** | Passage d'un fait privé au public, par la presse ou parce que trop de monde est au courant (phase 8c). |
+| **Réputation perçue** | Réputation d'un acteur aux yeux d'un observateur : faits publics, plus les faits privés qu'il connaît, pondérés par ce qu'il en croit (phase 8c). |
+| **Avant-projet** | Réforme préparée par la fédération avant sa publication ; seules les écuries qui en ont vent le connaissent, et approximativement (phase 8c). |
