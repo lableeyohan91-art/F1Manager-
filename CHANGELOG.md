@@ -397,3 +397,8 @@ Aucun code à ce stade.
 
 ### Performances
 - Démissions et ruptures : index des souvenirs, contrats et anciennetés pendant le passage mensuel (29 s → 5,8 s sur 50 saisons), résultats identiques (empreintes vérifiées).
+
+## [Fin de la phase 8] — 23/11/2026
+
+### Mesures
+- Rapport court de fin de phase : `docs/rapports/2026-11-23-p8d-fin-de-phase-8.md` ; références `p8d-*` ; outil `tools/diagnostic-8d.mts`.
