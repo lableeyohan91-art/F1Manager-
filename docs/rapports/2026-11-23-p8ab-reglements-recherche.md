@@ -62,7 +62,7 @@
 
 **Format de sauvegarde 20**, avec migration et test. **157 tests** (10 nouveaux dans `tests/technique.test.ts`).
 
-## 2. Un choix de mise en œuvre à te signaler (D-133, à discuter)
+## 2. Un choix de mise en œuvre (D-133, validé par le porteur)
 
 Le premier essai donnait un résultat absurde : **13 saisons du même règlement**, prolongé à chaque vote.
 
