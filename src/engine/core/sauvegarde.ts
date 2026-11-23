@@ -216,6 +216,15 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['agents'] ??= {};
     return { ...m, versionFormat: 17 };
   },
+  // v17 → v18 (audit de la phase 7) : les entreprises créées pour un pilote sont rattachées à lui (hors vivier général).
+  17: (m) => {
+    const t = ((m['tables'] ?? {}) as Record<string, Record<string, Record<string, unknown>>>)['sponsors'] ?? {};
+    for (const [id, s] of Object.entries(t)) {
+      const r = /^spo_(fam|nat)_(.+)$/.exec(id);
+      if (r) s['lie'] = `per_${r[2]}`;
+    }
+    return { ...m, versionFormat: 18 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

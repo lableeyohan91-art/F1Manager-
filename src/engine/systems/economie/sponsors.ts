@@ -36,6 +36,19 @@ const couvre = (c: ContratSponsoring, annee: number) => c.statut === 'actif' && 
 export const contratsActifs = (m: Monde, annee: number, idEcurie?: string) =>
   contratsSponsoring(m).filter((c) => couvre(c, annee) && (!idEcurie || c.ecurie === idEcurie));
 
+/**
+ * Audit de la phase 7 (priorité 1) — source commune des engagements d'un sponsor pour une saison :
+ * contrats d'écurie qui la couvrent, et sponsoring personnel d'un pilote (qui paie le pilote lui-même).
+ * Un sponsor engagé ne peut pas s'engager ailleurs : jamais deux fois le même budget.
+ */
+export function sponsorsEngages(monde: Monde, annee: number): Set<string> {
+  const res = new Set(contratsActifs(monde, annee).map((c) => c.sponsor));
+  for (const p of Object.values(table(monde, TABLES.personnes)) as unknown as { statut: string; sponsorPersonnel?: { sponsor: string; jusqua: number } }[]) {
+    if (p.statut !== 'retraite' && p.sponsorPersonnel && p.sponsorPersonnel.jusqua >= annee) res.add(p.sponsorPersonnel.sponsor);
+  }
+  return res;
+}
+
 /** Revenus de sponsoring prévus pour une année (hors primes d'objectif). */
 export function revenusSponsors(monde: Monde, idEcurie: string, annee: number): number {
   return contratsActifs(monde, annee, idEcurie).reduce((a, c) => a + c.montantAnnuelMEUR, 0);
@@ -98,8 +111,9 @@ export function initialiserSponsors(monde: Monde): void {
 
 /** Départs des sponsors restés longtemps sans contrat, arrivées de nouvelles entreprises (volume borné). */
 function renouvelerVivier(monde: Monde, annee: number): void {
+  const engages = sponsorsEngages(monde, annee);
   for (const s of sponsors(monde)) {
-    if (!s.actif || contratsSponsoring(monde).some((c) => c.sponsor === s.id && c.statut === 'actif')) continue;
+    if (!s.actif || engages.has(s.id) || contratsSponsoring(monde).some((c) => c.sponsor === s.id && c.statut === 'actif')) continue;
     if (annee - s.derniereAnneeContrat >= VIVIER_SPONSORS.anneesSansContratAvantDepart && tirageLocal(monde, 'sponsor.depart', s.id, annee).chance(VIVIER_SPONSORS.probabiliteDepart)) {
       s.actif = false;
     }
@@ -108,9 +122,10 @@ function renouvelerVivier(monde: Monde, annee: number): void {
   // Volume borné : les sponsors inactifs sans contrat sont effacés (les contrats terminés gardent leur identifiant).
   const t = table(monde, TABLES.sponsors);
   for (const s of sponsors(monde)) {
-    if (!s.actif && !contratsSponsoring(monde).some((c) => c.sponsor === s.id && c.fin >= annee - 5)) delete t[s.id];
+    if (!s.actif && !engages.has(s.id) && !contratsSponsoring(monde).some((c) => c.sponsor === s.id && c.fin >= annee - 5)) delete t[s.id];
   }
-  const actifs = sponsors(monde).filter((s) => s.actif).length;
+  // Les entreprises liées à un pilote (phase 7c) ne comptent pas dans le vivier général (elles ne sponsorisent que leur pilote).
+  const actifs = sponsors(monde).filter((s) => s.actif && !s.lie).length;
   const n = Math.min(VIVIER_SPONSORS.arriveesParAn, Math.max(0, VIVIER_SPONSORS.maximum - actifs));
   for (let i = 0; i < n; i++) {
     const s = creerSponsor(monde, annee);
@@ -231,8 +246,8 @@ export function evaluerSponsors(monde: Monde, annee: number, financesDe: (id: st
 export function marcheSponsors(monde: Monde, annee: number): void {
   evoluerConjoncture(monde, annee);
   renouvelerVivier(monde, annee);
-  const sousContrat = new Set(contratsActifs(monde, annee).map((c) => c.sponsor));
-  const libres = sponsors(monde).filter((s) => s.actif && !sousContrat.has(s.id)).sort((a, b) => b.budgetMEUR - a.budgetMEUR || (a.id < b.id ? -1 : 1));
+  const sousContrat = sponsorsEngages(monde, annee);
+  const libres = sponsors(monde).filter((s) => s.actif && !s.lie && !sousContrat.has(s.id)).sort((a, b) => b.budgetMEUR - a.budgetMEUR || (a.id < b.id ? -1 : 1));
   const eqs = ecuriesActives(monde);
   for (const s of libres) {
     let meilleur: { e: Ecurie; a: number; rang: RangSponsor; montant: number } | undefined;

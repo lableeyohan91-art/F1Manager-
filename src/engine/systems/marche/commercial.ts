@@ -11,7 +11,7 @@
  */
 
 import {
-  AGENTS, ATTRAIT_PILOTES, PILOTES_PAYANTS, POPULARITE, SPONSORS_PERSONNELS, TAILLE_MARCHE, TAILLE_MARCHE_DEFAUT, VALEUR_COMMERCIALE,
+  AGENTS, ATTRAIT_PILOTES, ENTREPRISES_LIEES, PILOTES_PAYANTS, POPULARITE, SPONSORS_PERSONNELS, TAILLE_MARCHE, TAILLE_MARCHE_DEFAUT, VALEUR_COMMERCIALE,
 } from '../../balance/commercial';
 import { SEUILS_RANG_SPONSOR } from '../../balance/finances';
 import { ajouterEvenement } from '../../core/evenements';
@@ -25,7 +25,7 @@ import { TABLES, type Agent, type Candidature, type ContratSponsoring, type Ecur
 import { ecuriesActives } from '../saison/performance';
 import { niveauMetier, valeurMarche } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
-import { emplacementsLibres, signerSponsor } from '../economie/sponsors';
+import { emplacementsLibres, signerSponsor, sponsorsEngages } from '../economie/sponsors';
 
 const borner = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -89,47 +89,105 @@ export function sponsorsDuPilote(monde: Monde, idPilote: string): ContratSponsor
   return contratsSponsoring(monde).filter((c) => c.pilote === idPilote && c.statut === 'actif');
 }
 
+/** Secteurs des sponsors actifs d'une écurie pour une saison (exclusivité de secteur). */
+function secteursEcurie(monde: Monde, idEcurie: string, annee: number): Set<string | undefined> {
+  const ts = table(monde, TABLES.sponsors);
+  return new Set(contratsSponsoring(monde).filter((c) => c.statut === 'actif' && c.ecurie === idEcurie && c.debut <= annee && c.fin >= annee)
+    .map((c) => (ts[c.sponsor] as unknown as Sponsor | undefined)?.secteur));
+}
+
+export interface ApportCommercial {
+  /** Revenus versés au pilote lui-même (sponsor personnel) : ils réduisent ses exigences, l'écurie ne les touche pas. */
+  verseAuPilote: number;
+  /** Sponsors qui le suivent et pourraient être transférés (avant vérification des places et des secteurs). */
+  potentiel: number;
+  /** Part réellement transférable à l'écurie recruteuse : emplacement libre, pas de conflit de secteur, sponsor qui suit (sa nationalité). */
+  transferable: number;
+  /** Déjà acquis par l'écurie (le pilote y est déjà : rien de nouveau). */
+  dejaAcquis: number;
+  /** Nouveau et net pour l'écurie (transférable et pas déjà acquis). */
+  netNouveau: number;
+}
+
 /**
- * Apport commercial d'un candidat pour une écurie (M€/an) : sponsors qui le suivent ; pour un débutant, le budget familial
- * qui financera un sponsor personnel. Lu par le score de recrutement (pilotes payants, D-098).
+ * Audit de la phase 7 (priorité 2) — apport commercial RÉEL d'un candidat pour une écurie donnée (même calcul pour le joueur et l'IA).
+ * Les indemnités de transfert et les salaires sont comptés à part, dans le score de recrutement ; ici, seuls les revenus de sponsoring.
  */
+export function apportCommercialPour(monde: Monde, e: Ecurie, p: Personne, annee = monde.date.annee + 1): ApportCommercial {
+  const res: ApportCommercial = { verseAuPilote: 0, potentiel: 0, transferable: 0, dejaAcquis: 0, netNouveau: 0 };
+  if (!p.poste.startsWith('pilote')) return res;
+  if (p.sponsorPersonnel && p.sponsorPersonnel.jusqua >= annee) res.verseAuPilote = p.sponsorPersonnel.montantMEUR;
+  const ts = table(monde, TABLES.sponsors);
+  const libres = { ...emplacementsLibres(monde, e.id, annee) };
+  const secteurs = secteursEcurie(monde, e.id, annee);
+  const flux: { sponsor?: Sponsor; montant: number; suit: boolean }[] = sponsorsDuPilote(monde, p.id).map((c) => {
+    const sp = ts[c.sponsor] as unknown as Sponsor | undefined;
+    return { sponsor: sp, montant: c.montantAnnuelMEUR, suit: !!sp && sp.nationalite === p.nationalite };
+  });
+  // Débutant dont la famille finance la carrière : l'entreprise familiale suivra (si elle peut être créée).
+  if ((p.carriere?.saisonsF1 ?? 0) === 0 && (p.budgetFamilleMEUR ?? 0) >= SPONSORS_PERSONNELS.seuilFamilleMEUR && !flux.length) {
+    flux.push({ montant: (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille, suit: entreprisesLieesActives(monde) < ENTREPRISES_LIEES.maximum });
+  }
+  for (const f of flux) {
+    res.potentiel += f.montant;
+    if (p.ecurie === e.id && p.poste === 'pilote_titulaire') { res.dejaAcquis += f.montant; continue; }
+    if (!f.suit || (f.sponsor && secteurs.has(f.sponsor.secteur))) continue;
+    const rang = f.montant >= SEUILS_RANG_SPONSOR.principal && libres.principal > 0 ? 'principal' : libres.secondaire > 0 ? 'secondaire' : libres.principal > 0 ? 'principal' : null;
+    if (!rang) continue;
+    libres[rang]--;
+    res.transferable += rang === 'secondaire' ? Math.min(f.montant, SEUILS_RANG_SPONSOR.principal - 0.1) : f.montant;
+  }
+  res.netNouveau = res.transferable;
+  return res;
+}
+
+/** Apport commercial potentiel d'un pilote, toutes écuries confondues (indicateur ; le recrutement lit apportCommercialPour). */
 export function apportCommercial(monde: Monde, p: Personne): number {
   const suivent = sponsorsDuPilote(monde, p.id).reduce((a, c) => a + c.montantAnnuelMEUR, 0);
   const famille = (p.carriere?.saisonsF1 ?? 0) === 0 && (p.budgetFamilleMEUR ?? 0) >= SPONSORS_PERSONNELS.seuilFamilleMEUR ? (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille : 0;
   return suivent + famille;
 }
 
-/** Terme « apport commercial » du score de recrutement, à l'échelle du coût salarial (même référence de coût du poste). */
+/** Terme « apport commercial » du score de recrutement : revenus nouveaux et nets pour cette écurie, à l'échelle du coût salarial. */
 export function bonusPilotePayant(monde: Monde, e: Ecurie, p: Personne, duree: number): number {
   if (!p.poste.startsWith('pilote')) return 0;
   const budgetPoste = e.budgetMEUR * 0.05;
-  return (PILOTES_PAYANTS.poids * apportCommercial(monde, p)) / Math.max(1, budgetPoste) * Math.min(1, duree / 2);
+  return (PILOTES_PAYANTS.poids * apportCommercialPour(monde, e, p).netNouveau) / Math.max(1, budgetPoste) * Math.min(1, duree / 2);
 }
 
-/** Entreprise familiale (sponsor créé pour un pilote dont la famille finance la carrière). */
-function sponsorFamilial(monde: Monde, p: Personne): Sponsor {
-  const id = `spo_fam_${p.id.replace(/^per_/, '')}`;
-  const t = table(monde, TABLES.sponsors);
-  if (!t[id]) {
-    t[id] = {
-      id, nom: `Groupe ${p.nom}`, secteur: `groupe familial ${p.id}`, nationalite: p.nationalite, budgetMEUR: (p.budgetFamilleMEUR ?? 0) * 2,
-      image: 'nationalite', fidelite: 18, exigence: 4, rancunes: [], actif: true, derniereAnneeContrat: 0,
-    } satisfies Sponsor as unknown as Entite;
-  }
-  return t[id] as unknown as Sponsor;
+/** Nombre d'entreprises liées à un pilote actuellement actives (plafond, audit de la phase 7). */
+function entreprisesLieesActives(monde: Monde): number {
+  return (Object.values(table(monde, TABLES.sponsors)) as unknown as Sponsor[]).filter((s) => s.actif && s.lie).length;
 }
 
-/** Entreprise nationale créée pour un pilote populaire quand le vivier n'a pas de sponsor libre de sa nationalité. */
-function entrepriseNationale(monde: Monde, p: Personne, valeur: number): Sponsor {
-  const id = `spo_nat_${p.id.replace(/^per_/, '')}`;
+/** Entreprise liée à un pilote (familiale ou nationale) ; null si le plafond du monde est atteint. */
+function entrepriseLiee(monde: Monde, p: Personne, genre: 'fam' | 'nat', montant: number): Sponsor | null {
+  const id = `spo_${genre}_${p.id.replace(/^per_/, '')}`;
   const t = table(monde, TABLES.sponsors);
-  if (!t[id]) {
-    t[id] = {
-      id, nom: `Entreprise ${p.nationalite} (soutien de ${p.nom})`, secteur: `soutien national ${p.id}`, nationalite: p.nationalite, budgetMEUR: valeur * 2,
-      image: 'nationalite', fidelite: 14, exigence: 6, rancunes: [], actif: true, derniereAnneeContrat: 0,
-    } satisfies Sponsor as unknown as Entite;
+  const existant = t[id] as unknown as Sponsor | undefined;
+  if (existant?.actif) return existant;
+  // Plafond du monde, y compris pour réactiver une entreprise déjà créée.
+  if (entreprisesLieesActives(monde) >= ENTREPRISES_LIEES.maximum) return null;
+  if (existant) { existant.actif = true; return existant; }
+  const s: Sponsor = {
+    id, nom: genre === 'fam' ? `Groupe ${p.nom}` : `Entreprise ${p.nationalite} (soutien de ${p.nom})`,
+    secteur: `${genre === 'fam' ? 'groupe familial' : 'soutien national'} ${p.id}`, nationalite: p.nationalite,
+    budgetMEUR: arrondi(montant * ENTREPRISES_LIEES.multipleBudget), image: 'nationalite', fidelite: genre === 'fam' ? 18 : 14, exigence: genre === 'fam' ? 4 : 6,
+    rancunes: [], actif: true, derniereAnneeContrat: 0, lie: p.id,
+  };
+  t[id] = s as unknown as Entite;
+  ajouterEvenement(monde, { type: 'sponsor.creation_liee', acteurs: [{ id: p.id, role: 'pilote' }, { id, role: 'sponsor' }], importance: 1, contexte: { genre, budget: s.budgetMEUR } });
+  return s;
+}
+
+/** Fin de vie : une entreprise liée cesse quand son pilote n'est plus titulaire depuis plus d'un an (ou a disparu). */
+function fermerEntreprisesLiees(monde: Monde, annee: number): void {
+  const engagees = sponsorsEngages(monde, annee);
+  for (const s of Object.values(table(monde, TABLES.sponsors)) as unknown as Sponsor[]) {
+    if (!s.lie || !s.actif || engagees.has(s.id)) continue;
+    const p = table(monde, TABLES.personnes)[s.lie] as unknown as Personne | undefined;
+    if (!p || p.statut === 'retraite' || annee - s.derniereAnneeContrat > ENTREPRISES_LIEES.anneesSansPilote) s.actif = false;
   }
-  return t[id] as unknown as Sponsor;
 }
 
 /** Début d'année : les pilotes titulaires qui le peuvent attirent un sponsor personnel ; les sponsors suivent leurs pilotes. */
@@ -141,28 +199,33 @@ export function sponsorsPersonnels(monde: Monde, annee: number): void {
     if (p && p.statut === 'actif' && p.poste === 'pilote_titulaire' && p.ecurie === c.ecurie) continue;
     suivreLePilote(monde, c, p, annee);
   }
-  // 2. Nouveaux sponsors personnels.
-  const sousContrat = new Set(contratsSponsoring(monde).filter((c) => c.statut === 'actif').map((c) => c.sponsor));
-  const libres = (Object.values(table(monde, TABLES.sponsors)) as unknown as Sponsor[]).filter((s) => s.actif && !sousContrat.has(s.id)).sort((a, b) => (a.id < b.id ? -1 : 1));
+  fermerEntreprisesLiees(monde, annee);
+  // 2. Nouveaux sponsors personnels. Source commune des engagements : un sponsor déjà engagé (écurie ou pilote) ne l'est jamais deux fois.
+  const engages = sponsorsEngages(monde, annee);
+  const libres = (Object.values(table(monde, TABLES.sponsors)) as unknown as Sponsor[]).filter((s) => s.actif && !s.lie && !engages.has(s.id)).sort((a, b) => (a.id < b.id ? -1 : 1));
   for (const p of titulaires(monde)) {
     if (sponsorsDuPilote(monde, p.id).length || (p.sponsorPersonnel && p.sponsorPersonnel.jusqua >= annee)) continue;
     const valeur = valeurCommerciale(monde, p);
     const famille = (p.budgetFamilleMEUR ?? 0) >= SPONSORS_PERSONNELS.seuilFamilleMEUR;
     if (valeur < SPONSORS_PERSONNELS.seuilMEUR && !famille) continue;
     if (!tirageLocal(monde, 'sponsor.personnel', p.id, annee).chance(SPONSORS_PERSONNELS.probabilite)) continue;
-    // Entreprise familiale ; sinon un sponsor libre de sa nationalité ; sinon une entreprise nationale attirée par sa popularité (§8).
-    const s = famille && valeur < SPONSORS_PERSONNELS.seuilMEUR ? sponsorFamilial(monde, p)
-      : libres.find((x) => x.nationalite === p.nationalite && !sousContrat.has(x.id)) ?? entrepriseNationale(monde, p, valeur);
+    const parFamille = famille && valeur < SPONSORS_PERSONNELS.seuilMEUR;
+    let montant = arrondi(parFamille ? (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille : valeur * SPONSORS_PERSONNELS.part);
+    // Entreprise familiale ; sinon un sponsor libre de sa nationalité ; sinon une entreprise nationale (plafonnée).
+    const s = parFamille ? entrepriseLiee(monde, p, 'fam', montant)
+      : libres.find((x) => x.nationalite === p.nationalite && !engages.has(x.id)) ?? entrepriseLiee(monde, p, 'nat', montant);
     if (!s) continue;
-    const montant = arrondi(famille && valeur < SPONSORS_PERSONNELS.seuilMEUR ? (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille : valeur * SPONSORS_PERSONNELS.part);
+    // Conservation du budget : jamais plus qu'une part du budget du sponsor.
+    montant = arrondi(Math.min(montant, s.budgetMEUR * ENTREPRISES_LIEES.partMaxBudget));
     if (montant <= 0) continue;
+    engages.add(s.id);
     const e = table(monde, TABLES.ecuries)[p.ecurie] as unknown as Ecurie;
     const rang = emplacementLibrePour(monde, e.id, annee, montant, s);
-    sousContrat.add(s.id);
     if (rang) {
       const c = signerSponsor(monde, s, e, rang, Math.min(montant, rang === 'secondaire' ? SEUILS_RANG_SPONSOR.principal - 0.1 : rang === 'principal' ? SEUILS_RANG_SPONSOR.titre - 0.1 : montant), annee, false);
       c.pilote = p.id;
       c.fin = Math.min(c.fin, annee + SPONSORS_PERSONNELS.dureeAns - 1);
+      s.derniereAnneeContrat = c.fin;
       ajouterEvenement(monde, { type: 'sponsor.personnel', acteurs: [{ id: p.id, role: 'pilote' }, { id: s.id, role: 'sponsor' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'public', contexte: { contrat: c.id, montant: c.montantAnnuelMEUR, genre: 'accompagnant' }, texte: `${s.nom} accompagne ${p.prenom} ${p.nom} chez ${e.nom}.` });
     } else {
       p.sponsorPersonnel = { sponsor: s.id, montantMEUR: montant, jusqua: annee + SPONSORS_PERSONNELS.dureeAns - 1 };

@@ -526,6 +526,8 @@ export interface Sponsor {
   actif: boolean;
   /** Dernière année sous contrat (pour le renouvellement du vivier). */
   derniereAnneeContrat: number;
+  /** Phase 7c : entreprise familiale ou nationale liée à un pilote (ne sponsorise que lui ; hors vivier général ; disparaît avec lui). */
+  lie?: string;
 }
 export type RangSponsor = 'titre' | 'principal' | 'secondaire';
 export interface ContratSponsoring {

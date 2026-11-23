@@ -60,3 +60,11 @@ export const AGENTS = {
   commissionMin: 0.05, commissionMax: 0.2, surenchere: 0.15, partCommissionRessentie: 0.5, pousseeTransfert: 0.06, demarchages: 3,
   semaine: 2, semaineDemarchage: 28,
 };
+
+/**
+ * Audit de la phase 7 (priorité 3) — entreprises créées pour un pilote (familiale ou nationale) :
+ * au plus `maximum` actives en même temps dans le monde ; budget = valeur commerciale (ou budget familial) × multipleBudget ;
+ * le montant engagé ne dépasse jamais partMaxBudget de leur budget ; elles cessent quand leur pilote n'est plus titulaire depuis
+ * plus de `anneesSansPilote` saisons (ou à sa retraite). Les sponsors du vivier engagés auprès d'un pilote respectent aussi partMaxBudget.
+ */
+export const ENTREPRISES_LIEES = { maximum: 15, multipleBudget: 2, partMaxBudget: 0.5, anneesSansPilote: 1 };
