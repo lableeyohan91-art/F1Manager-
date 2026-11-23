@@ -418,3 +418,4 @@ Aucun code à ce stade.
 - Dates d'arrivée des dirigeants réels dans `carrieres.csv` : ancienneté et usure du succès dès le départ.
 - Chronique du passé : titres 2010–2026 et grandes ères.
 - La grille, les contrats et les voitures de 2027 restent ceux des données (test). Tests `tests/histoire.test.ts`. 193 tests.
+- Rapport court : `docs/rapports/2026-11-23-p9-histoire-ancree.md` ; références `p9-*`.
