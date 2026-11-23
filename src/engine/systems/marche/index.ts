@@ -33,6 +33,7 @@ import { dureeMaxEffectif, lireConditions, motifRefusConseil, nombrePlaces, occu
 import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer, nePasProlonger, proposerProlongation } from '../humain/contrats';
 import { candidaturesSpontanees, commandeCandidature, planPersonnel } from './personnel';
 import { apportCommercialPour, bonusPilotePayant, systemeCommercial, transfererSponsors } from './commercial';
+import { PILOTES_PAYANTS } from '../../balance/commercial';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 const POSTE_MARCHE: Poste = 'pilote_titulaire';
@@ -431,12 +432,20 @@ interface Cible { p: Personne; score: number; salaire: number; duree: number; in
 
 /** Vivier commun du tour : présélection sur l'opinion du paddock (niveau et potentiel estimé publics), pour borner le calcul. */
 function vivier(monde: Monde): Personne[] {
-  return personnes(monde)
+  const notes = personnes(monde)
     .filter((p) => p.statut !== 'retraite' && p.poste.startsWith('pilote') && monde.date.annee + 1 - p.anneeNaissance >= AGE_MINIMAL_F1)
     .map((p) => ({ p, v: niveauMetier(p) + 0.5 * Math.max(0, potentielEstime(monde, null, p).centre - niveauMetier(p)) }))
-    .sort((a, b) => b.v - a.v || (a.p.id < b.p.id ? -1 : 1))
-    .slice(0, PLAN_MARCHE.vivier)
+    .sort((a, b) => b.v - a.v || (a.p.id < b.p.id ? -1 : 1));
+  const sportifs = notes.slice(0, PLAN_MARCHE.vivier).map((x) => x.p);
+  // D-131 : les pilotes qui apportent un soutien commercial réel (sponsors qui les suivent, engagement conditionnel) sont aussi examinés,
+  // s'ils ont un niveau minimal. Ils ne sont pas préférés d'office : le score de recrutement pèse leur niveau ET leur apport.
+  const pris = new Set(sportifs.map((p) => p.id));
+  const soutenus = notes
+    .filter((x) => !pris.has(x.p.id) && niveauMetier(x.p) >= PILOTES_PAYANTS.niveauMin
+      && (!!x.p.engagementF1 || (Object.values(table(monde, TABLES.contratsSponsoring)) as unknown as { pilote?: string; statut: string }[]).some((c) => c.pilote === x.p.id && c.statut === 'actif')))
+    .slice(0, PILOTES_PAYANTS.vivierSupplementaire)
     .map((x) => x.p);
+  return [...sportifs, ...soutenus];
 }
 
 /** Score de marché : score de recrutement (phase 4/6) + pari sur la progression pendant le contrat − coût de l'indemnité. */

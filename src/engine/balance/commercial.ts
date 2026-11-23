@@ -42,7 +42,14 @@ export const SPONSORS_PERSONNELS = { seuilMEUR: 4, part: 0.5, seuilFamilleMEUR: 
  * Pilotes payants : apport commercial d'un candidat (sponsors qui le suivent, ou budget familial pour un débutant) ajouté au score de
  * recrutement, rapporté à la référence de coût du poste (même échelle que le coût salarial). Aucune règle n'oppose talent et argent (D-099).
  */
-export const PILOTES_PAYANTS = { poids: 0.4 };
+export const PILOTES_PAYANTS = {
+  poids: 0.4,
+  /**
+   * D-131 : en plus des meilleurs pilotes sportivement, le marché examine jusqu'à `vivierSupplementaire` pilotes qui apportent un soutien
+   * commercial réel, à condition d'un niveau minimal `niveauMin` (/20) : la compétence sportive reste un filtre.
+   */
+  vivierSupplementaire: 10, niveauMin: 12,
+};
 
 /** Attrait d'une écurie pour les sponsors (D-096) : popularité internationale de son pilote le plus populaire, jeune espoir (≤ ageJeune). */
 export const ATTRAIT_PILOTES = { popularite: 0.12, jeuneEspoir: 0.05, ageJeune: 23, reputationJeune: 50 };
