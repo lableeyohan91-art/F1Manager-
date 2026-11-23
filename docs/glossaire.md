@@ -193,3 +193,6 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Demande de départ** | Demande d'une personne de quitter son poste à l'amiable, contre une partie de son indemnité ; l'employeur accepte ou refuse (phase 8d). |
 | **Rupture négociée** | Fin de contrat d'un commun accord, avec une indemnité convenue, proposée par l'employeur ou demandée par la personne (D-077, phase 8d). |
 | **Démission** | Départ unilatéral d'une personne, sans indemnité, suivi d'une période de non-concurrence (phase 8d). |
+| **Groupe social** | Ensemble de personnes liées par l'affinité ou le respect et une expérience commune, détecté chaque saison autour d'un leader, jamais créé à la main (memoire.md §4, phase 8d). |
+| **Lien social** | Relation de la mémoire v1, plus une affinité née de valeurs proches et un respect né de la compétence, en proportion de la familiarité ; lu seulement par les groupes (D-137). |
+| **Leader (groupe)** | Membre d'un groupe social qui reçoit le plus de respect ; quand il change d'écurie, certains membres veulent le suivre (phase 8d). |

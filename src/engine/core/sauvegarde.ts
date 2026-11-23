@@ -251,6 +251,12 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['equipesStands'] ??= {};
     return { ...m, versionFormat: 22 };
   },
+  // v22 → v23 (phase 8d-3) : groupes sociaux (détectés à la prochaine semaine de détection).
+  22: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['groupes'] ??= {};
+    return { ...m, versionFormat: 23 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

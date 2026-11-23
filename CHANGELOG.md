@@ -380,3 +380,10 @@ Aucun code à ce stade.
 - Envie de partir, demandes de départ à l'amiable, démissions (non-concurrence, trahison ressentie), ruptures négociées proposées par l'employeur (`systems/humain/departs.ts`, `balance/departs.ts`).
 - Commandes `contrat.rupture_negociee` et `contrat.repondre_depart` ; décisions de l'IA ; postes libérés pourvus par le recrutement habituel.
 - Demandes de départ et refus suivis par la diffusion de l'information (8c). Tests `tests/departs.test.ts`. 174 tests.
+
+## [Phase 8d-3 : groupes sociaux] — 23/11/2026
+
+### Ajouté (D-137)
+- Groupes sociaux émergents (`systems/humain/groupes.ts`, `balance/groupes.ts`) : lien social, détection annuelle, leader, types déduits (clan, opposants, mentor, anciens collaborateurs, collègues).
+- Effets : membres qui suivent leur leader (candidatures), climat dégradé par un groupe d'opposants.
+- Format de sauvegarde 23, migration et test. Tests `tests/groupes.test.ts`. 179 tests.
