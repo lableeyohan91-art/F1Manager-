@@ -8,15 +8,16 @@ import { fichiersGrille2026 } from '../donnees';
 import { charger, enregistrer } from '../../platform/navigateur/stockage';
 import { avancer, commander, ecurieJoueur, faitsVisibles, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, prochainGP, saisonCourante, type ArretAvance, type Partie } from './partie';
 import { EcranEquipe, EcranMarche, FichePersonne } from './Equipe';
+import { EcranActualites, EcranArchives, Image } from './Medias';
 import { EcranChampionnat, EcranDirection, EcranFinances, EcranReglages, EcranTechnique } from './Gestion';
 import './jeu.css';
 
-export type Ecran = 'tableau' | 'messages' | 'equipe' | 'marche' | 'technique' | 'finances' | 'championnat' | 'direction' | 'reglages';
+export type Ecran = 'tableau' | 'actualites' | 'equipe' | 'marche' | 'technique' | 'finances' | 'championnat' | 'archives' | 'direction' | 'reglages';
 /** Sur téléphone, les 4 premiers écrans sont dans la barre du bas ; les autres derrière « Plus ». */
 const PRINCIPAUX = 4;
 const NAV: [Ecran, string, string][] = [
-  ['tableau', 'Accueil', '◉'], ['messages', 'Messages', '✉'], ['equipe', 'Équipe', '☰'], ['marche', 'Marché', '⇄'], ['technique', 'Technique', '⚙'],
-  ['finances', 'Finances', '€'], ['championnat', 'Championnat', '🏁'], ['direction', 'Direction', '⚖'], ['reglages', 'Réglages', '⋯'],
+  ['tableau', 'Accueil', '◉'], ['actualites', 'Actualités', '✉'], ['equipe', 'Équipe', '☰'], ['marche', 'Marché', '⇄'], ['technique', 'Technique', '⚙'],
+  ['finances', 'Finances', '€'], ['championnat', 'Championnat', '🏁'], ['archives', 'Archives', '★'], ['direction', 'Direction', '⚖'], ['reglages', 'Réglages', '⋯'],
 ];
 export const NOM_SAUVEGARDE = 'partie-joueur';
 
@@ -95,7 +96,8 @@ export function Jeu() {
         {fiche ? <FichePersonne partie={p} id={fiche} nav={nav} retour={() => setFiche(null)} /> : (
           <>
             {ecran === 'tableau' && <TableauDeBord partie={p} nav={nav} lancer={lancer} occupe={!!calcul} />}
-            {ecran === 'messages' && <EcranMessages partie={p} />}
+            {ecran === 'actualites' && <EcranActualites partie={p} nav={nav} />}
+            {ecran === 'archives' && <EcranArchives partie={p} />}
             {ecran === 'equipe' && <EcranEquipe partie={p} nav={nav} />}
             {ecran === 'marche' && <EcranMarche partie={p} nav={nav} />}
             {ecran === 'technique' && <EcranTechnique partie={p} nav={nav} />}
@@ -215,8 +217,9 @@ const LIB_DECISION: Record<DecisionEnAttente['type'], string> = {
 };
 
 function cibleDecision(d: DecisionEnAttente, nav: Navigation) {
-  if (d.personne && d.type !== 'offre_marche') return () => nav.ouvrirPersonne(d.personne!);
+  if (d.personne && d.type !== 'offre_marche' && d.type !== 'conference') return () => nav.ouvrirPersonne(d.personne!);
   if (d.type === 'poste_vacant' || d.type === 'offre_marche') return () => nav.aller('marche');
+  if (d.type === 'conference') return () => nav.aller('actualites');
   return () => nav.aller('direction');
 }
 
@@ -252,6 +255,7 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
           <h3>Finances</h3>
           {fi && <p>Trésorerie <strong>{meur(fi.tresorerieMEUR)}</strong></p>}
           {fi && <p class="muted">Développement {meur(fi.budget.developpementMEUR)} · plafond {meur(plafond(m))}{fi.detteMEUR > 0 ? ` · dette ${meur(fi.detteMEUR)}` : ''}</p>}
+          <p class="muted petit">Image publique : <Image v={e.image} /></p>
         </div>
       </div>
       <div class="carte">
@@ -274,7 +278,7 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
       <div class="carte">
         <h3>Dernières nouvelles de l’écurie</h3>
         <ListeFaits faits={faitsVisibles(m, 'ecurie', 6)} />
-        <button class="btn" onClick={() => nav.aller('messages')}>Tous les messages</button>
+        <button class="btn" onClick={() => nav.aller('actualites')}>Actualités</button>
       </div>
     </>
   );
@@ -286,22 +290,6 @@ export function ListeFaits({ faits }: { faits: { id: string; date: { annee: numb
     <ul class="liste-faits">
       {faits.map((f) => <li key={f.id} class={f.importance >= 4 ? 'fort' : ''}><span class="muted petit">{f.date.annee} · sem. {f.date.semaine}</span> {f.texte}</li>)}
     </ul>
-  );
-}
-
-function EcranMessages({ partie }: { partie: Partie }) {
-  const [portee, setPortee] = useState<'ecurie' | 'paddock'>('ecurie');
-  return (
-    <>
-      <div class="onglets">
-        <button class={`btn ${portee === 'ecurie' ? 'actif' : ''}`} onClick={() => setPortee('ecurie')}>Mon écurie</button>
-        <button class={`btn ${portee === 'paddock' ? 'actif' : ''}`} onClick={() => setPortee('paddock')}>Paddock</button>
-      </div>
-      <div class="carte">
-        <p class="muted petit">Seuls les faits publics, ou connus de vous et de votre écurie, sont affichés. Les faits mineurs s’effacent après une saison.</p>
-        <ListeFaits faits={faitsVisibles(partie.monde, portee, 120)} />
-      </div>
-    </>
   );
 }
 

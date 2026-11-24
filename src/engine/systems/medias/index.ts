@@ -137,9 +137,12 @@ function bonusLigne(media: Media, type: string): number {
   return 0;
 }
 
+/** Titre : la phrase du fait si elle est courte ; sinon sa première phrase, ou un début coupé (le texte complet reste dans l'article). */
 function titreDe(e: Evenement): string {
-  const t = (e.texte ?? '').split(/(?<=[.!?])\s/)[0] ?? '';
-  return t.length > 110 ? `${t.slice(0, 107)}…` : t;
+  const texte = e.texte ?? '';
+  if (texte.length <= ARTICLES.longueurTitre) return texte;
+  const premiere = texte.split(/(?<=[.!?])\s(?=[A-ZÀ-Ý])/)[0] ?? texte;
+  return premiere.length <= ARTICLES.longueurTitre ? premiere : `${premiere.slice(0, ARTICLES.longueurTitre - 1)}…`;
 }
 
 function genreDe(type: string): Article['genre'] {

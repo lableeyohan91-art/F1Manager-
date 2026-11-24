@@ -59,12 +59,12 @@ async function parcours(nomAppareil, contexteOptions) {
   ok(`${nomAppareil} : avance jusqu’aux décisions (${await page.locator('.jeu-titre .muted').textContent()})`);
   await capture('04-tableau-apres');
 
-  for (const [ecran, texte] of [['Messages', 'Mon écurie'], ['Équipe', 'Effectif de'], ['Marché', 'Cibles possibles'], ['Technique', 'Savoir technique'], ['Finances', 'Budget de développement'], ['Championnat', 'Constructeurs'], ['Direction', 'Délégations'], ['Réglages', 'Mesure des performances']]) {
+  for (const [ecran, texte] of [['Actualités', 'À la une'], ['Archives', 'Records'], ['Équipe', 'Effectif de'], ['Marché', 'Cibles possibles'], ['Technique', 'Savoir technique'], ['Finances', 'Budget de développement'], ['Championnat', 'Constructeurs'], ['Direction', 'Délégations'], ['Réglages', 'Mesure des performances']]) {
     await allerA(ecran);
     await page.getByText(texte).first().waitFor();
     await capture(`05-${ecran.normalize('NFD').replace(/[^a-zA-Z]/g, '').toLowerCase()}`);
   }
-  ok(`${nomAppareil} : les 8 écrans s’ouvrent`);
+  ok(`${nomAppareil} : les 9 écrans s’ouvrent`);
 
   // Fiche d'un pilote de l'équipe, et une action (soutien).
   await allerA('Équipe');

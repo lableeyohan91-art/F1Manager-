@@ -207,3 +207,12 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Délégation** | Domaine de décision (pilotes, personnel, recherche, stands, académie, politique) que le joueur confie à son équipe : elle décide avec exactement les règles de l'IA (phase 10). |
 | **Décision en attente** | Ce qui attend une réponse du joueur (contre-proposition, demande d'augmentation ou de départ, fin de contrat, place à pourvoir, vote), avec son échéance et la conséquence d'une absence de réponse (phase 10). |
 | **Filet de sécurité** | Recrutement d'office d'un remplaçant pour un poste encore vacant, la même règle pour toutes les écuries : une écurie n'est jamais sans directeur ni sans pilote (phase 10). |
+| **Média** | Journal fictif (`data/commun/medias.csv`) avec une ligne éditoriale (quotidien de référence, tabloïd, revue technique, presse nationale) et une fiabilité ; il ne publie que des faits du moteur (phase 11). |
+| **Article** | Ce qu'un média publie à partir d'un fait du moteur (jamais inventé) ; volume borné (phase 11). |
+| **Rumeur de presse** | Article présenté comme une rumeur : un fait qui circule déjà dans le paddock (exagéré), ou une rumeur de transfert, vraie ou fausse ; le moteur sait laquelle, le joueur non (phase 11). |
+| **Image publique** | Manière dont une personne ou une écurie est perçue, de −100 à 100, distincte de la popularité ; lue par la valeur commerciale, les sponsors, le conseil et les candidats (phase 11, D-149). |
+| **Exposition médiatique** | Présence récente dans les articles (0 à 100), qui s'efface ; elle nourrit la popularité (phase 11). |
+| **Scandale** | Fait privé grave, strictement professionnel et issu de la simulation, révélé par la presse : image en baisse, sponsors sensibles déçus (phase 11). |
+| **Conférence de presse** | Question d'un journaliste à un team principal, avec quelques réponses possibles (commande `media.declaration`, commune au joueur et à l'IA) ; délégable au service de communication (phase 11). |
+| **Objectif annoncé** | « Viser le titre » déclaré en conférence de presse : le conseil juge la saison sur cet objectif (phase 11). |
+| **Record** | Meilleure performance (titres depuis 2010, victoires et podiums depuis 2027) ; quand il change de détenteur, c'est un fait et un article (phase 11). |

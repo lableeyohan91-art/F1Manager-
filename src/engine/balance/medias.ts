@@ -5,11 +5,12 @@
 /**
  * Choix des articles : chaque semaine, chaque média retient au plus `parSemaine` faits dont le score ≥ `seuil`.
  * score = importance + bonus de ligne éditoriale (par type de fait) + popularité des sujets / `diviseurPopularite`.
+ * Titre : la phrase du fait jusqu'à `longueurTitre` caractères.
  * Hors de sa ligne éditoriale (aucun bonus), un média autre que le quotidien de référence ne reprend qu'un fait d'importance ≥ `importanceHorsLigne`.
  * Volumes : les articles d'importance < `importanceArchive` sont effacés après `saisonsConservees` saisons ; les autres restent,
  * au plus `archiveParSaison` par saison (les plus importants).
  */
-export const ARTICLES = { parSemaine: 3, seuil: 3, diviseurPopularite: 40, saisonsConservees: 1, importanceArchive: 4, archiveParSaison: 20, importanceHorsLigne: 5 };
+export const ARTICLES = { parSemaine: 3, seuil: 3, diviseurPopularite: 40, saisonsConservees: 1, importanceArchive: 4, archiveParSaison: 20, importanceHorsLigne: 5, longueurTitre: 120 };
 
 /** Faits jamais repris par la presse : la construction du passé, la vie interne sans intérêt public. */
 export const TYPES_IGNORES = ['histoire.', 'saison.', 'demo.', 'dev.', 'recrutement.genere', 'generation.'];

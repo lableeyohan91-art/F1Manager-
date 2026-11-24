@@ -7,6 +7,7 @@ import {
 import { LIBELLES_POSTES } from '../diagnostic/outils';
 import { commander, ecurieJoueur, meur, nom, nomEcurie, personne, verifier, type Partie } from './partie';
 import type { Navigation } from './Jeu';
+import { Image } from './Medias';
 
 const LIB_COMPETENCES: Record<string, string> = {
   freinage: 'Freinage', viragesLents: 'Virages lents', viragesRapides: 'Virages rapides', motricite: 'Motricité', depassement: 'Dépassement', defense: 'Défense',
@@ -96,6 +97,7 @@ export function FichePersonne({ partie, id, nav, retour }: { partie: Partie; id:
         {c && <p>Contrat : {c.salaireMEUR} M€ par an, jusqu’en {c.fin}{c.clauses.statutN1 ? ' · pilote n°1' : ''}{c.nonProlonge ? ' · ne sera pas prolongé' : ''}</p>}
         {!x.joueur && <p>Niveau actuel <strong>{Math.round(niveauMetier(x))}</strong>/20 · potentiel estimé par votre écurie : <strong>{Math.round(est.centre)}</strong> ± {Math.round(est.demiLargeur)}</p>}
         {!chezMoi && <p class="muted petit">Valeur sur le marché : {meur(valeurMarche(m, x))} par an.</p>}
+        <p class="muted petit">Image publique : <Image v={x.image} /></p>
       </div>
       {chezMoi && !x.joueur && (
         <div class="grille">
