@@ -31,7 +31,9 @@ export function caracteristique(monde: Monde, ecurie: Ecurie, v: Voiture, c: (ty
 }
 
 /** Poids des caractéristiques de la voiture sur un circuit (D-107), normalisés à 1. */
-export function poidsVoiture(circuit: Pick<Circuit, 'exigences' | 'altitudeM'>): Record<(typeof CARACTERISTIQUES_VITESSE)[number], number> {
+export function poidsVoiture(circuit: Pick<Circuit, 'exigences' | 'altitudeM' | 'poidsProfil'>): Record<(typeof CARACTERISTIQUES_VITESSE)[number], number> {
+  // Phase 11b : poids issus du profil de vitesse sur le tracé réel, quand une campagne les a injectés (expérience, D-159).
+  if (circuit.poidsProfil) return circuit.poidsProfil as Record<(typeof CARACTERISTIQUES_VITESSE)[number], number>;
   const brut = {} as Record<(typeof CARACTERISTIQUES_VITESSE)[number], number>;
   let total = 0;
   for (const c of CARACTERISTIQUES_VITESSE) {
@@ -46,7 +48,7 @@ export function poidsVoiture(circuit: Pick<Circuit, 'exigences' | 'altitudeM'>):
 }
 
 /** Indice de performance d'une voiture sur un circuit (moyenne pondérée des caractéristiques selon ses exigences). */
-export function indiceSurCircuit(monde: Monde, ecurie: Ecurie, circuit: Pick<Circuit, 'exigences' | 'altitudeM'>): number {
+export function indiceSurCircuit(monde: Monde, ecurie: Ecurie, circuit: Pick<Circuit, 'exigences' | 'altitudeM' | 'poidsProfil'>): number {
   const v = voitureDe(monde, ecurie.id);
   const poids = poidsVoiture(circuit);
   let s = 0;

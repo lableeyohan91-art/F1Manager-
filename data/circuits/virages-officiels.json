@@ -3,111 +3,683 @@
   "cir_monza": {
     "statut": "R",
     "virages": [
-      { "numero": 1, "nom": "Variante del Rettifilo (1)", "portionsM": [830], "confiance": "sûr" },
-      { "numero": 2, "nom": "Variante del Rettifilo (2)", "portionsM": [905], "confiance": "sûr" },
-      { "numero": 3, "nom": "Curva Biassono (Curva Grande)", "portionsM": [1025, 1235, 1410], "confiance": "sûr" },
-      { "numero": 4, "nom": "Variante della Roggia (1)", "portionsM": [2060], "confiance": "sûr" },
-      { "numero": 5, "nom": "Variante della Roggia (2)", "portionsM": [2125], "confiance": "sûr" },
-      { "numero": 6, "nom": "Lesmo 1", "portionsM": [2410], "confiance": "sûr" },
-      { "numero": 7, "nom": "Lesmo 2", "portionsM": [2765], "confiance": "sûr" },
-      { "numero": 8, "nom": "Variante Ascari (1)", "portionsM": [3870], "confiance": "sûr" },
-      { "numero": 9, "nom": "Variante Ascari (2)", "portionsM": [3965], "confiance": "sûr" },
-      { "numero": 10, "nom": "Variante Ascari (3)", "portionsM": [4075], "confiance": "sûr" },
-      { "numero": 11, "nom": "Curva Alboreto (Parabolica)", "portionsM": [5040], "confiance": "sûr" }
+      {
+        "numero": 1,
+        "nom": "Variante del Rettifilo (1)",
+        "portionsM": [
+          830
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 2,
+        "nom": "Variante del Rettifilo (2)",
+        "portionsM": [
+          905
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 3,
+        "nom": "Curva Biassono (Curva Grande)",
+        "portionsM": [
+          1025,
+          1235,
+          1410
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 4,
+        "nom": "Variante della Roggia (1)",
+        "portionsM": [
+          2060
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 5,
+        "nom": "Variante della Roggia (2)",
+        "portionsM": [
+          2125
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 6,
+        "nom": "Lesmo 1",
+        "portionsM": [
+          2410
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 7,
+        "nom": "Lesmo 2",
+        "portionsM": [
+          2765
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 8,
+        "nom": "Variante Ascari (1)",
+        "portionsM": [
+          3870
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 9,
+        "nom": "Variante Ascari (2)",
+        "portionsM": [
+          3965
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 10,
+        "nom": "Variante Ascari (3)",
+        "portionsM": [
+          4075
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 11,
+        "nom": "Curva Alboreto (Parabolica)",
+        "portionsM": [
+          5040
+        ],
+        "confiance": "sûr"
+      }
     ]
   },
   "cir_suzuka": {
     "statut": "R",
     "virages": [
-      { "numero": 1, "nom": "Premier virage", "portionsM": [605], "confiance": "sûr (portion commune avec le 2)" },
-      { "numero": 2, "nom": "Deuxième virage", "portionsM": [605], "confiance": "sûr (portion commune avec le 1)" },
-      { "numero": 3, "nom": "S (1)", "portionsM": [1010], "confiance": "sûr" },
-      { "numero": 4, "nom": "S (2)", "portionsM": [1145], "confiance": "sûr" },
-      { "numero": 5, "nom": "S (3)", "portionsM": [1290], "confiance": "sûr" },
-      { "numero": 6, "nom": "S (4)", "portionsM": [1440], "confiance": "sûr" },
-      { "numero": 7, "nom": "Courbe Dunlop", "portionsM": [1655, 2050], "confiance": "sûr" },
-      { "numero": 8, "nom": "Degner 1", "portionsM": [2225], "confiance": "sûr" },
-      { "numero": 9, "nom": "Degner 2", "portionsM": [2355], "confiance": "sûr" },
-      { "numero": 10, "nom": "Sous le pont", "portionsM": [2700, 2765], "confiance": "probable" },
-      { "numero": 11, "nom": "Épingle", "portionsM": [2835], "confiance": "sûr" },
-      { "numero": 12, "nom": "Courbe 200R", "portionsM": [3060, 3305, 3405], "confiance": "probable" },
-      { "numero": 13, "nom": "Spoon (1)", "portionsM": [3715], "confiance": "sûr (portion commune avec le 14)" },
-      { "numero": 14, "nom": "Spoon (2)", "portionsM": [3715], "confiance": "sûr (portion commune avec le 13)" },
-      { "numero": 15, "nom": "130R", "portionsM": [4905, 5060], "confiance": "sûr" },
-      { "numero": 16, "nom": "Chicane Casio (1)", "portionsM": [5310], "confiance": "sûr" },
-      { "numero": 17, "nom": "Chicane Casio (2)", "portionsM": [5410], "confiance": "sûr" },
-      { "numero": 18, "nom": "Dernier virage", "portionsM": [5480], "confiance": "sûr" }
+      {
+        "numero": 1,
+        "nom": "Premier virage",
+        "portionsM": [
+          605
+        ],
+        "confiance": "sûr (portion commune avec le 2)"
+      },
+      {
+        "numero": 2,
+        "nom": "Deuxième virage",
+        "portionsM": [
+          605
+        ],
+        "confiance": "sûr (portion commune avec le 1)"
+      },
+      {
+        "numero": 3,
+        "nom": "S (1)",
+        "portionsM": [
+          1010
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 4,
+        "nom": "S (2)",
+        "portionsM": [
+          1145
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 5,
+        "nom": "S (3)",
+        "portionsM": [
+          1290
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 6,
+        "nom": "S (4)",
+        "portionsM": [
+          1440
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 7,
+        "nom": "Courbe Dunlop",
+        "portionsM": [
+          1655,
+          2050
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 8,
+        "nom": "Degner 1",
+        "portionsM": [
+          2225
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 9,
+        "nom": "Degner 2",
+        "portionsM": [
+          2355
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 10,
+        "nom": "Sous le pont",
+        "portionsM": [
+          2700,
+          2765
+        ],
+        "confiance": "probable"
+      },
+      {
+        "numero": 11,
+        "nom": "Épingle",
+        "portionsM": [
+          2835
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 12,
+        "nom": "Courbe 200R",
+        "portionsM": [
+          3060,
+          3305,
+          3405
+        ],
+        "confiance": "probable"
+      },
+      {
+        "numero": 13,
+        "nom": "Spoon (1)",
+        "portionsM": [
+          3715
+        ],
+        "confiance": "sûr (portion commune avec le 14)"
+      },
+      {
+        "numero": 14,
+        "nom": "Spoon (2)",
+        "portionsM": [
+          3715
+        ],
+        "confiance": "sûr (portion commune avec le 13)"
+      },
+      {
+        "numero": 15,
+        "nom": "130R",
+        "portionsM": [
+          4905,
+          5060
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 16,
+        "nom": "Chicane Casio (1)",
+        "portionsM": [
+          5310
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 17,
+        "nom": "Chicane Casio (2)",
+        "portionsM": [
+          5410
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 18,
+        "nom": "Dernier virage",
+        "portionsM": [
+          5480
+        ],
+        "confiance": "sûr"
+      }
     ]
   },
   "cir_mexico": {
     "statut": "R",
     "virages": [
-      { "numero": 1, "portionsM": [1140], "confiance": "sûr" },
-      { "numero": 2, "portionsM": [1245], "confiance": "sûr" },
-      { "numero": 3, "portionsM": [1310], "confiance": "sûr" },
-      { "numero": 4, "portionsM": [1970], "confiance": "sûr" },
-      { "numero": 5, "portionsM": [2080], "confiance": "sûr" },
-      { "numero": 6, "portionsM": [2195], "confiance": "sûr" },
-      { "numero": 7, "nom": "Esses (1)", "portionsM": [2515], "confiance": "sûr" },
-      { "numero": 8, "nom": "Esses (2)", "portionsM": [2660], "confiance": "sûr" },
-      { "numero": 9, "nom": "Esses (3)", "portionsM": [2740], "confiance": "sûr" },
-      { "numero": 10, "nom": "Esses (4)", "portionsM": [2900], "confiance": "sûr" },
-      { "numero": 11, "nom": "Esses (5)", "portionsM": [3040, 3110], "confiance": "probable" },
-      { "numero": 12, "nom": "Entrée du stade", "portionsM": [3575], "confiance": "sûr" },
-      { "numero": 13, "nom": "Stade", "portionsM": [3750], "confiance": "sûr" },
-      { "numero": 14, "nom": "Stade", "portionsM": [3865], "confiance": "à vérifier" },
-      { "numero": 15, "nom": "Stade", "portionsM": [3865], "confiance": "à vérifier (non séparé du 14)" },
-      { "numero": 16, "nom": "Sortie du stade", "portionsM": [3955], "confiance": "probable (portion commune avec le 17)" },
-      { "numero": 17, "nom": "Dernier virage", "portionsM": [3955], "confiance": "probable (portion commune avec le 16)" }
+      {
+        "numero": 1,
+        "portionsM": [
+          1140
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 2,
+        "portionsM": [
+          1245
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 3,
+        "portionsM": [
+          1310
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 4,
+        "portionsM": [
+          1970
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 5,
+        "portionsM": [
+          2080
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 6,
+        "portionsM": [
+          2195
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 7,
+        "nom": "Esses (1)",
+        "portionsM": [
+          2515
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 8,
+        "nom": "Esses (2)",
+        "portionsM": [
+          2660
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 9,
+        "nom": "Esses (3)",
+        "portionsM": [
+          2740
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 10,
+        "nom": "Esses (4)",
+        "portionsM": [
+          2900
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 11,
+        "nom": "Esses (5)",
+        "portionsM": [
+          3040,
+          3110
+        ],
+        "confiance": "probable"
+      },
+      {
+        "numero": 12,
+        "nom": "Entrée du stade",
+        "portionsM": [
+          3575
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 13,
+        "nom": "Stade",
+        "portionsM": [
+          3750
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 14,
+        "nom": "Stade",
+        "portionsM": [
+          3865
+        ],
+        "confiance": "à vérifier"
+      },
+      {
+        "numero": 15,
+        "nom": "Stade",
+        "portionsM": [
+          3865
+        ],
+        "confiance": "à vérifier (non séparé du 14)"
+      },
+      {
+        "numero": 16,
+        "nom": "Sortie du stade",
+        "portionsM": [
+          3955
+        ],
+        "confiance": "probable (portion commune avec le 17)"
+      },
+      {
+        "numero": 17,
+        "nom": "Dernier virage",
+        "portionsM": [
+          3955
+        ],
+        "confiance": "probable (portion commune avec le 16)"
+      }
     ]
   },
   "cir_monaco": {
     "statut": "R",
     "virages": [
-      { "numero": 1, "nom": "Sainte-Dévote", "portionsM": [70], "confiance": "sûr" },
-      { "numero": 2, "nom": "Beau Rivage", "portionsM": [440, 520], "confiance": "probable" },
-      { "numero": 3, "nom": "Massenet", "portionsM": [625], "confiance": "sûr" },
-      { "numero": 4, "nom": "Casino", "portionsM": [835], "confiance": "sûr" },
-      { "numero": 5, "nom": "Mirabeau Haute", "portionsM": [1030], "confiance": "sûr" },
-      { "numero": 6, "nom": "Épingle (Grand Hôtel)", "portionsM": [1160], "confiance": "sûr" },
-      { "numero": 7, "nom": "Mirabeau Bas", "portionsM": [1275], "confiance": "sûr (portion commune avec le 8)" },
-      { "numero": 8, "nom": "Portier", "portionsM": [1275], "confiance": "sûr (portion commune avec le 7)" },
-      { "numero": 9, "nom": "Tunnel", "portionsM": [1635, 1920], "confiance": "sûr" },
-      { "numero": 10, "nom": "Nouvelle chicane (1)", "portionsM": [2035], "confiance": "sûr" },
-      { "numero": 11, "nom": "Nouvelle chicane (2)", "portionsM": [2085], "confiance": "sûr" },
-      { "numero": 12, "nom": "Tabac", "portionsM": [2310], "confiance": "sûr" },
-      { "numero": 13, "nom": "Piscine (1)", "portionsM": [], "confiance": "à vérifier (non détecté)" },
-      { "numero": 14, "nom": "Piscine (2)", "portionsM": [2545], "confiance": "à vérifier" },
-      { "numero": 15, "nom": "Piscine (3)", "portionsM": [2630], "confiance": "à vérifier" },
-      { "numero": 16, "nom": "Piscine (4)", "portionsM": [2710], "confiance": "à vérifier" },
-      { "numero": 17, "nom": "Rascasse", "portionsM": [2865], "confiance": "sûr (portion commune avec le 18)" },
-      { "numero": 18, "nom": "Anthony-Noghes", "portionsM": [2865], "confiance": "sûr (portion commune avec le 17)" },
-      { "numero": 19, "nom": "Ligne d'arrivée", "portionsM": [3090], "confiance": "probable" }
+      {
+        "numero": 1,
+        "nom": "Sainte-Dévote",
+        "portionsM": [
+          70
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 2,
+        "nom": "Beau Rivage",
+        "portionsM": [
+          440,
+          520
+        ],
+        "confiance": "probable"
+      },
+      {
+        "numero": 3,
+        "nom": "Massenet",
+        "portionsM": [
+          625
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 4,
+        "nom": "Casino",
+        "portionsM": [
+          835
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 5,
+        "nom": "Mirabeau Haute",
+        "portionsM": [
+          1030
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 6,
+        "nom": "Épingle (Grand Hôtel)",
+        "portionsM": [
+          1160
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 7,
+        "nom": "Mirabeau Bas",
+        "portionsM": [
+          1275
+        ],
+        "confiance": "sûr (portion commune avec le 8)"
+      },
+      {
+        "numero": 8,
+        "nom": "Portier",
+        "portionsM": [
+          1275
+        ],
+        "confiance": "sûr (portion commune avec le 7)"
+      },
+      {
+        "numero": 9,
+        "nom": "Tunnel",
+        "portionsM": [
+          1635,
+          1920
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 10,
+        "nom": "Nouvelle chicane (1)",
+        "portionsM": [
+          2035
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 11,
+        "nom": "Nouvelle chicane (2)",
+        "portionsM": [
+          2085
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 12,
+        "nom": "Tabac",
+        "portionsM": [
+          2310
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 13,
+        "nom": "Piscine (1)",
+        "portionsM": [],
+        "confiance": "probable : gauche rapide non détectée (angle trop faible)"
+      },
+      {
+        "numero": 14,
+        "nom": "Piscine (2)",
+        "portionsM": [
+          2545
+        ],
+        "confiance": "probable (ordre des sens cohérent : gauche-droite rapide, droite-gauche lente)"
+      },
+      {
+        "numero": 15,
+        "nom": "Piscine (3)",
+        "portionsM": [
+          2630
+        ],
+        "confiance": "probable (ordre des sens cohérent : gauche-droite rapide, droite-gauche lente)"
+      },
+      {
+        "numero": 16,
+        "nom": "Piscine (4)",
+        "portionsM": [
+          2710
+        ],
+        "confiance": "probable (ordre des sens cohérent : gauche-droite rapide, droite-gauche lente)"
+      },
+      {
+        "numero": 17,
+        "nom": "Rascasse",
+        "portionsM": [
+          2865
+        ],
+        "confiance": "sûr (portion commune avec le 18)"
+      },
+      {
+        "numero": 18,
+        "nom": "Anthony-Noghes",
+        "portionsM": [
+          2865
+        ],
+        "confiance": "sûr (portion commune avec le 17)"
+      },
+      {
+        "numero": 19,
+        "nom": "Ligne d'arrivée",
+        "portionsM": [
+          3090
+        ],
+        "confiance": "probable"
+      }
     ]
   },
   "cir_singapour": {
-    "statut": "R partiel",
-    "remarque": "Tracé modifié en 2023 (19 virages en 2025–2026). Rapprochement par l'ordre seulement : à vérifier sur un plan officiel avant validation.",
+    "statut": "R",
+    "source": "Wikipédia, « Marina Bay Street Circuit » (récit du tour virage par virage : sens et vitesses)",
+    "remarque": "Virages 4 et 18 : courbes rapides sans portion détectée.",
     "virages": [
-      { "numero": 1, "portionsM": [315], "confiance": "probable" },
-      { "numero": 2, "portionsM": [435], "confiance": "probable" },
-      { "numero": 3, "portionsM": [490], "confiance": "probable" },
-      { "numero": 4, "portionsM": [780], "confiance": "à vérifier" },
-      { "numero": 5, "portionsM": [1365], "confiance": "à vérifier" },
-      { "numero": 6, "portionsM": [], "confiance": "à vérifier (non détecté)" },
-      { "numero": 7, "portionsM": [1695], "confiance": "à vérifier" },
-      { "numero": 8, "portionsM": [1930], "confiance": "à vérifier" },
-      { "numero": 9, "portionsM": [2075], "confiance": "à vérifier" },
-      { "numero": 10, "portionsM": [2570], "confiance": "à vérifier" },
-      { "numero": 11, "portionsM": [2725], "confiance": "à vérifier" },
-      { "numero": 12, "portionsM": [2810], "confiance": "à vérifier" },
-      { "numero": 13, "portionsM": [2915], "confiance": "à vérifier" },
-      { "numero": 14, "portionsM": [2990], "confiance": "à vérifier" },
-      { "numero": 15, "portionsM": [3520], "confiance": "à vérifier" },
-      { "numero": 16, "portionsM": [3760], "confiance": "à vérifier" },
-      { "numero": 17, "portionsM": [4270], "confiance": "à vérifier" },
-      { "numero": 18, "portionsM": [4360], "confiance": "à vérifier" },
-      { "numero": 19, "portionsM": [4620], "confiance": "à vérifier" }
+      {
+        "numero": 1,
+        "portionsM": [
+          315
+        ],
+        "confiance": "sûr",
+        "nom": "Sheares"
+      },
+      {
+        "numero": 2,
+        "portionsM": [
+          435
+        ],
+        "confiance": "sûr"
+      },
+      {
+        "numero": 3,
+        "portionsM": [
+          490
+        ],
+        "confiance": "sûr (≈ 90 km/h, comme le récit)"
+      },
+      {
+        "numero": 4,
+        "portionsM": [],
+        "confiance": "non détecté (courbe à pleine vitesse)"
+      },
+      {
+        "numero": 5,
+        "portionsM": [
+          780
+        ],
+        "confiance": "sûr (freinage à ≈ 145 km/h)"
+      },
+      {
+        "numero": 6,
+        "portionsM": [
+          1365
+        ],
+        "confiance": "sûr (partie la plus rapide)"
+      },
+      {
+        "numero": 7,
+        "portionsM": [
+          1695
+        ],
+        "confiance": "sûr (gros freinage, ≈ 127 km/h)",
+        "nom": "Memorial"
+      },
+      {
+        "numero": 8,
+        "portionsM": [
+          1930
+        ],
+        "confiance": "sûr (≈ 81 km/h)"
+      },
+      {
+        "numero": 9,
+        "portionsM": [
+          2075
+        ],
+        "confiance": "sûr (≈ 140 km/h)"
+      },
+      {
+        "numero": 10,
+        "portionsM": [
+          2570
+        ],
+        "confiance": "sûr (gauche ≈ 150 km/h)",
+        "nom": "Singapore Sling"
+      },
+      {
+        "numero": 11,
+        "portionsM": [
+          2725,
+          2810
+        ],
+        "confiance": "probable"
+      },
+      {
+        "numero": 12,
+        "portionsM": [
+          2915
+        ],
+        "confiance": "probable (pont, ≈ 190 km/h)"
+      },
+      {
+        "numero": 13,
+        "portionsM": [
+          2990
+        ],
+        "confiance": "sûr (épingle)"
+      },
+      {
+        "numero": 14,
+        "portionsM": [
+          3520
+        ],
+        "confiance": "sûr (droite ≈ 90 km/h)"
+      },
+      {
+        "numero": 15,
+        "portionsM": [
+          3760
+        ],
+        "confiance": "probable (tracé 2023)"
+      },
+      {
+        "numero": 16,
+        "portionsM": [
+          4270
+        ],
+        "confiance": "probable (tracé 2023)"
+      },
+      {
+        "numero": 17,
+        "portionsM": [
+          4360
+        ],
+        "confiance": "probable (tracé 2023)"
+      },
+      {
+        "numero": 18,
+        "portionsM": [],
+        "confiance": "non détecté (tracé 2023)"
+      },
+      {
+        "numero": 19,
+        "portionsM": [
+          4620
+        ],
+        "confiance": "probable"
+      }
     ]
   }
 }

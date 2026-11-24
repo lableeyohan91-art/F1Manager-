@@ -33,7 +33,7 @@
 
 **E. Virages officiels**
 
-- 1 Sainte-Dévote · 2 Beau Rivage (probable) · 3 Massenet · 4 Casino · 5 Mirabeau Haute · 6 Épingle (Grand Hôtel) · 7 Mirabeau Bas · 8 Portier · 9 Tunnel · 10 Nouvelle chicane (1) · 11 Nouvelle chicane (2) · 12 Tabac · 13 Piscine (1) (à vérifier (non détecté)) · 14 Piscine (2) (à vérifier) · 15 Piscine (3) (à vérifier) · 16 Piscine (4) (à vérifier) · 17 Rascasse · 18 Anthony-Noghes · 19 Ligne d'arrivée (probable).
+- 1 Sainte-Dévote · 2 Beau Rivage (probable) · 3 Massenet · 4 Casino · 5 Mirabeau Haute · 6 Épingle (Grand Hôtel) · 7 Mirabeau Bas · 8 Portier · 9 Tunnel · 10 Nouvelle chicane (1) · 11 Nouvelle chicane (2) · 12 Tabac · 13 Piscine (1) (probable : gauche rapide non détectée (angle trop faible)) · 14 Piscine (2) (probable (ordre des sens cohérent : gauche-droite rapide, droite-gauche lente)) · 15 Piscine (3) (probable (ordre des sens cohérent : gauche-droite rapide, droite-gauche lente)) · 16 Piscine (4) (probable (ordre des sens cohérent : gauche-droite rapide, droite-gauche lente)) · 17 Rascasse · 18 Anthony-Noghes · 19 Ligne d'arrivée (probable).
 
 ## Monzza (Monza)
 
@@ -129,7 +129,7 @@
 
 **E. Virages officiels**
 
-- 1 (probable) · 2 (probable) · 3 (probable) · 4 (à vérifier) · 5 (à vérifier) · 6 (à vérifier (non détecté)) · 7 (à vérifier) · 8 (à vérifier) · 9 (à vérifier) · 10 (à vérifier) · 11 (à vérifier) · 12 (à vérifier) · 13 (à vérifier) · 14 (à vérifier) · 15 (à vérifier) · 16 (à vérifier) · 17 (à vérifier) · 18 (à vérifier) · 19 (à vérifier).
+- 1 Sheares · 2 · 3 · 4 (non détecté (courbe à pleine vitesse)) · 5 · 6 · 7 Memorial · 8 · 9 · 10 Singapore Sling · 11 (probable) · 12 (probable (pont, ≈ 190 km/h)) · 13 · 14 · 15 (probable (tracé 2023)) · 16 (probable (tracé 2023)) · 17 (probable (tracé 2023)) · 18 (non détecté (tracé 2023)) · 19 (probable).
 
 ## Hermanos Rodrigues (Mexico)
 

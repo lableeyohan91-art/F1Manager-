@@ -1,0 +1,197 @@
+{
+ "_lisezmoi": "Phase 11b, expérience (non utilisée par défaut). Voir tools/circuits/poids-voiture.mts.",
+ "poids": {
+  "cir_albert": {
+   "viragesLents": 0.1024,
+   "viragesRapides": 0.1543,
+   "vitessePointe": 0.2286,
+   "motorisation": 0.1837,
+   "efficaciteAero": 0.1773,
+   "gestionPneus": 0.1538
+  },
+  "cir_shanghai": {
+   "viragesLents": 0.2287,
+   "viragesRapides": 0.1701,
+   "vitessePointe": 0.1017,
+   "motorisation": 0.1749,
+   "efficaciteAero": 0.1489,
+   "gestionPneus": 0.1758
+  },
+  "cir_suzuka": {
+   "viragesLents": 0.1102,
+   "viragesRapides": 0.1782,
+   "vitessePointe": 0.1851,
+   "motorisation": 0.1688,
+   "efficaciteAero": 0.1803,
+   "gestionPneus": 0.1775
+  },
+  "cir_sakhir": {
+   "viragesLents": 0.1522,
+   "viragesRapides": 0.148,
+   "vitessePointe": 0.1493,
+   "motorisation": 0.1774,
+   "efficaciteAero": 0.1484,
+   "gestionPneus": 0.2246
+  },
+  "cir_jeddah": {
+   "viragesLents": 0.1089,
+   "viragesRapides": 0.1776,
+   "vitessePointe": 0.2379,
+   "motorisation": 0.1951,
+   "efficaciteAero": 0.1963,
+   "gestionPneus": 0.0842
+  },
+  "cir_miami": {
+   "viragesLents": 0.1603,
+   "viragesRapides": 0.1535,
+   "vitessePointe": 0.1914,
+   "motorisation": 0.1538,
+   "efficaciteAero": 0.1652,
+   "gestionPneus": 0.1758
+  },
+  "cir_montreal": {
+   "viragesLents": 0.1459,
+   "viragesRapides": 0.1267,
+   "vitessePointe": 0.2174,
+   "motorisation": 0.1953,
+   "efficaciteAero": 0.1548,
+   "gestionPneus": 0.1598
+  },
+  "cir_monaco": {
+   "viragesLents": 0.3427,
+   "viragesRapides": 0.2233,
+   "vitessePointe": 0.0865,
+   "motorisation": 0.0867,
+   "efficaciteAero": 0.1809,
+   "gestionPneus": 0.08
+  },
+  "cir_barcelone": {
+   "viragesLents": 0.1497,
+   "viragesRapides": 0.2172,
+   "vitessePointe": 0.1081,
+   "motorisation": 0.1275,
+   "efficaciteAero": 0.1834,
+   "gestionPneus": 0.214
+  },
+  "cir_spielberg": {
+   "viragesLents": 0.1433,
+   "viragesRapides": 0.1326,
+   "vitessePointe": 0.2068,
+   "motorisation": 0.2232,
+   "efficaciteAero": 0.1556,
+   "gestionPneus": 0.1385
+  },
+  "cir_silverstone": {
+   "viragesLents": 0.1287,
+   "viragesRapides": 0.1409,
+   "vitessePointe": 0.2256,
+   "motorisation": 0.1771,
+   "efficaciteAero": 0.1672,
+   "gestionPneus": 0.1605
+  },
+  "cir_spa": {
+   "viragesLents": 0.1325,
+   "viragesRapides": 0.1583,
+   "vitessePointe": 0.2364,
+   "motorisation": 0.1785,
+   "efficaciteAero": 0.1825,
+   "gestionPneus": 0.1117
+  },
+  "cir_hungaroring": {
+   "viragesLents": 0.207,
+   "viragesRapides": 0.2004,
+   "vitessePointe": 0.103,
+   "motorisation": 0.1337,
+   "efficaciteAero": 0.1702,
+   "gestionPneus": 0.1858
+  },
+  "cir_zandvoort": {
+   "viragesLents": 0.2098,
+   "viragesRapides": 0.2064,
+   "vitessePointe": 0.121,
+   "motorisation": 0.125,
+   "efficaciteAero": 0.1799,
+   "gestionPneus": 0.1579
+  },
+  "cir_monza": {
+   "viragesLents": 0.0882,
+   "viragesRapides": 0.1397,
+   "vitessePointe": 0.2766,
+   "motorisation": 0.2235,
+   "efficaciteAero": 0.1821,
+   "gestionPneus": 0.0899
+  },
+  "cir_madrid": {
+   "viragesLents": 0.1809,
+   "viragesRapides": 0.1727,
+   "vitessePointe": 0.1365,
+   "motorisation": 0.198,
+   "efficaciteAero": 0.1615,
+   "gestionPneus": 0.1503
+  },
+  "cir_bakou": {
+   "viragesLents": 0.2001,
+   "viragesRapides": 0.1851,
+   "vitessePointe": 0.1777,
+   "motorisation": 0.1664,
+   "efficaciteAero": 0.1828,
+   "gestionPneus": 0.0879
+  },
+  "cir_singapour": {
+   "viragesLents": 0.2417,
+   "viragesRapides": 0.1559,
+   "vitessePointe": 0.1277,
+   "motorisation": 0.1486,
+   "efficaciteAero": 0.1472,
+   "gestionPneus": 0.179
+  },
+  "cir_austin": {
+   "viragesLents": 0.1925,
+   "viragesRapides": 0.1628,
+   "vitessePointe": 0.1575,
+   "motorisation": 0.164,
+   "efficaciteAero": 0.1611,
+   "gestionPneus": 0.162
+  },
+  "cir_mexico": {
+   "viragesLents": 0.3163,
+   "viragesRapides": 0.2099,
+   "vitessePointe": 0.0908,
+   "motorisation": 0.12,
+   "efficaciteAero": 0.173,
+   "gestionPneus": 0.0899
+  },
+  "cir_interlagos": {
+   "viragesLents": 0.1877,
+   "viragesRapides": 0.1636,
+   "vitessePointe": 0.1786,
+   "motorisation": 0.1564,
+   "efficaciteAero": 0.1682,
+   "gestionPneus": 0.1455
+  },
+  "cir_lasvegas": {
+   "viragesLents": 0.1866,
+   "viragesRapides": 0.1108,
+   "vitessePointe": 0.2454,
+   "motorisation": 0.2105,
+   "efficaciteAero": 0.1525,
+   "gestionPneus": 0.0942
+  },
+  "cir_lusail": {
+   "viragesLents": 0.1523,
+   "viragesRapides": 0.1976,
+   "vitessePointe": 0.0893,
+   "motorisation": 0.1723,
+   "efficaciteAero": 0.164,
+   "gestionPneus": 0.2246
+  },
+  "cir_yasmarina": {
+   "viragesLents": 0.1563,
+   "viragesRapides": 0.1767,
+   "vitessePointe": 0.1636,
+   "motorisation": 0.1911,
+   "efficaciteAero": 0.1727,
+   "gestionPneus": 0.1395
+  }
+ }
+}

@@ -392,6 +392,11 @@ export interface Circuit {
   verification: string;
   /** Rang dans le calendrier (ordre du fichier circuits.csv). */
   ordre?: number;
+  /**
+   * Phase 11b (expérience, non utilisée par défaut) : poids des caractéristiques de la voiture calculés par le profil de vitesse sur le
+   * tracé réel (data/circuits/poids-voiture-profil.json). Présents seulement quand une campagne les injecte ; sinon, poids D-107.
+   */
+  poidsProfil?: Record<string, number>;
 }
 
 export interface ExigencesCircuit {
