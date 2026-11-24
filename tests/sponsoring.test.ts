@@ -346,6 +346,6 @@ describe('Phase 11c — opérations exceptionnelles', () => {
         expect(operationsSponsors(m, disette.id).filter((o) => o.proposeeLe.annee === 2030)).toHaveLength(1);
       }
     }
-  });
+  }, 60_000); // 3 saisons et demie simulées pour avoir 3 ans d’historique (≈ 4 s en local, plus de 5 s sur la CI) : délai justifié, assertions inchangées
 });
 
