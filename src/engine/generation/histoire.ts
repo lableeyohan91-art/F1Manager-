@@ -25,15 +25,34 @@ const nomDe = (monde: Monde, id: string) => {
   return (table(monde, TABLES.ecuries)[id] as unknown as Ecurie | undefined)?.nom ?? id;
 };
 
-/** Présents dans chaque écurie (lignée) pour une saison passée, d'après les carrières. */
-function presents(carrieres: Carriere[], annee: number): Map<string, string[]> {
-  const res = new Map<string, string[]>();
+/** Présence d'une personne dans une écurie pour une saison passée : mois couverts (bit 0 = janvier), et poste de pilote. */
+export interface Presence { mois: number; pilote: boolean }
+
+const compterMois = (masque: number) => { let n = 0; for (let x = masque; x; x &= x - 1) n++; return n; };
+/** Nombre de mois de présence dans la saison. */
+export const dureePresence = (p: Presence) => compterMois(p.mois);
+
+/** Mois de la saison `annee` couverts par un passage (null s'il ne la couvre pas). Audit phase 9 : transferts en cours de saison. */
+export function moisCouverts(c: Pick<Carriere, 'de' | 'a' | 'moisDe' | 'moisA'>, annee: number): [number, number] | null {
+  if (c.de > annee || c.a < annee) return null;
+  return [c.de === annee ? (c.moisDe ?? 1) : 1, c.a === annee ? (c.moisA ?? 12) : 12];
+}
+
+/** Mois partagés par deux présences de la même saison (un départ puis un retour dans l'année sont comptés exactement). */
+export const moisPartages = (a: Presence, b: Presence) => compterMois(a.mois & b.mois);
+
+/** Présences dans chaque écurie (lignée) pour une saison passée, au mois près, d'après les carrières. */
+export function presences(carrieres: Carriere[], annee: number): Map<string, Map<string, Presence>> {
+  const res = new Map<string, Map<string, Presence>>();
   for (const c of carrieres) {
-    if (c.de > annee || c.a < annee) continue;
-    const l = res.get(c.ecurieLignee) ?? res.set(c.ecurieLignee, []).get(c.ecurieLignee)!;
-    if (!l.includes(c.personne)) l.push(c.personne);
+    const m = moisCouverts(c, annee);
+    if (!m) continue;
+    const l = res.get(c.ecurieLignee) ?? res.set(c.ecurieLignee, new Map()).get(c.ecurieLignee)!;
+    let masque = 0;
+    for (let k = m[0]; k <= m[1]; k++) masque |= 1 << (k - 1);
+    const p = l.get(c.personne);
+    l.set(c.personne, { mois: (p?.mois ?? 0) | masque, pilote: (p?.pilote ?? false) || c.poste.startsWith('pilote') });
   }
-  for (const l of res.values()) l.sort();
   return res;
 }
 
@@ -45,8 +64,21 @@ function souvenirPasse(monde: Monde, porteur: string, cible: string, etiquette: 
   lireEvenement(monde, porteur, cible, etiquette, evt.id, { facteur });
 }
 
-export function construirePasse(monde: Monde, histoires: HistoireDonnees[]): void {
+/**
+ * `finDeSaison(annee)` : appelé à sa vraie date (semaine `PASSE.semaineFinSaison`) pour simuler ce qui appartient à la saison
+ * (saisons juniors du passé), afin que ses faits soient datés et vieillis comme le reste du passé (audit de la phase 9).
+ */
+export function construirePasse(monde: Monde, histoires: HistoireDonnees[], finDeSaison?: (annee: number) => void): void {
   const dateDepart = { ...monde.date };
+  // Horloge du passé : chaque souvenir ne vieillit que du temps réellement écoulé depuis son fait (audit de la phase 9).
+  const rang = (d: { annee: number; semaine: number }) => d.annee * 52 + d.semaine;
+  let curseur: { annee: number; semaine: number } | undefined;
+  let semainesEnAttente = 0;
+  const vieillirJusqua = (d: { annee: number; semaine: number }) => {
+    if (curseur) semainesEnAttente += Math.max(0, rang(d) - rang(curseur));
+    curseur = { ...d };
+    while (semainesEnAttente >= PASSE.semainesParMois) { oublierUnMois(monde); semainesEnAttente -= PASSE.semainesParMois; }
+  };
   const carrieres = (Object.values(table(monde, TABLES.carrieres)) as unknown as Carriere[]).slice().sort((a, b) => (a.id < b.id ? -1 : 1));
   const palmares = (Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[]).slice().sort((a, b) => a.saison - b.saison);
   const personnes = table(monde, TABLES.personnes);
@@ -66,20 +98,27 @@ export function construirePasse(monde: Monde, histoires: HistoireDonnees[]): voi
   }
 
   for (let annee = debut; annee <= fin; annee++) {
+    vieillirJusqua({ annee, semaine: PASSE.semaine });
     monde.date = { annee, semaine: PASSE.semaine };
-    const parEcurie = presents(carrieres, annee);
+    const presencesAnnee = presences(carrieres, annee);
+    // Membres pour les situations (rivalité, mentorat, réussite) : présents au moins `moisMinSituation` mois dans la saison.
+    const parEcurie = new Map([...presencesAnnee].map(([ecurie, l]) => [ecurie, [...l].filter(([, p]) => dureePresence(p) >= PASSE.moisMinSituation).map(([id]) => id).sort()] as const));
     const titre = palmares.find((p) => p.saison === annee);
 
-    // Familiarité : une saison passée ensemble (au même rythme qu'en jeu), et envers l'écurie.
-    for (const [ecurie, membres] of parEcurie) {
+    // Familiarité : le temps réellement passé ensemble cette saison (au même rythme qu'en jeu), et envers l'écurie.
+    for (const [ecurie, l] of presencesAnnee) {
+      const membres = [...l.keys()].sort();
       for (const a of membres) {
         if (!existe(a)) continue;
+        const pa = l.get(a)!;
         const re = relationBrute(monde, a, ecurie, true)!;
-        re.familiarite = Math.min(1, re.familiarite + 12 * FAMILIARITE_MENSUELLE);
+        re.familiarite = Math.min(1, re.familiarite + dureePresence(pa) * FAMILIARITE_MENSUELLE);
         for (const b of membres) {
           if (a === b || !existe(b)) continue;
+          const partages = moisPartages(pa, l.get(b)!);
+          if (!partages) continue;
           const r = relationBrute(monde, a, b, true)!;
-          r.familiarite = Math.min(1, r.familiarite + 12 * FAMILIARITE_MENSUELLE);
+          r.familiarite = Math.min(1, r.familiarite + partages * FAMILIARITE_MENSUELLE);
         }
       }
     }
@@ -104,7 +143,7 @@ export function construirePasse(monde: Monde, histoires: HistoireDonnees[]): voi
 
     // Souvenirs plausibles inventés autour des faits (personnalités fictives).
     for (const [ecurie, membres] of parEcurie) {
-      const pilotes = membres.filter((id) => carrieres.some((c) => c.personne === id && c.ecurieLignee === ecurie && c.de <= annee && c.a >= annee && c.poste.startsWith('pilote')) && existe(id));
+      const pilotes = membres.filter((id) => presencesAnnee.get(ecurie)?.get(id)?.pilote && existe(id));
       // Rivalité : le coéquipier du champion.
       if (titre && titre.ecurieChampionPilote === ecurie && pilotes.includes(titre.championPilote)) {
         for (const autre of pilotes.filter((id) => id !== titre.championPilote)) {
@@ -141,14 +180,20 @@ export function construirePasse(monde: Monde, histoires: HistoireDonnees[]): voi
       }
     }
 
-    // Les mois passent : les souvenirs s'atténuent, les plus anciens s'effacent en laissant un résidu.
-    for (let m = 0; m < PASSE.moisParSaison; m++) oublierUnMois(monde);
+    // Ce qui appartient à la fin de cette saison (saisons juniors), à sa vraie date.
+    if (finDeSaison) {
+      vieillirJusqua({ annee, semaine: PASSE.semaineFinSaison });
+      monde.date = { annee, semaine: PASSE.semaineFinSaison };
+      finDeSaison(annee);
+    }
   }
+  // Les mois passent jusqu'au départ : les souvenirs s'atténuent, les plus anciens s'effacent en laissant un résidu.
+  vieillirJusqua(dateDepart);
 
   // Histoires réelles : elles marquent durablement (atténuation ralentie pendant le passé, puis oubli normal en jeu).
   for (const { h, evt } of reelles) {
     monde.date = { annee: h.saison, semaine: PASSE.semaine };
-    const mois = (fin - h.saison + 1) * PASSE.moisParSaison;
+    const mois = Math.floor((rang(dateDepart) - rang({ annee: h.saison, semaine: PASSE.semaine })) / PASSE.semainesParMois);
     for (const [porteur, cible] of h.reciproque && existe(h.cible) ? [[h.porteur, h.cible], [h.cible, h.porteur]] : [[h.porteur, h.cible]]) {
       const s = lireEvenement(monde, porteur!, cible!, h.etiquette, evt, { facteur: h.intensite });
       if (!s) continue;

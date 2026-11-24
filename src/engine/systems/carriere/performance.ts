@@ -152,6 +152,9 @@ export function titreSurCircuit(monde: Monde, champion: Personne, circuit: Circu
  * saisons de titulaire depuis 2010 (carrieres.csv) → Grands Prix, courses sous la pluie, visites des circuits actuels ;
  * titres → luttes pour le titre ; saisons consécutives dans l'écurie actuelle.
  */
+/** Durée d'un passage en saisons, au mois près (transferts en cours de saison). */
+const dureeSaisons = (c: Carriere) => c.a - c.de + 1 - ((c.moisDe ?? 1) - 1) / 12 - (12 - (c.moisA ?? 12)) / 12;
+
 export function initialiserExperienceDonnees(monde: Monde): void {
   const carrieres = Object.values(table(monde, TABLES.carrieres)) as unknown as Carriere[];
   const circuits = Object.keys(table(monde, TABLES.circuits));
@@ -159,13 +162,14 @@ export function initialiserExperienceDonnees(monde: Monde): void {
   for (const p of Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]) {
     if (!p.poste.startsWith('pilote') || !p.carriere) continue;
     const lignes = carrieres.filter((c) => c.personne === p.id && c.poste === 'pilote_titulaire');
-    const saisons = lignes.reduce((a, c) => a + (c.a - c.de + 1), 0);
+    // Audit de la phase 9 : une saison partagée entre deux écuries (transfert en cours de saison) ne compte qu'une fois.
+    const saisons = lignes.reduce((a, c) => a + dureeSaisons(c), 0);
     const ex = experienceVide(p.ecurie);
     ex.gp = saisons * EXPERIENCE_HISTORIQUE.gpParSaison;
     ex.pluie = saisons * EXPERIENCE_HISTORIQUE.pluieParSaison;
     ex.luttesTitre = palmares.filter((x) => x.championPilote === p.id).length;
     if (saisons > 0) for (const c of circuits) ex.circuits[c] = saisons;
-    const recentes = lignes.filter((c) => c.ecurieLignee === p.ecurie).reduce((a, c) => a + (c.a - c.de + 1), 0);
+    const recentes = lignes.filter((c) => c.ecurieLignee === p.ecurie).reduce((a, c) => a + dureeSaisons(c), 0);
     ex.gpEcurie = recentes * EXPERIENCE_HISTORIQUE.gpParSaison;
     p.carriere.experience = ex;
   }

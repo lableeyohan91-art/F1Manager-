@@ -357,6 +357,10 @@ export interface Carriere {
   poste: Poste;
   de: number;
   a: number;
+  /** Audit phase 9 : mois d'arrivée la première année (1 à 12) ; absent = janvier. Transferts en cours de saison. */
+  moisDe?: number;
+  /** Audit phase 9 : mois de départ la dernière année (1 à 12) ; absent = décembre. */
+  moisA?: number;
   note: string;
 }
 

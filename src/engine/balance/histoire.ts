@@ -7,9 +7,13 @@
  * Calendrier du passé :
  * - debut : première saison reprise (D-046 : depuis 2010) ; une carrière antérieure compte à partir de cette saison ;
  * - semaine : semaine de référence des faits d'une saison passée (souvenirs et événements datés de cette semaine) ;
- * - moisParSaison : mois d'oubli appliqués après chaque saison passée (les souvenirs anciens s'effacent et laissent un résidu).
+ * - semaineFinSaison : semaine des faits de fin de saison (titres juniors du passé) ;
+ * - semainesParMois : un mois d'oubli par tranche de 52/12 semaines écoulées (audit de la phase 9 : chaque souvenir ne vieillit que du temps
+ *   réellement écoulé depuis son fait, jusqu'au départ ; avant l'audit, 12 mois par saison quelle que soit la date du fait) ;
+ * - moisMinSituation : présence minimale dans une écurie pendant une saison (mois) pour compter dans ses situations (rivalité, mentorat,
+ *   réussite commune) ; la familiarité, elle, suit exactement les mois partagés (transferts en cours de saison).
  */
-export const PASSE = { debut: 2010, semaine: 30, moisParSaison: 12 };
+export const PASSE = { debut: 2010, semaine: 30, semaineFinSaison: 49, semainesParMois: 52 / 12, moisMinSituation: 3 };
 
 /**
  * Histoires réelles connues (histoires.csv, D-143) : publiques et célèbres, elles marquent plus durablement que les souvenirs ordinaires.
@@ -35,3 +39,6 @@ export const SITUATIONS_PASSE = {
 
 /** Ères : une série d'au moins `serieMin` titres constructeurs consécutifs devient une ère de la Chronique. */
 export const ERES = { serieMin: 3 };
+
+/** Audit de la phase 9 — validation de histoires.csv : âge minimal d'un protagoniste l'année de l'histoire (ans). */
+export const AGE_MIN_HISTOIRE = 14;

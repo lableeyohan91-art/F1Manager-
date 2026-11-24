@@ -3,6 +3,8 @@
  * Toutes les erreurs sont accumulées puis signalées ensemble, avec fichier, ligne et colonne.
  */
 
+import { DATE_DEPART } from '../balance/monde';
+import { AGE_MIN_HISTOIRE, PASSE } from '../balance/histoire';
 import { TYPES_MEDIAS, type Media } from '../model/medias';
 import { ARCHETYPES } from '../balance/carriere';
 import { COMPETENCES_PILOTE } from '../balance/personnages';
@@ -272,8 +274,12 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     poste: rca.parmi(l, 'poste', POSTES_DONNEES),
     de: rca.entier(l, 'de', 1950, anneeMax),
     a: rca.entier(l, 'a', 1950, anneeMax),
+    ...((l.valeurs['moisDe'] ?? '') !== '' ? { moisDe: rca.entier(l, 'moisDe', 1, 12) } : {}),
+    ...((l.valeurs['moisA'] ?? '') !== '' ? { moisA: rca.entier(l, 'moisA', 1, 12) } : {}),
     note: l.valeurs['note'] ?? '',
   }));
+  // Audit de la phase 9 : carrières impossibles ou qui se chevauchent (un transfert en cours de saison précise ses mois).
+  problemes.push(...verifierCarrieres(carrieres, lcar.map((l) => l.numero), DATE_DEPART.annee));
 
   // Palmarès.
   const lpal = lireCsv('palmares.csv', fichier(f, 'palmares.csv'), ['saison', 'championPilote', 'ecurieChampionPilote', 'championConstructeurs']);
@@ -303,6 +309,16 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   }));
   verifierIdsUniques('histoires.csv', lhis.map((l, i) => ({ id: histoires[i]!.id, numero: l.numero })), problemes);
   for (const h of histoires) if (h.reciproque && idsEq.has(h.cible)) problemes.push(`histoires.csv : ${h.id} est réciproque mais sa cible est une écurie`);
+  // Audit de la phase 9 : une histoire appartient au passé reconstruit, et ses protagonistes y étaient en âge de la vivre.
+  const naissance = new Map(personnes.map((p) => [p.id, p.anneeNaissance]));
+  for (const h of histoires) {
+    if (!Number.isFinite(h.saison)) continue;
+    if (h.saison < PASSE.debut || h.saison >= DATE_DEPART.annee) problemes.push(`histoires.csv : ${h.id} est datée de ${h.saison}, hors du passé reconstruit (${PASSE.debut}–${DATE_DEPART.annee - 1})`);
+    for (const id of [h.porteur, h.cible]) {
+      const n = naissance.get(id);
+      if (n !== undefined && h.saison - n < AGE_MIN_HISTOIRE) problemes.push(`histoires.csv : ${h.id} met en scène ${id} à ${h.saison - n} ans (au moins ${AGE_MIN_HISTOIRE} ans)`);
+    }
+  }
 
   // Circuits.
   const lcir = lireCsv('circuits.csv', fichier(f, 'circuits.csv'), ['id', 'nom', 'ville', 'pays', 'type', 'altitudeM', 'climatPluie', ...CHAMPS_EXIGENCES]);
@@ -393,4 +409,29 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   if (ecuriesJuniors.length < 21) problemes.push('ecuries-juniors.csv : il faut au moins 21 noms (10 écuries Apex 3 + 11 écuries Apex 2)');
 
   return { motoristes, ecuries, personnes, contrats, carrieres, palmares, histoires, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises, ecuriesJuniors, medias };
+}
+
+/**
+ * Audit de la phase 9 — cohérence des carrières : fin avant le début, passage après le départ du jeu, mois invalides,
+ * et deux passages qui se recouvrent (au mois près : un transfert en cours de saison doit préciser `moisA` et `moisDe`).
+ */
+export function verifierCarrieres(carrieres: { personne: string; ecurieLignee: string; poste: string; de: number; a: number; moisDe?: number; moisA?: number }[], numeros: number[], anneeDepart: number): string[] {
+  const pb: string[] = [];
+  const ou = (i: number) => `carrieres.csv, ligne ${numeros[i]} (${carrieres[i]!.personne}, ${carrieres[i]!.ecurieLignee})`;
+  const debutMois = (c: (typeof carrieres)[number]) => c.de * 12 + (c.moisDe ?? 1) - 1;
+  const finMois = (c: (typeof carrieres)[number]) => c.a * 12 + (c.moisA ?? 12) - 1;
+  carrieres.forEach((c, i) => {
+    if (!Number.isFinite(c.de) || !Number.isFinite(c.a)) return;
+    if (c.a < c.de) pb.push(`${ou(i)} : la fin (${c.a}) est antérieure au début (${c.de})`);
+    else if (finMois(c) < debutMois(c)) pb.push(`${ou(i)} : le mois de départ (${c.moisA}) précède le mois d'arrivée (${c.moisDe}) la même année`);
+    if (c.a >= anneeDepart) pb.push(`${ou(i)} : le passé s'arrête en ${anneeDepart - 1} (la saison ${anneeDepart} relève de contrats.csv), fin déclarée ${c.a}`);
+  });
+  for (let i = 0; i < carrieres.length; i++) for (let j = i + 1; j < carrieres.length; j++) {
+    const a = carrieres[i]!, b = carrieres[j]!;
+    if (a.personne !== b.personne || ![a.de, a.a, b.de, b.a].every(Number.isFinite)) continue;
+    if (debutMois(a) <= finMois(b) && debutMois(b) <= finMois(a)) {
+      pb.push(`${ou(j)} : chevauche le passage chez ${a.ecurieLignee} (ligne ${numeros[i]}) ; un transfert en cours de saison doit préciser moisA et moisDe sans recouvrement`);
+    }
+  }
+  return pb;
 }

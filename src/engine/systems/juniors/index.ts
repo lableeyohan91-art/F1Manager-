@@ -266,23 +266,41 @@ export function classementsAbstraits(monde: Monde, annee: number): void {
  * sans faire progresser les compétences (le niveau de départ des jeunes tient déjà compte de leur passé)
  * et sans toucher à la F1.
  */
-export function simulerPasseJunior(monde: Monde): void {
+/** Passé junior : écuries et réputations de départ. Renvoie la première saison junior à simuler (les suivantes jusqu'au départ). */
+export function initialiserPasseJunior(monde: Monde): number {
   initialiserEcuriesJuniors(monde);
-  const circuits = idsTries(table(monde, TABLES.circuits));
   classementsAbstraits(monde, monde.date.annee - PASSE_JUNIOR_ANNEES - 1); // réputations de départ (karting, Apex 4)
-  for (let annee = monde.date.annee - PASSE_JUNIOR_ANNEES; annee < monde.date.annee; annee++) {
-    marcheBaquets(monde, annee);
-    for (const cat of CATEGORIES) {
-      const n = Math.min(CATEGORIES_JUNIORS[cat].manches, circuits.length);
-      const manches: MancheJunior[] = Array.from({ length: n }, (_, k) => ({ manche: k + 1, circuit: circuits[Math.round((k * (circuits.length - 1)) / Math.max(1, n - 1))]!, semaine: 0, pluie: false, termine: false, resultats: [] }));
-      const sj: SaisonJunior = { id: `sj_${cat}_${annee}`, categorie: cat, annee, manches, classement: [], classementEcuries: [], termine: false };
-      table(monde, TABLES.saisonsJuniors)[sj.id] = sj as unknown as Entite;
-      for (const m of manches) simulerMancheJunior(monde, sj, m, tirageLocal(monde, 'juniors.meteo', sj.id, m.manche).chance(PLUIE_PASSE_JUNIOR));
-      cloturerSaisonJunior(monde, sj);
-      for (const m of manches) m.resultats = []; // détail effacé (seul le résumé du passé est conservé)
-    }
-    classementsAbstraits(monde, annee);
+  return monde.date.annee - PASSE_JUNIOR_ANNEES;
+}
+
+/**
+ * Une saison junior du passé. Audit de la phase 9 : appelée à sa vraie date (par la construction du passé), pour que ses faits
+ * (titres, rivalités) soient datés de cette saison et ne vieillissent que du temps écoulé depuis.
+ */
+export function saisonPasseJunior(monde: Monde, annee: number): void {
+  const circuits = idsTries(table(monde, TABLES.circuits));
+  marcheBaquets(monde, annee);
+  for (const cat of CATEGORIES) {
+    const n = Math.min(CATEGORIES_JUNIORS[cat].manches, circuits.length);
+    const manches: MancheJunior[] = Array.from({ length: n }, (_, k) => ({ manche: k + 1, circuit: circuits[Math.round((k * (circuits.length - 1)) / Math.max(1, n - 1))]!, semaine: 0, pluie: false, termine: false, resultats: [] }));
+    const sj: SaisonJunior = { id: `sj_${cat}_${annee}`, categorie: cat, annee, manches, classement: [], classementEcuries: [], termine: false };
+    table(monde, TABLES.saisonsJuniors)[sj.id] = sj as unknown as Entite;
+    for (const m of manches) simulerMancheJunior(monde, sj, m, tirageLocal(monde, 'juniors.meteo', sj.id, m.manche).chance(PLUIE_PASSE_JUNIOR));
+    cloturerSaisonJunior(monde, sj);
+    for (const m of manches) m.resultats = []; // détail effacé (seul le résumé du passé est conservé)
   }
+  classementsAbstraits(monde, annee);
+}
+
+/** Passé junior complet, d'un seul tenant (sans construction du passé humain) : la date du monde est rétablie à la fin. */
+export function simulerPasseJunior(monde: Monde): void {
+  const depart = { ...monde.date };
+  const premiere = initialiserPasseJunior(monde);
+  for (let annee = premiere; annee < depart.annee; annee++) {
+    monde.date = { annee, semaine: SEMAINE_CLOTURE };
+    saisonPasseJunior(monde, annee);
+  }
+  monde.date = depart;
 }
 
 /* ---------------------------------------------------------------- Systèmes */

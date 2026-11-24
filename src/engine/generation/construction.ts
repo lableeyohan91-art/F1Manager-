@@ -38,10 +38,12 @@ import { TABLES } from '../model/types';
 import { moyenne, type DonneesInitiales, type PersonneDonnees } from './chargement';
 import { plafondCompetence, tirerCarriere } from '../systems/carriere/profil';
 import { construirePasse } from './histoire';
+import { PASSE } from '../balance/histoire';
+import { DATE_DEPART } from '../balance/monde';
 import { initialiserExperienceDonnees } from '../systems/carriere/performance';
-import { simulerPasseJunior } from '../systems/juniors';
+import { initialiserPasseJunior, saisonPasseJunior } from '../systems/juniors';
 
-export const DATE_DEPART: DateJeu = { annee: 2027, semaine: 1 };
+export { DATE_DEPART } from '../balance/monde';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 const note = (x: number) => Math.round(borner(x, 1, 20));
@@ -435,9 +437,16 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
   // D-106 : expérience initiale des pilotes issus des données (provisoire avant la phase 9).
   initialiserExperienceDonnees(monde);
   // Phase 6b : écuries juniors et passé junior simulé (sans effet sur la grille de F1 de 2027).
-  simulerPasseJunior(monde);
   // Phase 9 (D-143) : couche humaine du passé 2010–2026, construite sur les faits des données (la grille de 2027 n'est pas touchée).
-  construirePasse(monde, d.histoires);
+  // Audit de la phase 9 : les saisons juniors du passé sont simulées à leur vraie date, dans la chronologie du passé humain
+  // (avant : simulées en 2027, puis vieillies de 17 ans d'oubli, ce qui effaçait toutes leurs rivalités).
+  const premiereJunior = initialiserPasseJunior(monde);
+  const juniorsFaits = new Set<number>();
+  construirePasse(monde, d.histoires, (annee) => { if (annee >= premiereJunior) { saisonPasseJunior(monde, annee); juniorsFaits.add(annee); } });
+  // Saisons juniors hors de la période du passé humain (sans effet aujourd'hui : 2024–2026 sont dans 2010–2026).
+  const depart = { ...monde.date };
+  for (let annee = premiereJunior; annee < depart.annee; annee++) if (!juniorsFaits.has(annee)) { monde.date = { annee, semaine: PASSE.semaineFinSaison }; saisonPasseJunior(monde, annee); }
+  monde.date = depart;
 
   return monde;
 }

@@ -1,3 +1,8 @@
+import type { DateJeu } from '../core/calendrier';
+
+/** Date de départ d'une partie (scénario grille 2026) : le passé des données s'arrête l'année d'avant. */
+export const DATE_DEPART: DateJeu = { annee: 2027, semaine: 1 };
+
 /** Paramètres de génération du monde (phase 2). */
 
 /** Les 9 postes individualisés par écurie (D-029) et leur nombre. */
