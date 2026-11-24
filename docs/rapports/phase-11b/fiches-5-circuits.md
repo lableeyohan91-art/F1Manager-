@@ -1,5 +1,7 @@
 # Phase 11b — Fiches de relecture des 5 circuits test
 
+> **Remplacées dans le jeu** par les fiches des 30 circuits (`data/grille-2026/circuits-fiches.json`, `tools/circuits/generer-fiches-jeu.mts`), normalisées sur le calendrier complet. Ce document reste la relecture historique des 5 pilotes, régénérée avec le moteur actuel.
+
 > Générées par `tools/circuits/fiches.mts` à partir de `data/circuits/*.json` et du modèle de vitesse (24/11/2026). Statuts : **V** vérifié · **R** reconstruit · **E** estimé · **H** hypothèse de conception.
 > **Rien ici n’est encore dans le jeu.** Le classement des caractéristiques est **provisoire** (4 caractéristiques de la voiture actuelle, normalisation sur 5 circuits seulement). Aucun réglage n’est donné : il se découvrira en essais libres (D-161).
 
@@ -8,22 +10,22 @@
 **A. Présentation**
 
 - Longueur 3.337 km · 19 virages officiels (V) · urbain (E) · altitude 10 m (V) · dénivelé du tracé 42 m (R).
-- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 72.279 s (V) ; modèle : 72.9 s.
+- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 72.279 s (V) ; modèle : 72.4 s.
 - Voie des stands (course, arrêt compris) : 23.4 s sur 59 arrêts (V).
 
 **B. Ce que le circuit exige (provisoire)**
 
 - **Points essentiels** : virages lents (adhérence mécanique) · virages rapides (appui). **Le moins important** : vitesse de pointe (faible traînée).
-- Parts normalisées : virages lents 40 % · virages rapides 32 % · moteur 14 % · vitesse de pointe 14 %.
-- Gains bruts pour +2 % (s) : virages lents 0.43 · virages rapides 0.32 · motricité 0.18 · moteur 0.09 · freinage 0.06 · vitesse de pointe 0.06.
-- Le tour selon ce qui limite la vitesse (modèle) : puissance 29 % · virages 25 % · freinage 17 % · motricité 30 %.
+- Parts normalisées : virages lents 39 % · virages rapides 35 % · moteur 14 % · vitesse de pointe 13 %.
+- Gains bruts pour +2 % (s) : virages lents 0.46 · virages rapides 0.35 · motricité 0.18 · moteur 0.08 · freinage 0.06 · vitesse de pointe 0.05.
+- Le tour selon ce qui limite la vitesse (modèle) : puissance 27 % · virages 26 % · freinage 16 % · motricité 31 %.
 - Réel : pleine charge 53 % de la distance ; plus longue phase à pleine charge 530 m ; 4 gros freinages (plus de 100 km/h perdus) ; vitesse de 48 à 286 km/h.
 - Charge latérale des pneus sur un tour : 4.5 g·km (R, indicateur relatif ; l’usure réelle dépendra aussi de l’abrasivité, inconnue : E à venir).
 
 **C. Conditions (climat du mois du Grand Prix 2026)**
 
 - juin, course à 15 h : air ≈ 23.7 °C (E), 4.1 jours de pluie dans le mois (V), pluie pendant la course ≈ 5 % (E), humidité 80.5 %.
-- Source : Wikipédia (tableau climatique : Monaco) — station Monaco (1981–2010 averages, extremes 1966–present). Adhérence de la piste : 0.935 (R, calée).
+- Source : Wikipédia (tableau climatique : Monaco) — station Monaco (1981–2010 averages, extremes 1966–present). Adhérence de la piste : 0.903 (R, calée).
 - Contraintes pour les réglages (tendance connue de tous, E ; le réglage se découvrira en essais libres) : bosses fortes (revêtement routier), vibreurs peu utilisables (murs).
 
 **D. Neutralisations (10 dernières éditions réelles)**
@@ -40,22 +42,22 @@
 **A. Présentation**
 
 - Longueur 5.793 km · 11 virages officiels (V) · permanent (E) · altitude 160 m (V) · dénivelé du tracé 12 m (R).
-- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 81.882 s (V) ; modèle : 80.5 s.
+- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 81.882 s (V) ; modèle : 82.1 s.
 - Voie des stands (course, arrêt compris) : 24.9 s sur 6 arrêts (V).
 
 **B. Ce que le circuit exige (provisoire)**
 
 - **Points essentiels** : vitesse de pointe (faible traînée) · moteur (puissance). **Le moins important** : virages lents (adhérence mécanique).
-- Parts normalisées : vitesse de pointe 38 % · moteur 32 % · virages rapides 17 % · virages lents 12 %.
-- Gains bruts pour +2 % (s) : moteur 0.25 · virages rapides 0.22 · vitesse de pointe 0.20 · virages lents 0.18 · freinage 0.04 · motricité -0.02.
-- Le tour selon ce qui limite la vitesse (modèle) : puissance 75 % · virages 7 % · freinage 9 % · motricité 8 %.
+- Parts normalisées : vitesse de pointe 37 % · moteur 33 % · virages rapides 15 % · virages lents 15 %.
+- Gains bruts pour +2 % (s) : moteur 0.26 · virages lents 0.24 · virages rapides 0.21 · vitesse de pointe 0.20 · motricité 0.06 · freinage 0.06.
+- Le tour selon ce qui limite la vitesse (modèle) : puissance 67 % · virages 8 % · freinage 11 % · motricité 13 %.
 - Réel : pleine charge 82 % de la distance ; plus longue phase à pleine charge 1340 m ; 3 gros freinages (plus de 100 km/h perdus) ; vitesse de 72 à 339 km/h.
 - Charge latérale des pneus sur un tour : 5.1 g·km (R, indicateur relatif ; l’usure réelle dépendra aussi de l’abrasivité, inconnue : E à venir).
 
 **C. Conditions (climat du mois du Grand Prix 2026)**
 
 - septembre, course à 15 h : air ≈ 23.6 °C (E), 8.7 jours de pluie dans le mois (E), pluie pendant la course ≈ 10 % (E), humidité — %.
-- Source : Wikipédia (tableau climatique : Monza) — station Monza (reference: Milan Linate). Adhérence de la piste : 1.058 (R, calée).
+- Source : Wikipédia (tableau climatique : Monza) — station Monza (reference: Milan Linate). Adhérence de la piste : 0.907 (R, calée).
 - Contraintes pour les réglages (tendance connue de tous, E ; le réglage se découvrira en essais libres) : bosses faibles, vibreurs agressifs aux chicanes.
 
 **D. Neutralisations (10 dernières éditions réelles)**
@@ -72,22 +74,22 @@
 **A. Présentation**
 
 - Longueur 5.807 km · 18 virages officiels (V) · permanent (E) · altitude 45 m (V) · dénivelé du tracé 40 m (R).
-- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 89.132 s (V) ; modèle : 91.8 s.
+- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 89.132 s (V) ; modèle : 89.0 s.
 - Voie des stands (course, arrêt compris) : 24.2 s sur 28 arrêts (V).
 
 **B. Ce que le circuit exige (provisoire)**
 
 - **Points essentiels** : vitesse de pointe (faible traînée) · moteur (puissance). **Le moins important** : virages lents (adhérence mécanique).
-- Parts normalisées : vitesse de pointe 30 % · moteur 28 % · virages rapides 26 % · virages lents 16 %.
-- Gains bruts pour +2 % (s) : virages rapides 0.52 · virages lents 0.35 · moteur 0.34 · vitesse de pointe 0.24 · motricité 0.04 · freinage 0.03.
-- Le tour selon ce qui limite la vitesse (modèle) : puissance 71 % · virages 11 % · freinage 8 % · motricité 9 %.
+- Parts normalisées : vitesse de pointe 31 % · moteur 27 % · virages rapides 26 % · virages lents 17 %.
+- Gains bruts pour +2 % (s) : virages rapides 0.47 · virages lents 0.35 · moteur 0.27 · vitesse de pointe 0.23 · motricité 0.04 · freinage 0.03.
+- Le tour selon ce qui limite la vitesse (modèle) : puissance 73 % · virages 13 % · freinage 7 % · motricité 8 %.
 - Réel : pleine charge 70 % de la distance ; plus longue phase à pleine charge 1255 m ; 2 gros freinages (plus de 100 km/h perdus) ; vitesse de 77 à 323 km/h.
 - Charge latérale des pneus sur un tour : 10.1 g·km (R, indicateur relatif ; l’usure réelle dépendra aussi de l’abrasivité, inconnue : E à venir).
 
 **C. Conditions (climat du mois du Grand Prix 2026)**
 
 - mars, course à 14 h : air ≈ 13.4 °C (E), 10.5 jours de pluie dans le mois (V), pluie pendant la course ≈ 12 % (E), humidité 62 %.
-- Source : Wikipédia (tableau climatique : Tsu — station Tsu (1991−2020 normals, extremes 1889−present). Adhérence de la piste : 1.077 (R, calée).
+- Source : Wikipédia (tableau climatique : Tsu — station Tsu (1991−2020 normals, extremes 1889−present). Adhérence de la piste : 1.056 (R, calée).
 - Contraintes pour les réglages (tendance connue de tous, E ; le réglage se découvrira en essais libres) : bosses faibles, vibreurs modérés.
 
 **D. Neutralisations (10 dernières éditions réelles)**
@@ -104,22 +106,22 @@
 **A. Présentation**
 
 - Longueur 4.927 km · 19 virages officiels (V) · urbain (de nuit) (E) · altitude 10 m (V) · dénivelé du tracé 5 m (R).
-- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 91.496 s (V) ; modèle : 92.6 s.
+- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 91.496 s (V) ; modèle : 91.5 s.
 - Voie des stands (course, arrêt compris) : 24.4 s sur 24 arrêts (V).
 
 **B. Ce que le circuit exige (provisoire)**
 
-- **Points essentiels** : virages lents (adhérence mécanique) · moteur (puissance). **Le moins important** : vitesse de pointe (faible traînée).
-- Parts normalisées : virages lents 30 % · moteur 26 % · virages rapides 23 % · vitesse de pointe 21 %.
-- Gains bruts pour +2 % (s) : virages lents 0.43 · virages rapides 0.31 · moteur 0.21 · motricité 0.17 · vitesse de pointe 0.12 · freinage 0.07.
-- Le tour selon ce qui limite la vitesse (modèle) : puissance 40 % · virages 17 % · freinage 17 % · motricité 26 %.
+- **Points essentiels** : virages lents (adhérence mécanique) · virages rapides (appui). **Le moins important** : vitesse de pointe (faible traînée).
+- Parts normalisées : virages lents 30 % · virages rapides 28 % · moteur 24 % · vitesse de pointe 19 %.
+- Gains bruts pour +2 % (s) : virages lents 0.42 · virages rapides 0.34 · moteur 0.17 · motricité 0.15 · vitesse de pointe 0.09 · freinage 0.07.
+- Le tour selon ce qui limite la vitesse (modèle) : puissance 40 % · virages 18 % · freinage 15 % · motricité 28 %.
 - Réel : pleine charge 60 % de la distance ; plus longue phase à pleine charge 680 m ; 7 gros freinages (plus de 100 km/h perdus) ; vitesse de 69 à 307 km/h.
 - Charge latérale des pneus sur un tour : 5.1 g·km (R, indicateur relatif ; l’usure réelle dépendra aussi de l’abrasivité, inconnue : E à venir).
 
 **C. Conditions (climat du mois du Grand Prix 2026)**
 
 - octobre, course à 20 h : air ≈ 29.4 °C (E), 15 jours de pluie dans le mois (V), pluie pendant la course ≈ 17 % (E), humidité 81.5 %.
-- Source : Wikipédia (tableau climatique : Template:Singapore weatherbox) — station Singapore (1991–2020 normals, extremes 1929–1941 and 1948–present). Adhérence de la piste : 0.935 (R, calée).
+- Source : Wikipédia (tableau climatique : Template:Singapore weatherbox) — station Singapore (1991–2020 normals, extremes 1929–1941 and 1948–present). Adhérence de la piste : 0.925 (R, calée).
 - Contraintes pour les réglages (tendance connue de tous, E ; le réglage se découvrira en essais libres) : bosses fortes, vibreurs nombreux aux chicanes.
 
 **D. Neutralisations (10 dernières éditions réelles)**
@@ -136,22 +138,22 @@
 **A. Présentation**
 
 - Longueur 4.304 km · 17 virages officiels (V) · permanent (E) · altitude 2240 m (V) · dénivelé du tracé 3 m (R).
-- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 76.633 s (V) ; modèle : 77.9 s.
+- Tour de référence (qualifications 2026, médiane de 5 pilotes) : 76.633 s (V) ; modèle : 76.7 s.
 - Voie des stands (course, arrêt compris) : 22.9 s sur 29 arrêts (V).
 
 **B. Ce que le circuit exige (provisoire)**
 
 - **Points essentiels** : virages lents (adhérence mécanique) · virages rapides (appui). **Le moins important** : vitesse de pointe (faible traînée).
-- Parts normalisées : virages lents 38 % · virages rapides 29 % · moteur 19 % · vitesse de pointe 14 %.
-- Gains bruts pour +2 % (s) : virages lents 0.40 · virages rapides 0.28 · motricité 0.12 · moteur 0.11 · freinage 0.07 · vitesse de pointe 0.05.
-- Le tour selon ce qui limite la vitesse (modèle) : puissance 39 % · virages 19 % · freinage 17 % · motricité 24 %.
+- Parts normalisées : virages lents 33 % · virages rapides 25 % · moteur 24 % · vitesse de pointe 19 %.
+- Gains bruts pour +2 % (s) : virages lents 0.42 · virages rapides 0.28 · moteur 0.15 · vitesse de pointe 0.09 · freinage 0.07 · motricité 0.06.
+- Le tour selon ce qui limite la vitesse (modèle) : puissance 40 % · virages 20 % · freinage 16 % · motricité 24 %.
 - Réel : pleine charge 58 % de la distance ; plus longue phase à pleine charge 1270 m ; 4 gros freinages (plus de 100 km/h perdus) ; vitesse de 67 à 350 km/h.
 - Charge latérale des pneus sur un tour : 4.0 g·km (R, indicateur relatif ; l’usure réelle dépendra aussi de l’abrasivité, inconnue : E à venir).
 
 **C. Conditions (climat du mois du Grand Prix 2026)**
 
 - novembre, course à 14 h : air ≈ 22.8 °C (E), 3.7 jours de pluie dans le mois (V), pluie pendant la course ≈ 4 % (E), humidité 57.1 %.
-- Source : Wikipédia (tableau climatique : Mexico City) — station Ciudad de México ([[Tacubaya]]), normals 1991–2020, extremes 1877–2024. Adhérence de la piste : 0.996 (R, calée).
+- Source : Wikipédia (tableau climatique : Mexico City) — station Ciudad de México ([[Tacubaya]]), normals 1991–2020, extremes 1877–2024. Adhérence de la piste : 0.967 (R, calée).
 - Contraintes pour les réglages (tendance connue de tous, E ; le réglage se découvrira en essais libres) : bosses marquées, vibreurs modérés.
 
 **D. Neutralisations (10 dernières éditions réelles)**

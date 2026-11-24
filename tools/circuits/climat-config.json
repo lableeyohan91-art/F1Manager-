@@ -1,0 +1,271 @@
+{
+ "_lisezmoi": "Pages Wikipédia (ville la plus proche avec normales officielles), mois habituel du Grand Prix (calendrier 2026, ou dernière date connue pour les circuits hors calendrier), heure locale de départ, course de nuit. Statut E pour le mois et l'heure des circuits hors calendrier.",
+ "cir_albert": {
+  "pages": [
+   "Melbourne",
+   "Climate of Melbourne"
+  ],
+  "moisGP": 3,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_shanghai": {
+  "pages": [
+   "Shanghai",
+   "Climate of Shanghai"
+  ],
+  "moisGP": 3,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_sakhir": {
+  "pages": [
+   "Manama",
+   "Bahrain"
+  ],
+  "moisGP": 4,
+  "heureCourse": 18,
+  "nuit": true
+ },
+ "cir_jeddah": {
+  "pages": [
+   "Jeddah"
+  ],
+  "moisGP": 4,
+  "heureCourse": 20,
+  "nuit": true
+ },
+ "cir_miami": {
+  "pages": [
+   "Miami",
+   "Climate of Miami"
+  ],
+  "moisGP": 5,
+  "heureCourse": 16,
+  "nuit": false
+ },
+ "cir_montreal": {
+  "pages": [
+   "Montreal",
+   "Climate of Montreal"
+  ],
+  "moisGP": 5,
+  "heureCourse": 14,
+  "nuit": false
+ },
+ "cir_barcelone": {
+  "pages": [
+   "Barcelona",
+   "Climate of Barcelona"
+  ],
+  "moisGP": 6,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_spielberg": {
+  "pages": [
+   "Zeltweg",
+   "Graz"
+  ],
+  "moisGP": 6,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_silverstone": {
+  "pages": [
+   "Silverstone",
+   "Oxford",
+   "Northampton"
+  ],
+  "moisGP": 7,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_spa": {
+  "pages": [
+   "Spa, Belgium",
+   "Stavelot",
+   "Liège"
+  ],
+  "moisGP": 7,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_hungaroring": {
+  "pages": [
+   "Budapest",
+   "Climate of Budapest"
+  ],
+  "moisGP": 7,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_zandvoort": {
+  "pages": [
+   "Zandvoort",
+   "Amsterdam Airport Schiphol",
+   "De Bilt",
+   "Rotterdam",
+   "Climate of the Netherlands"
+  ],
+  "moisGP": 8,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_madrid": {
+  "pages": [
+   "Madrid",
+   "Climate of Madrid"
+  ],
+  "moisGP": 9,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_bakou": {
+  "pages": [
+   "Baku"
+  ],
+  "moisGP": 9,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_austin": {
+  "pages": [
+   "Austin, Texas",
+   "Climate of Austin, Texas"
+  ],
+  "moisGP": 10,
+  "heureCourse": 14,
+  "nuit": false
+ },
+ "cir_interlagos": {
+  "pages": [
+   "São Paulo",
+   "Climate of São Paulo"
+  ],
+  "moisGP": 11,
+  "heureCourse": 14,
+  "nuit": false
+ },
+ "cir_lasvegas": {
+  "pages": [
+   "Las Vegas",
+   "Climate of Las Vegas"
+  ],
+  "moisGP": 11,
+  "heureCourse": 22,
+  "nuit": true
+ },
+ "cir_lusail": {
+  "pages": [
+   "Doha",
+   "Lusail"
+  ],
+  "moisGP": 11,
+  "heureCourse": 19,
+  "nuit": true
+ },
+ "cir_yasmarina": {
+  "pages": [
+   "Abu Dhabi"
+  ],
+  "moisGP": 12,
+  "heureCourse": 17,
+  "nuit": true
+ },
+ "cir_imola": {
+  "pages": [
+   "Imola",
+   "Bologna"
+  ],
+  "moisGP": 5,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_sepang": {
+  "pages": [
+   "Sepang",
+   "Kuala Lumpur"
+  ],
+  "moisGP": 10,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_portimao": {
+  "pages": [
+   "Portimão",
+   "Faro, Portugal"
+  ],
+  "moisGP": 5,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_istanbul": {
+  "pages": [
+   "Istanbul",
+   "Climate of Istanbul"
+  ],
+  "moisGP": 10,
+  "heureCourse": 14,
+  "nuit": false
+ },
+ "cir_kyalami": {
+  "pages": [
+   "Midrand",
+   "Johannesburg"
+  ],
+  "moisGP": 3,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_paulricard": {
+  "pages": [
+   "Le Castellet",
+   "Toulon",
+   "Marseille"
+  ],
+  "moisGP": 6,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_monaco": {
+  "pages": [
+   "Monaco"
+  ],
+  "moisGP": 6,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_monza": {
+  "pages": [
+   "Monza"
+  ],
+  "moisGP": 9,
+  "heureCourse": 15,
+  "nuit": false
+ },
+ "cir_suzuka": {
+  "pages": [
+   "Suzuka, Mie"
+  ],
+  "moisGP": 3,
+  "heureCourse": 14,
+  "nuit": false
+ },
+ "cir_singapour": {
+  "pages": [
+   "Singapore"
+  ],
+  "moisGP": 10,
+  "heureCourse": 20,
+  "nuit": true
+ },
+ "cir_mexico": {
+  "pages": [
+   "Mexico City"
+  ],
+  "moisGP": 11,
+  "heureCourse": 14,
+  "nuit": false
+ }
+}
