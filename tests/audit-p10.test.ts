@@ -107,3 +107,42 @@ describe('D-152 — proximité (choix B)', () => {
     expect(r.contact).toBe(2027 * 52);
   });
 });
+
+describe('Audit phases 10–11 — départs répétés (cause des doublons de la chronique)', () => {
+  it('une personne partie à l’amiable n’est pas réembauchée aussitôt par la même écurie ; indemnité versée une seule fois', () => {
+    const m = sc.creerMonde(5);
+    const moteur = sc.creerMoteur();
+    moteur.avancer(m, 2);
+    const p = (Object.values(table(m, TABLES.personnes)) as unknown as Personne[]).find((x) => x.statut === 'actif' && x.ecurie === 'eq_alpine' && x.poste === 'responsable_conception')!;
+    const tp = teamPrincipal(m, 'eq_alpine')!;
+    const fi = (Object.values(table(m, TABLES.finances)) as unknown as { ecurie: string; comptes: { indemnites: number } }[]).find((f) => f.ecurie === 'eq_alpine')!;
+    const avant = fi.comptes.indemnites;
+    contratEmploi(m, p.id)!.demandeDepart = { indemnite: 0.9, depuis: { ...m.date } };
+    expect(moteur.commandes.executer(m, { type: 'contrat.repondre_depart', auteur: tp.id, source: 'ia', parametres: { personne: p.id, accepter: true } })).toEqual({ ok: true });
+    expect(p.statut).toBe('libre');
+    moteur.avancer(m, 10);
+    expect(p.ecurie === 'eq_alpine').toBe(false);
+    expect(fi.comptes.indemnites - avant).toBeCloseTo(0.9, 6);
+    expect(Object.values(m.evenements).filter((e) => e.type === 'contrat.depart_accepte' && e.acteurs.some((a) => a.id === p.id))).toHaveLength(1);
+  });
+
+  it('graine 42, 10 saisons : personne ne demande à partir deux fois la même saison, aucun départ accepté deux fois', () => {
+    const m = sc.creerMonde(42);
+    const moteur = sc.creerMoteur();
+    const vus = new Set<string>();
+    const demandes = new Map<string, number>();
+    const acceptes = new Map<string, number>();
+    for (let k = 0; k < 52 * 10; k++) {
+      moteur.avancer(m, 1);
+      for (const e of Object.values(m.evenements)) {
+        if (vus.has(e.id)) continue;
+        vus.add(e.id);
+        if (e.type === 'contrat.demande_depart') { const c = `${e.acteurs[0]!.id}|${e.date.annee}`; demandes.set(c, (demandes.get(c) ?? 0) + 1); }
+        if (e.type === 'contrat.depart_accepte') { const c = `${e.acteurs.find((a) => a.role === 'cible')!.id}|${e.date.annee}`; compterAccepte(c); }
+      }
+    }
+    function compterAccepte(c: string) { acceptes.set(c, (acceptes.get(c) ?? 0) + 1); }
+    expect([...demandes.values()].filter((n) => n > 1)).toEqual([]);
+    expect([...acceptes.values()].filter((n) => n > 1)).toEqual([]);
+  }, 180_000);
+});

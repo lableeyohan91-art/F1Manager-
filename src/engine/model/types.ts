@@ -144,6 +144,8 @@ export interface Personne {
   id: string;
   /** Phase 10 : le manager incarné par le joueur (ses décisions ne sont jamais prises par l'IA). */
   joueur?: boolean;
+  /** Audit des phases 10–11 : dernier départ d'une écurie (hors échéance normale), lu par le refus d'y revenir aussitôt. */
+  dernierDepart?: { organisation: string; annee: number; motif: string };
   /** Phase 11 : image publique (−100 à 100, absente = 0). Lue par la valeur commerciale et les candidats (via l'écurie). */
   image?: number;
   /** Phase 11 : exposition médiatique récente (0 à 100, s'efface). Lue par la popularité. */

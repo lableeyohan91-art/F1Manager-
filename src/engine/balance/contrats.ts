@@ -131,3 +131,9 @@ export const ENGAGEMENTS_PILOTES = { libre: 0.2, maximum: 0.5 };
  * de propriétaire) : la clause du contrat si elle existe, sinon cette part du salaire annuel. Dépense hors plafond (ligne « indemnités »).
  */
 export const INDEMNITE_RUPTURE = { partSalaireAnnuel: 0.5 };
+
+/**
+ * Audit des phases 10–11 : après un départ (à l'amiable, démission, licenciement, rupture, non-prolongation), la personne refuse de revenir
+ * dans la même écurie pendant la saison du départ et les `saisons` suivantes. Une fin de contrat à son échéance n'est pas concernée.
+ */
+export const RETOUR_APRES_DEPART = { saisons: 1 };

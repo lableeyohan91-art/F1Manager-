@@ -305,6 +305,8 @@ function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin
   p.statut = 'libre';
   p.ecurie = '';
   p.libreDepuis = monde.date.annee;
+  // Audit des phases 10–11 : un départ voulu ou subi (pas une simple échéance) interdit un retour immédiat (voir ligneRouge).
+  if (motif && motif !== 'echeance') p.dernierDepart = { organisation: ancienne, annee: monde.date.annee, motif };
   const evt = ajouterEvenement(monde, {
     type: 'contrat.fin', acteurs: [{ id: p.id, role: 'personne' }, { id: ancienne, role: 'organisation' }],
     importance: 2, visibilite: 'public', causes: causes.filter((x) => monde.evenements[x]), contexte: { contrat: c.id, motif, ...(c.indemniteVerseeMEUR !== undefined ? { indemnite: c.indemniteVerseeMEUR } : {}) },

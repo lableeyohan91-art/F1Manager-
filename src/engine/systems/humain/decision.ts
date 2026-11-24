@@ -6,7 +6,7 @@
  */
 
 import { COMPETENCES_TRANSVERSALES, courbeAge } from '../../balance/personnages';
-import { CROISSANCE_SALAIRE_PAR_POINT, PENALITE_AGE_RECRUTEMENT, PENALITE_BAISSE_SALAIRE, PRIME_PALMARES, SALAIRE_REFERENCE_MEUR, UTILITE, VALEUR_MARCHE } from '../../balance/contrats';
+import { CROISSANCE_SALAIRE_PAR_POINT, PENALITE_AGE_RECRUTEMENT, PENALITE_BAISSE_SALAIRE, PRIME_PALMARES, RETOUR_APRES_DEPART, SALAIRE_REFERENCE_MEUR, UTILITE, VALEUR_MARCHE } from '../../balance/contrats';
 import { idsTries, table, type Monde } from '../../core/monde';
 import { tirageLocal } from '../../core/moteur';
 import { TABLES, type Carriere, type Contrat, type Ecurie, type Palmares, type Personne, type Saison } from '../../model/types';
@@ -132,6 +132,10 @@ function aEteTrahiPar(monde: Monde, p: Personne, organisation: string, decideur:
 
 /** Lignes rouges situationnelles (D-067) : seulement pour une valeur ≥ 19 chez une personne qui se remet peu en question. */
 export function ligneRouge(monde: Monde, p: Personne, o: Offre): Evaluation['ligneRouge'] {
+  // Audit des phases 10–11 (cause des départs répétés de la chronique) : on ne revient pas aussitôt dans l'écurie qu'on vient de quitter
+  // (départ à l'amiable, démission, licenciement, non-prolongation) ; avant, le recrutement d'urgence la réembauchait la même semaine.
+  const d = p.dernierDepart;
+  if (d && d.organisation === o.organisation && monde.date.annee - d.annee <= RETOUR_APRES_DEPART.saisons) return { sens: 'refus', libelle: 'vient de quitter cette écurie' };
   if ((p.traits['remiseEnQuestion'] ?? 10) > UTILITE.remiseEnQuestionMaxLigneRouge) return undefined;
   const fort = (v: string) => (p.valeurs[v] ?? 0) >= UTILITE.seuilLigneRouge;
   const valeur = valeurMarche(monde, p);
