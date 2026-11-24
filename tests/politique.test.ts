@@ -33,6 +33,10 @@ describe('Phase 8d-4 — fédération et président', () => {
     expect(moteur.commandes.executer(m, { type: 'federation.vote', auteur: tp.id, source: 'exterieur', parametres: { ecurie: 'eq_williams', candidat: choix } }).ok).toBe(true);
     const ancienne = f.finMandat;
     moteur.avancer(m, 1);
+    // Audit 8.5 : l'élu est connu tout de suite, mais le mandat en cours va à son terme (prise de fonction en semaine 51).
+    expect(f.presidentElu).toBeDefined();
+    expect(f.debutMandat).not.toBe(ancienne + 1);
+    while (m.date.semaine <= 51 && m.date.annee === ancienne) moteur.avancer(m, 1);
     expect(f.debutMandat).toBe(ancienne + 1);
     expect(f.election?.votes['eq_williams']).toBe(choix);
     expect(Object.values(m.evenements).some((e) => e.type === 'federation.election')).toBe(true);

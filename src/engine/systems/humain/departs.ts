@@ -225,7 +225,9 @@ export const systemeDeparts: Systeme = {
     } finally {
       indexAnciennete.delete(monde);
     }
-    // Postes laissés vacants par un départ : recrutement habituel (les écuries du joueur recrutent elles-mêmes).
-    if (Object.values(tp).filter((x) => (x as unknown as Personne).statut === 'actif').length < actifsAvant) pourvoirPostes(monde);
+    // Postes laissés vacants par un départ : recrutement habituel (les écuries du joueur recrutent elles-mêmes). Audit 8.3 : aussi
+    // quand le départ a eu lieu entre deux passages (rupture négociée, départ accepté par commande), pas seulement pendant celui-ci.
+    void actifsAvant;
+    pourvoirPostes(monde);
   },
 };

@@ -81,7 +81,8 @@ export const systemeEtat: Systeme = {
  */
 function signalerNouveauDefi(monde: Monde, p: Personne, titres: number): void {
   p.nouveauDefiDemande = p.ecurie;
-  const posteSuperieur = ['responsable_aero', 'responsable_conception', 'chef_stands'].includes(p.poste) ? 'directeur_technique' : 'team_principal';
+  // Audit 8.11 : le chef d'équipe des stands relève du directeur sportif (D-135), les responsables techniques du directeur technique.
+  const posteSuperieur = p.poste === 'chef_stands' ? 'directeur_sportif' : ['responsable_aero', 'responsable_conception'].includes(p.poste) ? 'directeur_technique' : 'team_principal';
   const sup = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((x) => x.statut === 'actif' && x.ecurie === p.ecurie && x.poste === posteSuperieur && x.id !== p.id);
   const evt = ajouterEvenement(monde, {
     type: 'personnel.besoin_defi', acteurs: [{ id: p.id, role: 'auteur' }, ...(sup ? [{ id: sup.id, role: 'cible' }] : []), { id: p.ecurie, role: 'organisation' }],

@@ -9,6 +9,8 @@ export interface Federation {
   id: 'federation';
   president?: string;
   nomPresident?: string;
+  /** Audit 8.5 : président élu en semaine 40, qui prend ses fonctions avec la saison suivante (semaine 51). */
+  presidentElu?: string;
   debutMandat: number;
   finMandat: number;
   orientationPreferee?: string;

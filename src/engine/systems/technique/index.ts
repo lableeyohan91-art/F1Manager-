@@ -387,7 +387,11 @@ function diffuserDecouvertes(monde: Monde): void {
     }
     d.diffusee = r3(d.diffusee + part);
   }
-  const ids = idsTries(t);
+  // Audit 8.12 : on garde les découvertes encore en diffusion, puis les plus récentes (avant : ordre alphabétique des écuries).
+  const ids = idsTries(t).sort((a, b) => {
+    const x = t[a] as unknown as { diffusee: number; saison?: number }, y = t[b] as unknown as { diffusee: number; saison?: number };
+    return Number(x.diffusee < 1) - Number(y.diffusee < 1) || (x.saison ?? 0) - (y.saison ?? 0) || (a < b ? -1 : 1);
+  });
   for (const id of ids.slice(0, Math.max(0, ids.length - DECOUVERTES.conservees))) delete t[id];
 }
 

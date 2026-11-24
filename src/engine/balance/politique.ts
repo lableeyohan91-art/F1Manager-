@@ -40,7 +40,7 @@ export const LOBBYING = { montantMin: 0.5, montantMax: 5, avanceMin: 3, tresorer
  *   borné à [ecartAeroMin ; ecartAeroMax] ; une écurie de la seconde moitié du classement vote pour l'élargissement.
  * Sens tiré à pile ou face (probaSens) quand le président n'a pas de préférence (restrictions, Grands Prix, ou rigueur nulle).
  * Les règles adoptées s'appliquent en semaine `semaineApplication`, après la fin de saison, pour la saison suivante.
- * - nombre de Grands Prix (D-141) : ± pasGrandsPrix, borné à [grandsPrixMin ; grandsPrixMax] autour du calendrier de départ (24) ;
+ * - nombre de Grands Prix (D-141) : ± pasGrandsPrix, borné à [grandsPrixMin ; grandsPrixMax] (phase 11b : départ à 20 Grands Prix, le vote peut porter le calendrier jusqu'à 24) ;
  *   une écurie plus riche que la moyenne vote pour plus de courses, une plus pauvre pour moins (coûts d'opérations) ;
  *   sujet tiré : plafond (probaPlafond), Grands Prix (probaGrandsPrix), sinon restrictions.
  * Majorité simple des écuries qui votent ; égalité : le choix du président l'emporte.

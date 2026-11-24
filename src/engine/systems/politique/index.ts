@@ -125,11 +125,17 @@ function election(monde: Monde, f: Federation): void {
       votes[e.id] = choix;
     }
     if (choix && voix.has(choix)) voix.set(choix, voix.get(choix)! + 1);
+    else if (choix) {
+      // Audit 8.4 : le candidat choisi n'est plus candidat (recruté, retiré) : le bulletin est perdu, et l'écurie en est informée.
+      ajouterEvenement(monde, { type: 'federation.vote_perdu', acteurs: [{ id: e.id, role: 'ecurie' }, { id: choix, role: 'candidat' }], importance: 2, visibilite: 'prive', contexte: { annee: monde.date.annee },
+        texte: `Le candidat choisi par ${e.nom} n'est plus en lice : son vote n'a pas été compté.` });
+    }
   }
   const max = Math.max(...voix.values());
   const ex = [...voix.entries()].filter(([, v]) => v === max).map(([k]) => k).sort();
   const elu = candidats.find((c) => c.id === ex[tirageLocal(monde, 'politique.egalite', monde.date.annee).entier(0, ex.length - 1)])!;
-  installerPresident(monde, f, elu, monde.date.annee + 1);
+  // Audit 8.5 : le mandat en cours va à son terme ; l'élu prend ses fonctions avec la saison suivante.
+  f.presidentElu = elu.id;
   f.election = { annee: monde.date.annee, candidats: candidats.map((c) => c.id), votes };
   f.historique = [...f.historique, { annee: monde.date.annee, type: 'election', resultat: `${nomDe(elu)} (${max} voix)` }].slice(-10);
   ajouterEvenement(monde, {
@@ -225,7 +231,9 @@ function proposerVote(monde: Monde, f: Federation): void {
   let valeur: number, texte: string;
   if (sujet === 'grandsPrix') {
     const actuel = nombreGrandsPrix(monde);
-    valeur = Math.round(borner(actuel + (alea.chance(AUTRES_VOTES.probaSens) ? 1 : -1) * AUTRES_VOTES.pasGrandsPrix, AUTRES_VOTES.grandsPrixMin, AUTRES_VOTES.grandsPrixMax));
+    // Audit 8.6 : à une borne, la proposition va dans le seul sens possible (avant : le vote de l'année était annulé).
+    const sens = actuel <= AUTRES_VOTES.grandsPrixMin ? 1 : actuel >= AUTRES_VOTES.grandsPrixMax ? -1 : alea.chance(AUTRES_VOTES.probaSens) ? 1 : -1;
+    valeur = Math.round(borner(actuel + sens * AUTRES_VOTES.pasGrandsPrix, AUTRES_VOTES.grandsPrixMin, AUTRES_VOTES.grandsPrixMax));
     if (valeur === actuel) return;
     texte = `calendrier porté à ${valeur} Grands Prix`;
   } else if (sujet === 'plafondMEUR') {
@@ -361,6 +369,10 @@ export const systemePolitique: Systeme = {
         texte: `${ancien ?? 'Le président'} quitte la fédération ; ${nomDe(suivant)} assure l'intérim jusqu'en ${fin}.`,
       });
       else { delete f.president; delete f.nomPresident; }
+    }
+    if (date.semaine === AUTRES_VOTES.semaineApplication && f.presidentElu) {
+      installerPresident(monde, f, table(monde, TABLES.personnes)[f.presidentElu] as unknown as Personne | undefined, date.annee + 1);
+      delete f.presidentElu;
     }
     if (date.semaine === AUTRES_VOTES.semaineApplication && f.reglesAVenir) {
       // Règles votées pendant la saison : en vigueur pour la suivante (avant la création de son calendrier, en semaine 1).

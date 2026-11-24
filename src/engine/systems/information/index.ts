@@ -163,8 +163,11 @@ function avancerFaits(monde: Monde): void {
     if (!e) { delete t[id]; continue; } // effacé du journal : on l'oublie aussi
     if (e.visibilite === 'public' || age(f) > DIFFUSION.dureeDiffusion) continue;
     diffuser(monde, e, f, contexte());
-    if (e.connuPar.length >= DIFFUSION.connaisseursMax) reveler(monde, e, f, 'trop_de_monde');
-    else if (tirageLocal(monde, 'information.presse', id, monde.date.annee, monde.date.semaine).chance(REVELATION.base * f.interet * (e.connuPar.length / DIFFUSION.connaisseursMax))) reveler(monde, e, f, 'presse');
+    // Audit 8.8 : seuls ceux qui sont encore dans le milieu (actifs) comptent pour la révélation ; un retraité ou une personne
+    // archivée ne fait plus circuler le fait.
+    const actifs = e.connuPar.filter((x) => (table(monde, TABLES.personnes)[x] as unknown as { statut?: string } | undefined)?.statut === 'actif').length;
+    if (actifs >= DIFFUSION.connaisseursMax) reveler(monde, e, f, 'trop_de_monde');
+    else if (tirageLocal(monde, 'information.presse', id, monde.date.annee, monde.date.semaine).chance(REVELATION.base * f.interet * (actifs / DIFFUSION.connaisseursMax))) reveler(monde, e, f, 'presse');
   }
   // Volume borné : les plus anciens faits suivis sont oubliés.
   const ids = idsTries(t);
