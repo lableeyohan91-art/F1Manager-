@@ -1,0 +1,47 @@
+/**
+ * Phase 11b — calage reproductible de la voiture de référence sur les vitesses réelles médianes des circuits détaillés.
+ * Une seule voiture pour tous les circuits (aucun réglage par circuit, sauf le niveau d'ailerons choisi par le calcul).
+ * Critère : écart absolu moyen de vitesse (km/h) sur tous les points de tous les circuits. Recherche par coordonnées.
+ * Usage : npx tsx tools/calage-profil.mts   (affiche les valeurs à reporter dans src/engine/balance/profil.ts)
+ */
+import { readdirSync, readFileSync } from 'node:fs';
+import { appuiNaturel, courbures, type Trace } from '../src/engine/circuits/profil';
+import { VOITURE_REFERENCE } from '../src/engine/balance/profil';
+
+const ALTITUDE: Record<string, number> = { cir_monza: 160, cir_monaco: 10, cir_suzuka: 45, cir_singapour: 10, cir_mexico: 2240 };
+const traces = readdirSync('data/circuits').filter((f) => f.endsWith('.json')).sort().map((f) => JSON.parse(readFileSync(`data/circuits/${f}`, 'utf8')) as Trace & { points: { v: number }[] });
+const ks = traces.map((t) => courbures(t));
+type V = typeof VOITURE_REFERENCE;
+function erreur(v: V): number {
+  let s = 0, n = 0;
+  traces.forEach((t, i) => {
+    const p = appuiNaturel(t, v, { altitudeM: ALTITUDE[t.circuit] ?? 0 }, ks[i]).profil;
+    p.vitesses.forEach((x, j) => { s += Math.abs(x * 3.6 - t.points[j]!.v); n++; });
+  });
+  return s / n;
+}
+const PARAMS: (keyof V)[] = ['cla', 'cda', 'muMeca', 'muAero', 'muMotricite', 'muFreinage', 'energieElectriqueTourJ'];
+/** Bornes physiquement plausibles pour une F1 (H) : le calage ne peut pas compenser un effet absent du modèle par une valeur absurde. */
+const BORNES: Partial<Record<keyof V, [number, number]>> = {
+  cla: [2.5, 5.5], cda: [0.6, 1.4], muMeca: [1.2, 1.9], muAero: [1.2, 2.2], muMotricite: [1.0, 1.7], muFreinage: [1.4, 2.4], energieElectriqueTourJ: [2e6, 9e6],
+};
+const dansBornes = (k: keyof V, x: number) => { const b = BORNES[k]; return !b || (x >= b[0] && x <= b[1]); };
+let v: V = { ...VOITURE_REFERENCE, deploiement: { ...VOITURE_REFERENCE.deploiement } };
+let e = erreur(v);
+console.log('départ', e.toFixed(2));
+for (const pasRel of [0.16, 0.08, 0.04, 0.02]) {
+  let ameliore = true;
+  while (ameliore) {
+    ameliore = false;
+    for (const k of PARAMS) {
+      for (const sgn of [1, -1]) {
+        const x = (v[k] as number) * (1 + sgn * pasRel);
+        if (!dansBornes(k, x)) continue;
+        const w = { ...v, [k]: x } as V;
+        const ew = erreur(w);
+        if (ew < e - 0.01) { v = w; e = ew; ameliore = true; console.log(`  ${String(k)} → ${(v[k] as number).toPrecision(4)} : ${e.toFixed(2)} km/h`); }
+      }
+    }
+  }
+}
+console.log('résultat', JSON.stringify(Object.fromEntries(PARAMS.map((k) => [k, +(v[k] as number).toPrecision(4)]))), 'écart moyen', e.toFixed(2), 'km/h');
