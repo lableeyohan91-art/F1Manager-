@@ -59,3 +59,18 @@ python3 tools/circuits/recoupement_wikipedia.py data/circuits/cir_*.json      # 
 npx tsx tools/circuits/fiches.mts > docs/rapports/phase-11b/fiches-5-circuits.md
 ```
 (circuitRef : monza, monaco, suzuka, marina_bay, rodriguez ; CSV : https://raw.githubusercontent.com/TracingInsights/RaceData/main/data/)
+
+## 7. Finalisation des 30 circuits (phase 11b, 24/11/2026)
+
+```
+python3 tools/circuits/collecte_tracinginsights.py <cache> cir_portimao 2021 "Portuguese Grand Prix" 5   # circuits absents d'OpenF1
+python3 tools/circuits/construire_trace.py <cache> cir_portimao 4653 15 data/circuits/reconstruits/cir_portimao.json
+npx tsx tools/circuits/trace_depuis_geojson.mts <f1-circuits.geojson> za-1961 cir_kyalami 4529 16 1500 data/circuits/reconstruits/cir_kyalami.json
+python3 tools/circuits/fermer_boucle.py <trace.json> ...         # sauts de position et fermeture de la boucle
+python3 tools/circuits/climat_wikipedia.py tools/circuits/climat-config.json data/circuits [id ...]
+python3 tools/circuits/historique_editions.py <CSV> <rc.json> <id> <circuitRef> <trace.json>
+npx tsx tools/circuits/generer-fiches-jeu.mts                    # data/grille-2026/circuits-fiches.json et climat-circuits.csv
+npx tsx tools/export-apex-lab.mts export/apex-lab tous           # export des 30 circuits pour APEX Lab
+```
+Dossiers : `data/circuits/` (5 pilotes), `validation/` (21, jamais utilisés pour caler), `reconstruits/` (4). Caractéristiques estimées :
+`data/circuits/caracteres.csv` (statut E, ou H pour Kyalami).

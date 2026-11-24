@@ -225,3 +225,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Courbure effective** | Courbure du tracé lissée sur une durée de trajet (0,25 s) à la vitesse calculée de la voiture : une voiture rapide traverse un pic de courbure court sans ralentir. C'est elle que lit le profil de vitesse. |
 | **Banc de spécialisation** | Mesure qui compare des voitures améliorées chacune sur une seule caractéristique, dosées pour gagner le même temps moyen sur le calendrier (`tools/banc-specialisation.mts`). |
 | **Caractéristique future** | Caractéristique de la voiture déclarée dans le registre mais sans effet physique (refroidissement, gestion des pneus) : non testée, aucun effet inventé. |
+| **Vivier (de circuits)** | Les 30 circuits que le jeu connaît. Chaque saison, 20 y sont choisis : les 10 permanents et 10 en rotation. |
+| **Circuit permanent** | Circuit du vivier présent à chaque saison (10 au départ). |
+| **Rotation (des circuits)** | Partage des places restantes du calendrier : contrats en cours, puis circuits absents depuis le plus longtemps, sans tirage. |
+| **Perte nette au stand** | Temps perdu par un arrêt par rapport à un tour sans arrêt : temps de passage dans la voie moins le temps de la même distance en piste. À ne pas confondre avec le temps de passage. |

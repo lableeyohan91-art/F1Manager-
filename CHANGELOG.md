@@ -525,3 +525,17 @@ Aucun code à ce stade.
 - Banc de spécialisation (`tools/banc-specialisation.mts`), étude de la normalisation (`tools/circuits/etude-normalisation.mts`), export APEX Lab (`tools/export-apex-lab.mts`, `export/apex-lab/`).
 - Outil de calage : écart de temps au tour dans le critère, contrainte « moins d'appui à Monza qu'à Monaco », recalage partiel (`pistes`).
 - Rapport `docs/rapports/phase-11b/audit-apex-lab.md` ; décisions D-162 et D-163 (validées par le porteur le 24/11/2026) ; 8 tests.
+
+## [Phase 11b — les 30 circuits] — 24/11/2026
+
+### Ajouté
+- Vivier de 30 circuits : Imola, Sepang, Portimão, Istanbul, Paul-Ricard et Kyalami rejoignent les 24 (noms altérés).
+- Calendrier de 20 Grands Prix : 10 permanents, 10 places en rotation (contrats, puis circuits absents depuis le plus longtemps) ; archives conservées.
+- Climat réel sur 12 mois pour les 30 circuits : la pluie dépend du mois où le Grand Prix a lieu.
+- Écran « Circuits » : 30 fiches (tracé et virages, exigences provisoires, conditions, historique, stratégie et incidents, préparation du week-end).
+- Données préparées pour les phases 12 et 13 (contraintes techniques, stands, dépassements, zones à risque), sans effet sur les courses.
+- Export APEX Lab des 30 circuits ; 186 tests de données, 7 tests du calendrier.
+
+### Modifié
+- Format de sauvegarde 29 (une ancienne partie garde son calendrier de 24 Grands Prix).
+- D-164 inscrite. Rapport : `docs/rapports/phase-11b/rapport-final-30-circuits.md`.
