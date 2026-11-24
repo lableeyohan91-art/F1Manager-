@@ -1,6 +1,6 @@
 # Phase 11 — Médias et archives
 
-> Statut : **À VALIDER** par le porteur (étape 2 du processus de CLAUDE.md). Aucun code avant validation.
+> Statut : **VALIDÉE** par le porteur le 24/11/2026 (D-149) : « oui » aux 6 questions, recommandations retenues.
 > Rédigée par Claude Code le 24/11/2026. S'appuie sur ce qui existe déjà :
 > - les faits, les fuites, les rumeurs et les révélations de presse (phase 8c) ;
 > - la popularité et la valeur commerciale (phase 7c, D-096 à D-099) ;
