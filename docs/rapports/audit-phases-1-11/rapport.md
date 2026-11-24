@@ -90,7 +90,43 @@
 
 Voir `donnees/campagne-audit-apres.md`, avec la référence d'avant l'audit (`donnees/campagne-audit-reference.md`) et tous les indicateurs suivis.
 
-RESULTATS_CAMPAGNE
+- Mêmes 20 graines × 10 saisons, mêmes mécaniques que la référence.
+- La référence est la campagne « 30 circuits, après », faite avant l'audit et avant le passage de la pluie à 0,43.
+- L'écart vient donc des corrections de l'audit **et** de la part pluvieuse.
+
+| Indicateur | Avant l'audit | Après | Lecture |
+| --- | --- | --- | --- |
+| Courses sous la pluie par saison | 1,7 | **2,2** | Favorable : effet voulu de la pluie vérifiée |
+| Vainqueurs différents par saison | 5,7 | 5,7 | Inchangé |
+| Écuries victorieuses par saison | 4,0 | 4,0 | Inchangé |
+| Part des victoires de l'écurie dominante | 58 % | 59 % | Inchangé |
+| Victoires inattendues par saison | 2,2 | 2,0 | Légèrement défavorable |
+| Écart de points entre les deux premiers | 55 | 61 | **Défavorable** |
+| Titre encore ouvert avant la dernière manche | 35 % | 32 % | **Défavorable** |
+| Retournement à la dernière manche | 6 % | 8 % | Favorable |
+| Dominations (≥ 120 points d'écart) | 11 % | 14 % | **Défavorable** |
+| Séries avec 5 titres consécutifs ou plus | 45 % | **55 %** | **Défavorable, objectif 0–25 % toujours non atteint** |
+| Plus longue série de titres constructeurs | 5,0 | 5,3 | Défavorable |
+| Écuries sans aucune victoire sur 10 saisons | 3,0 | 3,5 | Défavorable |
+| Remontées (+3 places d'une saison à l'autre) | 6,3 | 5,5 | Défavorable |
+| Transitions sans changement d'étage | 17 % | 12 % | Favorable |
+| Dernière écurie avec au moins 1 point | 54 % | 59 % | Favorable |
+| Champions pilotes différents sur 10 saisons | 4,3 | 4,2 | Inchangé |
+| Taux d'abandon | 7 % | 7 % | Inchangé |
+| Écart 1re–dernière voiture | 1,53 | 1,53 | Inchangé (52 % dans l'objectif) |
+
+Tous les autres indicateurs (luttes, coéquipiers, compétitivité à toutes les positions) sont dans les fichiers complets. Ils bougent d'un point au plus.
+
+**Lecture franche**
+- La tendance est **plutôt défavorable sur les dynasties** : séries de 5 titres à 55 %, dominations à 14 %.
+- C'est **en grande partie du bruit** :
+  - 45 % → 55 %, c'est 2 séries de plus sur 20 ;
+  - à cette taille d'échantillon, l'incertitude est d'environ ±11 points.
+- Une cause réelle est plausible et va dans ce sens : le plafond budgétaire **n'est plus contournable** et ne sanctionne plus l'année écoulée.
+  - Avant, 9 écuries sur 11 étaient pénalisées à tort chaque année de vote, ce qui brassait artificiellement la hiérarchie.
+- Conformément à ta consigne, **aucune correction des dynasties avant la fin de la phase 12**. Le problème reste ouvert et prioritaire pour la campagne de la phase 12.
+- À confirmer sur 100 graines lors de cette campagne.
+
 
 ## 5. Nouveaux choix de conception à valider (inclus dans D-165)
 
