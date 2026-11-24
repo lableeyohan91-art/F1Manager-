@@ -524,4 +524,4 @@ Aucun code à ce stade.
 - Registre des caractéristiques (`src/engine/circuits/specialisation.ts`) : modélisées ou futures (non testées), compromis, canal météo unique.
 - Banc de spécialisation (`tools/banc-specialisation.mts`), étude de la normalisation (`tools/circuits/etude-normalisation.mts`), export APEX Lab (`tools/export-apex-lab.mts`, `export/apex-lab/`).
 - Outil de calage : écart de temps au tour dans le critère, contrainte « moins d'appui à Monza qu'à Monaco », recalage partiel (`pistes`).
-- Rapport `docs/rapports/phase-11b/audit-apex-lab.md` ; décisions D-162 et D-163 (à discuter) ; 8 tests.
+- Rapport `docs/rapports/phase-11b/audit-apex-lab.md` ; décisions D-162 et D-163 (validées par le porteur le 24/11/2026) ; 8 tests.
