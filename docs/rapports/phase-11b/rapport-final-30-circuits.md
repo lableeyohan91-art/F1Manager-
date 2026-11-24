@@ -137,16 +137,16 @@ Aucune ne domine la moitié du calendrier, et un test le vérifie.
 - Moins de courses donne moins de points : les championnats restent plus souvent ouverts jusqu'au bout.
 - **Défavorable : la pluie est 37 % plus rare**, ce qui donne un peu moins de surprises.
   - Cause : avec le climat réel, la probabilité de pluie pendant la course est plus basse que les anciennes classes du jeu. Exemple : Silverstone passe de 25 % à 9 %.
-  - L'hypothèse de 0,35 pèse beaucoup.
-  - Je recommande de vérifier en phase 13, contre les courses réellement humides (récits de Wikipédia, vérification seulement), avant de toucher à quoi que ce soit.
+  - L'hypothèse de 0,35 pesait beaucoup.
+  - **Vérifié la nuit du 24 au 25/11** contre les 10 dernières éditions réelles des 30 circuits (récits de course, vérification seulement) : 29 courses humides sur 258 (11,2 %), contre 9,0 % pour le modèle. La part passe à **0,43**, un seul facteur global (répartition entre circuits et mois inchangée). Effet mesuré : `docs/rapports/audit-phases-1-11/rapport.md` §4.
 - Les **dynasties** sont inchangées. Conformément à ta consigne, aucune correction avant la fin de la phase 12.
-- **Non mesuré ici** : l'effet sur les finances. Moins de Grands Prix, c'est moins de coûts d'opérations et moins d'objectifs de course des sponsors titres. À inclure dans la campagne de la phase 12.
+- **Finances (mesuré la nuit du 24 au 25/11)** : avec 20 Grands Prix au lieu de 24, les coûts d'opérations baissent d'environ 4,8 M€ par an et par écurie. Cet argent part presque entièrement en développement (+4,6 M€), sous le plafond. La trésorerie ne change pas de façon notable. Les probabilités du sponsoring ont été ramenées au nombre réel de Grands Prix (audit, constat 5.8).
 
 ## 6. Problèmes ouverts
 
 1. **Ailerons presque toujours au maximum** : la voiture de référence est en cause, refonte en phase 12 (D-163). Les caractéristiques essentielles et la « sensibilité aux réglages » restent donc provisoires.
 2. **Virages de 25 circuits** : numérotation automatique. Les numéros peuvent différer de l'officiel sur les circuits à virages discrets (bosses, courbes rapides). À relire, ou à recouper avec une source que tu autoriserais.
-3. **Pluie moins fréquente** (§5) : à vérifier contre l'historique réel.
+3. **Pluie moins fréquente** (§5) : vérifiée contre l'historique réel et corrigée (0,43).
 4. **Zones de dépassement** : méthode simple, quelques résultats discutables (Suzuka).
 5. **Kyalami** : sans relief ni vitesse réelle ; historique indicatif seulement (anciennes configurations, 1977–1993).
 6. **Données réelles de vitesses 2021–2022** (Portimão, Istanbul, Paul-Ricard) : faites par des voitures d'une autre génération. Elles servent à la géométrie et au contrôle, pas à caler.

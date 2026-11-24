@@ -539,3 +539,25 @@ Aucun code à ce stade.
 ### Modifié
 - Format de sauvegarde 29 (une ancienne partie garde son calendrier de 24 Grands Prix).
 - D-164 inscrite. Rapport : `docs/rapports/phase-11b/rapport-final-30-circuits.md`.
+
+## [Audit des phases 1 à 11] — 25/11/2026
+
+### Corrigé
+- 92 constats relevés par six relectures indépendantes : 67 corrigés, 8 en partie, 16 documentés, 1 écarté (D-158). Détail : `docs/rapports/audit-phases-1-11/constats.md`.
+- Les plus importants :
+  - deux parties partageaient des objets (déterminisme) ;
+  - l'anti-répétition des gestes réduisait tous les soutiens ;
+  - un plafond voté sanctionnait l'année écoulée ;
+  - le plafond était contournable par le joueur ;
+  - double contrat après une prolongation ;
+  - pilotes titulaires à 51 ans ;
+  - égalités départagées par l'identifiant ;
+  - communication déléguée qui critiquait le pilote ;
+  - décisions sautées par « Continuer » ;
+  - pertes de sauvegarde silencieuses.
+
+### Modifié
+- Part pluvieuse 0,35 → 0,43, vérifiée sur 258 éditions réelles.
+- Grands Prix à la semaine de leur date habituelle.
+- Budget de développement modifiable une fois par trimestre.
+- D-165 ; rapport `docs/rapports/audit-phases-1-11/rapport.md` ; 16 tests (`tests/audit-nuit.test.ts`).
