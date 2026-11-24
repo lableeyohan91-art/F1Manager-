@@ -1,7 +1,7 @@
 /** Phase 11c — refonte du sponsoring (docs/systemes/phase-11c-sponsoring.md, D-155). */
 import { describe, expect, it } from 'vitest';
 import {
-  bilanSaison, choisirVarianteEquipe, conclure, construireVariantes, contratsActifs, creerScenarioGrille2026, decisionsEnAttente, deserialiser, evaluerSponsors,
+  bilanSaison, choisirVarianteEquipe, exploit, conclure, construireVariantes, contratsActifs, creerScenarioGrille2026, decisionsEnAttente, deserialiser, evaluerSponsors,
   executerCommandeJoueur, financesDe, objectifsGP, offresSponsors, operationsSponsors, probaClause, proposerOperation, rangAttenduPublic, serialiser, signerSponsor,
   sponsorsEngages, table, TABLES, teamPrincipal, variantesPour, VERSION_FORMAT, ecuriesActives,
   type ContratSponsoring, type Ecurie, type GrandPrix, type Monde, type OffreSponsor, type Personne, type Saison, type Sponsor,
@@ -309,4 +309,43 @@ describe('Phase 11c — opérations exceptionnelles', () => {
     expect(op.statut).toBe('refusee');
     expect(financesDe(m, petite.id)!.tresorerieMEUR).toBe(avant);
   });
+
+  it('D-157 : après 3 saisons, seul un PREMIER top 5, podium ou victoire depuis 3 ans déclenche ; non cumulable ; montant selon l’exploit', () => {
+    const m = sc.creerMonde(11);
+    const moteur = sc.creerMoteur();
+    moteur.avancer(m, 3 * 52 + 22); // saisons 2027 à 2029 jouées, quelques Grands Prix de 2030 courus
+    const gp = (table(m, TABLES.saisons)['ssn_2030'] as unknown as Saison).calendrier.map((id) => table(m, TABLES.grandsPrix)[id] as unknown as GrandPrix).filter((g) => g.termine).at(-1)!;
+    const meilleure = (id: string) => {
+      let b = 99;
+      for (const a of [2027, 2028, 2029, 2030]) for (const g of (table(m, TABLES.saisons)[`ssn_${a}`] as unknown as Saison).calendrier) {
+        const x = table(m, TABLES.grandsPrix)[g] as unknown as GrandPrix;
+        if (x.termine && x.id !== gp.id && (a < 2030 || x.manche < gp.manche)) for (const r of x.resultats) if (r.ecurie === id && r.position) b = Math.min(b, r.position);
+      }
+      return b;
+    };
+    const eqs = ecuriesActives(m);
+    const habituee = eqs.find((e) => meilleure(e.id) <= 3)!; // a déjà fait un podium ces 3 dernières années
+    const disette = eqs.find((e) => meilleure(e.id) > 3); // aucun podium depuis 3 ans
+    gp.resultats.find((r) => r.ecurie === habituee.id)!.position = 2;
+    expect(exploit(m, habituee, gp)).toBeUndefined();
+    expect(disette).toBeDefined();
+    if (disette) {
+      gp.resultats.find((r) => r.ecurie === disette.id)!.position = 3;
+      expect(exploit(m, disette, gp)?.type).toBe('podium');
+      if (!contratsActifs(m, 2030, disette.id).some((c) => c.rang === 'principal')) signerSponsor(m, sponsorsLibres(m)[0]!, disette, 'principal', 10, 2030, false);
+      const avant = operationsSponsors(m, disette.id).filter((o) => o.proposeeLe.annee === 2030).length;
+      proposerOperation(m, disette, gp);
+      const ops = operationsSponsors(m, disette.id).filter((o) => o.proposeeLe.annee === 2030);
+      expect(ops.length).toBeLessThanOrEqual(1); // non cumulable
+      expect(avant).toBe(0);
+      if (avant === 0) {
+        expect(ops[0]!.exploit).toBe('podium');
+        // Une victoire plus tard dans la saison ne donne rien de plus.
+        gp.resultats.find((r) => r.ecurie === disette.id)!.position = 1;
+        proposerOperation(m, disette, gp);
+        expect(operationsSponsors(m, disette.id).filter((o) => o.proposeeLe.annee === 2030)).toHaveLength(1);
+      }
+    }
+  });
 });
+

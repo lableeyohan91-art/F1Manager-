@@ -101,3 +101,37 @@ Catégorie d'écurie = classement constructeurs de la saison précédente (tête
 1. **Seuil du podium exploit** : je l'ai abaissé de la 9e à la 7e place attendue (sinon presque jamais). D'accord ?
 2. **Montant des opérations** : environ 1,8 M€ par saison pour une écurie du fond qui accepte tout. Suffisant, ou faut-il le relever ?
 3. **Écurie la moins dotée** : elle reçoit un peu moins qu'avant, si elle ne prend pas de pari. Veux-tu un coup de pouce, ou est-ce acceptable que l'argent aille à celles qui osent ?
+
+## 7. Réponses du porteur et nouvelle règle des opérations (D-157, D-158)
+
+Le porteur a choisi :
+- **Déclencheur** : premier top 5, premier podium ou première victoire depuis 3 saisons. Une seule opération par saison, la première.
+- **Montants** : relevés pour le fond de grille.
+- **Écurie la moins dotée** : coup de pouce reporté à la phase 12.
+- **Rumeurs** : fiabilité inchangée.
+
+En début de partie, les données ne contiennent pas les résultats d'avant 2027. L'ancienne règle s'applique donc tant que 3 saisons n'ont pas été jouées (recommandation, à confirmer).
+
+Mesures (mêmes 20 graines × 10 saisons ; montants par écurie et par saison) :
+
+| Indicateur | Avant la refonte | Phase 11c (1re règle) | D-157, IA | D-157, tout accepter | D-157, tout refuser |
+| --- | --- | --- | --- | --- | --- |
+| Opérations proposées / saison (plateau) | 0 | 2,16 | 1,43 | 1,44 | 1,45 |
+| dont fond / milieu / tête | — | 0,89 / 1,22 / 0,04 | 0,70 / 0,70 / 0,02 | 0,71 / 0,71 / 0,02 | 0,72 / 0,71 / 0,02 |
+| Total fond (M€) | 48,33 | 50,12 | 51,16 | 52,12 | 49,55 |
+| Total milieu (M€) | 89,14 | 90,65 | 92,14 | 92,50 | 90,38 |
+| Total tête (M€) | 178,63 | 181,28 | 180,91 | 181,26 | 180,28 |
+| Écurie la moins dotée (M€) | 28,32 | 26,59 | 27,26 | 27,02 | 26,70 |
+| Rapport premier / dernier | 9,04 | 9,69 | 9,56 | 9,63 | 9,62 |
+| Variabilité d'une saison à l'autre (M€) | 14,59 | 19,42 | 20,36 | 20,87 | 19,36 |
+| Sponsoring total du plateau (M€) | 1 085,8 | 1 106,9 | 1 115,9 | 1 122,3 | 1 100,6 |
+| Ruptures / saison | 0,71 | 0,67 | 0,70 | 0,73 | 0,76 |
+| Satisfaction moyenne | 69,5 | 69,1 | 69,1 | 69,0 | 69,0 |
+
+Toutes les colonnes : `docs/rapports/phase-11c/d157-*.json`.
+
+Lecture :
+- **Plus rare** (1,4 par saison au lieu de 2,2), mais **bien plus forte**. Pour une écurie du fond, accepter plutôt que refuser rapporte en moyenne 2,6 M€ par saison. Comme elle n'a une opération qu'environ une saison sur six, cela fait **environ 14 M€ par opération**, près d'un tiers de son sponsoring annuel. C'est l'effet « qui change la donne » demandé.
+- Les écuries de tête n'en reçoivent pratiquement jamais (0,02 par saison).
+- **Défavorable** : le rapport entre l'écurie la mieux dotée et la moins dotée reste au-dessus d'avant (9,56 contre 9,04). Le coup de pouce est attendu en phase 12.
+- **Défavorable** : le sponsoring total du plateau augmente de 30 M€ par rapport à avant la refonte (+2,8 %). C'est l'argent des exploits, assumé par le porteur (D-157) ; ce n'est plus « pas d'argent gratuit » au sens strict.

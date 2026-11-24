@@ -194,10 +194,10 @@ Un sponsor propose plusieurs variantes de contrat (prudente, équilibrée, audac
 
 ### Écarts avec la fiche, à valider
 
-- **Seuil du podium exploit abaissé de la 9e à la 7e place attendue.** Avec la 9e, un podium « exploit » n'arrivait qu'environ 0,4 fois par saison sur tout le plateau. Avec la 7e, les petites écuries en profitent davantage, ce que tu as demandé (question 6). Réglable : `OPERATIONS.rangMinPodium`.
+- **Remplacé par D-157** (règle du porteur : premier top 5, podium ou victoire depuis 3 saisons ; l'ancienne règle ne sert plus qu'en début de partie). Ancien écart : **seuil du podium exploit abaissé de la 9e à la 7e place attendue.** Avec la 9e, un podium « exploit » n'arrivait qu'environ 0,4 fois par saison sur tout le plateau. Avec la 7e, les petites écuries en profitent davantage, ce que tu as demandé (question 6). Réglable : `OPERATIONS.rangMinPodium`.
 - **Prime plafonnée à 3 fois la valeur du contrat** (`PRIME_MAX_MULTIPLE_VALEUR`). Au premier essai, un sponsor proposait 67 M€ de prime pour un contrat qui en vaut 12. Un pari réussi rapporte encore environ 3,5 fois le contrat prudent.
 - **La variante prudente est exactement le contrat d'avant la refonte** (même fixe, même prime de classement). Les sponsors secondaires n'ont que celle-là.
 - **Les objectifs de course de l'IA ne produisent pas de message** (volume) : la prime figure dans ses comptes et dans son contrat. L'écurie du joueur en reçoit un par Grand Prix.
 - **Clause liée à un pilote** (sponsor national ou personnel) : non faite, reportée.
-- **Record battu** comme déclencheur d'opération : non fait. Seuls le podium et la victoire inattendus déclenchent.
+- **Record battu** comme déclencheur d'opération : non fait (remplacé par la règle D-157).
 - **Réglages d'expérience** (`experience.sponsoring.*`) : uniquement pour les mesures ; sans effet en partie.

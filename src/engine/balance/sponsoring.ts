@@ -138,19 +138,25 @@ export const OFFRES_JOUEUR = { delaiSemaines: 3, offresEnPlus: 2 };
 export const SATISFACTION_CLAUSES = { probaReference: 0.75 };
 
 /**
- * Opérations publicitaires exceptionnelles (sponsors principaux), après un exploit mesuré par rapport au rang attendu public :
- * - podium d'une écurie attendue au-delà de `rangMinPodium`, victoire d'une écurie attendue au-delà de `rangMinVictoire` ;
- *   une écurie attendue dans les `rangMaxJamais` premières n'en reçoit jamais (D-155 question 6 : on privilégie les petites écuries) ;
- * - au plus une par écurie et par saison, une par contrat, et pas moins de `delaiSemaines` après la précédente ;
- * - montant = budget du sponsor × (partMin + (partMax − partMin) × petitesse) × multiplicateur du format (× `bonusVictoire` pour une victoire),
- *   petitesse = (rang attendu − 1) / (nombre d'écuries − 1) ;
+ * Opérations publicitaires exceptionnelles (sponsors principaux), règle du porteur (D-157) :
+ * - déclencheur : PREMIER top 5, premier podium ou première victoire de l'écurie depuis `anneesSansExploit` saisons
+ *   (meilleur pilote ; les grandes écuries, qui en font chaque année, en sont exclues d'elles-mêmes) ;
+ * - tant que ces saisons ne sont pas toutes simulées (début de partie : pas de résultats d'avant 2027 dans les données), règle de
+ *   repli : podium d'une écurie attendue au-delà de `rangMinPodium`, victoire au-delà de `rangMinVictoire`, jamais dans les
+ *   `rangMaxJamais` premières ;
+ * - non cumulable : au plus une proposition par écurie et par saison, la première (acceptée, refusée ou délaissée) ;
+ * - montant = budget F1 du sponsor × (partMin + (partMax − partMin) × petitesse) × multiplicateur de l'exploit × multiplicateur du format,
+ *   petitesse = (rang attendu − 1) / (nombre d'écuries − 1) ; plafonné par ce qu'il reste au sponsor après son contrat (ses moyens).
+ *   Relevé pour le fond de grille (D-157 : « des choses qui changent la donne ») ;
  * - formats : multiplicateur du montant, sollicitation du pilote (1 légère à 3 lourde), exposition et image gagnées ;
  * - satisfaction gagnée par le sponsor qui finance ; perte du sponsor titre si la visibilité empiète sur son emplacement ;
  * - ciblage du pilote demandé (poids) : l'auteur de l'exploit, le plus populaire, le n° 1 au championnat, au choix de l'écurie.
  */
 export const OPERATIONS = {
+  anneesSansExploit: 3,
   rangMinPodium: 7, rangMinVictoire: 4, rangMaxJamais: 3,
-  delaiSemaines: 26, partMin: 0.03, partMax: 0.12, bonusVictoire: 1.3,
+  partMin: 0.05, partMax: 0.35,
+  exploits: { top5: 0.6, podium: 1, victoire: 1.5 },
   formats: {
     tenues: { multiplicateur: 0.5, sollicitation: 1, exposition: 2, image: 1 },
     visibilite: { multiplicateur: 0.75, sollicitation: 1, exposition: 3, image: 1 },

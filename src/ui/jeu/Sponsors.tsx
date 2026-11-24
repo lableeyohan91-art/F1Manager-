@@ -1,7 +1,7 @@
 /** Phase 11c — écran Finances → Sponsors : offres, objectif du prochain Grand Prix, opération exceptionnelle, contrats en cours. */
 import { useState } from 'preact/hooks';
 import {
-  contratsActifs, estDelegue, LIBELLES_FORMATS, LIBELLES_VARIANTES, montantSansObjectif, objectifsGP, offresSponsors, operationEnAttente, table, TABLES,
+  contratsActifs, estDelegue, LIBELLE_EXPLOIT, LIBELLES_FORMATS, LIBELLES_VARIANTES, montantSansObjectif, objectifsGP, offresSponsors, operationEnAttente, table, TABLES,
   type ClauseSponsor, type Monde, type Personne, type Sponsor,
 } from '../../engine';
 import { commander, ecurieJoueur, meur, nom, nomCircuit, personne, type Partie } from './partie';
@@ -75,7 +75,7 @@ export function Sponsors({ partie, nav }: { partie: Partie; nav: Navigation }) {
         return (
           <div class="carte">
             <h3>Opération exceptionnelle : {nomSponsor(m, op.sponsor)}</h3>
-            <p>Après {op.exploit === 'victoire' ? 'votre victoire' : 'votre podium'} inattendu, votre sponsor propose une opération avant le prochain Grand Prix.</p>
+            <p>Votre {LIBELLE_EXPLOIT[op.exploit]} depuis longtemps : votre sponsor veut en profiter avant le prochain Grand Prix. Une seule opération par saison : si vous refusez, il n’y en aura pas d’autre cette année.</p>
             {demande ? <p>Pilote demandé : <strong>{nom(demande)}</strong></p> : (
               <label class="champ">Pilote (au choix)
                 <select value={pilote} onChange={(v) => setPilote((v.target as HTMLSelectElement).value)}>

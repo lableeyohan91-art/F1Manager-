@@ -619,7 +619,7 @@ export interface ContratSponsoring {
   enveloppeGPMEUR?: number;
   /** Phase 11c : primes versées depuis la signature (M€) : clauses, objectifs de course. */
   primesVerseesMEUR: number;
-  /** Phase 11c : une opération exceptionnelle a déjà été faite avec ce contrat (au plus une). */
+  /** Phase 11c : une opération exceptionnelle a déjà été faite avec ce contrat (un autre sponsor principal est sollicité en priorité). */
   operationFaite?: boolean;
   /** Clause de sortie : le sponsor peut partir avant la fin si l'objectif est manqué et sa satisfaction trop basse. */
   clauseSortie: boolean;
@@ -683,9 +683,9 @@ export interface OperationSponsor {
   ecurie: string;
   contrat: string;
   sponsor: string;
-  /** Fait déclencheur (podium ou victoire inattendus). */
+  /** Fait déclencheur (premier top 5, podium ou victoire depuis 3 saisons). */
   evenement: string;
-  exploit: 'podium' | 'victoire';
+  exploit: 'top5' | 'podium' | 'victoire';
   rangAttendu: number;
   /** Pilote demandé, affiché avant acceptation ; absent si le sponsor laisse l'écurie choisir. */
   ciblage: 'exploit' | 'populaire' | 'numero1' | 'libre';

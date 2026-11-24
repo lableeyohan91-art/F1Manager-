@@ -311,7 +311,7 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
       if (op.statut !== 'proposee') continue;
       const s = table(monde, TABLES.sponsors)[op.sponsor] as unknown as { nom: string } | undefined;
       const p = op.pilote ? personneDe(monde, op.pilote) : undefined;
-      res.push({ type: 'operation_sponsor', titre: `${s?.nom ?? 'Un sponsor'} propose une opération publicitaire`, detail: `Après ${op.exploit === 'victoire' ? 'votre victoire' : 'votre podium'} : ${p ? `avec ${nomDe(p)}` : 'pilote au choix'}, de ${Math.min(...op.formats.map((f) => f.montantMEUR))} à ${Math.max(...op.formats.map((f) => f.montantMEUR))} M€.`, consequence: 'Sans réponse avant le prochain Grand Prix, l’équipe décide.', echeance: op.echeance, urgente: urgente(op.echeance), operation: op.id, ...(p ? { personne: p.id } : {}) });
+      res.push({ type: 'operation_sponsor', titre: `${s?.nom ?? 'Un sponsor'} propose une opération publicitaire`, detail: `${op.exploit === 'victoire' ? 'Première victoire' : op.exploit === 'podium' ? 'Premier podium' : 'Premier top 5'} depuis longtemps : ${p ? `avec ${nomDe(p)}` : 'pilote au choix'}, de ${Math.min(...op.formats.map((f) => f.montantMEUR))} à ${Math.max(...op.formats.map((f) => f.montantMEUR))} M€.`, consequence: 'Sans réponse avant le prochain Grand Prix, l’équipe décide.', echeance: op.echeance, urgente: urgente(op.echeance), operation: op.id, ...(p ? { personne: p.id } : {}) });
     }
   }
   return res.sort((a, b) => Number(b.urgente) - Number(a.urgente) || (a.echeance ? rang(a.echeance) : 1e9) - (b.echeance ? rang(b.echeance) : 1e9));

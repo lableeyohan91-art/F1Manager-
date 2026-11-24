@@ -506,3 +506,10 @@ Aucun code à ce stade.
 - Écran Finances → Sponsors.
 - Format de sauvegarde 28 : les contrats existants deviennent prudents.
 - Tests `tests/sponsoring.test.ts` (15). Outil `tools/diagnostic-sponsors.mts`. Étape « offre de sponsor » dans le parcours navigateur.
+
+## [Phase 11c — arbitrages du porteur] — 24/11/2026
+
+### Modifié (D-157, D-158)
+- Opérations exceptionnelles : déclenchées par le premier top 5, podium ou victoire de l'écurie depuis 3 saisons. Une seule par saison. Montants relevés pour le fond de grille (environ 14 M€ par opération acceptée).
+- Rumeurs de presse : fiabilité inchangée (décision du porteur).
+

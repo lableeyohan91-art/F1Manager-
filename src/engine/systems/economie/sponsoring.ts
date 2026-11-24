@@ -208,32 +208,66 @@ function jugerObjectif(monde: Monde, o: ObjectifGP, gp: GrandPrix): void {
 
 /* ================================================================ Opérations exceptionnelles */
 
-function exploit(monde: Monde, e: Ecurie, gp: GrandPrix): { type: 'podium' | 'victoire'; r: number; auteur: string } | undefined {
+type Exploit = 'top5' | 'podium' | 'victoire';
+const SEUIL_EXPLOIT: Record<Exploit, number> = { victoire: 1, podium: 3, top5: 5 };
+export const LIBELLE_EXPLOIT: Record<Exploit, string> = { victoire: 'première victoire', podium: 'premier podium', top5: 'premier top 5' };
+
+/** Meilleure place de l'écurie sur une saison avant un Grand Prix donné (toute la saison si `avant` est absent). */
+function meilleureSaison(monde: Monde, annee: number, idEcurie: string, avant?: GrandPrix): number | undefined {
+  const s = table(monde, TABLES.saisons)[`ssn_${annee}`] as unknown as Saison | undefined;
+  if (!s) return undefined;
+  let best = 99;
+  for (const id of s.calendrier) {
+    const g = table(monde, TABLES.grandsPrix)[id] as unknown as GrandPrix | undefined;
+    if (!g || (avant && (g.id === avant.id || g.manche >= avant.manche))) continue;
+    best = Math.min(best, meilleurePosition(g, idEcurie) ?? 99);
+  }
+  return best;
+}
+
+/**
+ * Exploit du jour (D-157) : premier top 5, podium ou victoire depuis 3 saisons (le plus fort des trois). Tant que ces saisons ne sont
+ * pas toutes simulées, règle de repli sur le rang attendu public.
+ */
+export function exploit(monde: Monde, e: Ecurie, gp: GrandPrix): { type: Exploit; r: number; auteur: string } | undefined {
   const best = meilleurePosition(gp, e.id);
-  if (best === undefined || best > 3) return undefined;
+  if (best === undefined || best > SEUIL_EXPLOIT.top5) return undefined;
   const r = rangAttenduPublic(monde, e.id);
-  if (r <= OPERATIONS.rangMaxJamais) return undefined;
-  const type = best === 1 && r >= OPERATIONS.rangMinVictoire ? 'victoire' : r >= OPERATIONS.rangMinPodium ? 'podium' : undefined;
-  if (!type) return undefined;
   const auteur = gp.resultats.find((x) => x.ecurie === e.id && x.position === best)!.pilote;
-  return { type, r, auteur };
+  const passees: number[] = [];
+  for (let a = gp.saison - OPERATIONS.anneesSansExploit; a < gp.saison; a++) {
+    const s = table(monde, TABLES.saisons)[`ssn_${a}`] as unknown as Saison | undefined;
+    if (!s?.termine || !s.constructeurs.some((c) => c.ecurie === e.id)) { passees.length = 0; break; }
+    passees.push(meilleureSaison(monde, a, e.id)!);
+  }
+  if (passees.length === OPERATIONS.anneesSansExploit) {
+    const avant = Math.min(...passees, meilleureSaison(monde, gp.saison, e.id, gp) ?? 99);
+    const type = (['victoire', 'podium', 'top5'] as const).find((t) => best <= SEUIL_EXPLOIT[t] && avant > SEUIL_EXPLOIT[t]);
+    return type ? { type, r, auteur } : undefined;
+  }
+  // Repli (début de partie : pas de résultats d'avant 2027 dans les données).
+  if (best > 3 || r <= OPERATIONS.rangMaxJamais) return undefined;
+  const type = best === 1 && r >= OPERATIONS.rangMinVictoire ? 'victoire' : r >= OPERATIONS.rangMinPodium ? 'podium' : undefined;
+  return type ? { type, r, auteur } : undefined;
 }
 
 export function proposerOperation(monde: Monde, e: Ecurie, gp: GrandPrix): void {
   const x = exploit(monde, e, gp);
   if (!x) return;
   const annee = monde.date.annee;
-  const passees = operationsSponsors(monde, e.id);
-  if (passees.some((o) => o.proposeeLe.annee === annee)) return; // au plus une par écurie et par saison
-  if (passees.some((o) => rang(monde.date) - rang(o.proposeeLe) < OPERATIONS.delaiSemaines)) return;
-  const contrats = contratsActifs(monde, annee, e.id).filter((c) => c.rang === 'principal' && !c.operationFaite)
-    .sort((a, b) => (sponsorDe(monde, b.sponsor)?.budgetMEUR ?? 0) - (sponsorDe(monde, a.sponsor)?.budgetMEUR ?? 0) || (a.id < b.id ? -1 : 1));
+  // Non cumulable (D-157) : la première proposition de la saison, qu'elle soit acceptée, refusée ou délaissée.
+  if (operationsSponsors(monde, e.id).some((o) => o.proposeeLe.annee === annee)) return;
+  const contrats = contratsActifs(monde, annee, e.id).filter((c) => c.rang === 'principal')
+    .sort((a, b) => Number(!!a.operationFaite) - Number(!!b.operationFaite) || (sponsorDe(monde, b.sponsor)?.budgetMEUR ?? 0) - (sponsorDe(monde, a.sponsor)?.budgetMEUR ?? 0) || (a.id < b.id ? -1 : 1));
   const c = contrats[0];
   const s = c && sponsorDe(monde, c.sponsor);
   if (!c || !s) return;
   const n = ecuriesActives(monde).length;
-  const petitesse = n > 1 ? (x.r - 1) / (n - 1) : 0;
-  const base = s.budgetMEUR * conjoncture(monde) * (OPERATIONS.partMin + (OPERATIONS.partMax - OPERATIONS.partMin) * petitesse) * (x.type === 'victoire' ? OPERATIONS.bonusVictoire : 1);
+  const petitesse = n > 1 ? (borner(x.r, 1, n) - 1) / (n - 1) : 0;
+  const budgetF1 = s.budgetMEUR * conjoncture(monde);
+  const base = budgetF1 * (OPERATIONS.partMin + (OPERATIONS.partMax - OPERATIONS.partMin) * petitesse) * OPERATIONS.exploits[x.type];
+  // Moyens du sponsor : il ne paie jamais plus que ce qu'il lui reste après son contrat.
+  const reste = Math.max(0, budgetF1 - c.montantAnnuelMEUR);
   const f = tirageLocal(monde, 'sponsor.operation', e.id, gp.id);
   const ciblages = Object.keys(OPERATIONS.ciblage) as OperationSponsor['ciblage'][];
   const ciblage = f.choisirPondere(ciblages, ciblages.map((k) => OPERATIONS.ciblage[k]));
@@ -251,7 +285,7 @@ export function proposerOperation(monde: Monde, e: Ecurie, gp: GrandPrix): void 
   const op: OperationSponsor = {
     id: nouvelIdentifiant(monde, 'ops'), ecurie: e.id, contrat: c.id, sponsor: s.id, evenement: ev ?? '', exploit: x.type, rangAttendu: r1(x.r),
     ciblage, ...(pilote ? { pilote } : {}), auteur: x.auteur,
-    formats: FORMATS_OPERATION.map((format) => ({ format, montantMEUR: r1(base * OPERATIONS.formats[format].multiplicateur) })),
+    formats: FORMATS_OPERATION.map((format) => ({ format, montantMEUR: r1(Math.min(reste, base * OPERATIONS.formats[format].multiplicateur)) })),
     echeance: suivant ? { annee, semaine: suivant.semaine } : ajouterSemaines(monde.date, 2), proposeeLe: { ...monde.date }, statut: 'proposee',
   };
   table(monde, TABLES.operationsSponsors)[op.id] = op as unknown as Entite;
@@ -260,7 +294,7 @@ export function proposerOperation(monde: Monde, e: Ecurie, gp: GrandPrix): void 
     type: 'sponsor.operation_proposee', acteurs: [{ id: s.id, role: 'auteur' }, { id: e.id, role: 'cible' }, ...(p ? [{ id: p.id, role: 'pilote' }] : [])], importance: 2,
     visibilite: 'prive', connuPar: [e.id], causes: ev ? [ev] : [],
     contexte: { operation: op.id, exploit: x.type, rangAttendu: op.rangAttendu, ciblage },
-    texte: `Après ${x.type === 'victoire' ? 'une victoire' : 'un podium'} inattendu, ${s.nom} propose une opération publicitaire${p ? ` avec ${nomDe(p)}` : ''}.`,
+    texte: `${LIBELLE_EXPLOIT[x.type][0]!.toUpperCase()}${LIBELLE_EXPLOIT[x.type].slice(1)} depuis longtemps : ${s.nom} propose une opération publicitaire${p ? ` avec ${nomDe(p)}` : ''}.`,
   });
   if (iaDecide(e, 'commercial')) decisionEquipeOperation(monde, op);
 }
