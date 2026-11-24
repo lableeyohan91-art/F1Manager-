@@ -45,3 +45,8 @@ npx vitest run tests/circuits-profil.test.ts
 `1-tours-reels.py`, `2-elements.py`, `3-sensibilites.py` (+ `config.json`) ont produit `docs/rapports/phase-11b/releve-circuits-v1.md`
 (un seul tour par circuit, ancien modèle à une seule adhérence). Conservés pour pouvoir refaire ce relevé à l'identique ; **remplacés**
 pour les 5 circuits test par la chaîne ci-dessus (5 tours, modèle séparant adhérence, appui, motricité, freinage, budget d'énergie).
+
+## 5. Circuits de validation (hors échantillon)
+
+`liste-validation.txt` : identifiant, meeting OpenF1, longueur et virages officiels, année. Même chaîne (collecte en qualifications,
+`construire_trace.py`), sortie dans `data/circuits/validation/`. Ces traces ne servent **jamais** au calage.

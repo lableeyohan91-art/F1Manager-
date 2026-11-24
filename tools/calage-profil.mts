@@ -8,8 +8,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { appuiNaturel, courbures, type Trace } from '../src/engine/circuits/profil';
 import { VOITURE_REFERENCE } from '../src/engine/balance/profil';
 
-const ALTITUDE: Record<string, number> = { cir_monza: 160, cir_monaco: 10, cir_suzuka: 45, cir_singapour: 10, cir_mexico: 2240 };
-const traces = readdirSync('data/circuits').filter((f) => f.endsWith('.json')).sort().map((f) => JSON.parse(readFileSync(`data/circuits/${f}`, 'utf8')) as Trace & { points: { v: number }[] });
+const traces = readdirSync('data/circuits').filter((f) => f.endsWith('.json')).sort().map((f) => JSON.parse(readFileSync(`data/circuits/${f}`, 'utf8')) as Trace & { points: { v: number }[]; altitudeM: number });
 const ks = traces.map((t) => courbures(t));
 /** Adhérence de chaque piste, calée en même temps que la voiture (bornes 0,85–1,15), puis ramenée à une moyenne de 1. */
 const piste: number[] = traces.map((t) => t.adherencePiste?.valeur ?? 1);
@@ -19,7 +18,7 @@ function erreur(v: V): number {
   let s = 0, n = 0;
   traces.forEach((t, i) => {
     const tp = { ...t, adherencePiste: { valeur: piste[i]!, statut: '' } };
-    const p = appuiNaturel(tp, v, { altitudeM: ALTITUDE[t.circuit] ?? 0 }, ks[i]).profil;
+    const p = appuiNaturel(tp, v, { altitudeM: t.altitudeM ?? 0 }, ks[i]).profil;
     p.vitesses.forEach((x, j) => { s += Math.abs(x * 3.6 - t.points[j]!.v); n++; });
   });
   return s / n;
