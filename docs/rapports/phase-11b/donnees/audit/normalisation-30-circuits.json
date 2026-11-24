@@ -8,12 +8,12 @@
   "freinage": 0.05521920664885442
  },
  "moyennesCalendrier": {
-  "adherenceMecanique": 0.37017773654131975,
-  "appui": 0.36549510482208186,
-  "trainee": 0.1545268131937893,
-  "puissance": 0.22190313899753988,
-  "motricite": 0.08696844892720416,
-  "freinage": 0.049230226152026546
+  "adherenceMecanique": 0.354925994247339,
+  "appui": 0.35476177561812783,
+  "trainee": 0.15864365893446042,
+  "puissance": 0.2258469126559509,
+  "motricite": 0.08093974668936414,
+  "freinage": 0.04730910060353821
  },
  "seuil": {
   "gainNegligeableS": 0.05,
@@ -47,7 +47,7 @@
     ],
     "normCal": [
      "trainee",
-     "puissance"
+     "freinage"
     ]
    },
    "negligeables": []
@@ -413,7 +413,7 @@
     ],
     "normCal": [
      "appui",
-     "puissance"
+     "adherenceMecanique"
     ]
    },
    "negligeables": [
@@ -448,7 +448,7 @@
     ],
     "normCal": [
      "puissance",
-     "trainee"
+     "motricite"
     ]
    },
    "negligeables": [
@@ -517,7 +517,7 @@
     ],
     "normCal": [
      "trainee",
-     "puissance"
+     "appui"
     ]
    },
    "negligeables": [
@@ -685,7 +685,7 @@
     ],
     "normCal": [
      "motricite",
-     "puissance"
+     "adherenceMecanique"
     ]
    },
    "negligeables": []
@@ -819,15 +819,15 @@
      "trainee"
     ],
     "normCal": [
-     "puissance",
-     "trainee"
+     "adherenceMecanique",
+     "puissance"
     ]
    },
    "negligeables": []
   },
   "cir_imola": {
    "test": false,
-   "calendrier": true,
+   "calendrier": false,
    "tempsS": 77.15,
    "gainsS": {
     "adherenceMecanique": 0.272,
@@ -859,7 +859,7 @@
   },
   "cir_sepang": {
    "test": false,
-   "calendrier": true,
+   "calendrier": false,
    "tempsS": 92.09,
    "gainsS": {
     "adherenceMecanique": 0.6,
@@ -891,7 +891,7 @@
   },
   "cir_portimao": {
    "test": false,
-   "calendrier": true,
+   "calendrier": false,
    "tempsS": 82.79,
    "gainsS": {
     "adherenceMecanique": 0.434,
@@ -925,7 +925,7 @@
   },
   "cir_istanbul": {
    "test": false,
-   "calendrier": true,
+   "calendrier": false,
    "tempsS": 95.21,
    "gainsS": {
     "adherenceMecanique": 0.411,
@@ -957,7 +957,7 @@
   },
   "cir_kyalami": {
    "test": false,
-   "calendrier": true,
+   "calendrier": false,
    "tempsS": 82.92,
    "gainsS": {
     "adherenceMecanique": 0.399,
@@ -989,7 +989,7 @@
   },
   "cir_paulricard": {
    "test": false,
-   "calendrier": true,
+   "calendrier": false,
    "tempsS": 103.55,
    "gainsS": {
     "adherenceMecanique": 0.471,

@@ -14,7 +14,8 @@ import { appuiNaturel, avecAilerons, courbures, sensibilites, PARAMETRES, type T
 import { POINTS_ESSENTIELS, VOITURE_REFERENCE } from '../../src/engine/balance/profil';
 
 const TEST = ['cir_monza', 'cir_monaco', 'cir_suzuka', 'cir_singapour', 'cir_mexico'];
-const calendrier = readFileSync('data/grille-2026/circuits.csv', 'utf8').trim().split('\n').slice(1).map((l) => l.split(';')[0]!);
+/** Calendrier 2026 (24 circuits, base de la normalisation) : colonne calendrier2026 de data/circuits/caracteres.csv. */
+const calendrier = readFileSync('data/circuits/caracteres.csv', 'utf8').trim().split('\n').slice(1).map((l) => l.split(';')).filter((c) => c[c.length - 1] === '1').map((c) => c[0]!);
 const fichier = (id: string) => ['data/circuits', 'data/circuits/validation', 'data/circuits/reconstruits'].map((d) => `${d}/${id}.json`).find(existsSync) ?? `data/circuits/${id}.json`;
 /** Vivier complet (30 circuits) : data/circuits/caracteres.csv. */
 const vivier = readFileSync('data/circuits/caracteres.csv', 'utf8').trim().split('\n').slice(1).map((l) => l.split(';')[0]!);

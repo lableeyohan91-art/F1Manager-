@@ -18,7 +18,8 @@ import { CLASSES_VIRAGES, NIVEAUX_AILERONS, POINTS_ESSENTIELS, VOITURE_REFERENCE
 const TEST = ['cir_monza', 'cir_monaco', 'cir_suzuka', 'cir_singapour', 'cir_mexico'];
 const csv = (f: string) => { const [t, ...l] = readFileSync(f, 'utf8').trim().split('\n'); const h = t!.split(';'); return l.map((x) => Object.fromEntries(x.split(';').map((v, i) => [h[i]!, v]))); };
 const caracteres = Object.fromEntries(csv('data/circuits/caracteres.csv').map((r) => [r.id!, r]));
-const calendrier = csv('data/grille-2026/circuits.csv').map((r) => r.id!);
+/** Calendrier 2026 (24 circuits, base de la normalisation) : colonne calendrier2026 de data/circuits/caracteres.csv. */
+const calendrier = csv('data/circuits/caracteres.csv').filter((r) => r.calendrier2026 === '1').map((r) => r.id!);
 const ids = Object.keys(caracteres);
 const fichier = (id: string) => ['data/circuits', 'data/circuits/validation', 'data/circuits/reconstruits'].map((d) => `${d}/${id}.json`).find(existsSync)!;
 const officiels = JSON.parse(readFileSync('data/circuits/virages-officiels.json', 'utf8')) as Record<string, { virages: { numero: number; nom: string; portionsM: number[]; confiance: string }[] }>;

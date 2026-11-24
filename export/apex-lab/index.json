@@ -20,13 +20,13 @@
   "reductionAppuiLigne": 0.6953
  },
  "dosageBancPourcent": {
-  "appui": 2.78,
-  "faibleTrainee": 7.06,
-  "adherenceMecanique": 2.77,
-  "motricite": 14.27,
-  "moteur": 3.43,
-  "freinage": 27.94,
-  "polyvalente": 0.74
+  "appui": 2.83,
+  "faibleTrainee": 6.77,
+  "adherenceMecanique": 2.88,
+  "motricite": 15.95,
+  "moteur": 3.37,
+  "freinage": 29.21,
+  "polyvalente": 0.76
  },
  "caracteristiques": [
   {
