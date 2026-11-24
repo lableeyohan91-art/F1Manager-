@@ -10,14 +10,15 @@ import { avancer, commander, mesurerAppareil, ecurieJoueur, faitsVisibles, grand
 import { EcranEquipe, EcranMarche, FichePersonne } from './Equipe';
 import { EcranActualites, EcranArchives, Image } from './Medias';
 import { EcranChampionnat, EcranDirection, EcranFinances, EcranReglages, EcranTechnique } from './Gestion';
+import { EcranCircuits } from './Circuits';
 import './jeu.css';
 
-export type Ecran = 'tableau' | 'actualites' | 'equipe' | 'marche' | 'technique' | 'finances' | 'championnat' | 'archives' | 'direction' | 'reglages';
+export type Ecran = 'tableau' | 'actualites' | 'equipe' | 'marche' | 'technique' | 'finances' | 'championnat' | 'circuits' | 'archives' | 'direction' | 'reglages';
 /** Sur téléphone, les 4 premiers écrans sont dans la barre du bas ; les autres derrière « Plus ». */
 const PRINCIPAUX = 4;
 const NAV: [Ecran, string, string][] = [
   ['tableau', 'Accueil', '◉'], ['actualites', 'Actualités', '✉'], ['equipe', 'Équipe', '☰'], ['marche', 'Marché', '⇄'], ['technique', 'Technique', '⚙'],
-  ['finances', 'Finances', '€'], ['championnat', 'Championnat', '🏁'], ['archives', 'Archives', '★'], ['direction', 'Direction', '⚖'], ['reglages', 'Réglages', '⋯'],
+  ['finances', 'Finances', '€'], ['championnat', 'Championnat', '🏁'], ['circuits', 'Circuits', '◎'], ['archives', 'Archives', '★'], ['direction', 'Direction', '⚖'], ['reglages', 'Réglages', '⋯'],
 ];
 export const NOM_SAUVEGARDE = 'partie-joueur';
 /** Audit de la phase 10 : partie remplacée par une nouvelle, conservée et récupérable. */
@@ -106,6 +107,7 @@ export function Jeu() {
             {ecran === 'technique' && <EcranTechnique partie={p} nav={nav} />}
             {ecran === 'finances' && <EcranFinances partie={p} nav={nav} />}
             {ecran === 'championnat' && <EcranChampionnat partie={p} />}
+            {ecran === 'circuits' && <EcranCircuits partie={p} />}
             {ecran === 'direction' && <EcranDirection partie={p} nav={nav} />}
             {ecran === 'reglages' && <EcranReglages partie={p} nav={nav} quitter={() => { partie.current = null; rafraichir(); }} remplacer={(m) => { partie.current = { monde: m, moteur: sc().creerMoteur() }; setMessage('Partie importée. Sauvegardez-la dans Réglages pour la garder.'); nav.aller('tableau'); }} />}
           </>

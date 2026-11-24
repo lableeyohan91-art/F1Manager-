@@ -70,12 +70,27 @@ async function parcours(nomAppareil, contexteOptions) {
   ok(`${nomAppareil} : avance jusqu’aux décisions (${await page.locator('.jeu-titre .muted').textContent()})`);
   await capture('04-tableau-apres');
 
-  for (const [ecran, texte] of [['Actualités', 'À la une'], ['Archives', 'Records'], ['Équipe', 'Effectif de'], ['Marché', 'Cibles possibles'], ['Technique', 'Savoir technique'], ['Finances', 'Budget de développement'], ['Championnat', 'Constructeurs'], ['Direction', 'Délégations'], ['Réglages', 'Mesure des performances']]) {
+  for (const [ecran, texte] of [['Actualités', 'À la une'], ['Archives', 'Records'], ['Équipe', 'Effectif de'], ['Marché', 'Cibles possibles'], ['Technique', 'Savoir technique'], ['Finances', 'Budget de développement'], ['Championnat', 'Constructeurs'], ['Circuits', 'Hors calendrier'], ['Direction', 'Délégations'], ['Réglages', 'Mesure des performances']]) {
     await allerA(ecran);
     await page.getByText(texte).first().waitFor();
     await capture(`05-${ecran.normalize('NFD').replace(/[^a-zA-Z]/g, '').toLowerCase()}`);
   }
-  ok(`${nomAppareil} : les 9 écrans s’ouvrent`);
+  ok(`${nomAppareil} : les 10 écrans s’ouvrent`);
+
+  // Phase 11b : fiche d'un circuit du calendrier et d'un circuit hors calendrier (blocs A à E).
+  await allerA('Circuits');
+  await page.locator('button.lien').first().click();
+  await page.getByText('A. Présentation').waitFor();
+  await page.locator('svg.carte-circuit').waitFor();
+  for (const bloc of ['B. Exigences techniques', 'C. Conditions', 'D. Historique', 'Stratégie et incidents', 'E. Préparation du week-end']) await page.getByText(bloc).waitFor();
+  await page.getByText('C. Conditions').click();
+  await page.getByText('D. Historique').click();
+  await capture('05b-fiche-circuit');
+  await page.getByRole('button', { name: '← Tous les circuits' }).click();
+  await page.locator('button.lien').last().click();
+  await page.getByText('A. Présentation').waitFor();
+  await capture('05c-fiche-circuit-hors-calendrier');
+  ok(`${nomAppareil} : fiches circuits (calendrier et hors calendrier, blocs A à E)`);
 
   // Fiche d'un pilote de l'équipe, et une action (soutien).
   await allerA('Équipe');
