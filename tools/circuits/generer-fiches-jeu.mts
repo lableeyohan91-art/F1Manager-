@@ -30,6 +30,8 @@ const LIGNE_DROITE_MIN_M = 200;
 const FREINAGE_MIN_KMH = 40;
 /** Zone favorable au dépassement : au moins 500 m près de la vitesse maximale (à 60 km/h près) avant un freinage d'au moins 100 km/h. */
 const DEPASSEMENT = { ligneMinM: 500, freinageMinKmh: 100, procheVmaxKmh: 60 };
+/** Difficulté de dépasser : références d'une zone « pleine » (1 km d'aspiration, 150 km/h de freinage) et poids des facteurs (H). */
+const DIFFICULTE = { aspirationRefM: 1000, freinageRefKmh: 150, poidsZones: 1.6, poidsLargeur: 0.5, poidsRapides: 2 };
 /** Sommet de virage : maximum local de courbure sur ± cette distance (m). */
 const SOMMET_FENETRE_M = 25;
 /** Pas de la carte de la fiche (m) : assez fin pour les chicanes, léger pour un téléphone. */
@@ -181,7 +183,11 @@ for (const id of ids) {
   }).filter((z) => z.favorable).sort((a, b) => b.ligneAvantM * b.chuteKmh - a.ligneAvantM * a.chuteKmh)
     .filter((z, i, l) => l.findIndex((y) => y.virage === z.virage) === i).slice(0, 5); // une zone par virage d'arrivée
   const largeur = Number(ca.largeur), murs = Number(ca.murs), deg = Number(ca.degagements);
-  const difficulteDepassement = Math.max(1, Math.min(5, Math.round(5 - zonesDepassement.length + (3 - largeur) * 0.5)));
+  // Difficulté de dépasser (1–5, C provisoire) : chaque zone compte selon sa qualité (aspiration × freinage), la largeur aide,
+  // et une forte part de virages rapides gêne le suivi (air perturbé). Indicatif : le vrai dépassement arrive en phase 13.
+  const qualite = zonesDepassement.reduce((a, z) => a + Math.min(1, (z.ligneAvantM / DIFFICULTE.aspirationRefM) * (z.chuteKmh / DIFFICULTE.freinageRefKmh)), 0);
+  const partRapides = vir.filter((v) => v.classe === 'rapide').length / Math.max(1, vir.length);
+  const difficulteDepassement = Math.max(1, Math.min(5, Math.round(5 - DIFFICULTE.poidsZones * qualite + (3 - largeur) * DIFFICULTE.poidsLargeur + DIFFICULTE.poidsRapides * partRapides)));
   const zonesRisque = vir.map((v) => ({ v, score: (v.vMinKmh / 100) * (murs + (6 - deg)) / 2 })).sort((a, b) => b.score - a.score).slice(0, 4)
     .map(({ v }) => ({ virage: v.numero, s: v.s, raison: v.vMinKmh >= 180 ? 'virage rapide' + (murs >= 4 ? ', murs proches' : deg <= 2 ? ', dégagement court' : '') : murs >= 4 ? 'murs au ras de la piste' : 'freinage appuyé, accrochages possibles', statut: 'C (vitesse du tracé) et E (murs, dégagements)' }));
   const carte: [number, number][] = [];

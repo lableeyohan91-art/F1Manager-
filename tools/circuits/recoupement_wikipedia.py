@@ -34,21 +34,22 @@ def presences(t):
     dr = bool(re.search(r'red flag|red-flag|race was (suspended|stopped)|was red[- ]flagged', t))
     return dict(sc=sc, vsc=vsc, dr=dr)
 
-for trace in sys.argv[1:]:
-    d = json.load(open(trace))
-    for e in d['historique']['editions']:
-        if e['annee'] >= 2023:
-            continue
-        t = article(f"{e['annee']} {e['nom']}")
-        if t is None:
-            e['recoupementWikipedia'] = 'article inaccessible'; continue
-        rc = section_course(t)
-        if rc is None:
-            e['recoupementWikipedia'] = 'section « course » introuvable'; continue
-        p = presences(rc)
-        base = dict(sc=bool(e['safetyCars']), vsc=bool(e['vsc']), dr=bool(e['drapeauxRouges']))
-        diff = [k for k in p if p[k] != base[k]]
-        e['recoupementWikipedia'] = 'présences identiques' if not diff else 'désaccord sur : ' + ', '.join({'sc': 'Safety Car', 'vsc': 'VSC', 'dr': 'drapeau rouge'}[k] + (' (article : oui)' if p[k] else ' (article : non)') for k in diff)
-        print(d['circuit'], e['annee'], e['recoupementWikipedia'], flush=True)
-        time.sleep(3)
-    json.dump(d, open(trace, 'w'), ensure_ascii=False, separators=(',', ':'))
+if __name__ == '__main__':
+    for trace in sys.argv[1:]:
+        d = json.load(open(trace))
+        for e in d['historique']['editions']:
+            if e['annee'] >= 2023:
+                continue
+            t = article(f"{e['annee']} {e['nom']}")
+            if t is None:
+                e['recoupementWikipedia'] = 'article inaccessible'; continue
+            rc = section_course(t)
+            if rc is None:
+                e['recoupementWikipedia'] = 'section « course » introuvable'; continue
+            p = presences(rc)
+            base = dict(sc=bool(e['safetyCars']), vsc=bool(e['vsc']), dr=bool(e['drapeauxRouges']))
+            diff = [k for k in p if p[k] != base[k]]
+            e['recoupementWikipedia'] = 'présences identiques' if not diff else 'désaccord sur : ' + ', '.join({'sc': 'Safety Car', 'vsc': 'VSC', 'dr': 'drapeau rouge'}[k] + (' (article : oui)' if p[k] else ' (article : non)') for k in diff)
+            print(d['circuit'], e['annee'], e['recoupementWikipedia'], flush=True)
+            time.sleep(3)
+        json.dump(d, open(trace, 'w'), ensure_ascii=False, separators=(',', ':'))
