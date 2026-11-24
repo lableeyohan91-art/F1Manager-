@@ -11,7 +11,7 @@
  */
 
 import {
-  ARTICLES, CONFERENCES, EXPOSITION, IMAGE, IMAGE_PAR_FAIT, IMAGE_PAR_REPONSE, LIGNES_EDITORIALES, RUMEURS_MEDIAS, SCANDALE, SCANDALES, TYPES_IGNORES,
+  ARTICLES, CONFERENCES, EXPOSITION, IMAGE, IMAGE_PAR_FAIT, LASSITUDE_PUBLIC, IMAGE_PAR_REPONSE, LIGNES_EDITORIALES, RUMEURS_MEDIAS, SCANDALE, SCANDALES, TYPES_IGNORES,
 } from '../../balance/medias';
 import { FENETRE } from '../../balance/marche';
 import type { DateJeu } from '../../core/calendrier';
@@ -21,7 +21,7 @@ import { nouvelIdentifiant } from '../../core/identifiants';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import {
-  TABLES, type Article, type Conference, type ContratSponsoring, type Ecurie, type GrandPrix, type Media, type Personne, type QuestionConference,
+  TABLES, type Article, type Conference, type ContratSponsoring, type Ecurie, type GrandPrix, type Media, type Palmares, type Personne, type QuestionConference,
   type ReponseConference, type Saison, type Sponsor,
 } from '../../model/types';
 import { teamPrincipal } from '../humain/decision';
@@ -72,13 +72,42 @@ function sujetsDe(m: Monde, e: Evenement): { personne?: Personne; ecurie?: Ecuri
 
 /* ------------------------------------------------------------------ Image */
 
+/** D-150 : titres consécutifs les plus récents d'un pilote (titre pilotes) ou d'une écurie (titre constructeurs). */
+export function titresConsecutifs(m: Monde, id: string): number {
+  const pal = (Object.values(table(m, TABLES.palmares)) as unknown as Palmares[]).sort((a, b) => b.saison - a.saison);
+  let n = 0;
+  for (const x of pal) { if (x.championPilote === id || x.championConstructeurs === id) n++; else break; }
+  return n;
+}
+
+/** D-150 : un gain d'image sportif s'émousse chez ceux qui gagnent tout (lassitude du public). */
+const facteurLassitude = (m: Monde, id: string) => Math.max(0, 1 - titresConsecutifs(m, id) / LASSITUDE_PUBLIC.titresSaturation);
+
 function appliquerImageFait(m: Monde, e: Evenement): void {
   const v = IMAGE_PAR_FAIT[e.type];
   if (!v) return;
   if ((e.type.startsWith('personnel.')) && e.contexte['publique'] !== true) return; // seuls les gestes publics se voient
   const { personne, ecurie } = sujetsDe(m, e);
-  if (personne) changerImage(personne, v[0]);
-  if (ecurie) changerImage(ecurie, v[1]);
+  const sportif = e.type.startsWith('gp.') || e.type.startsWith('titre.');
+  if (personne) changerImage(personne, v[0] > 0 && sportif ? v[0] * facteurLassitude(m, personne.id) : v[0]);
+  if (ecurie) changerImage(ecurie, v[1] > 0 && sportif ? v[1] * facteurLassitude(m, ecurie.id) : v[1]);
+}
+
+/** D-150 : fin de saison, l'image de ceux qui enchaînent les titres s'érode (le public se lasse). */
+export function lassitudePublic(m: Monde): Evenement[] {
+  const faits: Evenement[] = [];
+  const titulaires = (Object.values(table(m, TABLES.personnes)) as unknown as Personne[]).filter((p) => p.statut === 'actif' && p.poste === 'pilote_titulaire').sort((a, b) => (a.id < b.id ? -1 : 1));
+  for (const x of [...ecuriesActives(m), ...titulaires] as (Ecurie | Personne)[]) {
+    const n = titresConsecutifs(m, x.id);
+    if (n < LASSITUDE_PUBLIC.seuilErosion) continue;
+    changerImage(x, -LASSITUDE_PUBLIC.erosionParTitre * (n - LASSITUDE_PUBLIC.seuilErosion + 1));
+    const nomX = 'prenom' in x ? nomDe(x) : x.nom;
+    faits.push(ajouterEvenement(m, {
+      type: 'media.lassitude_public', acteurs: [{ id: x.id, role: 'prenom' in x ? 'pilote' : 'ecurie' }], importance: 2, visibilite: 'public', contexte: { titresConsecutifs: n },
+      texte: `Après ${n} titres d'affilée, le public commence à se lasser de la domination de ${nomX}.`,
+    }));
+  }
+  return faits;
 }
 
 function retourNeutralite(m: Monde): void {
@@ -376,7 +405,10 @@ export const systemeMedias: Systeme = {
       appliquerImageFait(m, e);
       if (e.type === 'information.revelee') { const s = scandale(m, e); if (s) nouveaux.push(s); }
     }
-    if (date.semaine === 50) for (const ev of mettreAJourRecords(m)) { appliquerImageFait(m, ev); nouveaux.push(ev); }
+    if (date.semaine === 50) {
+      for (const ev of mettreAJourRecords(m)) { appliquerImageFait(m, ev); nouveaux.push(ev); }
+      nouveaux.push(...lassitudePublic(m));
+    }
     // 2. Conférences de presse : questions, réponses de l'IA (et du service de communication).
     const avantDeclarations = m.compteurs['evt'] ?? 0;
     questionsDeLaSemaine(m, nouveaux);

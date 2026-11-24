@@ -20,8 +20,8 @@ export const TYPES_IGNORES = ['histoire.', 'saison.', 'demo.', 'dev.', 'recrutem
  * Le tabloïd aime les conflits ; la revue technique, le règlement et la recherche ; le quotidien, le sport et le marché.
  */
 export const LIGNES_EDITORIALES: Record<string, Record<string, number>> = {
-  reference: { 'gp.': 1, 'titre.': 2, 'marche.signature': 1, 'conseil.': 1, 'federation.': 1, 'reglement.annonce': 1, 'record.': 2, 'media.declaration': 0.5 },
-  tabloid: { 'media.scandale': 3, 'information.revelee': 2, 'personnel.critique': 2, 'contrat.demission': 2, 'conseil.licenciement': 2, 'media.declaration': 1.5, 'media.rumeur': 2, 'groupe.suit_leader': 1, 'contrat.demande_depart': 1, 'gp.victoire_surprise': 1 },
+  reference: { 'gp.': 1, 'titre.': 2, 'media.lassitude_public': 1, 'marche.signature': 1, 'conseil.': 1, 'federation.': 1, 'reglement.annonce': 1, 'record.': 2, 'media.declaration': 0.5 },
+  tabloid: { 'media.lassitude_public': 2, 'media.scandale': 3, 'information.revelee': 2, 'personnel.critique': 2, 'contrat.demission': 2, 'conseil.licenciement': 2, 'media.declaration': 1.5, 'media.rumeur': 2, 'groupe.suit_leader': 1, 'contrat.demande_depart': 1, 'gp.victoire_surprise': 1 },
   technique: { 'reglement.': 2, 'recherche.': 2, 'politique.lobbying': 1, 'stands.': 1, 'infrastructure.': 1, 'federation.': 1 },
   national: { 'gp.': 1, 'titre.': 2, 'marche.signature': 1, 'recrutement': 0.5, 'record.': 1 },
 };
@@ -42,11 +42,12 @@ export const IMAGE = {
 
 /** Variation d'image par type de fait : [personne principale, écurie]. Le signe porte le sens (une critique publique abîme son auteur). */
 export const IMAGE_PAR_FAIT: Record<string, [number, number]> = {
-  'gp.victoire': [2, 1],
-  'gp.victoire_surprise': [4, 2.5],
-  'gp.podium': [0.5, 0.3],
-  'titre.pilotes': [12, 5],
-  'titre.constructeurs': [0, 10],
+  // D-150 : gains des victoires et des titres réduits (le porteur les jugeait trop positifs).
+  'gp.victoire': [1, 0.5],
+  'gp.victoire_surprise': [3, 2],
+  'gp.podium': [0.3, 0.2],
+  'titre.pilotes': [8, 3],
+  'titre.constructeurs': [0, 6],
   'personnel.soutien': [1.5, 0.5], // public seulement
   'personnel.felicitations': [1, 0.3],
   'personnel.critique': [-4, -1.5], // public seulement : l'auteur et son écurie
@@ -119,3 +120,12 @@ export const IMAGE_PAR_REPONSE: Record<string, [number, number]> = {
  * qu'après `saisonsMinAnnonce` saisons simulées (avant, « record » ne veut rien dire).
  */
 export const ARCHIVES = { victoiresMin: 5, saisonsMinAnnonce: 5 };
+
+/**
+ * D-150 — lassitude du public envers ceux qui gagnent tout (« comme en vrai ») :
+ * - `titresSaturation` : après autant de titres consécutifs (pilote, ou écurie aux constructeurs), une victoire n'améliore plus l'image ;
+ *   avant, son gain est réduit en proportion (gain × (1 − titres consécutifs / titresSaturation)) ;
+ * - `seuilErosion` : à partir de ce nombre de titres consécutifs, l'image s'érode en fin de saison de `erosionParTitre` × (titres − seuil + 1) points ;
+ * - mêmes règles pour toutes les écuries et tous les pilotes (joueur compris).
+ */
+export const LASSITUDE_PUBLIC = { titresSaturation: 3, seuilErosion: 2, erosionParTitre: 6 };

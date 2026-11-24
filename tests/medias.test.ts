@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   articles, calculerRecords, chargerDonnees, contratEmploi, creerScenarioGrille2026, decisionsEnAttente, deserialiser, executerCommandeJoueur, medias,
-  nomArchive, serialiser, texteArticle, table, TABLES, teamPrincipal, valeurCommerciale, verifierCoherence, ajouterEvenement,
+  nomArchive, serialiser, texteArticle, titresConsecutifs, lassitudePublic, table, TABLES, teamPrincipal, valeurCommerciale, verifierCoherence, ajouterEvenement,
   type Article, type Conference, type ContratSponsoring, type Ecurie, type Monde, type Personne,
 } from '../src/engine';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
@@ -149,6 +149,26 @@ describe('Phase 11 — conférences de presse', () => {
     expect(moteur.commandes.executer(m, { type: 'media.declaration', auteur: tp.id, source: 'ia', parametres: { conference: c.id, reponse: 'soutenir' } })).toEqual({ ok: true });
     expect(Object.values(m.evenements).some((x) => x.type === 'personnel.soutien' && x.contexte['publique'] === true && x.acteurs.some((a) => a.id === pilote.id))).toBe(true);
     void contratEmploi;
+  });
+});
+
+describe('D-150 — lassitude du public', () => {
+  it('une écurie à 3 titres constructeurs d’affilée : ses victoires n’améliorent plus son image, qui s’érode en fin de saison', () => {
+    const m = sc.creerMonde(9);
+    const pal = Object.values(table(m, TABLES.palmares)) as unknown as { saison: number; championConstructeurs: string }[];
+    for (const x of pal) if (x.saison >= 2024) x.championConstructeurs = 'eq_ferrari';
+    expect(titresConsecutifs(m, 'eq_ferrari')).toBe(3);
+    const fe = ecurie(m, 'eq_ferrari');
+    fe.image = 10;
+    const faits = lassitudePublic(m);
+    expect(faits.some((f) => f.acteurs.some((a) => a.id === 'eq_ferrari'))).toBe(true);
+    expect(fe.image).toBeLessThan(10);
+    // Une victoire ne rapporte plus rien en image (saturation à 3 titres).
+    const avant = fe.image!;
+    const pilote = auPoste(m, 'eq_ferrari', 'pilote_titulaire');
+    ajouterEvenement(m, { type: 'gp.victoire', acteurs: [{ id: pilote.id, role: 'pilote' }, { id: 'eq_ferrari', role: 'ecurie' }], importance: 3, visibilite: 'public', texte: 'Victoire.' });
+    sc.creerMoteur().avancer(m, 1);
+    expect(fe.image!).toBeLessThanOrEqual(avant);
   });
 });
 
