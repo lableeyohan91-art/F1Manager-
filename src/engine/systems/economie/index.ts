@@ -36,6 +36,9 @@ import { avancerProjets, deciderProjet, negligerEntretien, vieillirInstallations
 import { coutAnnuelAcademie } from '../juniors/academies';
 
 export * from './sponsors';
+export * from './sponsoring';
+export * from './probabilites';
+export * from './variantes';
 export * from './crises';
 import { nombreGrandsPrix, regleVotee } from '../politique/acces';
 import { CONFERENCES } from '../../balance/medias';

@@ -52,6 +52,17 @@ async function parcours(nomAppareil, contexteOptions) {
   await page.getByRole('button', { name: '+1 sem.' }).click();
   await page.waitForFunction((d) => document.querySelector('.jeu-titre .muted')?.textContent !== d, dateAvant);
   ok(`${nomAppareil} : une semaine simulée`);
+  // Phase 11c : le marché des sponsors de janvier a fait des offres à l'écurie du joueur (domaine commercial non délégué).
+  await allerA('Finances');
+  await page.getByText('Sponsors sous contrat').first().waitFor();
+  const signer = page.getByRole('button', { name: 'Signer ce contrat' });
+  if (await signer.count()) {
+    await capture('04b-offre-sponsor');
+    await signer.last().click();
+    await page.getByText(/Contrat signé avec/).waitFor();
+    ok(`${nomAppareil} : offre de sponsor signée (${await signer.count()} variante(s) encore proposée(s) par d'autres offres)`);
+  } else ok(`${nomAppareil} : écran des sponsors (aucune offre en attente)`);
+  await allerA('Accueil');
   for (let i = 0; i < 3; i++) {
     await page.getByRole('button', { name: 'Continuer ▸' }).click();
     await page.waitForFunction(() => !document.querySelector('.jeu-bandeau.calcul'), null, { timeout: 120_000 });

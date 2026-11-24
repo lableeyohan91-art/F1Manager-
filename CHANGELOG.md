@@ -493,3 +493,16 @@ Aucun code à ce stade.
 - Places à pourvoir signalées seulement tant que le marché est ouvert ; contre-propositions orphelines effacées.
 - Import d'une sauvegarde téléchargée (Réglages). Outil `diagnostic-joueur` : toutes les délégations.
 - Tests `tests/audit-p10.test.ts` (13) ; parcours navigateur : 26 étapes (import, secours, double corruption).
+
+## [Phase 11c — refonte du sponsoring] — 24/11/2026
+
+### Ajouté (D-155, D-156)
+- Contrats titre et principaux en trois variantes (prudente, équilibrée, audacieuse), de même valeur attendue pour le sponsor, à sa marge de risque près. Chaque variante est chiffrée d'après le rang attendu public de l'écurie et des fréquences mesurées sur la simulation.
+- Clauses annuelles variées selon l'image recherchée par le sponsor : rang, places gagnées, podium, victoire, arrivées dans les points. Engagement ferme dans la limite des moyens du sponsor, avec une prime plafonnée à 3 fois la valeur du contrat.
+- Sponsor titre : un objectif par Grand Prix (prudent, intermédiaire, audacieux, ou aucun), payé sur une enveloppe de 20 % du contrat. L'estimation affichée vient du directeur sportif, plus précise selon sa compétence stratégie.
+- Opérations exceptionnelles après un podium ou une victoire inattendus, réservées aux petites écuries. 4 formats ; le pilote demandé est affiché avant d'accepter ; effets sur l'exposition, l'image, les souvenirs du pilote et la satisfaction des sponsors ; un fait « sollicitation » daté, pour la phase 13.
+- Domaine délégable `commercial`, non délégué au départ. Offres et opérations s'affichent dans les décisions en attente ; à l'échéance, l'équipe tranche.
+- Commandes communes au joueur et à l'IA : `sponsor.signer`, `sponsor.objectif_gp`, `sponsor.operation`.
+- Écran Finances → Sponsors.
+- Format de sauvegarde 28 : les contrats existants deviennent prudents.
+- Tests `tests/sponsoring.test.ts` (15). Outil `tools/diagnostic-sponsors.mts`. Étape « offre de sponsor » dans le parcours navigateur.

@@ -283,6 +283,21 @@ const MIGRATIONS: Record<number, Migration> = {
     for (const r of Object.values(rel)) if ((r['familiarite'] as number) > 0 && r['contact'] === undefined && String(r['vers']).startsWith('per')) r['contact'] = rang;
     return { ...m, versionFormat: 27 };
   },
+  // v27 → v28 (phase 11c, D-155) : les contrats de sponsoring en cours deviennent des contrats « prudents » à une seule clause,
+  // celle d'avant la refonte (même objectif de classement, même prime) ; nouvelles tables vides (offres, objectifs de course, opérations).
+  27: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, Record<string, unknown>>>;
+    for (const c of Object.values(tables['contratsSponsoring'] ?? {})) {
+      if (c['clauses']) continue;
+      c['variante'] = 'prudente';
+      c['clauses'] = [{ type: 'rang', seuil: c['objectifRang'] ?? 11, primeMEUR: c['primeObjectifMEUR'] ?? 0, probabilite: 0.75 }];
+      c['primesVerseesMEUR'] = 0;
+      delete c['objectifRang'];
+      delete c['primeObjectifMEUR'];
+    }
+    for (const t of ['offresSponsors', 'objectifsGP', 'operationsSponsors']) tables[t] ??= {};
+    return { ...m, versionFormat: 28 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

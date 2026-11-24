@@ -93,7 +93,7 @@ export function VueFinances({ monde }: { monde: Monde }) {
                       {cs.map((c) => (
                         <tr key={c.id}>
                           <td>{parId.get(c.sponsor)?.nom ?? c.sponsor}<br /><span class="muted">{LIB_RANG[c.rang]}{c.clauseSortie ? ' · clause de sortie' : ''}</span></td>
-                          <td class="num">{m1(c.montantAnnuelMEUR).replace(' M€', '')}</td><td class="num">{c.objectifRang}e</td><td class="num">{c.fin}</td><td class="num">{c.satisfaction}</td>
+                          <td class="num">{m1(c.montantAnnuelMEUR).replace(' M€', '')}</td><td class="num">{c.variante ?? 'prudente'} · {(c.clauses ?? []).map((x) => `${x.type} ${x.seuil}`).join(', ')}</td><td class="num">{c.fin}</td><td class="num">{c.satisfaction}</td>
                         </tr>
                       ))}
                     </tbody>

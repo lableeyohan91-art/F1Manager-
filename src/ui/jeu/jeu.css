@@ -85,3 +85,9 @@ tr.moi td { color: var(--text); font-weight: 700; background: rgba(225,6,0,.12);
   .jeu-nav button .lib { font-size: .62rem; }
   .jeu { padding-bottom: 56px; }
 }
+
+/* Phase 11c : sponsors */
+.ligne-rang.choisi { background: color-mix(in srgb, var(--accent) 15%, transparent); border-radius: 6px; }
+.ligne-rang { align-items: center; padding: 4px 0; }
+.ligne-sponsor { border-top: 1px solid var(--bord, #333); padding-top: 6px; margin-top: 6px; }
+.ligne-sponsor p { margin: 2px 0; }

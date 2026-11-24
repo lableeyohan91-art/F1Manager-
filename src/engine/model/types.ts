@@ -51,6 +51,10 @@ export const TABLES = {
   conferences: 'conferences',
   records: 'records',
   etatMedias: 'etatMedias',
+  // Phase 11c
+  offresSponsors: 'offresSponsors',
+  objectifsGP: 'objectifsGP',
+  operationsSponsors: 'operationsSponsors',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -112,7 +116,7 @@ export interface Ecurie {
   /** Phase 8b (D-132, question 9) : le joueur confie ses programmes de recherche à son directeur technique (décisions de l'IA). */
   delegationRecherche?: boolean;
   /** Phase 10 : domaines que le joueur confie à son équipe (règles de l'IA). Absent = le joueur décide (défauts inscrits à la prise de fonction). */
-  delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands' | 'communication', boolean>>;
+  delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands' | 'communication' | 'commercial', boolean>>;
   /** Phase 11 : image publique de l'écurie (−100 à 100, absente = 0). Lue par les sponsors, le conseil et les candidats. */
   image?: number;
   /** Phase 11 : objectif annoncé en conférence de presse pour une saison (« viser le titre » relève l'exigence du conseil). */
@@ -585,16 +589,38 @@ export interface Sponsor {
   lie?: string;
 }
 export type RangSponsor = 'titre' | 'principal' | 'secondaire';
+/** Phase 11c : variante d'un contrat titre ou principal (même valeur attendue pour le sponsor, à sa marge de risque près). */
+export type VarianteContrat = 'prudente' | 'equilibree' | 'audacieuse';
+/** Phase 11c : type d'une clause annuelle (rang constructeurs, places gagnées, au moins un podium, une victoire, N arrivées dans les points). */
+export type TypeClause = 'rang' | 'progression' | 'podium' | 'victoire' | 'arrivees_points';
+export interface ClauseSponsor {
+  type: TypeClause;
+  /** rang et progression : rang constructeurs à atteindre (ou mieux) ; podium, victoire : 1 ; arrivées dans les points : nombre de Grands Prix. */
+  seuil: number;
+  /** Prime versée si la clause est tenue (M€), fixée au contrat. */
+  primeMEUR: number;
+  /** Probabilité estimée par le sponsor à la signature (sa connaissance publique du marché). Lue par la satisfaction. */
+  probabilite: number;
+  /** Bilan de la dernière saison évaluée. */
+  atteinte?: boolean;
+}
 export interface ContratSponsoring {
   id: string;
   sponsor: string;
   ecurie: string;
   rang: RangSponsor;
+  /** Partie fixe annuelle (M€). */
   montantAnnuelMEUR: number;
-  /** Prime versée si l'objectif de classement est atteint (M€). */
-  primeObjectifMEUR: number;
-  /** Classement constructeurs minimal visé (1 = premier). */
-  objectifRang: number;
+  /** Phase 11c : variante choisie à la signature. */
+  variante: VarianteContrat;
+  /** Phase 11c : clauses annuelles (la prudente : une clause de classement, celle d'avant la refonte). */
+  clauses: ClauseSponsor[];
+  /** Phase 11c : sponsor titre, enveloppe annuelle des primes de course (M€), répartie sur les Grands Prix. */
+  enveloppeGPMEUR?: number;
+  /** Phase 11c : primes versées depuis la signature (M€) : clauses, objectifs de course. */
+  primesVerseesMEUR: number;
+  /** Phase 11c : une opération exceptionnelle a déjà été faite avec ce contrat (au plus une). */
+  operationFaite?: boolean;
   /** Clause de sortie : le sponsor peut partir avant la fin si l'objectif est manqué et sa satisfaction trop basse. */
   clauseSortie: boolean;
   debut: number;
@@ -604,6 +630,73 @@ export interface ContratSponsoring {
   satisfaction: number;
   /** Phase 7c : sponsor personnel qui accompagne ce pilote (contrat conditionné à sa présence ; occupe un emplacement existant). */
   pilote?: string;
+}
+/** Phase 11c : une variante telle qu'elle est proposée (avant signature). */
+export interface VarianteOffre {
+  variante: VarianteContrat;
+  fixeMEUR: number;
+  clauses: ClauseSponsor[];
+  enveloppeGPMEUR?: number;
+  /** Valeur attendue pour le sponsor (fixe + primes × probabilités + enveloppe). */
+  valeurAttendueMEUR: number;
+  /** Montant maximal à payer sur une saison (engagement ferme). */
+  maximumMEUR: number;
+}
+/** Phase 11c : offre de contrat faite à l'écurie du joueur (domaine commercial non délégué). Effacée à la décision. */
+export interface OffreSponsor {
+  id: string;
+  sponsor: string;
+  ecurie: string;
+  rang: RangSponsor;
+  annee: number;
+  renouvellement: boolean;
+  echeance: DateJeu;
+  variantes: VarianteOffre[];
+}
+export type NiveauObjectifGP = 'prudent' | 'intermediaire' | 'audacieux';
+export interface OptionObjectifGP {
+  niveau: NiveauObjectifGP;
+  /** Le meilleur pilote de l'écurie finit dans les `seuil` premiers. */
+  seuil: number;
+  primeMEUR: number;
+  /** Probabilité estimée par le sponsor (jamais montrée au joueur). */
+  probabilite: number;
+  /** Fourchette du directeur sportif (lue par l'affichage et par le choix de l'équipe). */
+  estimation: [number, number];
+}
+/** Phase 11c : objectif de course proposé par le sponsor titre pour un Grand Prix (un par écurie, effacé après le jugement). */
+export interface ObjectifGP {
+  id: string;
+  gp: string;
+  ecurie: string;
+  contrat: string;
+  /** Part de l'enveloppe mise en jeu sur ce Grand Prix (M€) ; « aucun objectif » en verse une part fixe. */
+  partMEUR: number;
+  options: OptionObjectifGP[];
+  choix?: NiveauObjectifGP | 'aucun';
+  choisiPar?: 'joueur' | 'equipe';
+}
+export type FormatOperation = 'tenues' | 'visibilite' | 'interview' | 'campagne';
+/** Phase 11c : opération publicitaire exceptionnelle proposée après un exploit (sponsor principal). */
+export interface OperationSponsor {
+  id: string;
+  ecurie: string;
+  contrat: string;
+  sponsor: string;
+  /** Fait déclencheur (podium ou victoire inattendus). */
+  evenement: string;
+  exploit: 'podium' | 'victoire';
+  rangAttendu: number;
+  /** Pilote demandé, affiché avant acceptation ; absent si le sponsor laisse l'écurie choisir. */
+  ciblage: 'exploit' | 'populaire' | 'numero1' | 'libre';
+  pilote?: string;
+  /** Auteur de l'exploit (meilleur pilote de l'écurie ce jour-là). */
+  auteur: string;
+  formats: { format: FormatOperation; montantMEUR: number }[];
+  echeance: DateJeu;
+  proposeeLe: DateJeu;
+  statut: 'proposee' | 'acceptee' | 'refusee' | 'expiree';
+  format?: FormatOperation;
 }
 /** Projet d'infrastructure en cours (phase 5b). */
 export interface ProjetInfrastructure {

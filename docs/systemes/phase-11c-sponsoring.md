@@ -1,6 +1,6 @@
 # Refonte du sponsoring (proposée en « phase 11c »)
 
-> Statut : **À VALIDER** par le porteur (étape 2 du processus de CLAUDE.md). Aucun code avant validation.
+> Statut : **VALIDÉE** par le porteur le 24/11/2026 (D-155), avec les précisions du §11.
 > Fiche d'intention : message du porteur du 24/11/2026 (« F1 Manager mobile — refonte du système de sponsoring »).
 > Rédigée par Claude Code après audit de l'existant. Aucun rééquilibrage sportif ; les dynasties attendent la fin de la phase 12.
 
@@ -149,3 +149,55 @@ Un sponsor propose plusieurs variantes de contrat (prudente, équilibrée, audac
 6. **Rareté des opérations** : au plus 1 par écurie et par saison, et 1 par contrat de sponsor. *Recommandé.*
 7. **Domaine `commercial`** : délégué ou non au départ d'une partie ? *Recommandation : non délégué pour les contrats (c'est le cœur de la refonte), avec repli automatique à l'échéance.*
 8. **Place dans la feuille de route** : en « phase 11c », maintenant, avant la phase 11b (circuits) qui demande ta collecte de données ? *Recommandé.*
+
+## 11. Réponses du porteur (24/11/2026)
+
+| Question | Réponse | Conséquence dans la conception |
+| --- | --- | --- |
+| 1 Fatigue | Recommandation retenue | Fait « sollicitation » seulement ; aucune fatigue avant la phase 13 |
+| 2 Variantes | Décote oui, **mais un pari réussi doit vraiment rapporter, surtout pour une petite écurie** | Prime d'une clause = part du contrat ÷ probabilité estimée par le sponsor, décote comprise. Une clause improbable paie donc beaucoup quand elle tombe (par exemple un podium pour une écurie de fond de grille). Seule limite : les moyens du sponsor. Le gain réel est mesuré dans le rapport |
+| 3 Enveloppe du titre | 20 % | Valeur provisoire |
+| 4 Objectif de course sans choix | Oui | Le directeur commercial choisit selon le goût du risque du team principal, sans arrêt ni alerte |
+| 5 Estimation | Oui | Fourchette du directeur sportif, plus étroite avec sa compétence « stratégie » |
+| 6 Rareté des opérations | **Privilégier les petites écuries** | « Petite écurie » = rang attendu d'après le classement constructeurs des deux dernières saisons. Le montant grandit avec l'écart entre ce rang et l'exploit ; une écurie attendue dans les 3 premières n'en reçoit jamais |
+| 7 Domaine `commercial` | Non délégué au départ | Repli automatique à l'échéance |
+| 8 Place | Avant la phase 11b | Phase 11c inscrite avant les circuits |
+
+## 12. Mise en œuvre (24/11/2026)
+
+### Fichiers
+
+| Fichier | Rôle |
+| --- | --- |
+| `src/engine/balance/sponsoring.ts` | Tous les coefficients, dont les tables de fréquences mesurées (connaissance du marché des sponsors) |
+| `src/engine/systems/economie/probabilites.ts` | Rang attendu public, probabilités vues par le sponsor, bilan réel d'une saison |
+| `src/engine/systems/economie/variantes.ts` | Construction des variantes (fonction pure) |
+| `src/engine/systems/economie/sponsors.ts` | Signature, choix de l'équipe, offres au joueur, bilan annuel des clauses, marché |
+| `src/engine/systems/economie/sponsoring.ts` | Système hebdomadaire (échéances, objectifs de course, opérations) et commandes `sponsor.signer`, `sponsor.objectif_gp`, `sponsor.operation` |
+| `src/ui/jeu/Sponsors.tsx` | Écran Finances → Sponsors |
+
+### Attributs et tables : qui les lit
+
+| Attribut | Lu par |
+| --- | --- |
+| `ContratSponsoring.variante` | Bilan annuel (déception d'une clause ratée), écran |
+| `ContratSponsoring.clauses[]` (type, seuil, prime, probabilité) | Bilan annuel (prime, satisfaction), écran |
+| `ClauseSponsor.atteinte` | Écran (« tenue l'an dernier ») |
+| `ContratSponsoring.enveloppeGPMEUR` | Objectifs de course (part par Grand Prix) |
+| `ContratSponsoring.primesVerseesMEUR` | Écran, mesures |
+| `ContratSponsoring.operationFaite` | Rareté des opérations (une par contrat) |
+| `OptionObjectifGP.estimation` | Choix du directeur commercial, écran |
+| `OptionObjectifGP.probabilite` | Prime de l'objectif (jamais montrée au joueur) |
+| `OperationSponsor.proposeeLe` | Rareté (une par saison, 26 semaines d'écart) |
+| Compétence `strategie` du directeur sportif | Largeur de l'estimation (première utilisation de cette compétence) |
+| Fait `sponsor.operation` (contexte `sollicitation`) | Phase 13 (jauge d'énergie) ; aucun effet sportif avant |
+
+### Écarts avec la fiche, à valider
+
+- **Seuil du podium exploit abaissé de la 9e à la 7e place attendue.** Avec la 9e, un podium « exploit » n'arrivait qu'environ 0,4 fois par saison sur tout le plateau. Avec la 7e, les petites écuries en profitent davantage, ce que tu as demandé (question 6). Réglable : `OPERATIONS.rangMinPodium`.
+- **Prime plafonnée à 3 fois la valeur du contrat** (`PRIME_MAX_MULTIPLE_VALEUR`). Au premier essai, un sponsor proposait 67 M€ de prime pour un contrat qui en vaut 12. Un pari réussi rapporte encore environ 3,5 fois le contrat prudent.
+- **La variante prudente est exactement le contrat d'avant la refonte** (même fixe, même prime de classement). Les sponsors secondaires n'ont que celle-là.
+- **Les objectifs de course de l'IA ne produisent pas de message** (volume) : la prime figure dans ses comptes et dans son contrat. L'écurie du joueur en reçoit un par Grand Prix.
+- **Clause liée à un pilote** (sponsor national ou personnel) : non faite, reportée.
+- **Record battu** comme déclencheur d'opération : non fait. Seuls le podium et la victoire inattendus déclenchent.
+- **Réglages d'expérience** (`experience.sponsoring.*`) : uniquement pour les mesures ; sans effet en partie.

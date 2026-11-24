@@ -74,6 +74,8 @@ export const ETIQUETTES: Record<string, DefinitionEtiquette> = {
   gratitude: { libelle: 'Gratitude (opportunité offerte)', ressenti: 0.8, intensite: 0.55, axes: { confiance: 0.4, respect: 0.2, affinite: 0.4 }, oubli: 0.03, amplificateurs: { 't:ambition': 0.5, 'v:fidelite': 0.5 } },
   promesse_tenue: { libelle: 'Promesse tenue', ressenti: 0.7, intensite: 0.5, axes: { confiance: 0.7, respect: 0.2, affinite: 0.1 }, oubli: 0.04, amplificateurs: { 'v:fidelite': 0.4, 'v:equite': 0.5 } },
   promesse_rompue: { libelle: 'Promesse rompue', ressenti: -0.9, intensite: 0.65, axes: { confiance: 0.8, respect: 0.1, affinite: 0.1 }, oubli: 0.03, amplificateurs: { 'v:equite': 0.8 } },
+  // Phase 11c : opération publicitaire lourde imposée à un pilote discret ou très professionnel (cible : le team principal qui l'a acceptée).
+  sollicitation: { libelle: 'Sollicitation publicitaire pesante', ressenti: -0.3, intensite: 0.35, axes: { confiance: 0.2, respect: 0.3, affinite: 0.5 }, oubli: 0.06, amplificateurs: { 't:discretion': 0.8, 't:professionnalisme': 0.4 } },
   conflit: { libelle: 'Négociation conflictuelle', ressenti: -0.4, intensite: 0.3, axes: { confiance: 0.3, respect: 0.2, affinite: 0.5 }, oubli: 0.06, amplificateurs: { 't:temperament': 0.6 } },
   humiliation: { libelle: 'Humiliation', ressenti: -0.9, intensite: 0.6, axes: { confiance: 0.3, respect: 0.2, affinite: 0.5 }, oubli: 0.03, amplificateurs: { 't:besoinReconnaissance': 0.6, 't:temperament': 0.5 } },
   injustice: { libelle: 'Injustice', ressenti: -0.7, intensite: 0.45, axes: { confiance: 0.5, respect: 0.3, affinite: 0.2 }, oubli: 0.04, amplificateurs: { 'v:equite': 0.9 } },

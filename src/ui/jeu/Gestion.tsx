@@ -11,6 +11,7 @@ import { enregistrer, exporter, importer } from '../../platform/navigateur/stock
 import { commander, ecurieJoueur, mesurerAppareil, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, saisonCourante, type Partie } from './partie';
 import type { Navigation } from './Jeu';
 import { NOM_SAUVEGARDE } from './Jeu';
+import { Sponsors } from './Sponsors';
 
 const pct = (x: number) => `${Math.round(x * 100)} %`;
 
@@ -27,6 +28,7 @@ const LIB_DELEGATION: Record<DomaineJoueur, [string, string]> = {
   academie: ['Académie', 'Places et missions de repérage'],
   politique: ['Politique', 'Votes du règlement et de la fédération, lobbying'],
   communication: ['Communication', 'Réponses aux questions de la presse (service de communication)'],
+  commercial: ['Commercial', 'Contrats de sponsoring, objectifs de course, opérations publicitaires (directeur commercial)'],
 };
 
 function Delegation({ partie, domaine, nav }: { partie: Partie; domaine: DomaineJoueur; nav: Navigation }) {
@@ -137,6 +139,7 @@ export function EcranFinances({ partie, nav }: { partie: Partie; nav: Navigation
         <p>Plafond budgétaire {meur(plafond(m))} · dépenses plafonnées depuis janvier {meur(plafonnees)}</p>
         <p class="muted">Recettes depuis janvier {meur(recettes)} (primes {meur(c.primes)}, commercial {meur(c.commercial)}, sponsors {meur(c.sponsors)}, propriétaire {meur(c.apport)})</p>
       </div>
+      <Sponsors partie={partie} nav={nav} />
       <div class="carte">
         <h3>Budget de développement {m.date.annee}</h3>
         <p>Actuel : <strong>{meur(fi.budget.developpementMEUR)}</strong> ({fi.budget.strategie === 'choix_du_team_principal' ? 'fixé par vous' : 'proposé par la direction financière'})</p>

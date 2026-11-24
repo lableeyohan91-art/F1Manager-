@@ -28,7 +28,7 @@ import { contratEmploi, creerContrat, deciderProlongation, liberer, pourvoirPost
 import { reprendreProlongationsPilotes } from '../marche';
 import { teamPrincipal, valeurMarche } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
-import { financesDe, plafond } from '../economie';
+import { financesDe, offresSponsors, operationsSponsors, plafond } from '../economie';
 import { equipeStands } from '../stands';
 import { propositions } from '../technique';
 import { federation } from '../politique';
@@ -46,7 +46,7 @@ const ecurieDe = (monde: Monde, id: string) => table(monde, TABLES.ecuries)[id] 
 const personneDe = (monde: Monde, id: string) => table(monde, TABLES.personnes)[id] as unknown as Personne | undefined;
 
 /** Domaines que le joueur peut déléguer (les deux derniers ont leur drapeau propre, phases 8b et 8d). */
-export const DOMAINES_DELEGATION = ['pilotes', 'personnel', 'recherche', 'stands', 'academie', 'politique', 'communication'] as const;
+export const DOMAINES_DELEGATION = ['pilotes', 'personnel', 'recherche', 'stands', 'academie', 'politique', 'communication', 'commercial'] as const;
 export type DomaineJoueur = (typeof DOMAINES_DELEGATION)[number];
 
 /** Le domaine est-il délégué (décidé par l'équipe avec les règles de l'IA) ? */
@@ -207,7 +207,10 @@ export const commandeBudgetDeveloppement: DefinitionCommande = {
 /* ------------------------------------------------------------------ Décisions en attente (consultation) */
 
 export interface DecisionEnAttente {
-  type: 'contre_offre' | 'augmentation' | 'depart' | 'fin_contrat' | 'poste_vacant' | 'offre_marche' | 'vote_reglement' | 'election' | 'vote_federation' | 'conference';
+  type: 'contre_offre' | 'augmentation' | 'depart' | 'fin_contrat' | 'poste_vacant' | 'offre_marche' | 'vote_reglement' | 'election' | 'vote_federation' | 'conference' | 'offre_sponsor' | 'operation_sponsor';
+  /** Phase 11c : offre de contrat ou opération exceptionnelle d'un sponsor. */
+  offreSponsor?: string;
+  operation?: string;
   /** Phase 11 : question de la presse en attente (identifiant de la conférence). */
   conference?: string;
   titre: string;
@@ -297,6 +300,19 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
   for (const c of Object.values(table(monde, TABLES.conferences)) as unknown as Conference[]) {
     if (c.ecurie !== idEcurie) continue;
     res.push({ type: 'conference', titre: 'La presse vous interroge', detail: LIBELLES_QUESTIONS[c.question], consequence: 'Sans réponse, le service de communication esquive la question.', echeance: c.echeance, urgente: urgente(c.echeance), conference: c.id, ...(c.sujet && personneDe(monde, c.sujet) ? { personne: c.sujet } : {}) });
+  }
+  // Phase 11c : offres de contrat et opérations exceptionnelles des sponsors (domaine commercial non délégué).
+  if (!iaDecide(e, 'commercial')) {
+    for (const o of offresSponsors(monde, idEcurie)) {
+      const s = table(monde, TABLES.sponsors)[o.sponsor] as unknown as { nom: string } | undefined;
+      res.push({ type: 'offre_sponsor', titre: `${s?.nom ?? 'Un sponsor'} : offre de sponsor ${o.rang === 'titre' ? 'titre' : 'principal'}`, detail: `${o.variantes.length} variante${o.variantes.length > 1 ? 's' : ''}, de ${Math.min(...o.variantes.map((v) => v.fixeMEUR))} à ${Math.max(...o.variantes.map((v) => v.fixeMEUR))} M€ de fixe par an.`, consequence: 'Sans réponse, votre directeur commercial choisit à l’échéance.', echeance: o.echeance, urgente: urgente(o.echeance), offreSponsor: o.id });
+    }
+    for (const op of operationsSponsors(monde, idEcurie)) {
+      if (op.statut !== 'proposee') continue;
+      const s = table(monde, TABLES.sponsors)[op.sponsor] as unknown as { nom: string } | undefined;
+      const p = op.pilote ? personneDe(monde, op.pilote) : undefined;
+      res.push({ type: 'operation_sponsor', titre: `${s?.nom ?? 'Un sponsor'} propose une opération publicitaire`, detail: `Après ${op.exploit === 'victoire' ? 'votre victoire' : 'votre podium'} : ${p ? `avec ${nomDe(p)}` : 'pilote au choix'}, de ${Math.min(...op.formats.map((f) => f.montantMEUR))} à ${Math.max(...op.formats.map((f) => f.montantMEUR))} M€.`, consequence: 'Sans réponse avant le prochain Grand Prix, l’équipe décide.', echeance: op.echeance, urgente: urgente(op.echeance), operation: op.id, ...(p ? { personne: p.id } : {}) });
+    }
   }
   return res.sort((a, b) => Number(b.urgente) - Number(a.urgente) || (a.echeance ? rang(a.echeance) : 1e9) - (b.echeance ? rang(b.echeance) : 1e9));
 }

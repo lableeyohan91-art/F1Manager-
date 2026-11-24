@@ -204,7 +204,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Ère** | Série d'au moins trois titres constructeurs consécutifs d'une écurie, inscrite dans la Chronique (phase 9). |
 | **Date d'arrivée** | Année où un dirigeant a rejoint son écurie, saisie dans `carrieres.csv` ; elle fixe son ancienneté au départ (D-143). |
 | **Manager (du joueur)** | Personne incarnée par le joueur : team principal de son écurie, aux traits et valeurs neutres, jamais décidée par l'IA (ni marché, ni retraite) ; le conseil la juge comme les autres (phase 10, D-147). |
-| **Délégation** | Domaine de décision (pilotes, personnel, recherche, stands, académie, politique) que le joueur confie à son équipe : elle décide avec exactement les règles de l'IA (phase 10). |
+| **Délégation** | Domaine de décision (pilotes, personnel, recherche, stands, académie, politique, communication, commercial) que le joueur confie à son équipe : elle décide avec exactement les règles de l'IA (phase 10). |
 | **Décision en attente** | Ce qui attend une réponse du joueur (contre-proposition, demande d'augmentation ou de départ, fin de contrat, place à pourvoir, vote), avec son échéance et la conséquence d'une absence de réponse (phase 10). |
 | **Filet de sécurité** | Recrutement d'office d'un remplaçant pour un poste encore vacant, la même règle pour toutes les écuries : une écurie n'est jamais sans directeur ni sans pilote (phase 10). |
 | **Média** | Journal fictif (`data/commun/medias.csv`) avec une ligne éditoriale (quotidien de référence, tabloïd, revue technique, presse nationale) et une fiabilité ; il ne publie que des faits du moteur (phase 11). |
@@ -216,3 +216,9 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Conférence de presse** | Question d'un journaliste à un team principal, avec quelques réponses possibles (commande `media.declaration`, commune au joueur et à l'IA) ; délégable au service de communication (phase 11). |
 | **Objectif annoncé** | « Viser le titre » déclaré en conférence de presse : le conseil juge la saison sur cet objectif (phase 11). |
 | **Record** | Meilleure performance (titres depuis 2010, victoires et podiums depuis 2027) ; quand il change de détenteur, c'est un fait et un article (phase 11). |
+| **Rang attendu public** | Ce que le paddock attend d'une écurie : moyenne pondérée de ses deux derniers classements constructeurs (au départ, le rang de sa voiture). Les sponsors chiffrent leurs offres et repèrent les exploits avec lui (phase 11c, D-155). |
+| **Variante de contrat** | Forme d'un contrat de sponsor titre ou principal : prudente (fixe et une prime de classement, le contrat d'avant la refonte), équilibrée ou audacieuse (une part du fixe remplacée par des primes). Même valeur attendue pour le sponsor, à sa marge de risque près (phase 11c). |
+| **Clause (de sponsoring)** | Condition annuelle d'une prime : rang constructeurs, places gagnées, au moins un podium, une victoire, un nombre d'arrivées dans les points. Sa prime est fixée à la signature (phase 11c). |
+| **Objectif de course** | Défi que le sponsor titre propose avant chaque Grand Prix (prudent, intermédiaire, audacieux, ou aucun), payé sur son enveloppe de course ; jugé sur le meilleur pilote de l'écurie (phase 11c). |
+| **Opération exceptionnelle** | Opération publicitaire qu'un sponsor principal propose après un exploit inattendu d'une petite écurie (tenues, visibilité sur la voiture, interview, campagne) ; le pilote demandé est connu avant d'accepter (phase 11c). |
+| **Sollicitation** | Charge qu'une opération publicitaire fait peser sur un pilote (légère, moyenne, lourde) ; fait daté que la jauge d'énergie de la phase 13 lira. Aucun effet sportif avant (phase 11c). |
