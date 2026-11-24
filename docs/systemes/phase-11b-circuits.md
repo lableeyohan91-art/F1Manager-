@@ -455,6 +455,8 @@ Le porteur demande des caractéristiques qui « jouent avec nos circuits », par
 
 ### 14.3 Ce que le circuit fournit dès la phase 11b pour ces réglages
 
+> **D-161** : les réglages se **découvrent** en essais libres (phase 13), changent chaque année avec la voiture, et ne sont jamais donnés au joueur. Le niveau d'ailerons calculé ici reste interne ; la fiche montre seulement la tendance connue de tous.
+
 - Par élément : bosses, vibreurs, part de l'appui dans la vitesse de passage.
 - Pour le circuit : niveau d'appui « naturel » (calculé : le compromis appui et traînée qui donne le meilleur tour à la voiture de référence), énergie de freinage (refroidissement des freins), température et altitude (refroidissement).
 - Sur la fiche : « Réglage typique : appui faible, voiture haute (bosses) », **étiqueté comme indication**, jusqu'à ce que les réglages existent.

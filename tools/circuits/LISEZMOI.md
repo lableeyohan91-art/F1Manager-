@@ -50,3 +50,12 @@ pour les 5 circuits test par la chaîne ci-dessus (5 tours, modèle séparant ad
 
 `liste-validation.txt` : identifiant, meeting OpenF1, longueur et virages officiels, année. Même chaîne (collecte en qualifications,
 `construire_trace.py`), sortie dans `data/circuits/validation/`. Ces traces ne servent **jamais** au calage.
+
+## 6. Historique par édition, recoupement, fiches
+
+```
+python3 tools/circuits/historique_editions.py <dossier des CSV> <rc.json> cir_monza monza data/circuits/cir_monza.json
+python3 tools/circuits/recoupement_wikipedia.py data/circuits/cir_*.json      # présences dans le récit de la course (Wikipédia)
+npx tsx tools/circuits/fiches.mts > docs/rapports/phase-11b/fiches-5-circuits.md
+```
+(circuitRef : monza, monaco, suzuka, marina_bay, rodriguez ; CSV : https://raw.githubusercontent.com/TracingInsights/RaceData/main/data/)
