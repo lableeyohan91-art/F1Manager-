@@ -1,0 +1,4022 @@
+{
+ "cir_albert": {
+  "nom": "cir_albert",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 82.091,
+  "vmax": 323,
+  "vmin": 83,
+  "plein_pct": 57,
+  "frein_pct": 13,
+  "voie_stands_s": 18.6,
+  "longueurM": 5278,
+  "virages_officiels": 14,
+  "virages_detectes": 18,
+  "denivele_m": 2.4,
+  "plus_longue_droite_m": 638,
+  "lents": 5,
+  "moyens": 3,
+  "rapides": 10,
+  "elements": [
+   {
+    "debutM": 260,
+    "longueurM": 115,
+    "angleDeg": -57,
+    "rayonMinM": 69,
+    "vMinKmh": 155,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 385,
+    "longueurM": 170,
+    "angleDeg": 59,
+    "rayonMinM": 120,
+    "vMinKmh": 161,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 995,
+    "longueurM": 135,
+    "angleDeg": -114,
+    "rayonMinM": 37,
+    "vMinKmh": 98,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1145,
+    "longueurM": 150,
+    "angleDeg": 90,
+    "rayonMinM": 59,
+    "vMinKmh": 123,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1335,
+    "longueurM": 185,
+    "angleDeg": -61,
+    "rayonMinM": 107,
+    "vMinKmh": 210,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1815,
+    "longueurM": 85,
+    "angleDeg": -57,
+    "rayonMinM": 57,
+    "vMinKmh": 200,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2030,
+    "longueurM": 285,
+    "angleDeg": -64,
+    "rayonMinM": 167,
+    "vMinKmh": 257,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2340,
+    "longueurM": 90,
+    "angleDeg": -13,
+    "rayonMinM": 314,
+    "vMinKmh": 301,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2470,
+    "longueurM": 75,
+    "angleDeg": -13,
+    "rayonMinM": 238,
+    "vMinKmh": 316,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2695,
+    "longueurM": 155,
+    "angleDeg": 29,
+    "rayonMinM": 223,
+    "vMinKmh": 319,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2855,
+    "longueurM": 265,
+    "angleDeg": 38,
+    "rayonMinM": 304,
+    "vMinKmh": 309,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3230,
+    "longueurM": 115,
+    "angleDeg": 44,
+    "rayonMinM": 85,
+    "vMinKmh": 223,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3365,
+    "longueurM": 120,
+    "angleDeg": -45,
+    "rayonMinM": 90,
+    "vMinKmh": 216,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3645,
+    "longueurM": 165,
+    "angleDeg": -25,
+    "rayonMinM": 292,
+    "vMinKmh": 270,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4075,
+    "longueurM": 120,
+    "angleDeg": -85,
+    "rayonMinM": 39,
+    "vMinKmh": 113,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4335,
+    "longueurM": 170,
+    "angleDeg": -77,
+    "rayonMinM": 72,
+    "vMinKmh": 192,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4565,
+    "longueurM": 140,
+    "angleDeg": 119,
+    "rayonMinM": 34,
+    "vMinKmh": 84,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4710,
+    "longueurM": 190,
+    "angleDeg": -98,
+    "rayonMinM": 72,
+    "vMinKmh": 113,
+    "sens": "droite",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_austin": {
+  "nom": "cir_austin",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 97.976,
+  "vmax": 322,
+  "vmin": 76,
+  "plein_pct": 56,
+  "frein_pct": 18,
+  "voie_stands_s": 24.2,
+  "longueurM": 5513,
+  "virages_officiels": 20,
+  "virages_detectes": 17,
+  "denivele_m": 30.0,
+  "plus_longue_droite_m": 1055,
+  "lents": 6,
+  "moyens": 6,
+  "rapides": 5,
+  "elements": [
+   {
+    "debutM": 545,
+    "longueurM": 170,
+    "angleDeg": 153,
+    "rayonMinM": 28,
+    "vMinKmh": 81,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 740,
+    "longueurM": 260,
+    "angleDeg": -84,
+    "rayonMinM": 124,
+    "vMinKmh": 170,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1035,
+    "longueurM": 135,
+    "angleDeg": 31,
+    "rayonMinM": 136,
+    "vMinKmh": 260,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1190,
+    "longueurM": 80,
+    "angleDeg": -29,
+    "rayonMinM": 106,
+    "vMinKmh": 254,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1275,
+    "longueurM": 90,
+    "angleDeg": 44,
+    "rayonMinM": 83,
+    "vMinKmh": 238,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1375,
+    "longueurM": 230,
+    "angleDeg": -100,
+    "rayonMinM": 92,
+    "vMinKmh": 209,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1620,
+    "longueurM": 145,
+    "angleDeg": 74,
+    "rayonMinM": 65,
+    "vMinKmh": 183,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1780,
+    "longueurM": 125,
+    "angleDeg": -87,
+    "rayonMinM": 55,
+    "vMinKmh": 137,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1910,
+    "longueurM": 115,
+    "angleDeg": 52,
+    "rayonMinM": 65,
+    "vMinKmh": 141,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2065,
+    "longueurM": 155,
+    "angleDeg": 34,
+    "rayonMinM": 153,
+    "vMinKmh": 222,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2470,
+    "longueurM": 165,
+    "angleDeg": 149,
+    "rayonMinM": 28,
+    "vMinKmh": 76,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3690,
+    "longueurM": 155,
+    "angleDeg": 129,
+    "rayonMinM": 34,
+    "vMinKmh": 89,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3875,
+    "longueurM": 250,
+    "angleDeg": -196,
+    "rayonMinM": 38,
+    "vMinKmh": 99,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4135,
+    "longueurM": 210,
+    "angleDeg": 188,
+    "rayonMinM": 30,
+    "vMinKmh": 79,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4380,
+    "longueurM": 490,
+    "angleDeg": -185,
+    "rayonMinM": 98,
+    "vMinKmh": 175,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4940,
+    "longueurM": 165,
+    "angleDeg": 80,
+    "rayonMinM": 77,
+    "vMinKmh": 187,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 5240,
+    "longueurM": 175,
+    "angleDeg": 123,
+    "rayonMinM": 38,
+    "vMinKmh": 99,
+    "sens": "gauche",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_bakou": {
+  "nom": "cir_bakou",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 104.916,
+  "vmax": 326,
+  "vmin": 71,
+  "plein_pct": 60,
+  "frein_pct": 19,
+  "voie_stands_s": 20.6,
+  "longueurM": 6003,
+  "virages_officiels": 20,
+  "virages_detectes": 18,
+  "denivele_m": 26.7,
+  "plus_longue_droite_m": 1133,
+  "lents": 12,
+  "moyens": 0,
+  "rapides": 6,
+  "elements": [
+   {
+    "debutM": 200,
+    "longueurM": 120,
+    "angleDeg": 91,
+    "rayonMinM": 45,
+    "vMinKmh": 123,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 550,
+    "longueurM": 100,
+    "angleDeg": 86,
+    "rayonMinM": 36,
+    "vMinKmh": 102,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1430,
+    "longueurM": 95,
+    "angleDeg": 89,
+    "rayonMinM": 34,
+    "vMinKmh": 99,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1645,
+    "longueurM": 115,
+    "angleDeg": -92,
+    "rayonMinM": 37,
+    "vMinKmh": 89,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1985,
+    "longueurM": 90,
+    "angleDeg": 72,
+    "rayonMinM": 41,
+    "vMinKmh": 103,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2080,
+    "longueurM": 70,
+    "angleDeg": -68,
+    "rayonMinM": 36,
+    "vMinKmh": 91,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2455,
+    "longueurM": 110,
+    "angleDeg": -110,
+    "rayonMinM": 28,
+    "vMinKmh": 71,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2670,
+    "longueurM": 95,
+    "angleDeg": 64,
+    "rayonMinM": 51,
+    "vMinKmh": 126,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2775,
+    "longueurM": 65,
+    "angleDeg": -58,
+    "rayonMinM": 40,
+    "vMinKmh": 98,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2840,
+    "longueurM": 120,
+    "angleDeg": 90,
+    "rayonMinM": 33,
+    "vMinKmh": 108,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3225,
+    "longueurM": 115,
+    "angleDeg": 43,
+    "rayonMinM": 89,
+    "vMinKmh": 267,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3440,
+    "longueurM": 100,
+    "angleDeg": 18,
+    "rayonMinM": 235,
+    "vMinKmh": 269,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3685,
+    "longueurM": 80,
+    "angleDeg": 66,
+    "rayonMinM": 42,
+    "vMinKmh": 89,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4015,
+    "longueurM": 130,
+    "angleDeg": 92,
+    "rayonMinM": 42,
+    "vMinKmh": 123,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4225,
+    "longueurM": 125,
+    "angleDeg": -20,
+    "rayonMinM": 275,
+    "vMinKmh": 213,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4490,
+    "longueurM": 95,
+    "angleDeg": 29,
+    "rayonMinM": 129,
+    "vMinKmh": 287,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4650,
+    "longueurM": 90,
+    "angleDeg": -35,
+    "rayonMinM": 92,
+    "vMinKmh": 289,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4990,
+    "longueurM": 80,
+    "angleDeg": -13,
+    "rayonMinM": 280,
+    "vMinKmh": 319,
+    "sens": "droite",
+    "classe": "rapide"
+   }
+  ]
+ },
+ "cir_barcelone": {
+  "nom": "cir_barcelone",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 80.122,
+  "vmax": 327,
+  "vmin": 99,
+  "plein_pct": 37,
+  "frein_pct": 19,
+  "voie_stands_s": 22.7,
+  "longueurM": 4657,
+  "virages_officiels": 14,
+  "virages_detectes": 13,
+  "denivele_m": 29.6,
+  "plus_longue_droite_m": 917,
+  "lents": 3,
+  "moyens": 6,
+  "rapides": 4,
+  "elements": [
+   {
+    "debutM": 705,
+    "longueurM": 150,
+    "angleDeg": -79,
+    "rayonMinM": 52,
+    "vMinKmh": 140,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 865,
+    "longueurM": 100,
+    "angleDeg": 54,
+    "rayonMinM": 67,
+    "vMinKmh": 148,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 985,
+    "longueurM": 455,
+    "angleDeg": -158,
+    "rayonMinM": 106,
+    "vMinKmh": 187,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1595,
+    "longueurM": 305,
+    "angleDeg": -180,
+    "rayonMinM": 54,
+    "vMinKmh": 139,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2000,
+    "longueurM": 190,
+    "angleDeg": 152,
+    "rayonMinM": 35,
+    "vMinKmh": 99,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2280,
+    "longueurM": 140,
+    "angleDeg": 30,
+    "rayonMinM": 213,
+    "vMinKmh": 213,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2445,
+    "longueurM": 135,
+    "angleDeg": 84,
+    "rayonMinM": 58,
+    "vMinKmh": 137,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2585,
+    "longueurM": 75,
+    "angleDeg": -24,
+    "rayonMinM": 120,
+    "vMinKmh": 144,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2770,
+    "longueurM": 210,
+    "angleDeg": -91,
+    "rayonMinM": 87,
+    "vMinKmh": 208,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3405,
+    "longueurM": 240,
+    "angleDeg": 188,
+    "rayonMinM": 41,
+    "vMinKmh": 101,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3660,
+    "longueurM": 240,
+    "angleDeg": -172,
+    "rayonMinM": 46,
+    "vMinKmh": 116,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3970,
+    "longueurM": 185,
+    "angleDeg": -70,
+    "rayonMinM": 91,
+    "vMinKmh": 211,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4230,
+    "longueurM": 215,
+    "angleDeg": -87,
+    "rayonMinM": 95,
+    "vMinKmh": 222,
+    "sens": "droite",
+    "classe": "rapide"
+   }
+  ]
+ },
+ "cir_hungaroring": {
+  "nom": "cir_hungaroring",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 82.0,
+  "vmax": 286,
+  "vmin": 102,
+  "plein_pct": 35,
+  "frein_pct": 44,
+  "voie_stands_s": 22.0,
+  "longueurM": 4381,
+  "virages_officiels": 14,
+  "virages_detectes": 15,
+  "denivele_m": 9.7,
+  "plus_longue_droite_m": 801,
+  "lents": 5,
+  "moyens": 5,
+  "rapides": 5,
+  "elements": [
+   {
+    "debutM": 580,
+    "longueurM": 75,
+    "angleDeg": -70,
+    "rayonMinM": 37,
+    "vMinKmh": 118,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 705,
+    "longueurM": 75,
+    "angleDeg": -103,
+    "rayonMinM": 25,
+    "vMinKmh": 118,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1120,
+    "longueurM": 75,
+    "angleDeg": 122,
+    "rayonMinM": 21,
+    "vMinKmh": 128,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1430,
+    "longueurM": 65,
+    "angleDeg": -15,
+    "rayonMinM": 161,
+    "vMinKmh": 147,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1800,
+    "longueurM": 55,
+    "angleDeg": 17,
+    "rayonMinM": 131,
+    "vMinKmh": 147,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2180,
+    "longueurM": 75,
+    "angleDeg": -112,
+    "rayonMinM": 23,
+    "vMinKmh": 152,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2415,
+    "longueurM": 70,
+    "angleDeg": -36,
+    "rayonMinM": 71,
+    "vMinKmh": 176,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2625,
+    "longueurM": 70,
+    "angleDeg": 34,
+    "rayonMinM": 74,
+    "vMinKmh": 216,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2830,
+    "longueurM": 70,
+    "angleDeg": -44,
+    "rayonMinM": 57,
+    "vMinKmh": 215,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3050,
+    "longueurM": 65,
+    "angleDeg": 18,
+    "rayonMinM": 135,
+    "vMinKmh": 222,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3275,
+    "longueurM": 75,
+    "angleDeg": -46,
+    "rayonMinM": 56,
+    "vMinKmh": 257,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3380,
+    "longueurM": 60,
+    "angleDeg": -18,
+    "rayonMinM": 133,
+    "vMinKmh": 269,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3660,
+    "longueurM": 75,
+    "angleDeg": -48,
+    "rayonMinM": 53,
+    "vMinKmh": 118,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3845,
+    "longueurM": 75,
+    "angleDeg": 80,
+    "rayonMinM": 32,
+    "vMinKmh": 115,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4085,
+    "longueurM": 75,
+    "angleDeg": -101,
+    "rayonMinM": 25,
+    "vMinKmh": 131,
+    "sens": "droite",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_imola": {
+  "nom": "cir_imola",
+  "annee": 2025,
+  "session": "Race",
+  "duree": 77.988,
+  "vmax": 304,
+  "vmin": 98,
+  "plein_pct": 66,
+  "frein_pct": 18,
+  "voie_stands_s": 30.3,
+  "longueurM": 4909,
+  "virages_officiels": 19,
+  "virages_detectes": 13,
+  "denivele_m": 34.3,
+  "plus_longue_droite_m": 884,
+  "lents": 4,
+  "moyens": 4,
+  "rapides": 5,
+  "elements": [
+   {
+    "debutM": 830,
+    "longueurM": 75,
+    "angleDeg": 49,
+    "rayonMinM": 53,
+    "vMinKmh": 171,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 905,
+    "longueurM": 80,
+    "angleDeg": -35,
+    "rayonMinM": 76,
+    "vMinKmh": 171,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1015,
+    "longueurM": 110,
+    "angleDeg": 38,
+    "rayonMinM": 107,
+    "vMinKmh": 206,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1450,
+    "longueurM": 95,
+    "angleDeg": 33,
+    "rayonMinM": 111,
+    "vMinKmh": 248,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1555,
+    "longueurM": 95,
+    "angleDeg": -60,
+    "rayonMinM": 51,
+    "vMinKmh": 180,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1820,
+    "longueurM": 165,
+    "angleDeg": 145,
+    "rayonMinM": 34,
+    "vMinKmh": 101,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2450,
+    "longueurM": 290,
+    "angleDeg": 106,
+    "rayonMinM": 67,
+    "vMinKmh": 206,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2875,
+    "longueurM": 195,
+    "angleDeg": -112,
+    "rayonMinM": 46,
+    "vMinKmh": 130,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3490,
+    "longueurM": 60,
+    "angleDeg": -36,
+    "rayonMinM": 59,
+    "vMinKmh": 126,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3555,
+    "longueurM": 90,
+    "angleDeg": 59,
+    "rayonMinM": 45,
+    "vMinKmh": 98,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4095,
+    "longueurM": 110,
+    "angleDeg": -24,
+    "rayonMinM": 187,
+    "vMinKmh": 290,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4265,
+    "longueurM": 270,
+    "angleDeg": 181,
+    "rayonMinM": 43,
+    "vMinKmh": 117,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4755,
+    "longueurM": 100,
+    "angleDeg": -18,
+    "rayonMinM": 250,
+    "vMinKmh": 260,
+    "sens": "droite",
+    "classe": "rapide"
+   }
+  ]
+ },
+ "cir_interlagos": {
+  "nom": "cir_interlagos",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 72.689,
+  "vmax": 326,
+  "vmin": 85,
+  "plein_pct": 44,
+  "frein_pct": 20,
+  "voie_stands_s": 24.4,
+  "longueurM": 4309,
+  "virages_officiels": 15,
+  "virages_detectes": 9,
+  "denivele_m": 42.9,
+  "plus_longue_droite_m": 739,
+  "lents": 6,
+  "moyens": 3,
+  "rapides": 0,
+  "elements": [
+   {
+    "debutM": 210,
+    "longueurM": 160,
+    "angleDeg": 110,
+    "rayonMinM": 41,
+    "vMinKmh": 104,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 375,
+    "longueurM": 85,
+    "angleDeg": -58,
+    "rayonMinM": 53,
+    "vMinKmh": 124,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 470,
+    "longueurM": 295,
+    "angleDeg": 94,
+    "rayonMinM": 134,
+    "vMinKmh": 170,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1295,
+    "longueurM": 390,
+    "angleDeg": 159,
+    "rayonMinM": 63,
+    "vMinKmh": 150,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1930,
+    "longueurM": 445,
+    "angleDeg": -258,
+    "rayonMinM": 33,
+    "vMinKmh": 86,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2380,
+    "longueurM": 175,
+    "angleDeg": 155,
+    "rayonMinM": 38,
+    "vMinKmh": 108,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2575,
+    "longueurM": 240,
+    "angleDeg": -182,
+    "rayonMinM": 28,
+    "vMinKmh": 85,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2830,
+    "longueurM": 255,
+    "angleDeg": 109,
+    "rayonMinM": 77,
+    "vMinKmh": 150,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3165,
+    "longueurM": 615,
+    "angleDeg": 194,
+    "rayonMinM": 48,
+    "vMinKmh": 114,
+    "sens": "gauche",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_jeddah": {
+  "nom": "cir_jeddah",
+  "annee": 2025,
+  "session": "Race",
+  "duree": 91.778,
+  "vmax": 326,
+  "vmin": 75,
+  "plein_pct": 65,
+  "frein_pct": 13,
+  "voie_stands_s": 20.6,
+  "longueurM": 6174,
+  "virages_officiels": 27,
+  "virages_detectes": 21,
+  "denivele_m": 2.3,
+  "plus_longue_droite_m": 919,
+  "lents": 3,
+  "moyens": 8,
+  "rapides": 10,
+  "elements": [
+   {
+    "debutM": 380,
+    "longueurM": 95,
+    "angleDeg": 69,
+    "rayonMinM": 42,
+    "vMinKmh": 110,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 475,
+    "longueurM": 105,
+    "angleDeg": -96,
+    "rayonMinM": 30,
+    "vMinKmh": 75,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 610,
+    "longueurM": 85,
+    "angleDeg": 16,
+    "rayonMinM": 230,
+    "vMinKmh": 162,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 910,
+    "longueurM": 80,
+    "angleDeg": 55,
+    "rayonMinM": 49,
+    "vMinKmh": 159,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 995,
+    "longueurM": 195,
+    "angleDeg": -86,
+    "rayonMinM": 92,
+    "vMinKmh": 160,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1200,
+    "longueurM": 185,
+    "angleDeg": 78,
+    "rayonMinM": 74,
+    "vMinKmh": 234,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1385,
+    "longueurM": 240,
+    "angleDeg": -110,
+    "rayonMinM": 61,
+    "vMinKmh": 211,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1635,
+    "longueurM": 95,
+    "angleDeg": 46,
+    "rayonMinM": 75,
+    "vMinKmh": 214,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2235,
+    "longueurM": 380,
+    "angleDeg": 205,
+    "rayonMinM": 47,
+    "vMinKmh": 142,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2635,
+    "longueurM": 260,
+    "angleDeg": -54,
+    "rayonMinM": 190,
+    "vMinKmh": 236,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3020,
+    "longueurM": 85,
+    "angleDeg": -58,
+    "rayonMinM": 55,
+    "vMinKmh": 181,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3110,
+    "longueurM": 160,
+    "angleDeg": 70,
+    "rayonMinM": 60,
+    "vMinKmh": 189,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3275,
+    "longueurM": 140,
+    "angleDeg": 20,
+    "rayonMinM": 321,
+    "vMinKmh": 245,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3485,
+    "longueurM": 130,
+    "angleDeg": -17,
+    "rayonMinM": 380,
+    "vMinKmh": 287,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3680,
+    "longueurM": 170,
+    "angleDeg": 25,
+    "rayonMinM": 299,
+    "vMinKmh": 305,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3885,
+    "longueurM": 170,
+    "angleDeg": -24,
+    "rayonMinM": 310,
+    "vMinKmh": 306,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4225,
+    "longueurM": 100,
+    "angleDeg": 57,
+    "rayonMinM": 61,
+    "vMinKmh": 172,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4335,
+    "longueurM": 240,
+    "angleDeg": -75,
+    "rayonMinM": 90,
+    "vMinKmh": 191,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4670,
+    "longueurM": 230,
+    "angleDeg": 35,
+    "rayonMinM": 300,
+    "vMinKmh": 285,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 5040,
+    "longueurM": 205,
+    "angleDeg": 28,
+    "rayonMinM": 331,
+    "vMinKmh": 307,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 5485,
+    "longueurM": 150,
+    "angleDeg": 138,
+    "rayonMinM": 39,
+    "vMinKmh": 103,
+    "sens": "gauche",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_lasvegas": {
+  "nom": "cir_lasvegas",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 95.591,
+  "vmax": 349,
+  "vmin": 92,
+  "plein_pct": 63,
+  "frein_pct": 18,
+  "voie_stands_s": 22.2,
+  "longueurM": 6201,
+  "virages_officiels": 17,
+  "virages_detectes": 13,
+  "denivele_m": 16.0,
+  "plus_longue_droite_m": 1855,
+  "lents": 8,
+  "moyens": 2,
+  "rapides": 3,
+  "elements": [
+   {
+    "debutM": 180,
+    "longueurM": 245,
+    "angleDeg": 174,
+    "rayonMinM": 47,
+    "vMinKmh": 112,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 435,
+    "longueurM": 265,
+    "angleDeg": -127,
+    "rayonMinM": 73,
+    "vMinKmh": 190,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1450,
+    "longueurM": 135,
+    "angleDeg": -91,
+    "rayonMinM": 44,
+    "vMinKmh": 107,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1695,
+    "longueurM": 335,
+    "angleDeg": 145,
+    "rayonMinM": 48,
+    "vMinKmh": 105,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2035,
+    "longueurM": 85,
+    "angleDeg": -83,
+    "rayonMinM": 39,
+    "vMinKmh": 97,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2125,
+    "longueurM": 125,
+    "angleDeg": 117,
+    "rayonMinM": 35,
+    "vMinKmh": 93,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2510,
+    "longueurM": 290,
+    "angleDeg": -63,
+    "rayonMinM": 182,
+    "vMinKmh": 259,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2875,
+    "longueurM": 230,
+    "angleDeg": 51,
+    "rayonMinM": 205,
+    "vMinKmh": 259,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3135,
+    "longueurM": 100,
+    "angleDeg": 83,
+    "rayonMinM": 38,
+    "vMinKmh": 97,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5090,
+    "longueurM": 105,
+    "angleDeg": 69,
+    "rayonMinM": 50,
+    "vMinKmh": 92,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5200,
+    "longueurM": 40,
+    "angleDeg": -14,
+    "rayonMinM": 114,
+    "vMinKmh": 103,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5245,
+    "longueurM": 90,
+    "angleDeg": 33,
+    "rayonMinM": 93,
+    "vMinKmh": 143,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 5985,
+    "longueurM": 175,
+    "angleDeg": 43,
+    "rayonMinM": 171,
+    "vMinKmh": 307,
+    "sens": "gauche",
+    "classe": "rapide"
+   }
+  ]
+ },
+ "cir_lusail": {
+  "nom": "cir_lusail",
+  "annee": 2025,
+  "session": "Race",
+  "duree": 82.996,
+  "vmax": 310,
+  "vmin": 95,
+  "plein_pct": 59,
+  "frein_pct": 13,
+  "voie_stands_s": 28.8,
+  "longueurM": 5419,
+  "virages_officiels": 16,
+  "virages_detectes": 13,
+  "denivele_m": 4.2,
+  "plus_longue_droite_m": 949,
+  "lents": 1,
+  "moyens": 5,
+  "rapides": 7,
+  "elements": [
+   {
+    "debutM": 645,
+    "longueurM": 240,
+    "angleDeg": -148,
+    "rayonMinM": 61,
+    "vMinKmh": 157,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 980,
+    "longueurM": 195,
+    "angleDeg": 123,
+    "rayonMinM": 61,
+    "vMinKmh": 173,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1245,
+    "longueurM": 140,
+    "angleDeg": -40,
+    "rayonMinM": 127,
+    "vMinKmh": 226,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1645,
+    "longueurM": 335,
+    "angleDeg": -182,
+    "rayonMinM": 65,
+    "vMinKmh": 206,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2105,
+    "longueurM": 170,
+    "angleDeg": 151,
+    "rayonMinM": 30,
+    "vMinKmh": 95,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2485,
+    "longueurM": 225,
+    "angleDeg": -154,
+    "rayonMinM": 55,
+    "vMinKmh": 146,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2730,
+    "longueurM": 140,
+    "angleDeg": 25,
+    "rayonMinM": 268,
+    "vMinKmh": 203,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2885,
+    "longueurM": 145,
+    "angleDeg": -60,
+    "rayonMinM": 82,
+    "vMinKmh": 250,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3080,
+    "longueurM": 450,
+    "angleDeg": 172,
+    "rayonMinM": 53,
+    "vMinKmh": 148,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3715,
+    "longueurM": 370,
+    "angleDeg": -130,
+    "rayonMinM": 100,
+    "vMinKmh": 280,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4145,
+    "longueurM": 150,
+    "angleDeg": -66,
+    "rayonMinM": 71,
+    "vMinKmh": 266,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4445,
+    "longueurM": 185,
+    "angleDeg": 74,
+    "rayonMinM": 77,
+    "vMinKmh": 249,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4905,
+    "longueurM": 210,
+    "angleDeg": -122,
+    "rayonMinM": 65,
+    "vMinKmh": 159,
+    "sens": "droite",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_madrid": {
+  "nom": "cir_madrid",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 95.587,
+  "vmax": 330,
+  "vmin": 75,
+  "plein_pct": 46,
+  "frein_pct": 18,
+  "voie_stands_s": 31.4,
+  "longueurM": 5414,
+  "virages_officiels": 22,
+  "virages_detectes": 23,
+  "denivele_m": 24.2,
+  "plus_longue_droite_m": 525,
+  "lents": 10,
+  "moyens": 5,
+  "rapides": 8,
+  "elements": [
+   {
+    "debutM": 355,
+    "longueurM": 85,
+    "angleDeg": 55,
+    "rayonMinM": 52,
+    "vMinKmh": 121,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 445,
+    "longueurM": 245,
+    "angleDeg": -120,
+    "rayonMinM": 47,
+    "vMinKmh": 103,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1215,
+    "longueurM": 245,
+    "angleDeg": -36,
+    "rayonMinM": 289,
+    "vMinKmh": 222,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1480,
+    "longueurM": 50,
+    "angleDeg": 28,
+    "rayonMinM": 71,
+    "vMinKmh": 120,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1570,
+    "longueurM": 50,
+    "angleDeg": 18,
+    "rayonMinM": 110,
+    "vMinKmh": 117,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1715,
+    "longueurM": 70,
+    "angleDeg": -13,
+    "rayonMinM": 240,
+    "vMinKmh": 213,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1855,
+    "longueurM": 65,
+    "angleDeg": -65,
+    "rayonMinM": 34,
+    "vMinKmh": 82,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1920,
+    "longueurM": 85,
+    "angleDeg": 64,
+    "rayonMinM": 51,
+    "vMinKmh": 87,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2020,
+    "longueurM": 90,
+    "angleDeg": -22,
+    "rayonMinM": 160,
+    "vMinKmh": 165,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2125,
+    "longueurM": 150,
+    "angleDeg": -53,
+    "rayonMinM": 84,
+    "vMinKmh": 210,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2285,
+    "longueurM": 125,
+    "angleDeg": 71,
+    "rayonMinM": 71,
+    "vMinKmh": 200,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2470,
+    "longueurM": 565,
+    "angleDeg": -238,
+    "rayonMinM": 93,
+    "vMinKmh": 226,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3190,
+    "longueurM": 160,
+    "angleDeg": 90,
+    "rayonMinM": 49,
+    "vMinKmh": 143,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3410,
+    "longueurM": 125,
+    "angleDeg": -49,
+    "rayonMinM": 96,
+    "vMinKmh": 197,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3575,
+    "longueurM": 225,
+    "angleDeg": 80,
+    "rayonMinM": 105,
+    "vMinKmh": 252,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3825,
+    "longueurM": 115,
+    "angleDeg": 28,
+    "rayonMinM": 126,
+    "vMinKmh": 188,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3945,
+    "longueurM": 105,
+    "angleDeg": -81,
+    "rayonMinM": 38,
+    "vMinKmh": 99,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4165,
+    "longueurM": 125,
+    "angleDeg": 67,
+    "rayonMinM": 69,
+    "vMinKmh": 208,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4310,
+    "longueurM": 220,
+    "angleDeg": -86,
+    "rayonMinM": 93,
+    "vMinKmh": 214,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4715,
+    "longueurM": 95,
+    "angleDeg": 101,
+    "rayonMinM": 29,
+    "vMinKmh": 75,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4815,
+    "longueurM": 50,
+    "angleDeg": -15,
+    "rayonMinM": 124,
+    "vMinKmh": 92,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4875,
+    "longueurM": 145,
+    "angleDeg": -84,
+    "rayonMinM": 45,
+    "vMinKmh": 116,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5145,
+    "longueurM": 150,
+    "angleDeg": -88,
+    "rayonMinM": 44,
+    "vMinKmh": 130,
+    "sens": "droite",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_mexico": {
+  "nom": "cir_mexico",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 79.268,
+  "vmax": 352,
+  "vmin": 65,
+  "plein_pct": 34,
+  "frein_pct": 25,
+  "voie_stands_s": 22.9,
+  "longueurM": 4304,
+  "virages_officiels": 17,
+  "virages_detectes": 15,
+  "denivele_m": 2.6,
+  "plus_longue_droite_m": 1159,
+  "lents": 9,
+  "moyens": 6,
+  "rapides": 0,
+  "elements": [
+   {
+    "debutM": 1105,
+    "longueurM": 130,
+    "angleDeg": -84,
+    "rayonMinM": 53,
+    "vMinKmh": 97,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1235,
+    "longueurM": 60,
+    "angleDeg": 47,
+    "rayonMinM": 49,
+    "vMinKmh": 98,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1300,
+    "longueurM": 185,
+    "angleDeg": -74,
+    "rayonMinM": 49,
+    "vMinKmh": 103,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1965,
+    "longueurM": 100,
+    "angleDeg": 83,
+    "rayonMinM": 39,
+    "vMinKmh": 79,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2070,
+    "longueurM": 90,
+    "angleDeg": -103,
+    "rayonMinM": 29,
+    "vMinKmh": 74,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2185,
+    "longueurM": 145,
+    "angleDeg": -135,
+    "rayonMinM": 35,
+    "vMinKmh": 77,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2510,
+    "longueurM": 130,
+    "angleDeg": 62,
+    "rayonMinM": 75,
+    "vMinKmh": 157,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2650,
+    "longueurM": 70,
+    "angleDeg": -19,
+    "rayonMinM": 162,
+    "vMinKmh": 172,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2735,
+    "longueurM": 140,
+    "angleDeg": 53,
+    "rayonMinM": 115,
+    "vMinKmh": 197,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2895,
+    "longueurM": 130,
+    "angleDeg": -62,
+    "rayonMinM": 79,
+    "vMinKmh": 160,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3035,
+    "longueurM": 200,
+    "angleDeg": 48,
+    "rayonMinM": 107,
+    "vMinKmh": 171,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3570,
+    "longueurM": 150,
+    "angleDeg": -85,
+    "rayonMinM": 61,
+    "vMinKmh": 131,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3745,
+    "longueurM": 110,
+    "angleDeg": 120,
+    "rayonMinM": 27,
+    "vMinKmh": 65,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3860,
+    "longueurM": 60,
+    "angleDeg": -36,
+    "rayonMinM": 64,
+    "vMinKmh": 74,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3945,
+    "longueurM": 305,
+    "angleDeg": -175,
+    "rayonMinM": 38,
+    "vMinKmh": 97,
+    "sens": "droite",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_miami": {
+  "nom": "cir_miami",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 91.869,
+  "vmax": 331,
+  "vmin": 64,
+  "plein_pct": 49,
+  "frein_pct": 17,
+  "voie_stands_s": 23.1,
+  "longueurM": 5412,
+  "virages_officiels": 19,
+  "virages_detectes": 16,
+  "denivele_m": 3.2,
+  "plus_longue_droite_m": 1195,
+  "lents": 9,
+  "moyens": 2,
+  "rapides": 5,
+  "elements": [
+   {
+    "debutM": 270,
+    "longueurM": 120,
+    "angleDeg": -103,
+    "rayonMinM": 35,
+    "vMinKmh": 91,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 400,
+    "longueurM": 80,
+    "angleDeg": 37,
+    "rayonMinM": 83,
+    "vMinKmh": 111,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 485,
+    "longueurM": 340,
+    "angleDeg": -115,
+    "rayonMinM": 95,
+    "vMinKmh": 155,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1020,
+    "longueurM": 150,
+    "angleDeg": 55,
+    "rayonMinM": 112,
+    "vMinKmh": 238,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1180,
+    "longueurM": 135,
+    "angleDeg": -65,
+    "rayonMinM": 83,
+    "vMinKmh": 208,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1325,
+    "longueurM": 345,
+    "angleDeg": 216,
+    "rayonMinM": 47,
+    "vMinKmh": 114,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2105,
+    "longueurM": 90,
+    "angleDeg": -17,
+    "rayonMinM": 233,
+    "vMinKmh": 312,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2335,
+    "longueurM": 115,
+    "angleDeg": 14,
+    "rayonMinM": 386,
+    "vMinKmh": 325,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3005,
+    "longueurM": 140,
+    "angleDeg": 107,
+    "rayonMinM": 35,
+    "vMinKmh": 88,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3150,
+    "longueurM": 145,
+    "angleDeg": -131,
+    "rayonMinM": 46,
+    "vMinKmh": 92,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3300,
+    "longueurM": 130,
+    "angleDeg": 107,
+    "rayonMinM": 40,
+    "vMinKmh": 94,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3435,
+    "longueurM": 50,
+    "angleDeg": -38,
+    "rayonMinM": 50,
+    "vMinKmh": 88,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3490,
+    "longueurM": 115,
+    "angleDeg": 104,
+    "rayonMinM": 32,
+    "vMinKmh": 70,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4800,
+    "longueurM": 150,
+    "angleDeg": 153,
+    "rayonMinM": 27,
+    "vMinKmh": 64,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4970,
+    "longueurM": 125,
+    "angleDeg": 55,
+    "rayonMinM": 80,
+    "vMinKmh": 133,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 5125,
+    "longueurM": 255,
+    "angleDeg": -56,
+    "rayonMinM": 189,
+    "vMinKmh": 231,
+    "sens": "droite",
+    "classe": "rapide"
+   }
+  ]
+ },
+ "cir_monaco": {
+  "nom": "cir_monaco",
+  "annee": 2026,
+  "session": "Qualifying",
+  "duree": 72.051,
+  "vmax": 289,
+  "vmin": 44,
+  "plein_pct": 37,
+  "frein_pct": 29,
+  "voie_stands_s": 23.4,
+  "longueurM": 3337,
+  "virages_officiels": 19,
+  "virages_detectes": 17,
+  "denivele_m": 41.4,
+  "plus_longue_droite_m": 215,
+  "lents": 8,
+  "moyens": 5,
+  "rapides": 4,
+  "elements": [
+   {
+    "debutM": 0,
+    "longueurM": 220,
+    "angleDeg": -85,
+    "rayonMinM": 46,
+    "vMinKmh": 112,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 435,
+    "longueurM": 60,
+    "angleDeg": 17,
+    "rayonMinM": 151,
+    "vMinKmh": 254,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 515,
+    "longueurM": 80,
+    "angleDeg": -16,
+    "rayonMinM": 224,
+    "vMinKmh": 263,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 615,
+    "longueurM": 205,
+    "angleDeg": 117,
+    "rayonMinM": 69,
+    "vMinKmh": 157,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 830,
+    "longueurM": 115,
+    "angleDeg": -75,
+    "rayonMinM": 49,
+    "vMinKmh": 139,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1025,
+    "longueurM": 125,
+    "angleDeg": -124,
+    "rayonMinM": 26,
+    "vMinKmh": 75,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1155,
+    "longueurM": 110,
+    "angleDeg": 193,
+    "rayonMinM": 16,
+    "vMinKmh": 46,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1270,
+    "longueurM": 190,
+    "angleDeg": -217,
+    "rayonMinM": 29,
+    "vMinKmh": 73,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1635,
+    "longueurM": 145,
+    "angleDeg": -40,
+    "rayonMinM": 143,
+    "vMinKmh": 245,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1885,
+    "longueurM": 120,
+    "angleDeg": -16,
+    "rayonMinM": 334,
+    "vMinKmh": 283,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2025,
+    "longueurM": 50,
+    "angleDeg": 28,
+    "rayonMinM": 66,
+    "vMinKmh": 120,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2080,
+    "longueurM": 50,
+    "angleDeg": -38,
+    "rayonMinM": 48,
+    "vMinKmh": 69,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2305,
+    "longueurM": 230,
+    "angleDeg": 114,
+    "rayonMinM": 66,
+    "vMinKmh": 169,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2540,
+    "longueurM": 155,
+    "angleDeg": -47,
+    "rayonMinM": 79,
+    "vMinKmh": 144,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2700,
+    "longueurM": 150,
+    "angleDeg": 75,
+    "rayonMinM": 62,
+    "vMinKmh": 122,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2855,
+    "longueurM": 175,
+    "angleDeg": -217,
+    "rayonMinM": 24,
+    "vMinKmh": 60,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3080,
+    "longueurM": 70,
+    "angleDeg": -14,
+    "rayonMinM": 226,
+    "vMinKmh": 166,
+    "sens": "droite",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_montreal": {
+  "nom": "cir_montreal",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 74.21,
+  "vmax": 327,
+  "vmin": 61,
+  "plein_pct": 60,
+  "frein_pct": 20,
+  "voie_stands_s": 24.9,
+  "longueurM": 4361,
+  "virages_officiels": 14,
+  "virages_detectes": 13,
+  "denivele_m": 5.2,
+  "plus_longue_droite_m": 990,
+  "lents": 4,
+  "moyens": 8,
+  "rapides": 1,
+  "elements": [
+   {
+    "debutM": 120,
+    "longueurM": 105,
+    "angleDeg": 58,
+    "rayonMinM": 62,
+    "vMinKmh": 146,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 230,
+    "longueurM": 270,
+    "angleDeg": -178,
+    "rayonMinM": 30,
+    "vMinKmh": 79,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 595,
+    "longueurM": 95,
+    "angleDeg": -49,
+    "rayonMinM": 65,
+    "vMinKmh": 142,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 695,
+    "longueurM": 80,
+    "angleDeg": 37,
+    "rayonMinM": 78,
+    "vMinKmh": 142,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 895,
+    "longueurM": 170,
+    "angleDeg": -51,
+    "rayonMinM": 124,
+    "vMinKmh": 239,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1115,
+    "longueurM": 115,
+    "angleDeg": 88,
+    "rayonMinM": 42,
+    "vMinKmh": 96,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1235,
+    "longueurM": 150,
+    "angleDeg": -78,
+    "rayonMinM": 65,
+    "vMinKmh": 105,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1900,
+    "longueurM": 80,
+    "angleDeg": -52,
+    "rayonMinM": 51,
+    "vMinKmh": 135,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1985,
+    "longueurM": 115,
+    "angleDeg": 50,
+    "rayonMinM": 79,
+    "vMinKmh": 133,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2580,
+    "longueurM": 150,
+    "angleDeg": -185,
+    "rayonMinM": 21,
+    "vMinKmh": 61,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2745,
+    "longueurM": 75,
+    "angleDeg": 15,
+    "rayonMinM": 220,
+    "vMinKmh": 162,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3810,
+    "longueurM": 75,
+    "angleDeg": -34,
+    "rayonMinM": 76,
+    "vMinKmh": 138,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3885,
+    "longueurM": 105,
+    "angleDeg": 37,
+    "rayonMinM": 89,
+    "vMinKmh": 138,
+    "sens": "gauche",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_monza": {
+  "nom": "cir_monza",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 83.504,
+  "vmax": 330,
+  "vmin": 71,
+  "plein_pct": 70,
+  "frein_pct": 11,
+  "voie_stands_s": 24.9,
+  "longueurM": 5793,
+  "virages_officiels": 11,
+  "virages_detectes": 12,
+  "denivele_m": 12.4,
+  "plus_longue_droite_m": 1123,
+  "lents": 4,
+  "moyens": 5,
+  "rapides": 3,
+  "elements": [
+   {
+    "debutM": 815,
+    "longueurM": 75,
+    "angleDeg": -49,
+    "rayonMinM": 48,
+    "vMinKmh": 86,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 890,
+    "longueurM": 80,
+    "angleDeg": 69,
+    "rayonMinM": 37,
+    "vMinKmh": 71,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1200,
+    "longueurM": 245,
+    "angleDeg": -43,
+    "rayonMinM": 207,
+    "vMinKmh": 269,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1470,
+    "longueurM": 185,
+    "angleDeg": -29,
+    "rayonMinM": 253,
+    "vMinKmh": 298,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2025,
+    "longueurM": 85,
+    "angleDeg": 46,
+    "rayonMinM": 62,
+    "vMinKmh": 114,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2115,
+    "longueurM": 75,
+    "angleDeg": -37,
+    "rayonMinM": 70,
+    "vMinKmh": 111,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2395,
+    "longueurM": 215,
+    "angleDeg": -101,
+    "rayonMinM": 76,
+    "vMinKmh": 199,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2755,
+    "longueurM": 140,
+    "angleDeg": -66,
+    "rayonMinM": 74,
+    "vMinKmh": 177,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3845,
+    "longueurM": 95,
+    "angleDeg": 45,
+    "rayonMinM": 75,
+    "vMinKmh": 187,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3950,
+    "longueurM": 110,
+    "angleDeg": -38,
+    "rayonMinM": 123,
+    "vMinKmh": 187,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4070,
+    "longueurM": 105,
+    "angleDeg": 34,
+    "rayonMinM": 115,
+    "vMinKmh": 233,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 5030,
+    "longueurM": 455,
+    "angleDeg": -168,
+    "rayonMinM": 78,
+    "vMinKmh": 194,
+    "sens": "droite",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_sakhir": {
+  "nom": "cir_sakhir",
+  "annee": 2025,
+  "session": "Race",
+  "duree": 95.14,
+  "vmax": 298,
+  "vmin": 66,
+  "plein_pct": 48,
+  "frein_pct": 20,
+  "voie_stands_s": 24.8,
+  "longueurM": 5412,
+  "virages_officiels": 15,
+  "virages_detectes": 13,
+  "denivele_m": 16.4,
+  "plus_longue_droite_m": 987,
+  "lents": 6,
+  "moyens": 6,
+  "rapides": 1,
+  "elements": [
+   {
+    "debutM": 635,
+    "longueurM": 120,
+    "angleDeg": -131,
+    "rayonMinM": 26,
+    "vMinKmh": 66,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 760,
+    "longueurM": 105,
+    "angleDeg": 57,
+    "rayonMinM": 64,
+    "vMinKmh": 89,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 880,
+    "longueurM": 120,
+    "angleDeg": -26,
+    "rayonMinM": 156,
+    "vMinKmh": 182,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1420,
+    "longueurM": 190,
+    "angleDeg": -132,
+    "rayonMinM": 44,
+    "vMinKmh": 113,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1655,
+    "longueurM": 115,
+    "angleDeg": 19,
+    "rayonMinM": 255,
+    "vMinKmh": 190,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1795,
+    "longueurM": 120,
+    "angleDeg": -55,
+    "rayonMinM": 88,
+    "vMinKmh": 181,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1925,
+    "longueurM": 165,
+    "angleDeg": 56,
+    "rayonMinM": 122,
+    "vMinKmh": 183,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2135,
+    "longueurM": 195,
+    "angleDeg": -159,
+    "rayonMinM": 29,
+    "vMinKmh": 75,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2505,
+    "longueurM": 260,
+    "angleDeg": 182,
+    "rayonMinM": 29,
+    "vMinKmh": 74,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3335,
+    "longueurM": 315,
+    "angleDeg": 159,
+    "rayonMinM": 59,
+    "vMinKmh": 147,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3670,
+    "longueurM": 270,
+    "angleDeg": -93,
+    "rayonMinM": 125,
+    "vMinKmh": 234,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3990,
+    "longueurM": 220,
+    "angleDeg": -125,
+    "rayonMinM": 62,
+    "vMinKmh": 133,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4830,
+    "longueurM": 230,
+    "angleDeg": -123,
+    "rayonMinM": 49,
+    "vMinKmh": 122,
+    "sens": "droite",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_sepang": {
+  "nom": "cir_sepang",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 98.22,
+  "vmax": 325,
+  "vmin": 68,
+  "plein_pct": 50,
+  "frein_pct": 20,
+  "voie_stands_s": 28.2,
+  "longueurM": 5543,
+  "virages_officiels": 15,
+  "virages_detectes": 13,
+  "denivele_m": 21.5,
+  "plus_longue_droite_m": 843,
+  "lents": 8,
+  "moyens": 1,
+  "rapides": 4,
+  "elements": [
+   {
+    "debutM": 525,
+    "longueurM": 170,
+    "angleDeg": -196,
+    "rayonMinM": 31,
+    "vMinKmh": 68,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 700,
+    "longueurM": 105,
+    "angleDeg": 135,
+    "rayonMinM": 28,
+    "vMinKmh": 74,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 810,
+    "longueurM": 365,
+    "angleDeg": -105,
+    "rayonMinM": 110,
+    "vMinKmh": 115,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1485,
+    "longueurM": 145,
+    "angleDeg": -107,
+    "rayonMinM": 42,
+    "vMinKmh": 103,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1730,
+    "longueurM": 160,
+    "angleDeg": 51,
+    "rayonMinM": 86,
+    "vMinKmh": 214,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1900,
+    "longueurM": 150,
+    "angleDeg": 70,
+    "rayonMinM": 85,
+    "vMinKmh": 235,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2060,
+    "longueurM": 220,
+    "angleDeg": -92,
+    "rayonMinM": 100,
+    "vMinKmh": 232,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2470,
+    "longueurM": 265,
+    "angleDeg": -127,
+    "rayonMinM": 73,
+    "vMinKmh": 181,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3065,
+    "longueurM": 130,
+    "angleDeg": 140,
+    "rayonMinM": 26,
+    "vMinKmh": 75,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3210,
+    "longueurM": 365,
+    "angleDeg": -190,
+    "rayonMinM": 54,
+    "vMinKmh": 119,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3740,
+    "longueurM": 170,
+    "angleDeg": 67,
+    "rayonMinM": 101,
+    "vMinKmh": 255,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3925,
+    "longueurM": 340,
+    "angleDeg": -194,
+    "rayonMinM": 46,
+    "vMinKmh": 98,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5030,
+    "longueurM": 195,
+    "angleDeg": 175,
+    "rayonMinM": 38,
+    "vMinKmh": 75,
+    "sens": "gauche",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_shanghai": {
+  "nom": "cir_shanghai",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 95.275,
+  "vmax": 321,
+  "vmin": 65,
+  "plein_pct": 50,
+  "frein_pct": 22,
+  "voie_stands_s": 23.3,
+  "longueurM": 5451,
+  "virages_officiels": 16,
+  "virages_detectes": 11,
+  "denivele_m": 6.9,
+  "plus_longue_droite_m": 1160,
+  "lents": 7,
+  "moyens": 2,
+  "rapides": 2,
+  "elements": [
+   {
+    "debutM": 460,
+    "longueurM": 365,
+    "angleDeg": -295,
+    "rayonMinM": 34,
+    "vMinKmh": 97,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 825,
+    "longueurM": 240,
+    "angleDeg": 233,
+    "rayonMinM": 30,
+    "vMinKmh": 93,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1285,
+    "longueurM": 80,
+    "angleDeg": -21,
+    "rayonMinM": 147,
+    "vMinKmh": 271,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1525,
+    "longueurM": 210,
+    "angleDeg": -167,
+    "rayonMinM": 23,
+    "vMinKmh": 79,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1885,
+    "longueurM": 305,
+    "angleDeg": 122,
+    "rayonMinM": 119,
+    "vMinKmh": 246,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2235,
+    "longueurM": 225,
+    "angleDeg": -127,
+    "rayonMinM": 82,
+    "vMinKmh": 180,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2485,
+    "longueurM": 215,
+    "angleDeg": 184,
+    "rayonMinM": 31,
+    "vMinKmh": 115,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3090,
+    "longueurM": 80,
+    "angleDeg": 102,
+    "rayonMinM": 27,
+    "vMinKmh": 90,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3170,
+    "longueurM": 420,
+    "angleDeg": -280,
+    "rayonMinM": 36,
+    "vMinKmh": 109,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4750,
+    "longueurM": 165,
+    "angleDeg": -176,
+    "rayonMinM": 19,
+    "vMinKmh": 65,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5125,
+    "longueurM": 85,
+    "angleDeg": 68,
+    "rayonMinM": 40,
+    "vMinKmh": 148,
+    "sens": "gauche",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_silverstone": {
+  "nom": "cir_silverstone",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 91.777,
+  "vmax": 302,
+  "vmin": 80,
+  "plein_pct": 60,
+  "frein_pct": 14,
+  "voie_stands_s": 29.2,
+  "longueurM": 5891,
+  "virages_officiels": 18,
+  "virages_detectes": 15,
+  "denivele_m": 11.2,
+  "plus_longue_droite_m": 625,
+  "lents": 5,
+  "moyens": 1,
+  "rapides": 9,
+  "elements": [
+   {
+    "debutM": 285,
+    "longueurM": 210,
+    "angleDeg": -59,
+    "rayonMinM": 123,
+    "vMinKmh": 277,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 520,
+    "longueurM": 190,
+    "angleDeg": 50,
+    "rayonMinM": 149,
+    "vMinKmh": 269,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 785,
+    "longueurM": 155,
+    "angleDeg": -121,
+    "rayonMinM": 45,
+    "vMinKmh": 104,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 945,
+    "longueurM": 380,
+    "angleDeg": 221,
+    "rayonMinM": 31,
+    "vMinKmh": 80,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1835,
+    "longueurM": 215,
+    "angleDeg": 122,
+    "rayonMinM": 60,
+    "vMinKmh": 155,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2060,
+    "longueurM": 600,
+    "angleDeg": -253,
+    "rayonMinM": 40,
+    "vMinKmh": 106,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2965,
+    "longueurM": 245,
+    "angleDeg": -79,
+    "rayonMinM": 130,
+    "vMinKmh": 270,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3480,
+    "longueurM": 135,
+    "angleDeg": 17,
+    "rayonMinM": 396,
+    "vMinKmh": 283,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3650,
+    "longueurM": 110,
+    "angleDeg": -33,
+    "rayonMinM": 125,
+    "vMinKmh": 270,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3790,
+    "longueurM": 125,
+    "angleDeg": 41,
+    "rayonMinM": 111,
+    "vMinKmh": 236,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3930,
+    "longueurM": 180,
+    "angleDeg": -87,
+    "rayonMinM": 83,
+    "vMinKmh": 201,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4120,
+    "longueurM": 140,
+    "angleDeg": 30,
+    "rayonMinM": 174,
+    "vMinKmh": 227,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4885,
+    "longueurM": 295,
+    "angleDeg": -119,
+    "rayonMinM": 77,
+    "vMinKmh": 219,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 5440,
+    "longueurM": 105,
+    "angleDeg": 75,
+    "rayonMinM": 49,
+    "vMinKmh": 103,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5550,
+    "longueurM": 295,
+    "angleDeg": -152,
+    "rayonMinM": 49,
+    "vMinKmh": 107,
+    "sens": "droite",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_singapour": {
+  "nom": "cir_singapour",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 95.202,
+  "vmax": 291,
+  "vmin": 66,
+  "plein_pct": 48,
+  "frein_pct": 26,
+  "voie_stands_s": 24.4,
+  "longueurM": 4927,
+  "virages_officiels": 19,
+  "virages_detectes": 18,
+  "denivele_m": 5.2,
+  "plus_longue_droite_m": 410,
+  "lents": 10,
+  "moyens": 6,
+  "rapides": 2,
+  "elements": [
+   {
+    "debutM": 305,
+    "longueurM": 110,
+    "angleDeg": 65,
+    "rayonMinM": 54,
+    "vMinKmh": 130,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 420,
+    "longueurM": 50,
+    "angleDeg": -19,
+    "rayonMinM": 105,
+    "vMinKmh": 130,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 475,
+    "longueurM": 210,
+    "angleDeg": 148,
+    "rayonMinM": 33,
+    "vMinKmh": 85,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 765,
+    "longueurM": 280,
+    "angleDeg": -114,
+    "rayonMinM": 55,
+    "vMinKmh": 140,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1350,
+    "longueurM": 130,
+    "angleDeg": -22,
+    "rayonMinM": 252,
+    "vMinKmh": 281,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1680,
+    "longueurM": 205,
+    "angleDeg": 98,
+    "rayonMinM": 51,
+    "vMinKmh": 116,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1915,
+    "longueurM": 120,
+    "angleDeg": -116,
+    "rayonMinM": 30,
+    "vMinKmh": 76,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2060,
+    "longueurM": 220,
+    "angleDeg": 114,
+    "rayonMinM": 53,
+    "vMinKmh": 127,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2555,
+    "longueurM": 150,
+    "angleDeg": 95,
+    "rayonMinM": 66,
+    "vMinKmh": 134,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2710,
+    "longueurM": 85,
+    "angleDeg": -51,
+    "rayonMinM": 65,
+    "vMinKmh": 111,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2800,
+    "longueurM": 75,
+    "angleDeg": 37,
+    "rayonMinM": 74,
+    "vMinKmh": 124,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2905,
+    "longueurM": 60,
+    "angleDeg": -13,
+    "rayonMinM": 200,
+    "vMinKmh": 181,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2975,
+    "longueurM": 115,
+    "angleDeg": 135,
+    "rayonMinM": 25,
+    "vMinKmh": 67,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3500,
+    "longueurM": 140,
+    "angleDeg": -110,
+    "rayonMinM": 34,
+    "vMinKmh": 89,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3755,
+    "longueurM": 135,
+    "angleDeg": 33,
+    "rayonMinM": 171,
+    "vMinKmh": 221,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4255,
+    "longueurM": 85,
+    "angleDeg": -63,
+    "rayonMinM": 43,
+    "vMinKmh": 101,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4345,
+    "longueurM": 130,
+    "angleDeg": 65,
+    "rayonMinM": 71,
+    "vMinKmh": 104,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4615,
+    "longueurM": 255,
+    "angleDeg": 100,
+    "rayonMinM": 74,
+    "vMinKmh": 185,
+    "sens": "gauche",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_spa": {
+  "nom": "cir_spa",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 108.89,
+  "vmax": 326,
+  "vmin": 66,
+  "plein_pct": 60,
+  "frein_pct": 14,
+  "voie_stands_s": 24.2,
+  "longueurM": 7004,
+  "virages_officiels": 19,
+  "virages_detectes": 17,
+  "denivele_m": 102.2,
+  "plus_longue_droite_m": 1015,
+  "lents": 4,
+  "moyens": 7,
+  "rapides": 6,
+  "elements": [
+   {
+    "debutM": 280,
+    "longueurM": 155,
+    "angleDeg": -148,
+    "rayonMinM": 26,
+    "vMinKmh": 69,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 985,
+    "longueurM": 70,
+    "angleDeg": 18,
+    "rayonMinM": 164,
+    "vMinKmh": 321,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1065,
+    "longueurM": 145,
+    "angleDeg": -50,
+    "rayonMinM": 112,
+    "vMinKmh": 295,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1225,
+    "longueurM": 90,
+    "angleDeg": 20,
+    "rayonMinM": 167,
+    "vMinKmh": 295,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2330,
+    "longueurM": 110,
+    "angleDeg": -55,
+    "rayonMinM": 67,
+    "vMinKmh": 144,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2445,
+    "longueurM": 110,
+    "angleDeg": 57,
+    "rayonMinM": 75,
+    "vMinKmh": 142,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2565,
+    "longueurM": 155,
+    "angleDeg": -74,
+    "rayonMinM": 81,
+    "vMinKmh": 170,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2910,
+    "longueurM": 265,
+    "angleDeg": -187,
+    "rayonMinM": 46,
+    "vMinKmh": 109,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3195,
+    "longueurM": 165,
+    "angleDeg": 82,
+    "rayonMinM": 70,
+    "vMinKmh": 179,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3720,
+    "longueurM": 460,
+    "angleDeg": 148,
+    "rayonMinM": 104,
+    "vMinKmh": 257,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4400,
+    "longueurM": 180,
+    "angleDeg": -94,
+    "rayonMinM": 70,
+    "vMinKmh": 149,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4585,
+    "longueurM": 195,
+    "angleDeg": 87,
+    "rayonMinM": 80,
+    "vMinKmh": 151,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4850,
+    "longueurM": 580,
+    "angleDeg": -192,
+    "rayonMinM": 59,
+    "vMinKmh": 153,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 5800,
+    "longueurM": 195,
+    "angleDeg": 31,
+    "rayonMinM": 259,
+    "vMinKmh": 317,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 6095,
+    "longueurM": 185,
+    "angleDeg": 40,
+    "rayonMinM": 184,
+    "vMinKmh": 302,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 6675,
+    "longueurM": 95,
+    "angleDeg": -74,
+    "rayonMinM": 37,
+    "vMinKmh": 87,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 6775,
+    "longueurM": 100,
+    "angleDeg": 100,
+    "rayonMinM": 29,
+    "vMinKmh": 66,
+    "sens": "gauche",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_spielberg": {
+  "nom": "cir_spielberg",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 70.374,
+  "vmax": 321,
+  "vmin": 64,
+  "plein_pct": 55,
+  "frein_pct": 19,
+  "voie_stands_s": 21.6,
+  "longueurM": 4326,
+  "virages_officiels": 10,
+  "virages_detectes": 9,
+  "denivele_m": 63.4,
+  "plus_longue_droite_m": 685,
+  "lents": 3,
+  "moyens": 3,
+  "rapides": 3,
+  "elements": [
+   {
+    "debutM": 95,
+    "longueurM": 120,
+    "angleDeg": -73,
+    "rayonMinM": 58,
+    "vMinKmh": 119,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 780,
+    "longueurM": 105,
+    "angleDeg": 13,
+    "rayonMinM": 392,
+    "vMinKmh": 320,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1055,
+    "longueurM": 130,
+    "angleDeg": -130,
+    "rayonMinM": 27,
+    "vMinKmh": 66,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 1870,
+    "longueurM": 370,
+    "angleDeg": -185,
+    "rayonMinM": 39,
+    "vMinKmh": 99,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2340,
+    "longueurM": 285,
+    "angleDeg": 129,
+    "rayonMinM": 74,
+    "vMinKmh": 163,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2670,
+    "longueurM": 215,
+    "angleDeg": 98,
+    "rayonMinM": 65,
+    "vMinKmh": 179,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2930,
+    "longueurM": 140,
+    "angleDeg": -38,
+    "rayonMinM": 139,
+    "vMinKmh": 226,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3445,
+    "longueurM": 175,
+    "angleDeg": -72,
+    "rayonMinM": 85,
+    "vMinKmh": 206,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3685,
+    "longueurM": 200,
+    "angleDeg": -89,
+    "rayonMinM": 63,
+    "vMinKmh": 164,
+    "sens": "droite",
+    "classe": "moyen"
+   }
+  ]
+ },
+ "cir_suzuka": {
+  "nom": "cir_suzuka",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 92.432,
+  "vmax": 322,
+  "vmin": 71,
+  "plein_pct": 53,
+  "frein_pct": 16,
+  "voie_stands_s": 24.2,
+  "longueurM": 5807,
+  "virages_officiels": 18,
+  "virages_detectes": 17,
+  "denivele_m": 40.1,
+  "plus_longue_droite_m": 805,
+  "lents": 4,
+  "moyens": 7,
+  "rapides": 6,
+  "elements": [
+   {
+    "debutM": 590,
+    "longueurM": 320,
+    "angleDeg": -187,
+    "rayonMinM": 59,
+    "vMinKmh": 150,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 970,
+    "longueurM": 145,
+    "angleDeg": 51,
+    "rayonMinM": 98,
+    "vMinKmh": 212,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1125,
+    "longueurM": 125,
+    "angleDeg": -65,
+    "rayonMinM": 78,
+    "vMinKmh": 191,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1270,
+    "longueurM": 140,
+    "angleDeg": 68,
+    "rayonMinM": 85,
+    "vMinKmh": 193,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1420,
+    "longueurM": 195,
+    "angleDeg": -106,
+    "rayonMinM": 68,
+    "vMinKmh": 165,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 1630,
+    "longueurM": 485,
+    "angleDeg": 163,
+    "rayonMinM": 63,
+    "vMinKmh": 191,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2205,
+    "longueurM": 100,
+    "angleDeg": -40,
+    "rayonMinM": 79,
+    "vMinKmh": 239,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2345,
+    "longueurM": 135,
+    "angleDeg": -88,
+    "rayonMinM": 48,
+    "vMinKmh": 141,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 2690,
+    "longueurM": 115,
+    "angleDeg": -33,
+    "rayonMinM": 137,
+    "vMinKmh": 225,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 2820,
+    "longueurM": 135,
+    "angleDeg": 175,
+    "rayonMinM": 25,
+    "vMinKmh": 71,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3045,
+    "longueurM": 330,
+    "angleDeg": -75,
+    "rayonMinM": 128,
+    "vMinKmh": 212,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3405,
+    "longueurM": 220,
+    "angleDeg": -44,
+    "rayonMinM": 233,
+    "vMinKmh": 275,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 3700,
+    "longueurM": 395,
+    "angleDeg": 207,
+    "rayonMinM": 59,
+    "vMinKmh": 159,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4900,
+    "longueurM": 250,
+    "angleDeg": 59,
+    "rayonMinM": 101,
+    "vMinKmh": 278,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 5305,
+    "longueurM": 100,
+    "angleDeg": -68,
+    "rayonMinM": 46,
+    "vMinKmh": 101,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5405,
+    "longueurM": 70,
+    "angleDeg": 62,
+    "rayonMinM": 41,
+    "vMinKmh": 95,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 5480,
+    "longueurM": 260,
+    "angleDeg": -86,
+    "rayonMinM": 84,
+    "vMinKmh": 111,
+    "sens": "droite",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_yasmarina": {
+  "nom": "cir_yasmarina",
+  "annee": 2025,
+  "session": "Race",
+  "duree": 86.725,
+  "vmax": 310,
+  "vmin": 67,
+  "plein_pct": 60,
+  "frein_pct": 15,
+  "voie_stands_s": 21.7,
+  "longueurM": 5281,
+  "virages_officiels": 16,
+  "virages_detectes": 12,
+  "denivele_m": 10.9,
+  "plus_longue_droite_m": 1035,
+  "lents": 6,
+  "moyens": 3,
+  "rapides": 3,
+  "elements": [
+   {
+    "debutM": 300,
+    "longueurM": 180,
+    "angleDeg": 95,
+    "rayonMinM": 51,
+    "vMinKmh": 156,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 550,
+    "longueurM": 135,
+    "angleDeg": 55,
+    "rayonMinM": 85,
+    "vMinKmh": 228,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 715,
+    "longueurM": 200,
+    "angleDeg": -79,
+    "rayonMinM": 104,
+    "vMinKmh": 258,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1315,
+    "longueurM": 200,
+    "angleDeg": 155,
+    "rayonMinM": 35,
+    "vMinKmh": 95,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2550,
+    "longueurM": 115,
+    "angleDeg": 103,
+    "rayonMinM": 29,
+    "vMinKmh": 67,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2670,
+    "longueurM": 80,
+    "angleDeg": -71,
+    "rayonMinM": 37,
+    "vMinKmh": 75,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2780,
+    "longueurM": 200,
+    "angleDeg": 31,
+    "rayonMinM": 291,
+    "vMinKmh": 164,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3595,
+    "longueurM": 290,
+    "angleDeg": 192,
+    "rayonMinM": 61,
+    "vMinKmh": 167,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 4045,
+    "longueurM": 360,
+    "angleDeg": -169,
+    "rayonMinM": 36,
+    "vMinKmh": 104,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4410,
+    "longueurM": 255,
+    "angleDeg": 182,
+    "rayonMinM": 52,
+    "vMinKmh": 120,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 4790,
+    "longueurM": 155,
+    "angleDeg": -67,
+    "rayonMinM": 97,
+    "vMinKmh": 236,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 4975,
+    "longueurM": 185,
+    "angleDeg": -113,
+    "rayonMinM": 39,
+    "vMinKmh": 125,
+    "sens": "droite",
+    "classe": "lent"
+   }
+  ]
+ },
+ "cir_zandvoort": {
+  "nom": "cir_zandvoort",
+  "annee": 2026,
+  "session": "Race",
+  "duree": 74.23,
+  "vmax": 321,
+  "vmin": 87,
+  "plein_pct": 53,
+  "frein_pct": 21,
+  "voie_stands_s": 18.0,
+  "longueurM": 4259,
+  "virages_officiels": 14,
+  "virages_detectes": 15,
+  "denivele_m": 8.7,
+  "plus_longue_droite_m": 604,
+  "lents": 5,
+  "moyens": 4,
+  "rapides": 6,
+  "elements": [
+   {
+    "debutM": 210,
+    "longueurM": 230,
+    "angleDeg": -185,
+    "rayonMinM": 39,
+    "vMinKmh": 103,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 480,
+    "longueurM": 90,
+    "angleDeg": 25,
+    "rayonMinM": 152,
+    "vMinKmh": 210,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 580,
+    "longueurM": 110,
+    "angleDeg": -70,
+    "rayonMinM": 56,
+    "vMinKmh": 171,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 705,
+    "longueurM": 185,
+    "angleDeg": 176,
+    "rayonMinM": 36,
+    "vMinKmh": 127,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 935,
+    "longueurM": 160,
+    "angleDeg": -28,
+    "rayonMinM": 240,
+    "vMinKmh": 218,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1135,
+    "longueurM": 155,
+    "angleDeg": 39,
+    "rayonMinM": 155,
+    "vMinKmh": 281,
+    "sens": "gauche",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1320,
+    "longueurM": 120,
+    "angleDeg": -27,
+    "rayonMinM": 181,
+    "vMinKmh": 283,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1520,
+    "longueurM": 265,
+    "angleDeg": -119,
+    "rayonMinM": 97,
+    "vMinKmh": 231,
+    "sens": "droite",
+    "classe": "rapide"
+   },
+   {
+    "debutM": 1925,
+    "longueurM": 410,
+    "angleDeg": -234,
+    "rayonMinM": 38,
+    "vMinKmh": 109,
+    "sens": "droite",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2355,
+    "longueurM": 220,
+    "angleDeg": 162,
+    "rayonMinM": 44,
+    "vMinKmh": 109,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 2605,
+    "longueurM": 140,
+    "angleDeg": 17,
+    "rayonMinM": 399,
+    "vMinKmh": 181,
+    "sens": "gauche",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3020,
+    "longueurM": 65,
+    "angleDeg": -54,
+    "rayonMinM": 43,
+    "vMinKmh": 131,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3090,
+    "longueurM": 125,
+    "angleDeg": 129,
+    "rayonMinM": 36,
+    "vMinKmh": 87,
+    "sens": "gauche",
+    "classe": "lent"
+   },
+   {
+    "debutM": 3395,
+    "longueurM": 170,
+    "angleDeg": -103,
+    "rayonMinM": 59,
+    "vMinKmh": 171,
+    "sens": "droite",
+    "classe": "moyen"
+   },
+   {
+    "debutM": 3575,
+    "longueurM": 290,
+    "angleDeg": -108,
+    "rayonMinM": 96,
+    "vMinKmh": 214,
+    "sens": "droite",
+    "classe": "rapide"
+   }
+  ]
+ }
+}

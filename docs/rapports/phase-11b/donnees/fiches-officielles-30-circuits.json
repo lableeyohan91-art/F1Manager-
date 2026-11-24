@@ -1,0 +1,242 @@
+{
+ "cir_albert": {
+  "page": "Albert_Park_Circuit",
+  "configuration": "Grand Prix Circuit (2021–present)",
+  "longueur_km": "5.278",
+  "virages": "14",
+  "record": "1:19.813",
+  "record_annee": "2024"
+ },
+ "cir_shanghai": {
+  "page": "Shanghai_International_Circuit",
+  "configuration": "Grand Prix Circuit (2004–present)",
+  "longueur_km": "5.451",
+  "virages": "16",
+  "record": "1:32.238",
+  "record_annee": "2004"
+ },
+ "cir_suzuka": {
+  "page": "Suzuka_Circuit",
+  "configuration": "Grand Prix Circuit (2003–present)",
+  "longueur_km": "5.807",
+  "virages": "18",
+  "record": "1:30.965",
+  "record_annee": "2025"
+ },
+ "cir_sakhir": {
+  "page": "Bahrain_International_Circuit",
+  "configuration": "Grand Prix Circuit (2005–present)",
+  "longueur_km": "5.412",
+  "virages": "15",
+  "record": "1:31.447",
+  "record_annee": "2005"
+ },
+ "cir_jeddah": {
+  "page": "Jeddah_Corniche_Circuit",
+  "configuration": "Grand Prix Circuit (2021–present)",
+  "longueur_km": "6.174",
+  "virages": "27",
+  "record": "1:30.734",
+  "record_annee": "2021"
+ },
+ "cir_miami": {
+  "page": "Miami_International_Autodrome",
+  "configuration": "Grand Prix Circuit (2022–present)",
+  "longueur_km": "5.412",
+  "virages": "19",
+  "record": "1:29.708",
+  "record_annee": "2023"
+ },
+ "cir_montreal": {
+  "page": "Circuit_Gilles_Villeneuve",
+  "configuration": "Grand Prix Circuit (2002–present)",
+  "longueur_km": "4.361",
+  "virages": "14",
+  "record": "1:13.078",
+  "record_annee": "2019"
+ },
+ "cir_monaco": {
+  "page": "Circuit_de_Monaco",
+  "configuration": "Grand Prix Circuit (2015–present) (Tabac slightly moved)",
+  "longueur_km": "3.337",
+  "virages": "19",
+  "record": "1:12.909",
+  "record_annee": "2021"
+ },
+ "cir_barcelone": {
+  "page": "Circuit_de_Barcelona-Catalunya",
+  "configuration": "Grand Prix Circuit without Chicane (2021–present)",
+  "longueur_km": "4.657",
+  "virages": "14",
+  "record": "1:15.743",
+  "record_annee": "2025"
+ },
+ "cir_spielberg": {
+  "page": "Red_Bull_Ring",
+  "configuration": "Red Bull Ring Grand Prix Circuit (2025–present)",
+  "longueur_km": "4.326",
+  "virages": "10",
+  "record": "1:07.924",
+  "record_annee": "2025"
+ },
+ "cir_silverstone": {
+  "page": "Silverstone_Circuit",
+  "configuration": "Arena Grand Prix Circuit (2011–present)",
+  "longueur_km": "5.891",
+  "virages": "18",
+  "record": "1:27.097",
+  "record_annee": "2020"
+ },
+ "cir_spa": {
+  "page": "Circuit_de_Spa-Francorchamps",
+  "configuration": "Grand Prix Circuit (2007–present)",
+  "longueur_km": "7.004",
+  "virages": "19",
+  "record": "1:44.701",
+  "record_annee": "2024"
+ },
+ "cir_hungaroring": {
+  "page": "Hungaroring",
+  "configuration": "Grand Prix Circuit (2003–present)",
+  "longueur_km": "4.381",
+  "virages": "14",
+  "record": "1:16.627",
+  "record_annee": "2020"
+ },
+ "cir_zandvoort": {
+  "page": "Circuit_Zandvoort",
+  "configuration": "Grand Prix Circuit (2020–present)",
+  "longueur_km": "4.259",
+  "virages": "14",
+  "record": "1:11.097",
+  "record_annee": "2021"
+ },
+ "cir_monza": {
+  "page": "Monza_Circuit",
+  "configuration": "Modern Grand Prix Circuit (2000–present)",
+  "longueur_km": "5.793",
+  "virages": "11",
+  "record": "1:20.901<br ",
+  "record_annee": "2025"
+ },
+ "cir_madrid": {
+  "page": "Madring",
+  "configuration": "Grand Prix Circuit (2026)",
+  "longueur_km": "5.414",
+  "virages": "22",
+  "record": "1:35.587",
+  "record_annee": "2026"
+ },
+ "cir_bakou": {
+  "page": "Baku_City_Circuit",
+  "configuration": "Grand Prix Circuit (2016–present)",
+  "longueur_km": "6.003",
+  "virages": "20",
+  "record": "1:43.009",
+  "record_annee": "2019"
+ },
+ "cir_singapour": {
+  "page": "Marina_Bay_Street_Circuit",
+  "configuration": "Grand Prix Circuit (2025–present)",
+  "longueur_km": "4.927",
+  "virages": "19",
+  "record": "1:33.808",
+  "record_annee": "2025"
+ },
+ "cir_austin": {
+  "page": "Circuit_of_the_Americas",
+  "configuration": "Grand Prix Circuit (2012–present)",
+  "longueur_km": "5.513",
+  "virages": "20",
+  "record": "1:36.169",
+  "record_annee": "2019"
+ },
+ "cir_mexico": {
+  "page": "Autódromo_Hermanos_Rodríguez",
+  "configuration": "Grand Prix Circuit (2015–present)",
+  "longueur_km": "4.304",
+  "virages": "17",
+  "record": "1:17.774",
+  "record_annee": "2021"
+ },
+ "cir_interlagos": {
+  "page": "Interlagos_Circuit",
+  "configuration": "Grand Prix Circuit (5th Variation)<br />(1999–present)",
+  "longueur_km": "4.309",
+  "virages": "15",
+  "record": "1:10.540",
+  "record_annee": "2018"
+ },
+ "cir_lasvegas": {
+  "page": "Las_Vegas_Strip_Circuit",
+  "configuration": "Grand Prix Circuit (2023–present)",
+  "longueur_km": "6.201",
+  "virages": "17",
+  "record": "1:33.365",
+  "record_annee": "2025"
+ },
+ "cir_lusail": {
+  "page": "Lusail_International_Circuit",
+  "configuration": "Grand Prix Circuit (2023–present)",
+  "longueur_km": "5.419",
+  "virages": "16",
+  "record": "1:22.384",
+  "record_annee": "2024"
+ },
+ "cir_yasmarina": {
+  "page": "Yas_Marina_Circuit",
+  "configuration": "Grand Prix Circuit (2021–present)",
+  "longueur_km": "5.281",
+  "virages": "16",
+  "record": "1:25.637",
+  "record_annee": "2024"
+ },
+ "cir_imola": {
+  "page": "Imola_Circuit",
+  "configuration": "Grand Prix Circuit (2008–present)",
+  "longueur_km": "4.909",
+  "virages": "19",
+  "record": "1:15.484",
+  "record_annee": "2020"
+ },
+ "cir_sepang": {
+  "page": "Sepang_International_Circuit",
+  "configuration": "Grand Prix Circuit (1999–present)",
+  "longueur_km": "5.543",
+  "virages": "15",
+  "record": "1:34.080",
+  "record_annee": "2017"
+ },
+ "cir_portimao": {
+  "page": "Algarve_International_Circuit",
+  "configuration": "Grand Prix Circuit (2008–present)",
+  "longueur_km": "4.653",
+  "virages": "15",
+  "record": "1:18.750",
+  "record_annee": "2020"
+ },
+ "cir_istanbul": {
+  "page": "Istanbul_Park",
+  "configuration": "Grand Prix Circuit (2005–present)",
+  "longueur_km": "5.338",
+  "virages": "14",
+  "record": "1:24.770",
+  "record_annee": "2005"
+ },
+ "cir_kyalami": {
+  "page": "Kyalami",
+  "configuration": "Grand Prix Circuit (2015–present)",
+  "longueur_km": "4.529",
+  "virages": "16",
+  "record": "1:40.120",
+  "record_annee": "2025"
+ },
+ "cir_paulricard": {
+  "page": "Circuit_Paul_Ricard",
+  "configuration": "Current layout with Mistral chicane (1C-V2)<br>(2005–present)",
+  "longueur_km": "5.842",
+  "virages": "15",
+  "record": "1:32.740",
+  "record_annee": "2019"
+ }
+}

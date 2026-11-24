@@ -1,0 +1,110 @@
+{
+ "identiques": 83,
+ "total": 91,
+ "ecarts": [
+  {
+   "course": "2023 cir_albert",
+   "source_communautaire": [
+    3,
+    1,
+    3
+   ],
+   "messages_officiels": [
+    3,
+    1,
+    4
+   ]
+  },
+  {
+   "course": "2023 cir_zandvoort",
+   "source_communautaire": [
+    2,
+    1,
+    1
+   ],
+   "messages_officiels": [
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "course": "2024 cir_lusail",
+   "source_communautaire": [
+    3,
+    0,
+    0
+   ],
+   "messages_officiels": [
+    3,
+    1,
+    0
+   ]
+  },
+  {
+   "course": "2025 cir_spa",
+   "source_communautaire": [
+    1,
+    0,
+    0
+   ],
+   "messages_officiels": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "course": "2026 cir_barcelone",
+   "source_communautaire": [
+    0,
+    0,
+    0
+   ],
+   "messages_officiels": [
+    0,
+    2,
+    0
+   ]
+  },
+  {
+   "course": "2026 cir_silverstone",
+   "source_communautaire": [
+    1,
+    2,
+    0
+   ],
+   "messages_officiels": [
+    2,
+    2,
+    0
+   ]
+  },
+  {
+   "course": "2026 cir_spa",
+   "source_communautaire": [
+    1,
+    0,
+    0
+   ],
+   "messages_officiels": [
+    1,
+    2,
+    0
+   ]
+  },
+  {
+   "course": "2026 cir_sepang",
+   "source_communautaire": [
+    3,
+    1,
+    1
+   ],
+   "messages_officiels": [
+    2,
+    1,
+    0
+   ]
+  }
+ ]
+}

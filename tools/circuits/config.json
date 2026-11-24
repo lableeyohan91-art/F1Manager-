@@ -1,0 +1,11 @@
+{
+"cir_albert":["Melbourne","Albert_Park_Circuit"],"cir_shanghai":["Shanghai","Shanghai_International_Circuit"],"cir_suzuka":["Suzuka","Suzuka_Circuit"],
+"cir_sakhir":["Sakhir","Bahrain_International_Circuit"],"cir_jeddah":["Jeddah","Jeddah_Corniche_Circuit"],"cir_miami":["Miami","Miami_International_Autodrome"],
+"cir_montreal":["Montreal","Circuit_Gilles_Villeneuve"],"cir_monaco":["Monte Carlo","Circuit_de_Monaco"],"cir_barcelone":["Catalunya","Circuit_de_Barcelona-Catalunya"],
+"cir_spielberg":["Spielberg","Red_Bull_Ring"],"cir_silverstone":["Silverstone","Silverstone_Circuit"],"cir_spa":["Spa-Francorchamps","Circuit_de_Spa-Francorchamps"],
+"cir_hungaroring":["Hungaroring","Hungaroring"],"cir_zandvoort":["Zandvoort","Circuit_Zandvoort"],"cir_monza":["Monza","Monza_Circuit"],
+"cir_madrid":["Madring","Madring"],"cir_bakou":["Baku","Baku_City_Circuit"],"cir_singapour":["Singapore","Marina_Bay_Street_Circuit"],
+"cir_austin":["Austin","Circuit_of_the_Americas"],"cir_mexico":["Mexico City","Autódromo_Hermanos_Rodríguez"],"cir_interlagos":["Interlagos","Interlagos_Circuit"],
+"cir_lasvegas":["Las Vegas","Las_Vegas_Strip_Circuit"],"cir_lusail":["Lusail","Lusail_International_Circuit"],"cir_yasmarina":["Yas Marina Circuit","Yas_Marina_Circuit"],
+"cir_imola":["Imola","Imola_Circuit"],"cir_sepang":["Kuala Lumpur","Sepang_International_Circuit"]
+}

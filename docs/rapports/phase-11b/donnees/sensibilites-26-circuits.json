@@ -1,0 +1,262 @@
+{
+ "cir_albert": {
+  "t": 77.69930129428532,
+  "reel": 82.091,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.27736095368233293,
+   "virages rapides (appui)": 0.1851815119531608,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.09688991158822091,
+   "moteur (puissance)": 0.26431560547797517
+  }
+ },
+ "cir_shanghai": {
+  "t": 95.3182996556264,
+  "reel": 95.275,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.4541691378290835,
+   "virages rapides (appui)": 0.28312209359943097,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.0723093304312954,
+   "moteur (puissance)": 0.21153756297998427
+  }
+ },
+ "cir_suzuka": {
+  "t": 91.21640021121635,
+  "reel": 92.432,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.38730480352683117,
+   "virages rapides (appui)": 0.2681920507608311,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.08330991619418171,
+   "moteur (puissance)": 0.2635560538734154
+  }
+ },
+ "cir_sakhir": {
+  "t": 84.36746822906973,
+  "reel": 95.14,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.32668867474730234,
+   "virages rapides (appui)": 0.2123830013820367,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.08329140894642251,
+   "moteur (puissance)": 0.2614300304780386
+  }
+ },
+ "cir_jeddah": {
+  "t": 91.54035445638442,
+  "reel": 91.778,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.30559737198221626,
+   "virages rapides (appui)": 0.1876220286573158,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.11620573545124557,
+   "moteur (puissance)": 0.31878758729118317
+  }
+ },
+ "cir_miami": {
+  "t": 83.52708414289471,
+  "reel": 91.869,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.30859519330491025,
+   "virages rapides (appui)": 0.18431197949809075,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.11065136284230448,
+   "moteur (puissance)": 0.2621097071202456
+  }
+ },
+ "cir_montreal": {
+  "t": 67.8594539625909,
+  "reel": 74.21,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.2430104573680154,
+   "virages rapides (appui)": 0.1436700688660295,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.07119086977237998,
+   "moteur (puissance)": 0.2190843140959231
+  }
+ },
+ "cir_monaco": {
+  "t": 66.16563110370836,
+  "reel": 72.051,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.3293640932295432,
+   "virages rapides (appui)": 0.18709048155048436,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.02208815828495858,
+   "moteur (puissance)": 0.12146238935143572
+  }
+ },
+ "cir_barcelone": {
+  "t": 75.37914912147704,
+  "reel": 80.122,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.3469780264167781,
+   "virages rapides (appui)": 0.24220213912461475,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.058966053105763194,
+   "moteur (puissance)": 0.19455600209994373
+  }
+ },
+ "cir_spielberg": {
+  "t": 64.8047973008795,
+  "reel": 70.374,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.22540281479599855,
+   "virages rapides (appui)": 0.1420061874300984,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.06382532514683703,
+   "moteur (puissance)": 0.22167544428583597
+  }
+ },
+ "cir_silverstone": {
+  "t": 85.96314558053265,
+  "reel": 91.777,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.3599998140253291,
+   "virages rapides (appui)": 0.2818349821918531,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.1010447062596711,
+   "moteur (puissance)": 0.2727513168348281
+  }
+ },
+ "cir_spa": {
+  "t": 101.5518505955429,
+  "reel": 108.89,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.38611230666626284,
+   "virages rapides (appui)": 0.2702525389297392,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.13583046397472742,
+   "moteur (puissance)": 0.3329218525526443
+  }
+ },
+ "cir_hungaroring": {
+  "t": 76.391589308993,
+  "reel": 82.0,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.3015036643107294,
+   "virages rapides (appui)": 0.16013811489864338,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.048176303273180565,
+   "moteur (puissance)": 0.2050544607272684
+  }
+ },
+ "cir_zandvoort": {
+  "t": 74.58928165778872,
+  "reel": 74.23,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.3543224217775105,
+   "virages rapides (appui)": 0.23151351426081135,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.04177719594919438,
+   "moteur (puissance)": 0.17375920826580682
+  }
+ },
+ "cir_monza": {
+  "t": 75.74718712239499,
+  "reel": 83.504,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.21888247050060272,
+   "virages rapides (appui)": 0.15995251054334858,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.14273939252069567,
+   "moteur (puissance)": 0.314041095058883
+  }
+ },
+ "cir_madrid": {
+  "t": 91.84725064495129,
+  "reel": 95.587,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.43602396850795344,
+   "virages rapides (appui)": 0.2823150017874809,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.04926671229580393,
+   "moteur (puissance)": 0.21119285559704792
+  }
+ },
+ "cir_bakou": {
+  "t": 96.56463140362997,
+  "reel": 104.916,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.33990739876421117,
+   "virages rapides (appui)": 0.17924358048117028,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.09967843211704519,
+   "moteur (puissance)": 0.3022735133623229
+  }
+ },
+ "cir_singapour": {
+  "t": 84.64767621901474,
+  "reel": 95.202,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.3238930811316152,
+   "virages rapides (appui)": 0.17145862061728678,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.05748995412720603,
+   "moteur (puissance)": 0.23857275536326483
+  }
+ },
+ "cir_austin": {
+  "t": 92.5060673032028,
+  "reel": 97.976,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.42079787122540324,
+   "virages rapides (appui)": 0.2805663397984688,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.06733292935345503,
+   "moteur (puissance)": 0.2335154461477913
+  }
+ },
+ "cir_mexico": {
+  "t": 72.68400458890635,
+  "reel": 79.268,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.2959480241498227,
+   "virages rapides (appui)": 0.14250821958204085,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.054061997847426824,
+   "moteur (puissance)": 0.18034585236181044
+  }
+ },
+ "cir_interlagos": {
+  "t": 68.8841507673536,
+  "reel": 72.689,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.2922619664505248,
+   "virages rapides (appui)": 0.18193999628472568,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.06642388099344032,
+   "moteur (puissance)": 0.18390820240682615
+  }
+ },
+ "cir_lasvegas": {
+  "t": 86.65317086505158,
+  "reel": 95.591,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.28210336603675046,
+   "virages rapides (appui)": 0.18275007506910868,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.14016469349748206,
+   "moteur (puissance)": 0.31469430636087736
+  }
+ },
+ "cir_lusail": {
+  "t": 88.37998571029529,
+  "reel": 82.996,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.3888985907207996,
+   "virages rapides (appui)": 0.26824237761502445,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.06531606148466551,
+   "moteur (puissance)": 0.24146448335704918
+  }
+ },
+ "cir_yasmarina": {
+  "t": 84.55139989621145,
+  "reel": 86.725,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.331317626237265,
+   "virages rapides (appui)": 0.20398583561096473,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.07983882919165808,
+   "moteur (puissance)": 0.2490515526708208
+  }
+ },
+ "cir_imola": {
+  "t": 74.87826682378989,
+  "reel": 77.988,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.2561701593309351,
+   "virages rapides (appui)": 0.15505540407670537,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.081339580853097,
+   "moteur (puissance)": 0.2533833069270628
+  }
+ },
+ "cir_sepang": {
+  "t": 92.66083896205834,
+  "reel": 98.22,
+  "g": {
+   "virages lents (adh\u00e9rence m\u00e9canique)": 0.403635162223722,
+   "virages rapides (appui)": 0.25558504325847764,
+   "vitesse de pointe (tra\u00een\u00e9e)": 0.06866086873078814,
+   "moteur (puissance)": 0.24216246063549818
+  }
+ }
+}
