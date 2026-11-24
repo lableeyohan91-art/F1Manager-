@@ -15,10 +15,10 @@ import { ETIQUETTES, FAMILIARITE_MENSUELLE, SEUIL_EFFACEMENT_SOUVENIR } from '..
 import { ajouterEvenement } from '../core/evenements';
 import { rangSemaine } from '../core/calendrier';
 import { SEMAINES_PAR_AN } from '../balance/calendrier';
-import { table, type Monde } from '../core/monde';
+import { table, type Monde, type Entite } from '../core/monde';
 import { tirageLocal } from '../core/moteur';
 import { TABLES, type Carriere, type Ecurie, type Palmares, type Personne } from '../model/types';
-import { effacer, lireEvenement, oublierUnMois, relationBrute } from '../systems/memoire';
+import { effacer, lireEvenement, oublierUnMois, relationBrute, souvenirsDe, TABLE_SOUVENIRS } from '../systems/memoire';
 import type { HistoireDonnees } from './chargement';
 
 const nomDe = (monde: Monde, id: string) => {
@@ -200,10 +200,18 @@ export function construirePasse(monde: Monde, histoires: HistoireDonnees[], finD
     monde.date = { annee: h.saison, semaine: PASSE.semaine };
     const mois = Math.floor((rang(dateDepart) - rang({ annee: h.saison, semaine: PASSE.semaine })) / PASSE.semainesParMois);
     for (const [porteur, cible] of h.reciproque && existe(h.cible) ? [[h.porteur, h.cible], [h.cible, h.porteur]] : [[h.porteur, h.cible]]) {
+      // Audit 4.6 : une histoire réelle n'est pas fondue dans un souvenir inventé de même étiquette (saturation, date et oubli
+      // appliqués deux fois) : on lit l'histoire seule, puis on garde le plus fort des deux souvenirs.
+      const ex = souvenirsDe(monde, porteur!).find((x) => x.etiquette === h.etiquette && x.cible === cible);
+      if (ex) delete table(monde, TABLE_SOUVENIRS)[ex.id];
       const s = lireEvenement(monde, porteur!, cible!, h.etiquette, evt, { facteur: h.intensite });
-      if (!s) continue;
-      s.intensite *= Math.pow(1 - (ETIQUETTES[h.etiquette]?.oubli ?? 0) * HISTOIRES_REELLES.persistance, mois);
-      if (s.intensite < SEUIL_EFFACEMENT_SOUVENIR) effacer(monde, s);
+      if (s) s.intensite *= Math.pow(1 - (ETIQUETTES[h.etiquette]?.oubli ?? 0) * HISTOIRES_REELLES.persistance, mois);
+      if (ex && (!s || ex.intensite >= s.intensite)) {
+        if (s) delete table(monde, TABLE_SOUVENIRS)[s.id];
+        table(monde, TABLE_SOUVENIRS)[ex.id] = ex as unknown as Entite;
+        continue;
+      }
+      if (s && s.intensite < SEUIL_EFFACEMENT_SOUVENIR) effacer(monde, s);
     }
   }
 

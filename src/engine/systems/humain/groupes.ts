@@ -162,14 +162,21 @@ function climat(monde: Monde): void {
   if (!opposants.length) return;
   const tp = table(monde, TABLES.personnes);
   for (const g of opposants) {
-    const membres = new Set([g.leader, ...g.membres]);
-    const ecuries = new Set([...membres].map((id) => (tp[id] as unknown as Personne | undefined)?.ecurie).filter((e): e is string => !!e));
+    // Audit 8.7 : le climat touche l'écurie visée à la détection, et seulement tant que des membres actifs y sont encore ; un membre
+    // parti ailleurs n'emporte pas le malaise dans sa nouvelle équipe.
+    const presents = [g.leader, ...g.membres].filter((id) => { const p = tp[id] as unknown as Personne | undefined; return p?.statut === 'actif' && p.ecurie === g.ecurieLeader; });
+    if (presents.length < 2) continue;
+    const membres = new Set(presents);
+    const touches: string[] = [];
     for (const id of idsTries(tp)) {
       const p = tp[id] as unknown as Personne;
-      if (p.statut !== 'actif' || !ecuries.has(p.ecurie)) continue;
+      if (p.statut !== 'actif' || p.ecurie !== g.ecurieLeader) continue;
       const baisse = membres.has(p.id) ? OPPOSANTS.motivationMembres : OPPOSANTS.motivationEquipe;
       p.etat.motivation = Math.max(0, Math.round((p.etat.motivation - baisse) * 10) / 10);
+      touches.push(p.id);
     }
+    // Audit 4.15 : la baisse de motivation est inscrite comme un fait (règle : toute modification significative produit un événement).
+    ajouterEvenement(monde, { type: 'groupe.climat', acteurs: [{ id: g.leader, role: 'meneur' }, { id: g.ecurieLeader, role: 'organisation' }], importance: 1, visibilite: 'prive', contexte: { groupe: g.id, personnes: touches.length } });
   }
 }
 

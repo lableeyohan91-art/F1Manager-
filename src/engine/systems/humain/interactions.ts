@@ -15,6 +15,7 @@ import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Ecurie, type Personne, type Saison } from '../../model/types';
 import { noterContact, lireEvenement, reconcilier, relation, relationBrute } from '../memoire';
 import { contratEmploi, indemniteRupture, liberer, personneDe } from './contrats';
+import { motifRefusConseil } from './effectifs';
 import { niveauMetier, teamPrincipal, valeurMarche } from './decision';
 import { domainePoste, iaDecide } from '../joueur/acces';
 
@@ -51,8 +52,9 @@ const changerConfiance = (p: Personne, delta: number) => (p.etat.confiance = Mat
 
 export function soutenir(monde: Monde, auteur: Personne, cible: Personne, publique: boolean): Evenement {
   const fragile = Math.max(0, (60 - cible.etat.confiance) / 60);
-  const evt = evenementInteraction(monde, 'personnel.soutien', auteur, cible, publique, {}, publique ? `${nom(auteur)} soutient publiquement ${nom(cible)}.` : undefined);
-  const recent = interactionRecente(monde, 'personnel.soutien', auteur.id, cible.id);
+  const recent = interactionRecente(monde, 'personnel.soutien', auteur.id, cible.id); // avant d'inscrire le nouveau fait (voir feliciter)
+  // Audit 10.1 : un soutien répété est marqué « répété » : les médias ne lui accordent plus d'image (sinon image illimitée par clics).
+  const evt = evenementInteraction(monde, 'personnel.soutien', auteur, cible, publique, recent ? { repete: true } : {}, publique ? `${nom(auteur)} soutient publiquement ${nom(cible)}.` : undefined);
   lireEvenement(monde, cible.id, auteur.id, 'soutien', evt.id, { facteur: (publique ? 1.1 : 0.9) * (1 + fragile) * (recent ? 0.5 : 1) });
   changerConfiance(cible, (publique ? 6 : 4) * (recent ? 0.3 : 1));
   return evt;
@@ -74,8 +76,9 @@ export function critiquer(monde: Monde, auteur: Personne, cible: Personne, publi
 }
 
 export function feliciter(monde: Monde, auteur: Personne, cible: Personne, publique: boolean): Evenement {
-  const evt = evenementInteraction(monde, 'personnel.felicitations', auteur, cible, publique, {});
+  // Audit de nuit : le geste est cherché AVANT d'inscrire le nouveau fait (sinon il se trouvait lui-même : toujours « récent »).
   const recent = interactionRecente(monde, 'personnel.felicitations', auteur.id, cible.id);
+  const evt = evenementInteraction(monde, 'personnel.felicitations', auteur, cible, publique, {});
   lireEvenement(monde, cible.id, auteur.id, 'reconnaissance', evt.id, { facteur: (publique ? 0.6 : 0.45) * (recent ? 0.3 : 1) });
   changerConfiance(cible, recent ? 0.5 : 2);
   return evt;
@@ -83,13 +86,16 @@ export function feliciter(monde: Monde, auteur: Personne, cible: Personne, publi
 
 export function reparer(monde: Monde, auteur: Personne, cible: Personne, type: 'excuses' | 'reconnaissanceErreur' | 'discussionPrivee', publique: boolean): Evenement {
   const typeEvt = { excuses: 'personnel.excuses', reconnaissanceErreur: 'personnel.reconnaissance_erreur', discussionPrivee: 'personnel.discussion_privee' }[type];
+  const recent = interactionRecente(monde, typeEvt, auteur.id, cible.id); // avant d'inscrire le nouveau fait (voir feliciter)
   const evt = evenementInteraction(monde, typeEvt, auteur, cible, publique, {});
-  const recent = interactionRecente(monde, typeEvt, auteur.id, cible.id);
-  const reduit = reconcilier(monde, cible.id, auteur.id, type, recent);
-  if (type !== 'discussionPrivee' && reduit > 0) lireEvenement(monde, cible.id, auteur.id, 'excuses_recues', evt.id, { facteur: (publique ? 1.2 : 1) * (recent ? 0.3 : 1) });
+  // Audit 4.3 : un geste de réparation répété dans la fenêtre de saturation n'a plus aucun effet (avant : un quart de l'effet à
+  // chaque fois, si bien que 40 discussions la même semaine effaçaient une humiliation). Le fait reste inscrit.
+  if (recent) return evt;
+  const reduit = reconcilier(monde, cible.id, auteur.id, type, false);
+  if (type !== 'discussionPrivee' && reduit > 0) lireEvenement(monde, cible.id, auteur.id, 'excuses_recues', evt.id, { facteur: publique ? 1.2 : 1 });
   if (type === 'discussionPrivee') {
     const r = relationBrute(monde, cible.id, auteur.id, true);
-    if (r) { r.familiarite = Math.min(1, r.familiarite + (recent ? 0.01 : 0.05)); noterContact(monde, r); }
+    if (r) { r.familiarite = Math.min(1, r.familiarite + 0.05); noterContact(monde, r); }
   }
   return evt;
 }
@@ -144,6 +150,10 @@ export function repondreAugmentation(monde: Monde, auteur: Personne, cible: Pers
   const c = contratEmploi(monde, cible.id) as Contrat;
   const demande = c.demandeAugmentation ?? c.salaireMEUR;
   delete c.demandeAugmentation;
+  delete c.demandeAugmentationDepuis;
+  // Audit 4.9 : l'augmentation d'un pilote titulaire passe par l'arbitrage du conseil, comme toute hausse de salaire de titulaire.
+  const e = table(monde, TABLES.ecuries)[c.organisation] as unknown as Ecurie | undefined;
+  if (accepter && e && c.poste === 'pilote_titulaire' && motifRefusConseil(monde, e, cible.id, demande, monde.date.annee, c.fin)) { accepter = false; justification = true; }
   const evt = evenementInteraction(monde, accepter ? 'augmentation.accordee' : 'augmentation.refusee', auteur, cible, false, { demande, justification });
   if (accepter) {
     c.salaireMEUR = Math.round(demande * 10) / 10;
@@ -214,6 +224,7 @@ export const systemeVieDuPersonnel: Systeme = {
       if (c && c.demandeAugmentation === undefined && c.salaireMEUR < DEMANDE_AUGMENTATION.seuilSousPaye * valeurMarche(monde, p)
         && f.chance(DEMANDE_AUGMENTATION.probabiliteMensuelle * ((p.traits['ambition'] ?? 10) / 10))) {
         c.demandeAugmentation = Math.round(c.salaireMEUR * (1 + DEMANDE_AUGMENTATION.hausseDemandee) * 10) / 10;
+        c.demandeAugmentationDepuis = { ...date };
         const evt = ajouterEvenement(monde, { type: 'augmentation.demandee', acteurs: [{ id: p.id, role: 'auteur' }, { id: dirigeant.id, role: 'cible' }], importance: 1, visibilite: 'prive', contexte: { demande: c.demandeAugmentation } });
         if (!ecuriePilotee) {
           // Réponse de l'IA : accepte si la personne vaut la dépense ; la loyauté du TP l'y pousse, le budget l'en retient.
@@ -222,6 +233,15 @@ export const systemeVieDuPersonnel: Systeme = {
           repondreAugmentation(monde, dirigeant, p, envie > SEUIL_AUGMENTATION, budgetSerre || performanceInsuffisante(monde, p));
           void evt;
         }
+      }
+      // Audit 4.5 : une demande d'augmentation restée sans réponse vaut refus au bout du délai (le joueur ne peut pas l'ignorer
+      // indéfiniment) ; si le domaine a été délégué entre-temps, l'IA y répond.
+      if (c && c.demandeAugmentation !== undefined) {
+        const depuis = c.demandeAugmentationDepuis ?? date;
+        if (!ecuriePilotee) {
+          const budgetSerre = (table(monde, TABLES.ecuries)[p.ecurie] as unknown as { budgetMEUR: number }).budgetMEUR < 320;
+          if (rangSemaine(depuis) < rangSemaine(date)) repondreAugmentation(monde, dirigeant, p, niveauMetier(p) / 20 + f.normale(0, 0.08) > SEUIL_AUGMENTATION, budgetSerre);
+        } else if (rangSemaine(date) - rangSemaine(depuis) >= DEMANDE_AUGMENTATION.delaiReponseSemaines) repondreAugmentation(monde, dirigeant, p, false, false);
       }
       // Réaction du TP (IA) à un pilote en difficulté : soutien ou critique, en privé ou en public, selon sa personnalité.
       if (!ecuriePilotee && p.poste === 'pilote_titulaire' && performanceInsuffisante(monde, p) && f.chance(REACTION_TEAM_PRINCIPAL.probabiliteMensuelle)) {

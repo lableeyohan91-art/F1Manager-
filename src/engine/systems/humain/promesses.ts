@@ -55,6 +55,24 @@ export function motifPromesseInvalide(type: TypePromesse, parametres: Record<str
   if (type === 'prolongation' && !(fini(parametres['finAvant']) && Number.isInteger(parametres['finAvant']))) return 'Une promesse de prolongation doit préciser l’échéance actuelle du contrat.';
   if (type === 'ne_pas_recruter' && !(typeof parametres['personne'] === 'string' && parametres['personne'] !== '')) return 'Une promesse de ne pas recruter doit désigner la personne concernée.';
   if (type === 'promotion_categorie') return 'Type de promesse réservé, pas encore utilisable.';
+  if (!TYPES_PROMESSES.includes(type)) return `Type de promesse inconnu : ${String(type)}.`;
+  return null;
+}
+
+/** Audit 4.2 : types de promesses connus. */
+export const TYPES_PROMESSES: readonly TypePromesse[] = ['salaire_minimum', 'statut_n1', 'titularisation', 'prolongation', 'ne_pas_recruter', 'promotion_categorie'];
+
+/**
+ * Audit 4.2 : une promesse doit engager à quelque chose de nouveau. Dans une prolongation, « prolongation » et « salaire minimum »
+ * sont déjà acquis par le contrat lui-même ; « statut de n° 1 » et « titularisation » ne concernent que les pilotes (et la
+ * titularisation, un pilote qui ne l'est pas déjà) ; « ne pas recruter » vise une personne qui existe.
+ */
+export function motifPromesseSansObjet(monde: Monde, type: TypePromesse, beneficiaire: Personne, enProlongation: boolean, parametres: Record<string, string | number>): string | null {
+  if (enProlongation && (type === 'prolongation' || type === 'salaire_minimum')) return 'Cette promesse est déjà acquise par la prolongation elle-même.';
+  const pilote = beneficiaire.poste === 'pilote_titulaire' || beneficiaire.poste === 'pilote_reserve';
+  if ((type === 'statut_n1' || type === 'titularisation') && !pilote) return 'Cette promesse ne concerne que les pilotes.';
+  if (type === 'titularisation' && beneficiaire.poste === 'pilote_titulaire') return 'Ce pilote est déjà titulaire.';
+  if (type === 'ne_pas_recruter' && !table(monde, TABLES.personnes)[String(parametres['personne'])]) return 'La personne visée par la promesse n’existe pas.';
   return null;
 }
 
@@ -154,9 +172,15 @@ export const systemePromesses: Systeme = {
         else p.statut = 'caduque';
         continue;
       }
+      // Audit 4.11 : un jeune à qui l'on promettait une titularisation, devenu titulaire ailleurs de son plein gré : promesse caduque.
+      if (p.type === 'titularisation' && benef.poste === 'pilote_titulaire' && benef.ecurie !== p.organisation && !departProvoque(monde, benef.id, p.organisation)) {
+        p.statut = 'caduque';
+        continue;
+      }
       const ok = promesseRespectee(monde, p);
-      // Rupture anticipée : un statut de n°1 promis qui disparaît en cours de route.
-      if (p.type === 'statut_n1' && ok === false) clore(monde, p, false);
+      // Rupture anticipée : un statut de n°1 promis qui disparaît en cours de route ; la personne qu'on avait promis de ne pas
+      // recruter l'est quand même (audit 4.10 : avant, la recruter puis la laisser partir avant l'échéance passait pour tenu).
+      if ((p.type === 'statut_n1' || p.type === 'ne_pas_recruter') && ok === false) clore(monde, p, false);
       else if (echues.has(p.id) && ok !== null) clore(monde, p, ok);
       else if (echues.has(p.id) && ok === null) p.statut = 'caduque'; // promesse incomplète (ancienne sauvegarde) : ni tenue ni rompue
     }

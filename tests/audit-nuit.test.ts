@@ -76,3 +76,45 @@ describe('Audit — phases 1 à 3', () => {
     expect(parCircuit['cir_monza']).toBe(36); // jour 249 → semaine 36 (septembre)
   });
 });
+
+describe('Audit — phases 4 et 9', () => {
+  const partie = () => {
+    const m = sc.creerMonde(11), moteur = sc.creerMoteur();
+    moteur.avancer(m, 2);
+    executerCommandeJoueur(moteur, m, { type: 'joueur.prendre_ecurie', auteur: 'joueur', parametres: { ecurie: 'eq_williams', prenom: 'Camille', nom: 'Essai' } });
+    const personnes = Object.values(table(m, TABLES.personnes)) as unknown as { id: string; ecurie: string; poste: string; statut: string }[];
+    const manager = m.joueur!.personne;
+    const titulaire = personnes.find((p) => p.ecurie === 'eq_williams' && p.poste === 'pilote_titulaire' && p.statut === 'actif')!;
+    const dt = personnes.find((p) => p.ecurie === 'eq_williams' && p.poste === 'directeur_technique' && p.statut === 'actif')!;
+    return { m, moteur, manager, titulaire, dt };
+  };
+  const prolonger = (x: ReturnType<typeof partie>, personne: string, promesses: string[], salaire = 3) =>
+    executerCommandeJoueur(x.moteur, x.m, { type: 'contrat.proposer_prolongation', auteur: x.manager, parametres: { personne, salaire, duree: 2, promesses, tour: 0 } });
+
+  it('4.2 : les promesses vides ou absurdes sont refusées', () => {
+    const x = partie();
+    expect(prolonger(x, x.titulaire.id, ['prolongation'])).toMatchObject({ ok: false });
+    expect(prolonger(x, x.titulaire.id, ['salaire_minimum'])).toMatchObject({ ok: false });
+    expect(prolonger(x, x.titulaire.id, ['titularisation'])).toMatchObject({ ok: false });
+    expect(prolonger(x, x.dt.id, ['statut_n1'])).toMatchObject({ ok: false });
+    expect(prolonger(x, x.titulaire.id, ['n_importe_quoi'])).toMatchObject({ ok: false });
+  });
+
+  it('4.4 : une seule offre de prolongation par semaine et par personne (on ne sonde pas le salaire minimum)', () => {
+    const x = partie();
+    expect(prolonger(x, x.dt.id, [], 0.5).ok).toBe(true);
+    // Refus ou contre-offre : dans les deux cas, une nouvelle ouverture au tour 0 la même semaine est refusée.
+    expect(prolonger(x, x.dt.id, [], 0.6)).toMatchObject({ ok: false });
+  });
+
+  it('4.3 : un geste de réparation répété dans la fenêtre de saturation n’a plus d’effet', () => {
+    const x = partie();
+    const discuter = () => executerCommandeJoueur(x.moteur, x.m, { type: 'personnel.discussion_privee', auteur: x.manager, parametres: { personne: x.dt.id } });
+    const relationDe = () => JSON.stringify((Object.values(table(x.m, 'relations')) as unknown as { de: string; vers: string }[]).find((r) => r.de === x.dt.id && r.vers === x.manager));
+    expect(discuter().ok).toBe(true);
+    const apresUn = relationDe();
+    expect(apresUn).toBeDefined();
+    for (let i = 0; i < 10; i++) discuter();
+    expect(relationDe()).toBe(apresUn);
+  });
+});

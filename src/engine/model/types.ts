@@ -337,6 +337,8 @@ export interface Contrat {
   nonProlonge?: boolean;
   /** Demande d'augmentation en attente de réponse (salaire demandé, M€). */
   demandeAugmentation?: number;
+  /** Audit 4.5 : date de la demande d'augmentation (délai de réponse). */
+  demandeAugmentationDepuis?: DateJeu;
   /** Audit n°4 : indemnité de rupture effectivement versée (M€), une seule fois. */
   indemniteVerseeMEUR?: number;
   /** Phase 7b : personne que ce contrat signé remplace (son contrat sera rompu, avec indemnité, à la prise d'effet). */

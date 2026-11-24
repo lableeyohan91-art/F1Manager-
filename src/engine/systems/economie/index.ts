@@ -14,7 +14,7 @@
  */
 
 import {
-  ALEA_APPORT, BUDGET_IA, DIVIDENDES, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
+  ALEA_APPORT, BUDGET_IA, DIVIDENDES, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
   DEVELOPPEMENT_MINIMUM, EFFORT_TECHNIQUE_REFERENCE, MARGE_SECURITE_PLAFOND, ENTRETIEN_PAR_NIVEAU, FACTEUR_BUDGET_DEV, OPERATIONS_PAR_GP, PART_MARKETING,
   PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
 } from '../../balance/finances';
@@ -367,7 +367,13 @@ function prolongationTeamPrincipal(monde: Monde, e: Ecurie): void {
     nePasProlonger(monde, c, e.id, 'résultats jugés insuffisants par le conseil');
     return;
   }
-  proposerProlongation(monde, c, e.id, valeurMarche(monde, tp), 2, [], 1);
+  // Audit 4.1 : une contre-offre du team principal reçoit une réponse (jusqu'à un plafond), puis le dernier mot ; sans accord, le conseil
+  // décide explicitement de ne pas prolonger (avant : la contre-offre restait sans suite et le contrat expirait sans décision).
+  let res = proposerProlongation(monde, c, e.id, valeurMarche(monde, tp), 2, [], 1);
+  if (res.issue === 'contre_offre' && res.salaireDemande !== undefined) {
+    res = proposerProlongation(monde, c, e.id, Math.min(res.salaireDemande, valeurMarche(monde, tp) * CONSEIL_CONTRE_OFFRE.plafondValeur), 2, [], 2, [res.evenement.id]);
+  }
+  if (res.issue !== 'accord' && c.statut === 'actif' && !c.nonProlonge) nePasProlonger(monde, c, e.id, 'pas d’accord avec le conseil sur la prolongation');
 }
 
 /* ---------------------------------------------------------------- Systèmes */

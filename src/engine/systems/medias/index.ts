@@ -61,7 +61,8 @@ function ignore(type: string): boolean {
 function sujetsDe(m: Monde, e: Evenement): { personne?: Personne; ecurie?: Ecurie } {
   let personne: Personne | undefined;
   let ec: Ecurie | undefined;
-  for (const role of ['auteur', 'pilote', 'champion', 'personne', 'cible']) {
+  // Audit 10.3 et 10.13 : le vainqueur (rôle « vainqueur ») et le pilote lancé passent avant le décideur.
+  for (const role of ['vainqueur', 'champion', 'pilote', 'auteur', 'personne', 'cible']) {
     const a = e.acteurs.find((x) => x.role === role && personneDe(m, x.id));
     if (a) { personne = personneDe(m, a.id); break; }
   }
@@ -87,6 +88,7 @@ function appliquerImageFait(m: Monde, e: Evenement): void {
   const v = IMAGE_PAR_FAIT[e.type];
   if (!v) return;
   if ((e.type.startsWith('personnel.')) && e.contexte['publique'] !== true) return; // seuls les gestes publics se voient
+  if (e.contexte['repete'] === true) return; // audit 10.1 : un geste répété n'apporte plus d'image
   const { personne, ecurie } = sujetsDe(m, e);
   const sportif = e.type.startsWith('gp.') || e.type.startsWith('titre.');
   if (personne) changerImage(personne, v[0] > 0 && sportif ? v[0] * facteurLassitude(m, personne.id) : v[0]);

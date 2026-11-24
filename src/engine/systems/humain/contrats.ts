@@ -24,7 +24,8 @@ import { ecuriesActives } from '../saison/performance';
 import {
   age, ecurie, niveauMetier, repondre, scoreCandidat, teamPrincipal, texteRaisons, valeurMarche, type Offre, type Raison,
 } from './decision';
-import { faireUnePromesse, motifPromesseInvalide, type TypePromesse } from './promesses';
+import { faireUnePromesse, motifPromesseInvalide, motifPromesseSansObjet, type TypePromesse } from './promesses';
+import { evenementsDeType } from '../../core/evenements';
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, motifRefusEffectif } from './effectifs';
 import { activerContratsSignes, clotureMarche } from '../marche';
 import { domainePoste, iaDecide } from '../joueur/acces';
@@ -153,6 +154,11 @@ function parametresPromesse(t: TypePromesse, salaire: number, finAvant: number, 
   if (t === 'prolongation') return { finAvant };
   if (t === 'ne_pas_recruter') return cibles['ne_pas_recruter'] ? { personne: cibles['ne_pas_recruter'] } : {};
   return {};
+}
+
+/** Audit 4.4 : une offre de prolongation a-t-elle déjà été faite cette semaine pour ce contrat ? */
+function offreCetteSemaine(monde: Monde, idContrat: string): boolean {
+  return evenementsDeType(monde, 'negociation.offre').some((e) => e.contexte?.['contrat'] === idContrat && e.date.annee === monde.date.annee && e.date.semaine === monde.date.semaine);
 }
 
 /** L'organisation refuse de prolonger : la personne s'en souvient. */
@@ -312,8 +318,10 @@ function liberer(monde: Monde, p: Personne, c: Contrat, motif: Contrat['motifFin
     importance: 2, visibilite: 'public', causes: causes.filter((x) => monde.evenements[x]), contexte: { contrat: c.id, motif, ...(c.indemniteVerseeMEUR !== undefined ? { indemnite: c.indemniteVerseeMEUR } : {}) },
     texte: `${nomDe(monde, p.id)} quitte ${nomDe(monde, ancienne)}.`,
   });
-  // Départ d'un proche : ceux qui l'apprécient s'en souviennent.
-  for (const id of idsTries(table(monde, TABLES.personnes))) {
+  // Départ d'un proche : ceux qui l'apprécient s'en souviennent, et en veulent à l'écurie seulement si c'est elle qui l'a fait partir
+  // (audit 4.12 : avant, une retraite ou une démission faisait aussi perdre confiance envers l'écurie).
+  const voulu = motif === 'licenciement' || motif === 'rupture_employeur' || (motif === 'echeance' && !!c.nonProlonge);
+  if (voulu) for (const id of idsTries(table(monde, TABLES.personnes))) {
     const autre = table(monde, TABLES.personnes)[id] as unknown as Personne;
     if (autre.id === p.id || autre.ecurie !== ancienne || autre.statut !== 'actif') continue;
     const r = relation(monde, autre.id, p.id);
@@ -542,14 +550,22 @@ export const commandeProposerProlongation: DefinitionCommande = {
     if (!contrat) return 'Aucun contrat actif.';
     const tour = c.parametres['tour'] ?? 0;
     if (!(typeof tour === 'number' && Number.isInteger(tour) && tour >= 0 && tour <= 2)) return 'Tour de négociation invalide (0 à 2).';
+    // Audit 4.4 : le tour suit la négociation réelle (0 pour ouvrir, 1 ou 2 pour répondre à une contre-offre), et l'on n'ouvre
+    // qu'une négociation par semaine avec la même personne (on ne sonde pas son salaire minimum par des offres répétées).
+    const enCours = !!table(monde, TABLE_NEGOCIATIONS)[contrat.id];
+    if (enCours && tour === 0) return 'Une négociation est déjà en cours : répondez à la contre-offre.';
+    if (!enCours && tour > 0) return 'Aucune contre-offre en attente : la négociation s’ouvre au tour 0.';
+    if (!enCours && offreCetteSemaine(monde, contrat.id)) return 'Une offre a déjà été faite cette semaine à cette personne.';
     const effectif = motifRefusEffectif(monde, contrat.organisation, contrat.personne, contrat.poste, contrat.fin + 1, Math.max(contrat.fin, monde.date.annee) + cond.duree);
     if (effectif) return effectif;
     if (Math.max(contrat.fin, monde.date.annee) + cond.duree > monde.date.annee + BORNES_CONTRAT.dureeMax) return `Un contrat ne peut pas aller au-delà de ${monde.date.annee + BORNES_CONTRAT.dureeMax}.`;
     const promesses = c.parametres['promesses'] ?? [];
     if (!Array.isArray(promesses)) return 'Liste de promesses invalide.';
     const cibles = (c.parametres['cibles'] ?? {}) as Record<string, string>;
+    const beneficiaire = personneDe(monde, contrat.personne) as Personne;
     for (const t of promesses as TypePromesse[]) {
-      const m = motifPromesseInvalide(t, parametresPromesse(t, cond.salaire, contrat.fin, cibles));
+      const prm = parametresPromesse(t, cond.salaire, contrat.fin, cibles);
+      const m = motifPromesseInvalide(t, prm) ?? motifPromesseSansObjet(monde, t, beneficiaire, true, prm);
       if (m) return m;
     }
     const e = ecurie(monde, contrat.organisation);

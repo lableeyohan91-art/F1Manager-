@@ -92,6 +92,8 @@ export const COUPE_EN_COURS = 0.2;
 
 /** Le conseil licencie le team principal si l'écart au classement attendu est trop grand, selon sa patience. */
 export const CONSEIL = { ecartGrave: 5, ecartRepete: 3, patienceMaxGrave: 8, patienceMaxRepete: 12, probabilite: 0.6 };
+/** Audit 4.1 : contre-offre d'un team principal au conseil — le conseil suit jusqu'à ce multiple de la valeur de marché (H). */
+export const CONSEIL_CONTRE_OFFRE = { plafondValeur: 1.2 };
 
 /* =================================================================== Phase 5b */
 

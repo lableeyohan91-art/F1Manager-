@@ -88,7 +88,8 @@ export const PENALITE_AGE_RECRUTEMENT = 0.04;
 export const SEUIL_AUGMENTATION = 0.68;
 
 /** Demandes d'augmentation : probabilité mensuelle de base pour une personne sous-payée et performante. */
-export const DEMANDE_AUGMENTATION = { probabiliteMensuelle: 0.06, seuilSousPaye: 0.8, hausseDemandee: 0.2 };
+/** delaiReponseSemaines (audit 4.5) : sans réponse, une demande d'augmentation vaut refus au bout de ce délai (H, comme une demande de départ). */
+export const DEMANDE_AUGMENTATION = { probabiliteMensuelle: 0.06, seuilSousPaye: 0.8, hausseDemandee: 0.2, delaiReponseSemaines: 8 };
 
 /** Interactions de l'IA team principal : probabilité mensuelle de réagir à un pilote en difficulté. */
 export const REACTION_TEAM_PRINCIPAL = { probabiliteMensuelle: 0.15 };

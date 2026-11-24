@@ -7,6 +7,7 @@
  * directement, et jamais le moral.
  */
 
+import { PASSE } from '../../balance/histoire';
 import {
   LIEN_SOCIAL,
   ETIQUETTES, FAMILIARITE_MENSUELLE, RECONCILIATION, RESIDU, RETOUR_BASE_MENSUEL, SATURATION, SEUIL_CREATION_SOUVENIR,
@@ -226,7 +227,8 @@ export function lireEvenement(monde: Monde, porteurId: string, cible: string, et
   // Plafond de souvenirs par personne : le plus faible s'efface, avec son résidu.
   const tous = souvenirsDe(monde, porteurId);
   if (tous.length > SOUVENIRS_MAX_PAR_PERSONNE) {
-    const plusFaible = tous.filter((x) => x.id !== s.id).sort((a, b) => a.intensite - b.intensite || (a.id < b.id ? -1 : 1))[0];
+    // Audit 4.13 : le nouveau souvenir fait partie des candidats (s'il est le plus faible, c'est lui qui s'efface, avec son résidu).
+    const plusFaible = [...tous].sort((a, b) => a.intensite - b.intensite || (a.id < b.id ? -1 : 1))[0];
     if (plusFaible) effacer(monde, plusFaible);
   }
   return s;
@@ -350,6 +352,9 @@ export function evenementsProteges(monde: Monde): string[] {
 export const systemeOubli: Systeme = {
   nom: 'memoire.oubli',
   executer({ monde, date }) {
-    if (date.semaine % 4 === 0) passerUnMois(monde);
+    // Audit 4.14 : 12 passages par an, au changement de mois (comme le passé reconstruit), et non toutes les 4 semaines (13 par an).
+    const mois = (s: number) => Math.floor((s - 1) / PASSE.semainesParMois);
+    if (date.semaine > 1 && mois(date.semaine) !== mois(date.semaine - 1)) passerUnMois(monde);
+    else if (date.semaine === 1) passerUnMois(monde);
   },
 };

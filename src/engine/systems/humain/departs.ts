@@ -189,7 +189,8 @@ export const systemeDeparts: Systeme = {
           repondreDepart(monde, dirigeant, p, accepter && d.indemnite <= REPONSE_EMPLOYEUR.partBudgetMax * e.budgetMEUR);
           invalider();
         } else if (rang(date) - rang(d.depuis) >= DEMANDES_DEPART.delaiReponseSemaines) {
-          c.demandeDepart = { ...d, refusee: true };
+          // Audit 4.5 et 8.10 : le silence vaut refus, avec ses conséquences (fait, souvenir de conflit), comme un refus explicite.
+          repondreDepart(monde, dirigeant, p, false);
         }
         continue;
       }

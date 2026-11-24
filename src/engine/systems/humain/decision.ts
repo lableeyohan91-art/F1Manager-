@@ -84,13 +84,18 @@ export function indexerAnciennete(monde: Monde): void {
 }
 
 export function anneesDans(monde: Monde, p: Personne, organisation: string): number {
+  return anneesVecues(monde, p, organisation).size;
+}
+
+/** Années (saisons) vécues dans une organisation, réelles du passé et du jeu (audit 8.2 : la fenêtre n'est pas forcément continue). */
+export function anneesVecues(monde: Monde, p: Personne, organisation: string): Set<number> {
   const idx = indexAnciennete.get(monde);
   const contrats = (idx ? idx.contrats.get(p.id) ?? [] : (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[])).filter((c) => c.personne === p.id && c.organisation === organisation);
   const carriere = (idx ? idx.carrieres.get(p.id) ?? [] : (Object.values(table(monde, TABLES.carrieres)) as unknown as Carriere[])).filter((c) => c.personne === p.id && c.ecurieLignee === organisation);
   const annees = new Set<number>();
   for (const c of contrats) for (let y = c.debut; y <= Math.min(c.fin, monde.date.annee); y++) annees.add(y);
   for (const c of carriere) for (let y = c.de; y <= c.a; y++) annees.add(y);
-  return annees.size;
+  return annees;
 }
 
 /** Écurie formatrice : la première de la carrière connue. */
@@ -197,8 +202,11 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
     const rep = reputation(monde, o.decideur, p.id); // phase 8c : ce que la personne sait (ou a entendu dire) du team principal
     u += ajouter('réputation du team principal', 0.3 * (rep.paroleTenue + rep.fideliteAuPersonnel) / 2);
   }
-  const ro = relation(monde, p.id, o.organisation);
-  u += ajouter(ro.confiance >= 0 ? 'confiance envers l’écurie' : 'rancœur envers l’écurie', UTILITE.confianceOrganisation * ro.confiance);
+  // Audit 4.7 : quand le décideur est l'écurie elle-même (conseil), sa relation est déjà comptée ci-dessus : pas de double compte.
+  if (o.decideur !== o.organisation) {
+    const ro = relation(monde, p.id, o.organisation);
+    u += ajouter(ro.confiance >= 0 ? 'confiance envers l’écurie' : 'rancœur envers l’écurie', UTILITE.confianceOrganisation * ro.confiance);
+  }
 
   // Couche 4 : aspirations.
   for (const asp of p.aspirations) {
@@ -227,12 +235,13 @@ export function lassitude(monde: Monde, p: Personne): { niveau: number; ecurie?:
   const pilote = p.poste === 'pilote_titulaire';
   const reglage = pilote ? LASSITUDE_PILOTE : LASSITUDE_PERSONNEL;
   if (!pilote && (RANG_POSTE[p.poste] ?? 0) === 0) return { niveau: 0 };
-  const annees = anneesDans(monde, p, p.ecurie);
+  const vecues = anneesVecues(monde, p, p.ecurie);
+  const annees = vecues.size;
   const pal = Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[];
   const titres = pilote
     ? pal.filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie).length
-    : pal.filter((x) => x.championConstructeurs === p.ecurie && x.saison > monde.date.annee - annees).length;
-  const usure = usureSucces(monde, p, annees).usure;
+    : pal.filter((x) => x.championConstructeurs === p.ecurie && vecues.has(x.saison)).length;
+  const usure = usureSucces(monde, p, vecues).usure;
   if (annees < reglage.anneesMin) return { niveau: usure, ecurie: p.ecurie };
   let brut = reglage.parAnnee * (annees - reglage.anneesMin + 1) + reglage.parTitre * titres;
   if (!pilote) {
@@ -254,14 +263,16 @@ export function seuilPersonnel(p: Personne): number {
  * D-140 — usure du succès : titres vécus avec l'écurie, seuil personnel (3 à 5 titres selon le caractère), immunité des très loyaux.
  * Renvoie aussi le signal précurseur (la personne a atteint seuil − anticipation : elle demande un nouveau défi).
  */
-export function usureSucces(monde: Monde, p: Personne, anneesConnues?: number): { usure: number; titres: number; seuil: number; signal: boolean } {
+export function usureSucces(monde: Monde, p: Personne, anneesConnues?: Set<number>): { usure: number; titres: number; seuil: number; signal: boolean } {
   if (p.statut !== 'actif' || !p.ecurie || (p.traits['loyaute'] ?? 10) >= USURE_SUCCES.loyauteImmunite) return { usure: 0, titres: 0, seuil: Infinity, signal: false };
   const pilote = p.poste === 'pilote_titulaire';
   if (!pilote && (RANG_POSTE[p.poste] ?? 0) === 0) return { usure: 0, titres: 0, seuil: Infinity, signal: false };
-  const annees = anneesConnues ?? anneesDans(monde, p, p.ecurie);
+  // Audit 8.2 : seuls les titres des saisons réellement vécues dans l'écurie comptent (avant : les N dernières saisons, même pendant
+  // une absence).
+  const annees = anneesConnues ?? anneesVecues(monde, p, p.ecurie);
   const pal = Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[];
-  const constructeurs = pal.filter((x) => x.championConstructeurs === p.ecurie && x.saison > monde.date.annee - annees).length;
-  const titres = pilote ? Math.max(constructeurs, pal.filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie && x.saison > monde.date.annee - annees).length) : constructeurs;
+  const constructeurs = pal.filter((x) => x.championConstructeurs === p.ecurie && annees.has(x.saison)).length;
+  const titres = pilote ? Math.max(constructeurs, pal.filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie && annees.has(x.saison)).length) : constructeurs;
   const seuil = seuilPersonnel(p);
   const depart = seuil - USURE_SUCCES.anticipation;
   const usure = Math.min(USURE_SUCCES.max, Math.max(0, USURE_SUCCES.parTitre * (titres - depart)));

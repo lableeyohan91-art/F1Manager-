@@ -91,6 +91,8 @@ export function motifRefusConseil(monde: Monde, e: Ecurie, personne: string, sal
   const pro = (Object.values(table(monde, TABLES.proprietaires)) as unknown as Proprietaire[]).find((x) => x.ecurie === e.id && x.actif !== false);
   const accord = 1 - (pire - ENGAGEMENTS_PILOTES.libre) / (ENGAGEMENTS_PILOTES.maximum - ENGAGEMENTS_PILOTES.libre)
     + ((pro?.risque ?? 10) - 10) / 40 + ((pro?.ambition ?? 10) - 10) / 40;
-  const ok = tirageLocal(monde, 'conseil.engagement', e.id, personne, de, Math.round(salaire * 10)).chance(Math.min(1, Math.max(0, accord)));
+  // Audit 4.8 : un seul tirage par écurie, personne et saison (le salaire n'en fait pas partie) : changer le montant de 0,1 M€ ne
+  // relance plus le dé ; un salaire plus bas ne peut que rendre l'accord plus probable.
+  const ok = tirageLocal(monde, 'conseil.engagement', e.id, personne, de).chance(Math.min(1, Math.max(0, accord)));
   return ok ? null : `Le conseil refuse cet engagement (salaires des pilotes à ${Math.round(pire * 100)} % du budget).`;
 }
