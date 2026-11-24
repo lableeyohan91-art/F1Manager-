@@ -62,8 +62,11 @@ export function creerSaison(monde: Monde, annee: number): Saison {
   const retenus = avecVivier(monde) ? circuitsDeLaSaison(monde, annee, nombreGrandsPrix(monde)) : circuits.slice(0, nombreGrandsPrix(monde));
   const { debut, fin } = PHASES_SAISON.saison;
   const calendrier: string[] = [];
+  // Audit (1.15) : avec le vivier, chaque Grand Prix tombe à la semaine de sa date habituelle (son vrai mois, donc son vrai climat),
+  // dans la fenêtre de la saison et sans deux Grands Prix la même semaine ; sinon, répartition régulière (ancien calendrier).
+  const semaines = semainesDesGrandsPrix(retenus, debut, fin);
   retenus.forEach((c, i) => {
-    const semaine = retenus.length === 1 ? debut : debut + Math.round((i * (fin - debut)) / (retenus.length - 1));
+    const semaine = semaines[i]!;
     const id = `gp_${annee}_${String(i + 1).padStart(2, '0')}`;
     const gp: GrandPrix = { id, saison: annee, manche: i + 1, circuit: c.id, semaine, pluie: false, termine: false, resultats: [] };
     table(monde, TABLES.grandsPrix)[id] = gp as unknown as Entite;
@@ -87,6 +90,16 @@ export function creerSaison(monde: Monde, annee: number): Saison {
   };
   table(monde, TABLES.saisons)[saison.id] = saison as unknown as Entite;
   return saison;
+}
+
+function semainesDesGrandsPrix(retenus: Circuit[], debut: number, fin: number): number[] {
+  const n = retenus.length;
+  const regulier = retenus.map((_, i) => (n === 1 ? debut : debut + Math.round((i * (fin - debut)) / (n - 1))));
+  if (!retenus.every((c) => c.vivier) || n > fin - debut + 1) return regulier;
+  const s = retenus.map((c) => Math.min(fin, Math.max(debut, Math.ceil(c.vivier!.jourHabituel / 7))));
+  for (let i = 1; i < n; i++) s[i] = Math.max(s[i]!, s[i - 1]! + 1);
+  for (let i = n - 1; i >= 0; i--) s[i] = Math.min(s[i]!, i === n - 1 ? fin : s[i + 1]! - 1);
+  return s;
 }
 
 /* ---------------------------------------------------------------- Grand Prix */
@@ -127,7 +140,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const forme = EFFET_FORME_MAX * borner((p.etat.confiance - CONFIANCE_REFERENCE) / (100 - CONFIANCE_REFERENCE), -1, 1)
       + USURE_SUCCES.effetCourse * borner((p.etat.motivation - USURE_SUCCES.motivationReference) / USURE_SUCCES.motivationReference, -1, 0);
     const alea = f.normale(0, sigma);
-    const pMeca = ABANDON_MECANIQUE.base + (20 - voitureDe(monde, e.id).fiabilite) * ABANDON_MECANIQUE.parPoint;
+    // Audit (1.5) : la fiabilité peut dépasser 20 (bornes du développement) ; la probabilité ne descend pas sous le plancher.
+    const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - voitureDe(monde, e.id).fiabilite) * ABANDON_MECANIQUE.parPoint);
     const pInc = (INCIDENT.base + (20 - (p.competences['regularite'] ?? 10)) * INCIDENT.parPoint)
       * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.exigences.risqueAccident / INCIDENT.risqueReference);
     const abandon = f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : null;
@@ -174,7 +188,9 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       saison.pilotes.push(l);
       lp.set(r.pilote, l);
     }
+    l.ecurie = r.ecurie; // audit (1.10) : écurie du dernier Grand Prix couru (transfert en cours de saison)
     l.points += r.points;
+    if (r.position !== null) { l.places ??= []; l.places[r.position - 1] = (l.places[r.position - 1] ?? 0) + 1; }
     if (r.position === 1) l.victoires++;
     if (r.position !== null && r.position <= 3) l.podiums++;
     if (r.abandon) l.abandons++;
@@ -182,6 +198,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const c = lc.get(r.ecurie);
     if (c) {
       c.points += r.points;
+      if (r.position !== null) { c.places ??= []; c.places[r.position - 1] = (c.places[r.position - 1] ?? 0) + 1; }
       if (r.position === 1) c.victoires++;
     }
   }
@@ -247,8 +264,18 @@ export function titreEncoreOuvert(s: Saison): boolean {
   });
 }
 
+/**
+ * Départage (D-061, audit 1.6 et 1.7) : points, victoires, puis le plus de 2es places, de 3es places, etc. (règle réelle du
+ * championnat) ; l'identifiant ne tranche qu'une égalité parfaite sur toutes les places.
+ */
+function comparerPlaces(a?: number[], b?: number[]): number {
+  const n = Math.max(a?.length ?? 0, b?.length ?? 0);
+  for (let i = 1; i < n; i++) { const d = (b?.[i] ?? 0) - (a?.[i] ?? 0); if (d) return d; }
+  return 0;
+}
 export function trierClassements(s: Saison): void {
-  const cmp = (a: { points: number; victoires: number }, b: { points: number; victoires: number }) => b.points - a.points || b.victoires - a.victoires;
+  const cmp = (a: { points: number; victoires: number; places?: number[] }, b: { points: number; victoires: number; places?: number[] }) =>
+    b.points - a.points || b.victoires - a.victoires || comparerPlaces(a.places, b.places);
   s.pilotes.sort((a, b) => cmp(a, b) || b.podiums - a.podiums || (a.pilote < b.pilote ? -1 : 1));
   s.constructeurs.sort((a, b) => cmp(a, b) || (a.ecurie < b.ecurie ? -1 : 1));
 }
@@ -330,8 +357,9 @@ export function terminerSaison(monde: Monde, annee: number): void {
   const champion = s.pilotes[0];
   const championC = s.constructeurs[0];
   if (champion && championC && champion.points > 0) {
-    const eqP = ecuries.get(champion.ecurie) as Ecurie;
-    const eqC = ecuries.get(championC.ecurie) as Ecurie;
+    // Audit (1.10) : une écurie devenue inactive en cours de saison ne fait pas planter la fin de saison.
+    const eqP = ecuries.get(champion.ecurie) ?? (table(monde, TABLES.ecuries)[champion.ecurie] as unknown as Ecurie);
+    const eqC = ecuries.get(championC.ecurie) ?? (table(monde, TABLES.ecuries)[championC.ecurie] as unknown as Ecurie);
     eqP.titresPilotes++;
     // D-108 : le champion s'attache souvent au circuit de son sacre (dernière manche).
     const derniere = s.calendrier.length ? grandPrix(monde, s.calendrier[s.calendrier.length - 1]!) : undefined;

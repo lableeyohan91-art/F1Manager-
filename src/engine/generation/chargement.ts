@@ -292,6 +292,10 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     note: l.valeurs['note'] ?? '',
   }));
 
+  // Audit (1.11) : une saison n'a qu'un palmarès (sinon la seconde ligne écrasait la première en silence).
+  const saisonsPal = new Set<number>();
+  palmares.forEach((p, i) => { if (saisonsPal.has(p.saison)) problemes.push(`palmares.csv, ligne ${lpal[i]!.numero} : saison ${p.saison} en double`); saisonsPal.add(p.saison); });
+
   // Phase 9 : histoires réelles (porteur : une personne ; cible : une personne ou une écurie).
   const lhis = lireCsv('histoires.csv', fichier(f, 'histoires.csv'), ['id', 'saison', 'porteur', 'cible', 'etiquette', 'intensite', 'reciproque', 'texte']);
   const rh = new Lecteur('histoires.csv');
@@ -309,6 +313,14 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   }));
   verifierIdsUniques('histoires.csv', lhis.map((l, i) => ({ id: histoires[i]!.id, numero: l.numero })), problemes);
   for (const h of histoires) if (h.reciproque && idsEq.has(h.cible)) problemes.push(`histoires.csv : ${h.id} est réciproque mais sa cible est une écurie`);
+  // Audit (4.16) : pas d'histoire envers soi-même ; pas deux histoires de même étiquette pour la même paire la même saison.
+  const paires = new Set<string>();
+  for (const h of histoires) {
+    if (h.porteur === h.cible) problemes.push(`histoires.csv : ${h.id} a le même porteur et la même cible`);
+    const cle = `${h.saison}|${h.porteur}|${h.cible}|${h.etiquette}`;
+    if (paires.has(cle)) problemes.push(`histoires.csv : ${h.id} répète une histoire déjà saisie (même saison, paire et étiquette)`);
+    paires.add(cle);
+  }
   // Audit de la phase 9 : une histoire appartient au passé reconstruit, et ses protagonistes y étaient en âge de la vivre.
   const naissance = new Map(personnes.map((p) => [p.id, p.anneeNaissance]));
   for (const h of histoires) {
@@ -343,17 +355,27 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
       },
     } : {}),
   }));
+  // Audit (1.14) : le vivier est tout ou rien (sinon les circuits sans statut ne seraient jamais courus, sans message).
+  const avecStatut = circuits.filter((c) => c.vivier).length;
+  if (avecStatut > 0 && avecStatut < circuits.length) problemes.push(`circuits.csv : ${circuits.length - avecStatut} circuit(s) sans statut de vivier alors que d'autres en ont un`);
   // Phase 11b : climat mensuel (fichier facultatif climat-circuits.csv, généré par tools/circuits/generer-fiches-jeu.mts).
   if (f['climat-circuits.csv'] !== undefined) {
     const lcl = lireCsv('climat-circuits.csv', f['climat-circuits.csv'], ['id', 'mois', 'pluieCourse']);
     const rcl = new Lecteur('climat-circuits.csv');
     const parId = new Map(circuits.map((c) => [c.id, c]));
+    const vus = new Map<string, Set<number>>();
     for (const l of lcl) {
       const c = parId.get(rcl.texte(l, 'id'));
       if (!c) { problemes.push(`climat-circuits.csv ligne ${l.numero} : circuit inconnu`); continue; }
-      (c.pluieMensuelle ??= new Array<number>(12).fill(0))[rcl.entier(l, 'mois', 1, 12) - 1] = rcl.decimal(l, 'pluieCourse', 0, 1);
+      const mois = rcl.entier(l, 'mois', 1, 12);
+      const dejaVus = vus.get(c.id) ?? new Set<number>();
+      if (dejaVus.has(mois)) problemes.push(`climat-circuits.csv ligne ${l.numero} : mois ${mois} en double pour ${c.id}`);
+      dejaVus.add(mois); vus.set(c.id, dejaVus);
+      (c.pluieMensuelle ??= new Array<number>(12).fill(Number.NaN))[mois - 1] = rcl.decimal(l, 'pluieCourse', 0, 1);
     }
-    for (const c of circuits) if (c.pluieMensuelle && c.pluieMensuelle.length !== 12) problemes.push(`climat-circuits.csv : ${c.id} n'a pas 12 mois`);
+    // Audit (1.4) : un mois absent n'est jamais remplacé par 0 en silence.
+    for (const c of circuits) if (c.pluieMensuelle && c.pluieMensuelle.some((x) => !Number.isFinite(x))) problemes.push(`climat-circuits.csv : ${c.id} n'a pas ses 12 mois`);
+    problemes.push(...rcl.problemes);
   }
   verifierIdsUniques('circuits.csv', lcir.map((l, i) => ({ id: circuits[i]!.id, numero: l.numero })), problemes);
 
@@ -421,13 +443,18 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     suffixes: rs.texte(l, 'suffixes').split('|').map((x) => x.trim()).filter(Boolean),
   }));
   for (const s of secteurs) if (s.budgetMaxMEUR < s.budgetMinMEUR) problemes.push(`secteurs.csv : budget maximal inférieur au minimal pour ${s.secteur}`);
-  const racinesEntreprises = lireCsv('entreprises.csv', fichier(f, 'entreprises.csv'), ['racine']).map((l) => new Lecteur('entreprises.csv').texte(l, 'racine'));
+  const rent = new Lecteur('entreprises.csv');
+  const racinesEntreprises = lireCsv('entreprises.csv', fichier(f, 'entreprises.csv'), ['racine']).map((l) => rent.texte(l, 'racine'));
   if (racinesEntreprises.length < 10) problemes.push('entreprises.csv : il faut au moins 10 racines de noms');
 
   const ljun = lireCsv('ecuries-juniors.csv', fichier(f, 'ecuries-juniors.csv'), ['nom', 'nationalite']);
   const rj = new Lecteur('ecuries-juniors.csv');
   const ecuriesJuniors = ljun.map((l) => ({ nom: rj.texte(l, 'nom'), nationalite: rj.reference(l, 'nationalite', codesNat) }));
   if (ecuriesJuniors.length < 21) problemes.push('ecuries-juniors.csv : il faut au moins 21 noms (10 écuries Apex 3 + 11 écuries Apex 2)');
+
+  // Audit (1.3) : les erreurs des fichiers communs lus après le premier contrôle sont signalées elles aussi.
+  problemes.push(...rs.problemes, ...rent.problemes, ...rj.problemes);
+  if (problemes.length > 0) throw new ErreurDonnees(problemes);
 
   return { motoristes, ecuries, personnes, contrats, carrieres, palmares, histoires, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises, ecuriesJuniors, medias };
 }

@@ -532,6 +532,8 @@ export interface LigneClassementPilote {
   podiums: number;
   abandons: number;
   meilleurResultat: number | null;
+  /** Nombre d'arrivées à chaque place (indice 0 = 1re place) : départage des égalités (audit 1.7). */
+  places?: number[];
 }
 
 export interface LigneClassementConstructeur {
@@ -540,6 +542,8 @@ export interface LigneClassementConstructeur {
   victoires: number;
   doubles: number;
   primesMEUR?: number;
+  /** Nombre d'arrivées à chaque place des deux voitures (indice 0 = 1re place) : départage des égalités (audit 1.6). */
+  places?: number[];
 }
 
 export interface Saison {

@@ -48,8 +48,11 @@ export const CONFIANCE_REFERENCE = 65;
 export const ALEA_SIGMA = 0.3;
 export const MULTIPLICATEUR_ALEA_PLUIE = 1.7;
 
-/** Abandon mécanique : probabilité = base + (20 − fiabilité) × parPoint. */
-export const ABANDON_MECANIQUE = { base: 0.025, parPoint: 0.007 };
+/**
+ * Abandon mécanique : probabilité = base + (20 − fiabilité) × parPoint, jamais sous le plancher (une voiture de fiabilité 24 casse
+ * encore parfois : audit 1.5, la fiabilité peut dépasser 20 ; H : environ une panne tous les 100 départs).
+ */
+export const ABANDON_MECANIQUE = { base: 0.025, parPoint: 0.007, plancher: 0.01 };
 
 /** Incident de course : probabilité = base + (20 − régularité) × parPoint, multipliée selon les conditions. */
 /** Incidents : probabilité = (base + (20 − régularité) × parPoint) × pluie × (risque d'accident du circuit / référence). */

@@ -344,6 +344,9 @@ export function problemesMonde(m: unknown): string[] {
   if (!dateValide(m['date'])) pb.push(`date de jeu invalide (${JSON.stringify(m['date'])})`);
   for (const champ of ['tables', 'evenements', 'flux', 'compteurs']) if (!estObjet(m[champ])) pb.push(`partie « ${champ} » absente ou invalide`);
   if (!Array.isArray(m['chronique'])) pb.push('chronique absente ou invalide');
+  // Audit (1.8) : sans agenda ni file de commandes, la partie plantait à la première semaine.
+  for (const champ of ['agenda', 'fileCommandes', 'journalCommandes']) if (!Array.isArray(m[champ])) pb.push(`partie « ${champ} » absente ou invalide`);
+  if (m['parametres'] !== undefined && !estObjet(m['parametres'])) pb.push('réglages d’expérience invalides');
   if (pb.length) return pb;
   const tables = m['tables'] as Record<string, unknown>;
   for (const [nom, t] of Object.entries(tables)) {
@@ -374,6 +377,9 @@ export function deserialiser(texte: string): Monde {
   let version = f.entete.versionFormat;
   if (!entier(version) || version < 1) throw new ErreurSauvegarde('Sauvegarde illisible : la version du format est absente ou invalide.');
   if (!estObjet(f.monde)) throw new ErreurSauvegarde('Sauvegarde illisible : le contenu du monde est absent ou invalide.');
+  // Audit (1.8) : un contenu plus ancien que l'en-tête ne recevrait pas ses migrations : refusé avec un message clair.
+  const vContenu = (f.monde as Record<string, unknown>)['versionFormat'];
+  if (entier(vContenu) && vContenu < version) throw new ErreurSauvegarde(`Sauvegarde incohérente : l’en-tête annonce le format ${version}, le contenu le format ${vContenu}.`);
   if (version > VERSION_FORMAT) {
     throw new ErreurSauvegarde(
       `Cette sauvegarde vient d'une version plus récente du jeu (format ${version}, ce jeu lit jusqu'au format ${VERSION_FORMAT}).`,
@@ -383,7 +389,10 @@ export function deserialiser(texte: string): Monde {
   while (version < VERSION_FORMAT) {
     const migration = MIGRATIONS[version];
     if (!migration) throw new ErreurSauvegarde(`Aucune migration depuis le format ${version}.`);
-    monde = migration(monde);
+    // Audit (1.8) : une migration qui échoue sur un contenu endommagé donne un message clair, jamais une erreur brute.
+    try { monde = migration(monde); } catch (e) {
+      throw new ErreurSauvegarde(`Sauvegarde endommagée : la mise à jour du format ${version} vers ${version + 1} a échoué (${e instanceof Error ? e.message : String(e)}).`);
+    }
     version++;
   }
   monde['versionFormat'] = VERSION_FORMAT;

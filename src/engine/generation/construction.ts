@@ -345,7 +345,10 @@ function contratGenere(ctx: Contexte, p: Personne): Contrat {
   } satisfies Contrat);
 }
 
-export function construireMonde(graine: number, d: DonneesInitiales, scenario: string): Monde {
+export function construireMonde(graine: number, donnees: DonneesInitiales, scenario: string): Monde {
+  // Audit des phases 1 à 11 (1.1) : copie profonde des données. Un monde ne partage jamais un objet avec les données du scénario
+  // (sinon une action dans une partie, ex. une rupture négociée qui modifie des clauses, se retrouvait dans la partie suivante).
+  const d = structuredClone(donnees);
   const monde = creerMondeVide(graine, scenario, DATE_DEPART);
   const ctx: Contexte = { monde, graine, d, nomsPris: new Set() };
   // Phase 11 : médias fictifs (données).
@@ -355,8 +358,7 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
   for (const m of d.motoristes) ajouter(monde, TABLES.motoristes, { ...m });
   const ecuries = new Map<string, Ecurie>();
   for (const e of d.ecuries) ecuries.set(e.id, ajouter(monde, TABLES.ecuries, { ...e }));
-  // Copie profonde des parties modifiables (contrats du vivier) : chaque partie a les siennes, jamais celles des données partagées.
-  d.circuits.forEach((c, i) => ajouter(monde, TABLES.circuits, { ...c, ordre: i + 1, ...(c.vivier ? { vivier: { ...c.vivier } } : {}), ...(c.pluieMensuelle ? { pluieMensuelle: [...c.pluieMensuelle] } : {}) }));
+  d.circuits.forEach((c, i) => ajouter(monde, TABLES.circuits, { ...c, ordre: i + 1 }));
   for (const v of d.voitures) ajouter(monde, TABLES.voitures, { ...v });
   // Finances et propriétaires (phase 5a).
   for (const fi of d.finances) {

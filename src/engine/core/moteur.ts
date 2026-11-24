@@ -145,6 +145,12 @@ export class Moteur {
       }
       this.avancerUneSemaine(monde);
     }
+    // Audit (1.2) : une commande journalisée à la date cible elle-même a été exécutée tout de suite dans la partie d'origine (commande
+    // du joueur entre deux semaines) : on l'exécute de même, sans la journaliser une seconde fois.
+    while (parDate.length > 0 && datesEgales((parDate[0] as CommandeJournalisee).date, monde.date)) {
+      const c = structuredClone((parDate.shift() as CommandeJournalisee).commande);
+      if (this.commandes.executer(monde, c).ok) monde.journalCommandes.push({ date: { ...monde.date }, commande: c });
+    }
     return monde;
   }
 }
