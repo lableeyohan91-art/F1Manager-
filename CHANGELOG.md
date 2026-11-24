@@ -456,3 +456,16 @@ Aucun code à ce stade.
 
 ### Corrigé
 - Des prolongations successives pouvaient porter un contrat très au-delà de 5 saisons (jusqu'en 2045 dans un test) : borne commune au joueur et à l'IA.
+
+## [Phase 11 : médias et archives] — 24/11/2026
+
+### Ajouté (D-149)
+- 9 médias fictifs (`data/commun/medias.csv`) ; articles tirés des seuls faits du moteur, selon la ligne éditoriale ; rumeurs étiquetées (vraies ou fausses, le joueur ne le sait pas).
+- Image publique des personnes et des écuries (lue par la valeur commerciale, les sponsors, le conseil, les candidats) ; exposition médiatique (lue par la popularité).
+- Scandales professionnels issus de la simulation ; conférences de presse (commande `media.declaration`, commune au joueur et à l'IA ; délégation « communication ») ; objectif annoncé lu par le conseil.
+- Archives : records (titres depuis 2010, victoires et podiums depuis 2027), palmarès, classement d'image ; record battu = fait et article.
+- Écrans Actualités et Archives ; image sur le tableau de bord et les fiches. Format de sauvegarde 26 et migration.
+- Tests `tests/medias.test.ts` (11). 216 tests. Mesures : `docs/rapports/2026-11-24-p11-medias.md`.
+
+### Corrigé
+- Accord des phrases des infrastructures (« son nouveau simulateur »).
