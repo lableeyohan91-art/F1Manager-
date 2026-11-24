@@ -127,6 +127,13 @@ def construire(cache, cid, longueur, virages_officiels, sortie):
         points=[dict(x=round(X[i] - x0, 1), y=round(Y[i] - y0, 1), z=round(Z[i] - z0, 1), v=vitesses[i][0], vMin=vitesses[i][1], vMax=vitesses[i][2],
                      gaz=gaz[i], frein=freins[i]) for i in range(len(pts))],
     )
+    # L'adhérence de piste est calée à part (tools/calage-profil.mts) : on la conserve si la trace existe déjà.
+    try:
+        ancienne = json.load(open(sortie))
+        if 'adherencePiste' in ancienne:
+            sortie_d['adherencePiste'] = ancienne['adherencePiste']
+    except (OSError, ValueError):
+        pass
     json.dump(sortie_d, open(sortie, 'w'), ensure_ascii=False, separators=(',', ':'))
     return sortie_d
 

@@ -23,7 +23,7 @@ for (const f of readdirSync('data/circuits').filter((x) => x.endsWith('.json')).
   const s = sensibilites(tr, avecAilerons(VOITURE_REFERENCE, niveau), c);
   const parts = partsDuTour(tr, p);
   const r = {
-    niveauAilerons: niveau, partElectrique: +p.partElectrique.toFixed(2), tempsModele: +p.tempsS.toFixed(1), tempsReel: tr.tempsTourS.mediane,
+    niveauAilerons: niveau, coupureKmh: p.coupureKmh, tempsModele: +p.tempsS.toFixed(1), tempsReel: tr.tempsTourS.mediane,
     vmaxModele: Math.round(Math.max(...modele)), vmaxReel: Math.max(...reel), vminModele: Math.round(Math.min(...modele)), vminReel: Math.min(...reel),
     ecartMoyenKmh: +(ecart.reduce((a, b) => a + b, 0) / ecart.length).toFixed(1), ecartAbsMoyenKmh: +(ecart.reduce((a, b) => a + Math.abs(b), 0) / ecart.length).toFixed(1),
     virages: virages.length, ecartVitesseVirages: +(virages.reduce((a, v, i) => a + (vModeleVirages[i] ? vModeleVirages[i]!.vMinKmh - v.vMinKmh : 0), 0) / virages.length).toFixed(1),

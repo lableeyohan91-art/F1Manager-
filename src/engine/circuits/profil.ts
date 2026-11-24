@@ -9,10 +9,14 @@
  * « puissance » et « motricité »). Module pur : aucune dépendance au monde ni au hasard.
  */
 
-import { AIR, CLASSES_VIRAGES, DETECTION_VIRAGE, G, NIVEAUX_AILERONS, PERTURBATION_SENSIBILITE, PROFIL, PUISSANCE_ALTITUDE_EXPOSANT, VOITURE_REFERENCE } from '../balance/profil';
+import { AERO_ACTIVE, AIR, POINTS_ESSENTIELS, CLASSES_VIRAGES, DETECTION_VIRAGE, G, NIVEAUX_AILERONS, PERTURBATION_SENSIBILITE, PROFIL, PUISSANCE_ALTITUDE_EXPOSANT, VOITURE_REFERENCE } from '../balance/profil';
 
 export interface PointTrace { x: number; y: number; z: number; v?: number }
-export interface Trace { circuit: string; longueurM: number; pasM: number; points: PointTrace[] }
+export interface Trace {
+  circuit: string; longueurM: number; pasM: number; points: PointTrace[];
+  /** Adhérence du revêtement (1 = moyenne du calendrier) : multiplie toutes les adhérences pneu-piste (D-159 §2.1). */
+  adherencePiste?: { valeur: number; statut: string };
+}
 export type VoiturePhysique = typeof VOITURE_REFERENCE;
 export interface Conditions { altitudeM: number; temperatureC?: number }
 
@@ -21,8 +25,8 @@ export type Limite = 'virage' | 'freinage' | 'motricite' | 'puissance' | 'butee'
 export interface Profil {
   tempsS: number;
   vitesses: number[]; // m/s
-  /** Part de la puissance électrique effectivement disponible (budget d'énergie par tour). */
-  partElectrique: number;
+  /** Vitesse au-dessus de laquelle l'énergie électrique n'est plus déployée (budget par tour) ; null si le budget suffit partout. */
+  coupureKmh: number | null;
   limites: Limite[];
   courbures: number[]; // 1/m (absolue)
 }
@@ -71,29 +75,42 @@ export function puissance(v: VoiturePhysique, vitesseMs: number, rhoRel: number,
 
 export function profilVitesse(tr: Trace, v: VoiturePhysique, c: Conditions, k?: number[]): Profil {
   const kap = (k ?? courbures(tr)).map(Math.abs);
-  // Budget d'énergie électrique par tour : si le déploiement demandé dépasse le budget, la puissance électrique est réduite au prorata.
-  let part = 1, p = passeUnique(tr, v, c, kap, part);
+  // Budget d'énergie électrique par tour. Une écurie dépense son énergie là où elle rapporte le plus de temps : aux vitesses basses
+  // et moyennes (le gain par joule y est le plus grand), et coupe en bout de ligne droite (« clipping » observé en 2026).
+  // On cherche donc la vitesse de coupure au-dessus de laquelle on ne déploie plus, telle que l'énergie dépensée égale le budget.
+  let p = passeUnique(tr, v, c, kap, Infinity);
+  if (energieElectrique(tr, v, p, Infinity) <= v.energieElectriqueTourJ) return p;
+  let bas = 0, haut = v.vitesseMaxMs;
   for (let it = 0; it < PROFIL.iterationsEnergie; it++) {
-    const besoin = energieElectrique(tr, v, p, part);
-    if (besoin <= v.energieElectriqueTourJ * 1.001) break;
-    part *= v.energieElectriqueTourJ / besoin;
-    p = passeUnique(tr, v, c, kap, part);
+    const milieu = (bas + haut) / 2;
+    const q = passeUnique(tr, v, c, kap, milieu);
+    if (energieElectrique(tr, v, q, milieu) > v.energieElectriqueTourJ) haut = milieu; else { bas = milieu; p = q; }
   }
+  if (bas === 0) p = passeUnique(tr, v, c, kap, 0);
   return p;
 }
 
-/** Énergie électrique déployée sur le tour (points limités par la puissance). */
-function energieElectrique(tr: Trace, v: VoiturePhysique, p: Profil, part: number): number {
+/** Énergie électrique déployée sur le tour (points limités par la puissance, sous la vitesse de coupure). */
+function energieElectrique(tr: Trace, v: VoiturePhysique, p: Profil, coupure: number): number {
   let e = 0;
-  p.vitesses.forEach((x, i) => { if (p.limites[i] === 'puissance') e += v.puissanceElectriqueW * partDeploiement(v, x) * part * (tr.pasM / Math.max(x, 1)); });
+  p.vitesses.forEach((x, i) => { if (p.limites[i] === 'puissance' && x < coupure) e += v.puissanceElectriqueW * partDeploiement(v, x) * (tr.pasM / Math.max(x, 1)); });
   return e;
 }
 
-function passeUnique(tr: Trace, v: VoiturePhysique, c: Conditions, kap: number[], partElectrique: number): Profil {
+/** La voiture sur ce revêtement : toutes les adhérences pneu-piste multipliées par l'adhérence de la piste. */
+export function surPiste(v: VoiturePhysique, tr: Trace): VoiturePhysique {
+  const f = tr.adherencePiste?.valeur ?? 1;
+  return f === 1 ? v : { ...v, muMeca: v.muMeca * f, muAero: v.muAero * f, muMotricite: v.muMotricite * f, muFreinage: v.muFreinage * f };
+}
+
+function passeUnique(tr: Trace, v0: VoiturePhysique, c: Conditions, kap: number[], coupure: number): Profil {
+  const v = surPiste(v0, tr);
   const n = kap.length, pas = tr.pasM, m = v.masseKg;
   const rho = densiteAir(c), rhoRel = rho / AIR.densiteMer;
-  const appui = (vv: number) => 0.5 * rho * v.cla * vv * vv;
-  const trainee = (vv: number) => 0.5 * rho * v.cda * vv * vv;
+  // Aérodynamique active : configuration « ligne droite » sur les portions presque droites.
+  const ligne = kap.map((kk) => kk < 1 / AERO_ACTIVE.rayonMinLigneM);
+  const appui = (vv: number, i: number) => 0.5 * rho * v.cla * (ligne[i] ? 1 - v.reductionAppuiLigne : 1) * vv * vv;
+  const trainee = (vv: number, i: number) => 0.5 * rho * v.cda * (ligne[i] ? 1 - v.reductionTraineeLigne : 1) * vv * vv;
   // 1. Vitesse maximale en virage : m v² κ = muMeca m g + muAero × appui(v)  →  v² = muMeca m g / (m κ − muAero ½ ρ CLA)
   const vmax: number[] = [];
   for (const kk of kap) {
@@ -106,23 +123,23 @@ function passeUnique(tr: Trace, v: VoiturePhysique, c: Conditions, kap: number[]
     // 2. Passe avant (accélération).
     for (let i = 1; i < 2 * n; i++) {
       const a = (i - 1) % n, b = i % n, vv = Math.max(vit[a]!, 1);
-      const fPuissance = puissance(v, vv, rhoRel, partElectrique) / vv;
-      const fMotricite = v.muMotricite * (m * G + appui(vv));
-      const f = Math.min(fPuissance, fMotricite) - trainee(vv);
+      const fPuissance = puissance(v, vv, rhoRel, vv < coupure ? 1 : 0) / vv;
+      const fMotricite = v.muMotricite * (m * G + appui(vv, a));
+      const f = Math.min(fPuissance, fMotricite) - trainee(vv, a);
       const suiv = Math.sqrt(Math.max(0, vv * vv + (2 * pas * f) / m));
       if (suiv < vit[b]!) { vit[b] = suiv; lim[b] = fPuissance < fMotricite ? 'puissance' : 'motricite'; }
     }
     // 3. Passe arrière (freinage).
     for (let i = 2 * n; i > 0; i--) {
       const a = i % n, b = (i - 1) % n, vv = vit[a]!;
-      const f = v.muFreinage * (m * G + appui(vv)) + trainee(vv);
+      const f = v.muFreinage * (m * G + appui(vv, a)) + trainee(vv, a);
       const prec = Math.sqrt(vv * vv + (2 * pas * f) / m);
       if (prec < vit[b]!) { vit[b] = prec; lim[b] = 'freinage'; }
     }
   }
   let t = 0;
   for (const x of vit) t += pas / Math.max(x, 1);
-  return { tempsS: t, vitesses: vit, limites: lim, courbures: kap, partElectrique };
+  return { tempsS: t, vitesses: vit, limites: lim, courbures: kap, coupureKmh: Number.isFinite(coupure) ? Math.round(coupure * 3.6) : null };
 }
 
 /** Voiture avec un niveau d'ailerons a (réglage du week-end). */
@@ -130,14 +147,27 @@ export function avecAilerons(v: VoiturePhysique, a: number): VoiturePhysique {
   return { ...v, cla: v.cla * (1 + a), cda: v.cda * (1 + NIVEAUX_AILERONS.trainee * a) };
 }
 
-/** Niveau d'appui naturel : le réglage d'ailerons qui donne le meilleur tour à cette voiture sur ce circuit. */
+/**
+ * Niveau d'appui naturel : le réglage d'ailerons qui donne le meilleur tour à cette voiture sur ce circuit. Le temps au tour varie
+ * de façon unimodale avec le niveau : recherche par section dorée (≈ 10 profils au lieu de 31), arrondie au pas des réglages.
+ */
 export function appuiNaturel(tr: Trace, v: VoiturePhysique, c: Conditions, k?: number[]): { niveau: number; profil: Profil } {
-  const kk = k ?? courbures(tr);
-  let best: { niveau: number; profil: Profil } | undefined;
-  for (let a = NIVEAUX_AILERONS.min; a <= NIVEAUX_AILERONS.max + 1e-9; a += NIVEAUX_AILERONS.pas) {
-    const p = profilVitesse(tr, avecAilerons(v, a), c, kk);
-    if (!best || p.tempsS < best.profil.tempsS) best = { niveau: Math.round(a * 100) / 100, profil: p };
+  const kk = k ?? courbures(tr), cache = new Map<number, Profil>();
+  const arrondi = (a: number) => Math.round(Math.min(NIVEAUX_AILERONS.max, Math.max(NIVEAUX_AILERONS.min, a)) / NIVEAUX_AILERONS.pas) * NIVEAUX_AILERONS.pas;
+  const essai = (a: number) => {
+    const x = +arrondi(a).toFixed(2);
+    if (!cache.has(x)) cache.set(x, profilVitesse(tr, avecAilerons(v, x), c, kk));
+    return cache.get(x)!.tempsS;
+  };
+  const or = (Math.sqrt(5) - 1) / 2;
+  let lo = NIVEAUX_AILERONS.min, hi = NIVEAUX_AILERONS.max;
+  while (hi - lo > NIVEAUX_AILERONS.pas) {
+    const x1 = hi - or * (hi - lo), x2 = lo + or * (hi - lo);
+    if (essai(x1) <= essai(x2)) hi = x2; else lo = x1;
   }
+  for (const a of [lo, (lo + hi) / 2, hi, NIVEAUX_AILERONS.min, NIVEAUX_AILERONS.max]) essai(a);
+  let best: { niveau: number; profil: Profil } | undefined;
+  for (const [x, p] of [...cache.entries()].sort((a, b) => a[0] - b[0])) if (!best || p.tempsS < best.profil.tempsS) best = { niveau: x, profil: p };
   return best!;
 }
 
@@ -200,4 +230,27 @@ export function viragesDetectes(tr: Trace, vitessesKmh: number[]): VirageDetecte
     else if (dans && debut < 0) debut = i;
   }
   return res;
+}
+
+/* ------------------------------------------------------------------ Points essentiels (fiche circuit) */
+
+export interface PointsEssentiels<K extends string> { essentiels: [K, K]; moinsImportant: K; parts: Record<K, number> }
+
+/**
+ * Les deux paramètres les plus déterminants d'un circuit et le moins influent, à partir des gains bruts du circuit et de leur moyenne
+ * sur le calendrier. Un paramètre au gain négligeable ne peut pas être essentiel (POINTS_ESSENTIELS). Même calcul pour la fiche et le moteur.
+ */
+export function pointsEssentiels<K extends string>(gains: Record<K, number>, moyennes: Record<K, number>): PointsEssentiels<K> {
+  const cles = Object.keys(gains) as K[];
+  const max = Math.max(...cles.map((k) => gains[k]));
+  const rel = {} as Record<K, number>;
+  for (const k of cles) rel[k] = moyennes[k] > 0 ? Math.max(0, gains[k]) / moyennes[k] : 0;
+  const total = cles.reduce((a, k) => a + rel[k], 0) || 1;
+  const parts = {} as Record<K, number>;
+  for (const k of cles) parts[k] = rel[k] / total;
+  const significatif = (k: K) => gains[k] >= POINTS_ESSENTIELS.gainNegligeableS && gains[k] >= POINTS_ESSENTIELS.partNegligeable * max;
+  const tri = [...cles].sort((a, b) => parts[b] - parts[a] || (a < b ? -1 : 1));
+  const candidats = tri.filter(significatif);
+  const ess = (candidats.length >= 2 ? candidats : tri).slice(0, 2) as [K, K];
+  return { essentiels: ess, moinsImportant: tri[tri.length - 1]!, parts };
 }

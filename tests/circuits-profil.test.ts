@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { appuiNaturel, avecAilerons, courbures, profilVitesse, sensibilites, viragesDetectes, type Trace } from '../src/engine/circuits/profil';
+import { appuiNaturel, avecAilerons, courbures, pointsEssentiels, profilVitesse, sensibilites, viragesDetectes, type Trace } from '../src/engine/circuits/profil';
 import { VOITURE_REFERENCE } from '../src/engine/balance/profil';
 
 type TraceReelle = Trace & { viragesOfficiels: number; tempsTourS: { mediane: number }; points: { x: number; y: number; z: number; v: number }[] };
@@ -85,3 +85,23 @@ describe('Phase 11b — état du calage (24/11/2026, à améliorer : voir le rap
     expect(performance.now() - t0).toBeLessThan(200);
   });
 });
+
+describe('Phase 11b — points essentiels (normalisation validée le 24/11/2026)', () => {
+  it('un paramètre au gain négligeable ne peut pas être essentiel, même si sa part normalisée est la plus forte', () => {
+    const gains = { adherence: 0.4, appui: 0.3, motricite: 0.04 };
+    const moyennes = { adherence: 0.4, appui: 0.3, motricite: 0.01 }; // la motricité pèse 4 fois sa moyenne, mais 0,04 s seulement
+    const r = pointsEssentiels(gains, moyennes);
+    expect(r.parts.motricite).toBeGreaterThan(r.parts.adherence);
+    expect(r.essentiels).not.toContain('motricite');
+  });
+
+  it('les points essentiels sont calculés par le même profil que le temps au tour (cohérence fiche et moteur)', () => {
+    const c = 'cir_monza', t = lire(c);
+    const { niveau } = appuiNaturel(t, VOITURE_REFERENCE, cond(c));
+    const g = sensibilites(t, avecAilerons(VOITURE_REFERENCE, niveau), cond(c));
+    const r = pointsEssentiels({ trainee: g.trainee, puissance: g.puissance, appui: g.appui, adherenceMecanique: g.adherenceMecanique }, { trainee: 0.12, puissance: 0.19, appui: 0.32, adherenceMecanique: 0.36 });
+    // À Monza, ce qui pèse le plus (normalisé) est la traînée ou la puissance ; mesuré, pas imposé.
+    expect(r.essentiels).toEqual(expect.arrayContaining(['trainee']));
+  });
+});
+
