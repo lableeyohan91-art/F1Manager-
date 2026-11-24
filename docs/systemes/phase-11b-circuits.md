@@ -1,6 +1,6 @@
 # Phase 11b — Circuits : identité technique, segments, conditions, histoire
 
-> Statut : **ÉTUDE ET CONCEPTION, À VALIDER** (D-159). Aucun code de jeu avant validation des décisions du §12.
+> Statut : **ÉTUDE ET CONCEPTION, À VALIDER** (D-159). Aucun code de jeu avant validation des décisions du §13.
 > Fiche d'intention : `docs/echanges/2026-11-24-intention-phase-11b-circuits.md`.
 > Étude menée le 24/11/2026 par Claude Code. Les essais de calcul sont des **prototypes jetables** (scripts hors du dépôt), pas du code du jeu.
 
@@ -8,7 +8,8 @@
 
 | Source | État | Conséquence |
 | --- | --- | --- |
-| **APEX Lab** (`APEX-Lab-rapport-v0.9.md`) | **Inaccessible** : absent du dépôt et des dépôts ouverts à cette session | Ses chiffres (47,7 % SC, 35,5 % VSC, 7,7 % DR, 14,1 % pluie) sont cités tels que tu les as donnés, **non vérifiés**. Pour que je m'appuie sur ses enseignements, dépose le rapport dans `docs/echanges/` |
+| **APEX Lab v0.9** | **Reçu et lu** (`docs/echanges/APEX-Lab-rapport-a-transmettre.md`). Ses fichiers annexes (`historique-circuits.csv`, `historique-circuits-sources.json`, `campagne-48000-courses.json`) ne sont pas fournis | Enseignements intégrés au §12 ; observations réelles et sorties de simulation toujours séparées |
+| **Paddock** (appli de course pour circuit miniature) | Copie locale trouvée hors du dépôt (`ext/paddock`) | Modèle météo et stratégie des pneus lus (§12) : à adapter, pas à reprendre tel quel |
 | FIA (documents de course, plans officiels), formula1.com, OpenF1, Wikipédia, OpenStreetMap, archives météo (Open-Meteo, Meteostat) | **Bloqués** par le réseau de mon environnement | Collecte impossible d'ici pour l'instant : voir §6 et §7 (autorisation d'accès à demander) |
 | Dépôts GitHub publics en lecture brute (`raw.githubusercontent.com`) | **Accessibles** | Deux sources utilisables tout de suite (ci-dessous) |
 
@@ -251,13 +252,13 @@ Source : TracingInsights / Kaggle (CC0). Fenêtre : **les 10 dernières édition
 | Lussail | **4** (2021–2025) | 5 · 3 | 1 · 1 | 0 |
 | Yas Marinna | 10 (2016–2025) | 3 · 3 | 2 · 2 | 0 |
 
-**Sur les 208 éditions** : 53,8 % des Grands Prix ont eu au moins une SC (0,74 SC par GP), 34,7 % au moins une VSC, 11,5 % au moins un drapeau rouge. Pour mémoire, le générateur d'APEX Lab donnait 47,7 %, 35,5 % et 7,7 % (périodes et circuits différents) : il était **en dessous du réel pour les SC et les drapeaux rouges**, ce qui rejoint le défaut que ton laboratoire avait relevé.
+**Sur les 208 éditions** : 53,8 % des Grands Prix ont eu au moins une SC (0,74 SC par GP), 34,7 % au moins une VSC, 11,5 % au moins un drapeau rouge. Pour mémoire, le **générateur** d'APEX Lab (simulation, 48 000 profils) donnait 47,7 %, 35,5 % et 7,7 %. Ses fréquences étaient calées sur l'**historique complet** de chaque circuit (dénominateurs différents, Safety Car depuis 1993), et lissées : il est **en dessous des 10 dernières éditions réelles** pour les SC et les drapeaux rouges, ce qui rejoint le défaut relevé par ton laboratoire. Les SC et les drapeaux rouges sont plus fréquents dans la période récente.
 
 ### 6.2 Limites, à afficher honnêtement
 
 - **VSC seulement depuis 2015** (elle n'existait pas avant) : une édition antérieure ne compte pas dans le dénominateur des VSC.
 - **Zandvoort** : les dix dernières éditions remontent aux années 1980. Je propose d'afficher **séparément** les éditions modernes (depuis 2021) et anciennes, comme tu le demandes.
-- **Jeu communautaire** : quelques anomalies possibles (Spa sans aucune VSC en 10 ans me paraît suspect). Il faut **recouper par échantillon** avec les documents officiels de la FIA (accès à demander).
+- **Jeu communautaire, avec au moins un trou avéré** : en recoupant avec APEX Lab (source F1DB via TracingInsights), les **totaux concordent** (Singapour 13 GP avec SC sur 17, Djeddah 5/5 SC, 2/5 VSC, 1/5 drapeau rouge, Spa 1 VSC sur 12 éditions depuis 2015). Mais la Safety Car de **Singapour 2016** (accident au premier tour) **manque** dans ma source. Il faut donc **vérifier chaque édition** avant de l'inscrire dans les données du jeu, contre une seconde source (F1DB, documents FIA). « Spa sans VSC en 10 ans » est en revanche cohérent avec APEX Lab (sa seule VSC date de 2015 ou 2016, hors de la fenêtre).
 - **Courses sprint** : non comptées (seulement les Grands Prix).
 - Le départ sous SC sous la pluie (par exemple) compte comme une intervention : à préciser sur la fiche.
 
@@ -355,14 +356,39 @@ La chaîne de causes « incident → danger → intervention → décision » es
 
 | Sous-phase | Contenu | Validation par le porteur avant |
 | --- | --- | --- |
-| **11b-1 Données réelles** | Accès aux sources (environnement), collecte : tracés, numérotation des virages, stands, tours, climat mensuel, historique des neutralisations, revêtement. Fichiers de données avec statut et source de chaque valeur. **Relecture d'un échantillon** (5 circuits) par toi | Les choix du §12 |
+| **11b-1 Données réelles** | Accès aux sources (environnement), collecte : tracés, numérotation des virages, stands, tours, climat mensuel, historique des neutralisations, revêtement. Fichiers de données avec statut et source de chaque valeur. **Relecture d'un échantillon** (5 circuits) par toi | Les choix du §13 |
 | **11b-2 Profil de vitesse et sensibilités** | Modèle physique simplifié, « valeur d'un point » (§4.2), poids voiture et pilote **calculés** à la place des notes saisies, exigences dérivées. **Campagne d'équilibrage avant/après** (D-076), sans toucher aux dynasties | Le calibrage « un point » |
 | **11b-3 Calendrier et climat** | Vivier de 30, dates réelles, permanents et rotation, contrats des circuits, météo et température selon le mois, archives par circuit ; format de sauvegarde et migration | Le vivier et la taille du calendrier |
 | **11b-4 Fiche circuit** | Écran mobile (blocs A à D, E vide), explications générées, test de cohérence fiche et moteur, parcours navigateur | La maquette |
 
 La direction de course, les dépassements, l'énergie, la thermique et la course en 2D restent en **phase 13**. Les paramètres de voiture restent en **phase 12**.
 
-## 12. Décisions qui demandent ta validation
+## 12. Enseignements d'APEX Lab et de Paddock
+
+### 12.1 Ce qu'APEX Lab apporte (en distinguant réel et simulé)
+
+| Enseignement | Nature | Ce que j'en fais |
+| --- | --- | --- |
+| **Dénominateurs propres à chaque catégorie** (SC depuis 1993, VSC depuis 2015, drapeau rouge depuis 1950) | Méthode, appliquée aux données réelles | Repris tel quel : fiche et archives ont un dénominateur par catégorie ; les éditions antérieures à une règle ne comptent pas |
+| **Lissage des petits échantillons** (ne pas transformer 1/1 en certitude) | Méthode | Repris pour **vérifier** le moteur (comparaison des distributions) et pour les **probabilités météo** des circuits peu documentés. Jamais pour régler des SC : en phase 13, elles naîtront des incidents |
+| **Courses humides catégorisées à partir des récits Wikipédia** (licence CC BY-SA) ; intensité et durée des averses = **hypothèse** | Données réelles (occurrence) + hypothèse (intensité) | Occurrence : bonne source de vérification, mais la licence CC BY-SA impose le partage à l'identique si on l'intègre aux données du jeu (même question que D-043). Intensité et durée : resteront des hypothèses marquées **H** |
+| **Drapeaux jaunes non mesurés** ; méthode proposée : signaux de Race Control (OpenF1), en distinguant **messages** et **phases de drapeau** | Limite + méthode | OpenF1 couvre seulement depuis 2023, et l'accès est bloqué ici. À faire en phase 13 ; la phase 11b ne stocke que le risque par élément |
+| **Drapeau rouge simplifié** (neutralisation de deux tours) | Limite | Confirme l'intention : la phase 11b prépare une table des **règles par période** (interruption, reprise, changement de pneus) ; la procédure complète est en phase 13 |
+| **SC et VSC tirées par course, causes illustratives** | Limite reconnue par le laboratoire | Confirme la chaîne de causes de la phase 13 : les historiques servent à **vérifier**, pas à tirer |
+| **Paris rejoués avec les mêmes événements extérieurs ; prévision pré-course sèche, sans connaître l'averse** | Méthode de test | Repris pour la campagne stratégique de la phase 13 (mêmes graines, mêmes événements, seule la décision change) ; aucune IA ni conseil ne lit l'avenir |
+| **48 000 profils simulés en ≈ 9 s** sans faire rouler les voitures | Mesure de performance du laboratoire | Indique qu'un générateur d'événements par course est léger ; le coût de la phase 13 viendra du suivi des 22 voitures |
+| Exemples historiques : Singapour SC 13/17, Barcelone 7/34, Spa 20/32, Monaco 16/33 ; Djeddah 5/5 | **Réel** (toute l'histoire de chaque circuit) | Servent de recoupement à mes 10 dernières éditions (voir §6.2) |
+| Exemples simulés : Singapour SC 69,4 %, Spa pluie 34,8 %, Djeddah rouge 12,9 % | **Simulé** | Jamais affichés comme statistiques ; références pour comparer le futur moteur au laboratoire |
+
+### 12.2 Ce que Paddock apporte
+
+- **Météo** : un ciel qui évolue par états (soleil, nuages, bruine, pluie, orage) et une humidité de piste qui tend progressivement vers une valeur cible, puis sèche. C'est une bonne base pour la **pluie intermittente** de la phase 13. Les probabilités devront venir du climat réel du circuit et du mois.
+- **Stratégie des pneus** (rapport 3) :
+  - avec trois niveaux trop espacés, une seule gomme gagne partout. Il faut des écarts de l'ordre de 1 à 2 % pour que chaque gomme puisse gagner ;
+  - la leçon vaut pour la phase 13 : **éviter les paliers grossiers**, mesurer qu'aucune stratégie n'est toujours la meilleure.
+- **Limite** : modèles faits pour un circuit miniature à crans de vitesse. Ils guident la conception, ils ne se recopient pas.
+
+## 13. Décisions qui demandent ta validation
 
 1. **Le profil de vitesse comme source unique.** Les 9 notes actuelles et les poids des voitures et des pilotes ne sont plus saisis, mais **calculés** sur les tracés réels. *Recommandé* : c'est ce qui garantit la cohérence entre la fiche, le moteur actuel et la phase 13.
 2. **La valeur d'un point de note** : même gain moyen sur le calendrier pour chaque caractéristique, en attendant les coûts de développement de la phase 12. *Recommandé.*
@@ -373,4 +399,5 @@ La direction de course, les dépassements, l'énergie, la thermique et la course
 7. **Les 6 circuits du vivier** : Imola, Portimão, Istanbul, Sepang, Kyalami, plus un au choix (Nürburgring, Hockenheim, Paul Ricard, Mugello) ?
 8. **Configurations anciennes** : structure prête, mais **seule la configuration actuelle** saisie au départ ? *Recommandé* (le travail de données est déjà très important).
 9. **Historique avant la phase 13** : afficher les neutralisations **réelles** dès la phase 11b, et « non simulé » pour les saisons jouées jusqu'à la phase 13 ? *Recommandé.*
-10. **APEX Lab** : peux-tu déposer le rapport v0.9 dans `docs/echanges/` ? Sans lui, je ne reprends aucun de ses enseignements comme acquis.
+10. **Données de pluie issues des récits Wikipédia** (comme APEX Lab) : licence CC BY-SA. Les utiliser seulement pour **vérifier** le moteur, ou les intégrer aux données du jeu, avec le partage à l'identique que cela impose ?
+11. **Fichiers annexes d'APEX Lab** (`historique-circuits.csv`, `campagne-48000-courses.json`) : si tu les as, dépose-les. Ils permettraient de recouper circuit par circuit.
