@@ -10,7 +10,7 @@ Configuration : { "cir_x": { "pages": ["Ville", "Autre ville"], "moisGP": 6, "he
 import json, re, sys, time, urllib.parse, urllib.request, os, glob
 
 PAUSE_S = 4
-PART_PLUIE_COURSE = 0.35
+PART_PLUIE_COURSE = 0.43  # vérifiée contre les courses réellement humides (pluie_reelle.py : 29/258 réel contre 23,3 attendu avec 0,35)
 JOURS = [31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 MOIS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 UA = {'User-Agent': 'APEX-Manager-circuits/1.0 (outil de données de jeu)'}

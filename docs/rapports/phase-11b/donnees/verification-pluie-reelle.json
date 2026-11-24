@@ -1,0 +1,1222 @@
+{
+ "cir_mexico": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_monaco": {
+  "lues": 10,
+  "humides": 2,
+  "editions": [
+   [
+    2016,
+    true
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    true
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_monza": {
+  "lues": 9,
+  "humides": 0,
+  "editions": [
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    null
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_singapour": {
+  "lues": 10,
+  "humides": 2,
+  "editions": [
+   [
+    2015,
+    false
+   ],
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    true
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2022,
+    true
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_suzuka": {
+  "lues": 10,
+  "humides": 1,
+  "editions": [
+   [
+    2015,
+    false
+   ],
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2022,
+    true
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_albert": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    2015,
+    false
+   ],
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_austin": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_bakou": {
+  "lues": 10,
+  "humides": 1,
+  "editions": [
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    true
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_barcelone": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_hungaroring": {
+  "lues": 10,
+  "humides": 3,
+  "editions": [
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    true
+   ],
+   [
+    2021,
+    true
+   ],
+   [
+    2022,
+    true
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_imola": {
+  "lues": 10,
+  "humides": 1,
+  "editions": [
+   [
+    2002,
+    false
+   ],
+   [
+    2003,
+    false
+   ],
+   [
+    2004,
+    false
+   ],
+   [
+    2005,
+    false
+   ],
+   [
+    2006,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    true
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ]
+  ]
+ },
+ "cir_interlagos": {
+  "lues": 10,
+  "humides": 1,
+  "editions": [
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    true
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_jeddah": {
+  "lues": 5,
+  "humides": 0,
+  "editions": [
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ]
+  ]
+ },
+ "cir_lasvegas": {
+  "lues": 4,
+  "humides": 0,
+  "editions": [
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_lusail": {
+  "lues": 4,
+  "humides": 0,
+  "editions": [
+   [
+    2021,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ]
+  ]
+ },
+ "cir_madrid": {
+  "lues": 1,
+  "humides": 0,
+  "editions": [
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_miami": {
+  "lues": 5,
+  "humides": 2,
+  "editions": [
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    true
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    true
+   ]
+  ]
+ },
+ "cir_montreal": {
+  "lues": 10,
+  "humides": 1,
+  "editions": [
+   [
+    2015,
+    false
+   ],
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    true
+   ]
+  ]
+ },
+ "cir_sakhir": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ]
+  ]
+ },
+ "cir_sepang": {
+  "lues": 10,
+  "humides": 5,
+  "editions": [
+   [
+    2009,
+    true
+   ],
+   [
+    2010,
+    false
+   ],
+   [
+    2011,
+    false
+   ],
+   [
+    2012,
+    true
+   ],
+   [
+    2013,
+    true
+   ],
+   [
+    2014,
+    false
+   ],
+   [
+    2015,
+    true
+   ],
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2026,
+    true
+   ]
+  ]
+ },
+ "cir_shanghai": {
+  "lues": 10,
+  "humides": 1,
+  "editions": [
+   [
+    2013,
+    false
+   ],
+   [
+    2014,
+    false
+   ],
+   [
+    2015,
+    false
+   ],
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    true
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_silverstone": {
+  "lues": 10,
+  "humides": 2,
+  "editions": [
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    true
+   ],
+   [
+    2025,
+    true
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_spa": {
+  "lues": 10,
+  "humides": 2,
+  "editions": [
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    true
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    true
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_spielberg": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ],
+   [
+    2026,
+    false
+   ]
+  ]
+ },
+ "cir_yasmarina": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    2016,
+    false
+   ],
+   [
+    2017,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    false
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    false
+   ]
+  ]
+ },
+ "cir_zandvoort": {
+  "lues": 10,
+  "humides": 3,
+  "editions": [
+   [
+    1982,
+    false
+   ],
+   [
+    1983,
+    false
+   ],
+   [
+    1984,
+    false
+   ],
+   [
+    1985,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ],
+   [
+    2023,
+    true
+   ],
+   [
+    2024,
+    false
+   ],
+   [
+    2025,
+    true
+   ],
+   [
+    2026,
+    true
+   ]
+  ]
+ },
+ "cir_istanbul": {
+  "lues": 9,
+  "humides": 2,
+  "editions": [
+   [
+    2005,
+    false
+   ],
+   [
+    2006,
+    false
+   ],
+   [
+    2007,
+    false
+   ],
+   [
+    2008,
+    false
+   ],
+   [
+    2009,
+    false
+   ],
+   [
+    2010,
+    false
+   ],
+   [
+    2011,
+    false
+   ],
+   [
+    2020,
+    true
+   ],
+   [
+    2021,
+    true
+   ]
+  ]
+ },
+ "cir_kyalami": {
+  "lues": 10,
+  "humides": 0,
+  "editions": [
+   [
+    1977,
+    false
+   ],
+   [
+    1978,
+    false
+   ],
+   [
+    1979,
+    false
+   ],
+   [
+    1980,
+    false
+   ],
+   [
+    1982,
+    false
+   ],
+   [
+    1983,
+    false
+   ],
+   [
+    1984,
+    false
+   ],
+   [
+    1985,
+    false
+   ],
+   [
+    1992,
+    false
+   ],
+   [
+    1993,
+    false
+   ]
+  ]
+ },
+ "cir_paulricard": {
+  "lues": 9,
+  "humides": 0,
+  "editions": [
+   [
+    1985,
+    null
+   ],
+   [
+    1986,
+    false
+   ],
+   [
+    1987,
+    false
+   ],
+   [
+    1988,
+    false
+   ],
+   [
+    1989,
+    false
+   ],
+   [
+    1990,
+    false
+   ],
+   [
+    2018,
+    false
+   ],
+   [
+    2019,
+    false
+   ],
+   [
+    2021,
+    false
+   ],
+   [
+    2022,
+    false
+   ]
+  ]
+ },
+ "cir_portimao": {
+  "lues": 2,
+  "humides": 0,
+  "editions": [
+   [
+    2020,
+    false
+   ],
+   [
+    2021,
+    false
+   ]
+  ]
+ }
+}
