@@ -20,7 +20,7 @@ import {
   ALEA_DEVELOPPEMENT_MENSUEL, ALEA_INTERSAISON, BORNES_CARACTERISTIQUE, BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET, MOIS_EQUIVALENTS_INTERSAISON,
   MOTORISTE_ALEA_ANNUEL, MOTORISTE_PROGRESSION_ANNUELLE, PLAFOND_TECHNIQUE, POIDS_CAPACITE, TAUX_DEVELOPPEMENT_MENSUEL,
 } from '../../balance/developpement';
-import { BAREME_POINTS, ENVELOPPE_PRIMES_MEUR, GRANDS_PRIX_PAR_SAISON, PARTS_PRIMES } from '../../balance/reglement';
+import { BAREME_POINTS, ENVELOPPE_PRIMES_MEUR, PARTS_PRIMES } from '../../balance/reglement';
 import { ajouterEvenement } from '../../core/evenements';
 import { planifier, tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import { idsTries, parametre, table, type Entite, type Monde } from '../../core/monde';
@@ -34,6 +34,7 @@ import { facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero
 import { bonusSavoirDeveloppement } from '../technique/conception';
 import { usureSucces } from '../humain/decision';
 import { nombreGrandsPrix } from '../politique/acces';
+import { avecVivier, circuitsDeLaSaison, moisDeSemaine } from './calendrier';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 
@@ -57,7 +58,8 @@ export function grandPrix(monde: Monde, id: string): GrandPrix {
 export function creerSaison(monde: Monde, annee: number): Saison {
   const tc = table(monde, TABLES.circuits);
   const circuits = (Object.values(tc) as unknown as Circuit[]).sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0) || (a.id < b.id ? -1 : 1));
-  const retenus = circuits.slice(0, nombreGrandsPrix(monde)); // D-141 : nombre voté par les écuries
+  // D-141 : nombre voté par les écuries. Phase 11b : permanents et rotation (vivier) ; parties antérieures : les N premiers du fichier.
+  const retenus = avecVivier(monde) ? circuitsDeLaSaison(monde, annee, nombreGrandsPrix(monde)) : circuits.slice(0, nombreGrandsPrix(monde));
   const { debut, fin } = PHASES_SAISON.saison;
   const calendrier: string[] = [];
   retenus.forEach((c, i) => {
@@ -97,7 +99,9 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const saison = saisonDe(monde, gp.saison) as Saison;
   const circuit = table(monde, TABLES.circuits)[gp.circuit] as unknown as Circuit;
   const ecuries = new Map(ecuriesActives(monde).map((e) => [e.id, e]));
-  gp.pluie = tirageLocal(monde, 'meteo', gp.id).chance(PROBABILITE_PLUIE[circuit.climatPluie] ?? 0.1);
+  // Phase 11b : climat réel du mois où le Grand Prix a lieu (un Grand Prix déplacé change de climat) ; sinon, ancienne classe de pluie.
+  const pluie = circuit.pluieMensuelle ? circuit.pluieMensuelle[moisDeSemaine(gp.semaine) - 1]! : (PROBABILITE_PLUIE[circuit.climatPluie] ?? 0.1);
+  gp.pluie = tirageLocal(monde, 'meteo', gp.id).chance(pluie);
 
   // Rang des voitures sur ce circuit (1 = la plus rapide).
   const indices = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, circuit)]));

@@ -3,8 +3,8 @@
 /** Points attribués aux 10 premiers (D-031). */
 export const BAREME_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
 
-/** Nombre de Grands Prix par saison (D-030b). Si moins de circuits sont disponibles, on les prend tous. */
-export const GRANDS_PRIX_PAR_SAISON = 24;
+/* Nombre de Grands Prix par saison (D-030b, D-141) : voir VIVIER dans balance/circuits.ts (phase 11b : 20 au départ, 24 pour les
+   parties antérieures au vivier). Si moins de circuits sont disponibles, on les prend tous. */
 
 /** Enveloppe totale des primes de fin de saison, en M€. Estimation de game design. */
 export const ENVELOPPE_PRIMES_MEUR = 1100;

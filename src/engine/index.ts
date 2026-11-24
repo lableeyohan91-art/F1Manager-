@@ -16,6 +16,7 @@ export * from './generation/construction';
 export * from './generation/coherence';
 export * from './systems/saison';
 export * from './systems/saison/performance';
+export * from './systems/saison/calendrier';
 export * from './diagnostics/indicateurs';
 export * from './diagnostics/positions';
 export * from './systems/memoire';

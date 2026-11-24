@@ -397,6 +397,24 @@ export interface Circuit {
    * tracé réel (data/circuits/poids-voiture-profil.json). Présents seulement quand une campagne les injecte ; sinon, poids D-107.
    */
   poidsProfil?: Record<string, number>;
+  /**
+   * Phase 11b : place dans le vivier des circuits (lue par la création du calendrier, D-145). Absente des parties antérieures au
+   * format 29 : elles gardent l'ancien calendrier (les N premiers circuits du fichier).
+   */
+  vivier?: VivierCircuit;
+  /** Phase 11b : probabilité de pluie pendant la course pour chaque mois (12 valeurs, climat réel ; lue par la simulation du Grand Prix). */
+  pluieMensuelle?: number[];
+}
+
+export interface VivierCircuit {
+  /** Permanent : au calendrier chaque saison. Rotation : partage les places restantes selon la règle connue de tous. */
+  statut: 'permanent' | 'rotation';
+  /** Dernière saison couverte par le contrat en cours (rotation) ; null : aucun contrat. */
+  finContrat: number | null;
+  /** Jour de l'année habituel du Grand Prix (ordre du calendrier). */
+  jourHabituel: number;
+  /** Dernière saison où le circuit a accueilli un Grand Prix (réelle, puis simulée) ; null : jamais. */
+  derniereEdition: number | null;
 }
 
 export interface ExigencesCircuit {

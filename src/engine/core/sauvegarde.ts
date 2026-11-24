@@ -298,6 +298,9 @@ const MIGRATIONS: Record<number, Migration> = {
     for (const t of ['offresSponsors', 'objectifsGP', 'operationsSponsors']) tables[t] ??= {};
     return { ...m, versionFormat: 28 };
   },
+  // v28 → v29 (phase 11b) : vivier de circuits et climat mensuel. Une partie antérieure n'a pas de vivier (il vient des données) :
+  // elle garde son calendrier (les N premiers circuits, 24 au départ) et ses classes de pluie. Aucune donnée n'est modifiée.
+  28: (m) => ({ ...m, versionFormat: 29 }),
 };
 
 export function serialiser(monde: Monde): string {

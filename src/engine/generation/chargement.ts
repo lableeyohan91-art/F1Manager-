@@ -333,7 +333,28 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     climatPluie: rci.parmi(l, 'climatPluie', ['très faible', 'faible', 'moyen', 'élevé'] as const),
     exigences: Object.fromEntries(CHAMPS_EXIGENCES.map((c) => [c, rci.entier(l, c, 1, 5)])) as unknown as ExigencesCircuit,
     verification: l.valeurs['verification'] ?? '',
+    // Phase 11b : vivier (colonnes facultatives ; sans elles, ancien calendrier).
+    ...(l.valeurs['statut'] ? {
+      vivier: {
+        statut: rci.parmi(l, 'statut', ['permanent', 'rotation'] as const),
+        finContrat: l.valeurs['finContrat'] ? rci.entier(l, 'finContrat', 1950, 2200) : null,
+        jourHabituel: rci.entier(l, 'jourHabituel', 1, 366),
+        derniereEdition: l.valeurs['derniereEdition'] ? rci.entier(l, 'derniereEdition', 1950, 2200) : null,
+      },
+    } : {}),
   }));
+  // Phase 11b : climat mensuel (fichier facultatif climat-circuits.csv, généré par tools/circuits/generer-fiches-jeu.mts).
+  if (f['climat-circuits.csv'] !== undefined) {
+    const lcl = lireCsv('climat-circuits.csv', f['climat-circuits.csv'], ['id', 'mois', 'pluieCourse']);
+    const rcl = new Lecteur('climat-circuits.csv');
+    const parId = new Map(circuits.map((c) => [c.id, c]));
+    for (const l of lcl) {
+      const c = parId.get(rcl.texte(l, 'id'));
+      if (!c) { problemes.push(`climat-circuits.csv ligne ${l.numero} : circuit inconnu`); continue; }
+      (c.pluieMensuelle ??= new Array<number>(12).fill(0))[rcl.entier(l, 'mois', 1, 12) - 1] = rcl.decimal(l, 'pluieCourse', 0, 1);
+    }
+    for (const c of circuits) if (c.pluieMensuelle && c.pluieMensuelle.length !== 12) problemes.push(`climat-circuits.csv : ${c.id} n'a pas 12 mois`);
+  }
   verifierIdsUniques('circuits.csv', lcir.map((l, i) => ({ id: circuits[i]!.id, numero: l.numero })), problemes);
 
   // Voitures (D-056).

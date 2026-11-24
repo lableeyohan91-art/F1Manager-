@@ -1,25 +1,31 @@
-id;nom;ville;pays;type;altitudeM;climatPluie;lents;rapides;freinage;motricite;lignesDroites;degradationPneus;exigencePhysique;difficulte;risqueAccident;verification
-cir_albert;Albert Parc;Melbourne;AUS;mixte;10;faible;3;3;3;3;3;3;3;3;3;nom altéré / type et climat estimés
-cir_shanghai;Shangai;Shanghai;CHN;mixte;5;moyen;3;3;4;3;4;4;3;3;2;idem
-cir_suzuka;Suzuca;Suzuka;JPN;rapide;45;moyen;2;5;3;2;3;4;5;5;3;idem
-cir_sakhir;Sakir;Sakhir;BHR;mixte;10;très faible;3;2;5;4;4;5;3;2;2;idem
-cir_jeddah;Jedda;Djeddah;KSA;urbain;10;très faible;1;5;3;2;5;2;4;4;5;idem
-cir_miami;Miamy;Miami;USA;urbain;3;moyen;3;3;4;3;4;4;4;3;3;idem
-cir_montreal;Gilles-Villeneuves;Montréal;CAN;urbain;15;moyen;3;1;5;5;4;3;3;3;4;idem
-cir_monaco;Monacco;Monaco;MON;urbain;10;faible;5;1;4;5;1;1;4;5;5;idem
-cir_barcelone;Catalunia;Barcelone;ESP;mixte;110;faible;3;4;3;3;3;5;4;3;2;idem
-cir_spielberg;Spielbergh;Spielberg;AUT;rapide;680;moyen;2;3;5;4;4;3;3;2;2;idem
-cir_silverstone;Silverston;Silverstone;GBR;rapide;150;élevé;2;5;3;2;4;4;5;4;3;idem
-cir_spa;Spa-Francorchamp;Stavelot;BEL;rapide;400;élevé;2;5;3;3;5;3;4;4;3;idem
-cir_hungaroring;Hungarorring;Budapest;HUN;lent et sinueux;250;faible;5;2;3;4;1;3;4;4;2;idem
-cir_zandvoort;Zandvort;Zandvoort;NED;lent et sinueux;5;moyen;3;4;2;3;2;3;4;5;3;idem
-cir_monza;Monzza;Monza;ITA;rapide;160;faible;2;3;5;4;5;2;2;2;3;idem
-cir_madrid;Madrit;Madrid;ESP;urbain;650;faible;4;2;4;4;3;3;3;3;4;idem
-cir_bakou;Bakou;Bakou;AZE;urbain;-25;très faible;4;2;5;4;5;2;3;4;5;idem
-cir_singapour;Marinna Bay;Singapour;SGP;urbain;10;élevé;5;1;4;5;2;3;5;4;4;idem
-cir_austin;Austen;Austin;USA;mixte;150;faible;3;4;4;3;4;4;4;4;2;idem
-cir_mexico;Hermanos Rodrigues;Mexico;MEX;altitude;2240;faible;3;2;4;4;4;2;3;3;2;idem
-cir_interlagos;Interlagoss;São Paulo;BRA;mixte;800;élevé;3;3;3;4;3;3;3;4;3;idem
-cir_lasvegas;Las Vegaz;Las Vegas;USA;urbain;620;très faible;2;2;5;4;5;2;2;2;4;idem
-cir_lusail;Lussail;Lusail;QAT;rapide;10;très faible;1;5;2;2;3;5;5;3;2;idem
-cir_yasmarina;Yas Marinna;Abou Dabi;UAE;mixte;5;très faible;4;2;4;4;4;3;3;2;2;idem
+id;nom;ville;pays;type;altitudeM;climatPluie;lents;rapides;freinage;motricite;lignesDroites;degradationPneus;exigencePhysique;difficulte;risqueAccident;statut;finContrat;jourHabituel;derniereEdition;verification
+cir_albert;Albert Parc;Melbourne;AUS;mixte;10;faible;3;3;3;3;3;3;3;3;3;rotation;2037;67;2026;nom altéré / type et climat estimés
+cir_shanghai;Shangai;Shanghai;CHN;mixte;5;moyen;3;3;4;3;4;4;3;3;2;rotation;2030;74;2026;idem
+cir_suzuka;Suzuca;Suzuka;JPN;rapide;45;moyen;2;5;3;2;3;4;5;5;3;permanent;;88;2026;idem
+cir_sakhir;Sakir;Sakhir;BHR;mixte;10;très faible;3;2;5;4;4;5;3;2;2;rotation;2036;102;2025;idem
+cir_jeddah;Jedda;Djeddah;KSA;urbain;10;très faible;1;5;3;2;5;2;4;4;5;rotation;2030;109;2025;idem
+cir_miami;Miamy;Miami;USA;urbain;3;moyen;3;3;4;3;4;4;4;3;3;rotation;2031;123;2026;idem
+cir_montreal;Gilles-Villeneuves;Montréal;CAN;urbain;15;moyen;3;1;5;5;4;3;3;3;4;permanent;;144;2026;idem
+cir_monaco;Monacco;Monaco;MON;urbain;10;faible;5;1;4;5;1;1;4;5;5;permanent;;158;2026;idem
+cir_barcelone;Catalunia;Barcelone;ESP;mixte;110;faible;3;4;3;3;3;5;4;3;2;rotation;2026;165;2026;idem
+cir_spielberg;Spielbergh;Spielberg;AUT;rapide;680;moyen;2;3;5;4;4;3;3;2;2;rotation;2030;179;2026;idem
+cir_silverstone;Silverston;Silverstone;GBR;rapide;150;élevé;2;5;3;2;4;4;5;4;3;permanent;;186;2026;idem
+cir_spa;Spa-Francorchamp;Stavelot;BEL;rapide;400;élevé;2;5;3;3;5;3;4;4;3;permanent;;200;2026;idem
+cir_hungaroring;Hungarorring;Budapest;HUN;lent et sinueux;250;faible;5;2;3;4;1;3;4;4;2;permanent;;207;2026;idem
+cir_zandvoort;Zandvort;Zandvoort;NED;lent et sinueux;5;moyen;3;4;2;3;2;3;4;5;3;rotation;2026;235;2026;idem
+cir_monza;Monzza;Monza;ITA;rapide;160;faible;2;3;5;4;5;2;2;2;3;permanent;;249;2026;idem
+cir_madrid;Madrit;Madrid;ESP;urbain;650;faible;4;2;4;4;3;3;3;3;4;rotation;2035;256;2026;idem
+cir_bakou;Bakou;Bakou;AZE;urbain;-25;très faible;4;2;5;4;5;2;3;4;5;rotation;2030;269;2026;idem
+cir_singapour;Marinna Bay;Singapour;SGP;urbain;10;élevé;5;1;4;5;2;3;5;4;4;permanent;;284;2026;idem
+cir_austin;Austen;Austin;USA;mixte;150;faible;3;4;4;3;4;4;4;4;2;rotation;2026;298;2026;idem
+cir_mexico;Hermanos Rodrigues;Mexico;MEX;altitude;2240;faible;3;2;4;4;4;2;3;3;2;permanent;;305;2026;idem
+cir_interlagos;Interlagoss;São Paulo;BRA;mixte;800;élevé;3;3;3;4;3;3;3;4;3;permanent;;312;2026;idem
+cir_lasvegas;Las Vegaz;Las Vegas;USA;urbain;620;très faible;2;2;5;4;5;2;2;2;4;rotation;2032;325;2026;idem
+cir_lusail;Lussail;Lusail;QAT;rapide;10;très faible;1;5;2;2;3;5;5;3;2;rotation;2032;333;2025;idem
+cir_yasmarina;Yas Marinna;Abou Dabi;UAE;mixte;5;très faible;4;2;4;4;4;3;3;2;2;rotation;2030;340;2025;idem
+cir_imola;Imolla;Imola;ITA;rapide;40;moyen;3;4;4;3;3;3;4;4;3;rotation;2025;138;2025;nom altéré / vivier (phase 11b) / exigences estimées
+cir_sepang;Sepanng;Sepang;MAS;mixte;20;élevé;3;4;4;3;4;5;5;3;2;rotation;2026;277;2026;idem
+cir_portimao;Portimau;Portimão;POR;mixte;44;faible;3;3;3;3;3;3;4;4;2;rotation;2021;122;2021;idem
+cir_istanbul;Istambull;Istanbul;TUR;rapide;150;moyen;3;5;3;3;4;5;5;4;2;rotation;2021;283;2021;idem
+cir_kyalami;Kyalamy;Midrand;RSA;altitude;1500;moyen;3;3;3;3;3;3;3;3;3;rotation;;66;1993;idem (tracé sans relevé réel : statut E)
+cir_paulricard;Paul-Ricar;Le Castellet;FRA;rapide;408;faible;2;4;3;3;5;3;3;2;1;rotation;2022;177;2022;idem

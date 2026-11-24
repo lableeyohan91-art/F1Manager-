@@ -1,6 +1,7 @@
 /** Phase 8d-4 — accès à la fédération et aux alliances (module sans dépendance vers les autres systèmes). */
 
-import { GRANDS_PRIX_PAR_SAISON } from '../../balance/reglement';
+import { VIVIER } from '../../balance/circuits';
+import { avecVivier } from '../saison/calendrier';
 import { parametre, table, type Monde } from '../../core/monde';
 import { TABLES } from '../../model/types';
 
@@ -45,7 +46,9 @@ export function regleVotee(monde: Monde, nom: string, defaut: number): number {
 
 /** D-141 : nombre de Grands Prix de la saison (réglage d'expérience, sinon valeur votée, sinon valeur de départ). */
 export function nombreGrandsPrix(monde: Monde): number {
-  return parametre(monde, 'reglement.grandsPrix', regleVotee(monde, 'grandsPrix', GRANDS_PRIX_PAR_SAISON));
+  // Phase 11b : 20 Grands Prix au départ d'une partie à vivier ; les parties antérieures gardent leur nombre de départ (24).
+  const depart = avecVivier(monde) ? VIVIER.grandsPrix : VIVIER.grandsPrixAncienCalendrier;
+  return parametre(monde, 'reglement.grandsPrix', regleVotee(monde, 'grandsPrix', depart));
 }
 
 /** Poids de tirage des orientations des prochaines réformes : président et lobbying (1 par défaut). */

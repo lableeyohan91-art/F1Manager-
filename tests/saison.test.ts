@@ -11,12 +11,12 @@ const saisons = (m: ReturnType<typeof sc.creerMonde>) => Object.values(m.tables[
 const gps = (m: ReturnType<typeof sc.creerMonde>) => Object.values(m.tables['grandsprix'] ?? {}) as unknown as GrandPrix[];
 
 describe('Phase 3 — saison abstraite', () => {
-  it('une saison : 24 Grands Prix, 22 partants, points cohérents', () => {
+  it('une saison : 20 Grands Prix (phase 11b : vivier, D-145), 22 partants, points cohérents', () => {
     const m = sc.creerMonde(42);
     sc.creerMoteur().avancer(m, S);
     const [s] = saisons(m);
     expect(s!.termine).toBe(true);
-    expect(s!.calendrier).toHaveLength(24);
+    expect(s!.calendrier).toHaveLength(20);
     for (const gp of gps(m)) {
       expect(gp.termine).toBe(true);
       expect(gp.resultats).toHaveLength(22);
@@ -27,7 +27,7 @@ describe('Phase 3 — saison abstraite', () => {
     const totalConstructeurs = s!.constructeurs.reduce((a, l) => a + l.points, 0);
     expect(totalPilotes).toBe(totalConstructeurs);
     // Au plus 101 points par course (25+18+…+1), moins s'il y a moins de 10 arrivants.
-    expect(totalPilotes).toBeLessThanOrEqual(24 * 101);
+    expect(totalPilotes).toBeLessThanOrEqual(s!.calendrier.length * 101);
   });
 
   it('palmarès, titres et chronique à la fin de la saison', () => {

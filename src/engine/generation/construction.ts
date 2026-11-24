@@ -355,7 +355,8 @@ export function construireMonde(graine: number, d: DonneesInitiales, scenario: s
   for (const m of d.motoristes) ajouter(monde, TABLES.motoristes, { ...m });
   const ecuries = new Map<string, Ecurie>();
   for (const e of d.ecuries) ecuries.set(e.id, ajouter(monde, TABLES.ecuries, { ...e }));
-  d.circuits.forEach((c, i) => ajouter(monde, TABLES.circuits, { ...c, ordre: i + 1 }));
+  // Copie profonde des parties modifiables (contrats du vivier) : chaque partie a les siennes, jamais celles des données partagées.
+  d.circuits.forEach((c, i) => ajouter(monde, TABLES.circuits, { ...c, ordre: i + 1, ...(c.vivier ? { vivier: { ...c.vivier } } : {}), ...(c.pluieMensuelle ? { pluieMensuelle: [...c.pluieMensuelle] } : {}) }));
   for (const v of d.voitures) ajouter(monde, TABLES.voitures, { ...v });
   // Finances et propriétaires (phase 5a).
   for (const fi of d.finances) {

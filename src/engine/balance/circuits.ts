@@ -38,3 +38,12 @@ export const PROBABILITE_PLUIE: Record<string, number> = {
   moyen: 0.15,
   élevé: 0.25,
 };
+
+/**
+ * Phase 11b — vivier de circuits et calendrier (D-145, décisions du porteur) :
+ * - grandsPrix : nombre de Grands Prix de départ d'une partie à vivier (10 permanents + 10 places en rotation) ;
+ * - grandsPrixAncienCalendrier : nombre de départ des parties antérieures au vivier (format < 29), inchangé pour elles ;
+ * - contratRotationAns : durée (saisons) du contrat d'un circuit qui entre dans la rotation (H) ;
+ * - semainesParMois : conversion semaine de jeu → mois, pour le climat (52 semaines / 12 mois).
+ */
+export const VIVIER = { grandsPrix: 20, grandsPrixAncienCalendrier: 24, contratRotationAns: 3, semainesParMois: 52 / 12 };
