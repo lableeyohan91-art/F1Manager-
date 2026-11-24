@@ -29,10 +29,10 @@ const etoiles = (fiabilite: number) => '★'.repeat(Math.max(1, Math.round(fiabi
 const RISQUES: Record<string, string> = {
   soutenir: 'Le pilote s’en souviendra ; vous vous engagez publiquement.',
   mettre_pression: 'Critique publique : le pilote s’en souviendra, votre image en pâtit.',
-  viser_titre: 'Le conseil vous jugera sur le titre cette saison.',
+  viser_titre: 'Le conseil attendra au moins la 2e place du championnat cette saison.',
   prudence: 'Aucun engagement ; le conseil garde ses attentes habituelles.',
   assumer: 'Votre image se redresse un peu.',
-  nier: 'Démentir abîme votre image si les faits sont avérés.',
+  nier: 'Démentir abîme toujours un peu votre image.',
   attaquer_rival: 'Son team principal s’en souviendra.',
   respecter: 'Son team principal apprécie le geste.',
   critiquer_federation: 'Le président de la fédération s’en souviendra.',

@@ -108,9 +108,11 @@ describe('Phase 10 — budget de développement', () => {
 describe('Phase 10 — parties de contrôle', () => {
   it('joueur passif qui ne délègue rien pendant 3 saisons : l’écurie reste complète (filet de sécurité), le monde cohérent', () => {
     const { m, moteur, manager } = partie(5);
-    for (const domaine of ['pilotes', 'personnel', 'recherche', 'stands', 'academie', 'politique']) {
+    for (const domaine of ['pilotes', 'personnel', 'recherche', 'stands', 'politique']) {
       expect(executerCommandeJoueur(moteur, m, { type: 'joueur.deleguer', auteur: manager.id, parametres: { ecurie: ID, domaine, actif: false } })).toEqual({ ok: true });
     }
+    // Audit 10.9 : l'académie reste confiée à l'équipe tant qu'aucun écran ne permet de la diriger (sinon elle se figerait).
+    expect(executerCommandeJoueur(moteur, m, { type: 'joueur.deleguer', auteur: manager.id, parametres: { ecurie: ID, domaine: 'academie', actif: false } }).ok).toBe(false);
     let vuDecisions = 0;
     for (let k = 0; k < 52 * 3; k++) {
       moteur.avancer(m, 1);

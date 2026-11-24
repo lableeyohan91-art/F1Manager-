@@ -147,7 +147,9 @@ export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: numbe
   if (c && c.organisation !== e.id && c.fin >= debut) {
     const vendeur = ecurie(monde, c.organisation);
     if (c.clauses.rachatMEUR !== undefined) return { indemniteMEUR: c.clauses.rachatMEUR, beneficiaire: c.organisation, debauchage: true };
-    if (vendeur?.pilotee) return 'Sous contrat avec une écurie dirigée par un joueur, sans clause de rachat : son accord serait nécessaire.';
+    // Audit 10.7 : mêmes règles pour le joueur et l'IA (D-012) : le personnel du joueur peut être débauché contre la même
+    // indemnité que celui de l'IA (avant : intouchable, faute de commande permettant au joueur de donner son accord).
+    void vendeur;
     return { indemniteMEUR: indemniteExigee(monde, c, e, debut), beneficiaire: c.organisation, debauchage: true };
   }
   const aff = idx ? idx.affiliation.get(p.id) : affiliationDe(monde, p.id);

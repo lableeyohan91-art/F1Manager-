@@ -75,7 +75,8 @@ export type ArretAvance = 'decision' | 'urgence' | 'derniere_chance' | 'marche' 
  */
 export async function avancer(p: Partie, mode: 'semaine' | 'grand_prix' | 'decision', surProgression: (semaines: number) => void, max = 52): Promise<{ arret: ArretAvance; semaines: number; msParSemaine: number }> {
   const m = p.monde;
-  const cle = (d: DecisionEnAttente) => `${d.type}|${d.contrat ?? d.poste ?? ''}|${d.personne ?? ''}`;
+  // Audit 10.5 : la clé distingue aussi chaque conférence, offre et opération (deux décisions du même type ne se confondent plus).
+  const cle = (d: DecisionEnAttente) => `${d.type}|${d.contrat ?? d.poste ?? ''}|${d.personne ?? ''}|${d.conference ?? d.offreSponsor ?? d.operation ?? ''}`;
   const depart = decisionsEnAttente(m);
   const avant = new Set(depart.map(cle));
   const urgentesAvant = new Set(depart.filter((d) => d.urgente).map(cle));

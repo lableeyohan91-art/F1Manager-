@@ -11,7 +11,7 @@
  */
 
 import {
-  ARTICLES, CONFERENCES, EXPOSITION, IMAGE, IMAGE_PAR_FAIT, LASSITUDE_PUBLIC, IMAGE_PAR_REPONSE, LIGNES_EDITORIALES, RUMEURS_MEDIAS, SCANDALE, SCANDALES, TYPES_IGNORES,
+  ARTICLES, CONFERENCES, EXPOSITION, IMAGE, IMAGE_PAR_FAIT, LASSITUDE_PUBLIC, IMAGE_PAR_REPONSE, LIGNES_EDITORIALES, RETOUR_ZERO_SEUIL, RUMEURS_MEDIAS, SCANDALE, SCANDALES, TYPES_IGNORES,
 } from '../../balance/medias';
 import { FENETRE } from '../../balance/marche';
 import { ajouterSemaines, rangSemaine, type DateJeu } from '../../core/calendrier';
@@ -112,13 +112,25 @@ export function lassitudePublic(m: Monde): Evenement[] {
   return faits;
 }
 
+/**
+ * Audit 10.14 : retour vers zéro sans blocage. Arrondi au dixième, une petite valeur restait figée (0,8 × 0,94 = 0,75 → 0,8) ;
+ * sous le seuil, elle revient à zéro.
+ */
+const versZero = (x: number, retour: number) => { const y = Math.round(x * (1 - retour) * 10) / 10; return Math.abs(y) < RETOUR_ZERO_SEUIL ? undefined : y; };
+/** Applique le retour vers zéro à un champ ; le supprime à zéro (ordre des champs identique après une reprise de sauvegarde). */
+function retour(o: { image?: number; exposition?: number }, champ: 'image' | 'exposition', taux: number): void {
+  const v = o[champ];
+  if (!v) return;
+  const y = versZero(v, taux);
+  if (y === undefined) delete o[champ]; else o[champ] = y;
+}
 function retourNeutralite(m: Monde): void {
   for (const id of idsTries(table(m, TABLES.personnes))) {
     const p = personneDe(m, id)!;
-    if (p.image) p.image = Math.round(p.image * (1 - IMAGE.retourMensuel) * 10) / 10 || undefined;
-    if (p.exposition) p.exposition = Math.round(p.exposition * (1 - EXPOSITION.retourMensuel) * 10) / 10 || undefined;
+    retour(p, 'image', IMAGE.retourMensuel);
+    retour(p, 'exposition', EXPOSITION.retourMensuel);
   }
-  for (const e of ecuriesActives(m)) if (e.image) e.image = Math.round(e.image * (1 - IMAGE.retourMensuel) * 10) / 10 || undefined;
+  for (const e of ecuriesActives(m)) retour(e, 'image', IMAGE.retourMensuel);
 }
 
 /* ------------------------------------------------------------------ Scandales */
@@ -299,6 +311,9 @@ export function reponseIA(m: Monde, c: Conference, tp: Personne): ReponseConfere
     prudent: (t('professionnalisme') - 10) / 10,
     neutre: 0,
   };
+  // Audit 10.4 : le service de communication délégué du joueur répond de façon neutre (fiche phase 11 §5), jamais en critiquant
+  // un pilote ni en annonçant le titre à sa place.
+  if (tp.joueur) return c.options.find((o) => STYLE[o] === 'neutre') ?? c.options.find((o) => STYLE[o] === 'prudent') ?? c.options[0]!;
   const f = tirageLocal(m, 'medias.reponse', c.id);
   return c.options.map((o) => ({ o, u: styles[STYLE[o]] + f.normale(0, 0.3) })).sort((a, b) => b.u - a.u)[0]!.o;
 }
@@ -344,7 +359,8 @@ export const commandeDeclaration: DefinitionCommande = {
       importance: 2, visibilite: 'public', causes: c.cause && m.evenements[c.cause] ? [c.cause] : [],
       contexte: { question: c.question, reponse: r }, texte: phraseDeclaration(m, tp, c, r),
     });
-    const [ip, ie] = IMAGE_PAR_REPONSE[r] ?? [0, 0];
+    // Audit 10.12 : soutenir ou mettre la pression crée un geste public qui porte déjà son effet d'image : pas de double compte.
+    const [ip, ie] = r === 'soutenir' || r === 'mettre_pression' ? [0, 0] : IMAGE_PAR_REPONSE[r] ?? [0, 0];
     changerImage(tp, ip);
     changerImage(e, ie);
     const sujet = c.sujet ? personneDe(m, c.sujet) : undefined;
@@ -376,6 +392,8 @@ function repondreConferences(m: Monde, commander: (c: { type: string; auteur: st
 
 function purgerArticles(m: Monde): void {
   const t = table(m, TABLES.articles);
+  // Audit 10.15 : un article dont le fait source a été compacté disparaît avec lui (aucun article sans fait).
+  for (const a of articles(m)) if (!m.evenements[a.source]) delete t[a.id];
   const parSaison = new Map<number, Article[]>();
   for (const a of articles(m)) {
     if (a.date.annee >= m.date.annee - ARTICLES.saisonsConservees) continue;

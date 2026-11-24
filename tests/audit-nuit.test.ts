@@ -170,3 +170,19 @@ describe('Audit — phases 6 et 7', () => {
     expect(vieux).toBeGreaterThan(jeune);
   });
 });
+
+describe('Audit — phases 10 et 11', () => {
+  it('10.4 : le service de communication du joueur répond de façon neutre', async () => {
+    const { reponseIA } = await import('../src/engine/systems/medias');
+    const tp = { id: 'per_x', joueur: true, traits: { temperament: 20, ambition: 20 } } as never;
+    const c = { id: 'cnf_1', options: ['soutenir', 'mettre_pression', 'esquiver'] } as never;
+    expect(reponseIA(sc.creerMonde(1), c, tp)).toBe('esquiver');
+  });
+
+  it('10.18 : changer une délégation produit un fait', () => {
+    const m = sc.creerMonde(31), moteur = sc.creerMoteur();
+    executerCommandeJoueur(moteur, m, { type: 'joueur.prendre_ecurie', auteur: 'joueur', parametres: { ecurie: 'eq_williams', prenom: 'Camille', nom: 'Essai' } });
+    executerCommandeJoueur(moteur, m, { type: 'joueur.deleguer', auteur: m.joueur!.personne, parametres: { ecurie: 'eq_williams', domaine: 'politique', actif: true } });
+    expect(Object.values(m.evenements).some((e) => e.type === 'joueur.delegation')).toBe(true);
+  });
+});

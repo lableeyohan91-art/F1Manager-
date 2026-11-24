@@ -66,8 +66,19 @@ export async function enregistrer(nom: string, monde: Monde): Promise<number> {
     tx.objectStore(MAGASIN).put(blob, nom);
     tx.oncomplete = () => resoudre();
     tx.onerror = () => rejeter(tx.error);
+    // Audit 10.10 : une transaction annulée (quota dépassé) ne déclenche pas toujours « error » : sans ceci, la promesse ne se
+    // terminait jamais et le bouton « Sauvegarder » restait muet.
+    tx.onabort = () => rejeter(tx.error ?? new Error('Sauvegarde annulée par le navigateur (espace de stockage plein ?).'));
   });
   return blob.size;
+}
+
+/**
+ * Audit 10.10 : demande au navigateur de ne pas effacer les sauvegardes quand il manque de place (stockage « persistant »).
+ * Sans effet si le navigateur refuse ou ne connaît pas cette fonction.
+ */
+export async function demanderStockagePersistant(): Promise<boolean> {
+  try { return (await navigator.storage?.persist?.()) ?? false; } catch { return false; }
 }
 
 function lireBlob(db: IDBDatabase, nom: string): Promise<Blob | undefined> {

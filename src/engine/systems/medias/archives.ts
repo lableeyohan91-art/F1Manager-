@@ -74,6 +74,8 @@ export function mettreAJourRecords(m: Monde): Evenement[] {
   const faits: Evenement[] = [];
   for (const r of calculerRecords(m)) {
     const ancien = t[r.id] as unknown as RecordSportif | undefined;
+    // Audit 10.8 : un record seulement égalé reste à son détenteur (avant : l'égalité donnait un faux « record battu »).
+    if (ancien && ancien.detenteur !== r.detenteur && r.valeur === ancien.valeur) continue;
     t[r.id] = r as unknown as Entite;
     if (premier || !ancien || ancien.detenteur === r.detenteur) continue;
     const depuis2027 = r.id === 'rec_victoires' || r.id === 'rec_podiums' || r.id === 'rec_victoires_saison';

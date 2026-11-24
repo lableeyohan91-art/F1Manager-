@@ -128,6 +128,9 @@ export const commandeDeleguerJoueur: DefinitionCommande = {
     const v = validerJoueur(monde, c.auteur, String(c.parametres['ecurie'] ?? ''));
     if (v) return v;
     if (!(DOMAINES_DELEGATION as readonly string[]).includes(String(c.parametres['domaine']))) return `Domaine inconnu (${DOMAINES_DELEGATION.join(', ')}).`;
+    // Audit 10.9 : sans écran de commande pour l'académie (places, missions de repérage), la reprendre la figerait : elle reste
+    // confiée à l'équipe jusqu'à l'arrivée de cet écran.
+    if (c.parametres['domaine'] === 'academie' && c.parametres['actif'] === false) return 'L’académie reste confiée à votre équipe : ses commandes arriveront avec son écran.';
     return typeof c.parametres['actif'] === 'boolean' ? null : 'Préciser actif : vrai ou faux.';
   },
   appliquer({ monde }, c) {
@@ -141,6 +144,8 @@ export const commandeDeleguerJoueur: DefinitionCommande = {
       if (eq) eq.delegation = actif;
     }
     if (actif && (domaine === 'pilotes' || domaine === 'personnel')) reprendreDossiers(monde, e, domaine, c.auteur);
+    // Audit 10.18 : changer une délégation est inscrit comme un fait.
+    ajouterEvenement(monde, { type: 'joueur.delegation', acteurs: [{ id: c.auteur, role: 'auteur' }, { id: e.id, role: 'organisation' }], importance: 1, visibilite: 'prive', contexte: { domaine, actif } });
   },
 };
 
@@ -337,10 +342,11 @@ export const systemeSuiviJoueur: Systeme = {
     if (e?.pilotee && p && p.statut === 'actif' && p.ecurie === j.ecurie) return;
     j.etat = 'licencie';
     let fin: string | undefined;
-    for (const id of Object.keys(monde.evenements).reverse()) {
-      const ev = monde.evenements[id]!;
-      if (ev.type === 'conseil.licenciement_joueur' || (ev.type === 'contrat.fin' && ev.acteurs.some((a) => a.id === j.personne))) { fin = id; break; }
-    }
+    // Audit 10.11 : la décision du conseil prime sur le simple fait « fin de contrat » qui la suit (sinon l'écran de fin de partie
+    // n'expliquait pas le renvoi).
+    const ids = Object.keys(monde.evenements).reverse();
+    fin = ids.find((id) => monde.evenements[id]!.type === 'conseil.licenciement_joueur')
+      ?? ids.find((id) => { const ev = monde.evenements[id]!; return ev.type === 'contrat.fin' && ev.acteurs.some((a) => a.id === j.personne); });
     if (e) { e.pilotee = false; delete e.delegations; e.delegationRecherche = false; const eq = equipeStands(monde, e.id); if (eq) eq.delegation = false; }
     if (p) {
       // Le manager quitte le paddock : il n'est plus recrutable par l'IA (la suite de sa carrière : phase 14).

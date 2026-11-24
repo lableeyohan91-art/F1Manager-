@@ -36,7 +36,7 @@ function Delegation({ partie, domaine, nav }: { partie: Partie; domaine: Domaine
   const actif = estDelegue(partie.monde, e, domaine);
   return (
     <label class="interrupteur">
-      <input type="checkbox" checked={actif} onChange={() => { commander(partie, 'joueur.deleguer', { ecurie: e.id, domaine, actif: !actif }); nav.rafraichir(); }} />
+      <input type="checkbox" checked={actif} disabled={domaine === 'academie' && actif} onChange={() => { commander(partie, 'joueur.deleguer', { ecurie: e.id, domaine, actif: !actif }); nav.rafraichir(); }} />
       <span><strong>{LIB_DELEGATION[domaine][0]}</strong> : {actif ? 'délégué à votre équipe' : 'vous décidez'}<br /><span class="muted petit">{LIB_DELEGATION[domaine][1]}</span></span>
     </label>
   );

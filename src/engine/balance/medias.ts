@@ -82,6 +82,8 @@ export const SCANDALE = { imageMax: 15, satisfactionMax: 25, imagesSponsorsSensi
  * Exposition médiatique (0 à 100) : + parArticle × importance pour chaque article qui cite la personne ; − retourMensuel (part) chaque mois.
  * Lue par la popularité : cible + popularite × exposition / 100 (points de popularité).
  */
+/** Audit 10.14 : sous ce seuil (valeur absolue), l'image ou l'exposition revient à zéro (sinon l'arrondi la figeait). */
+export const RETOUR_ZERO_SEUIL = 1;
 export const EXPOSITION = { parArticle: 2, retourMensuel: 0.25, popularite: 8 };
 
 /**

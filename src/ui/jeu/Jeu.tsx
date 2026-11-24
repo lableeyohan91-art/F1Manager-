@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { creerScenarioGrille2026, decisionsEnAttente, ecuriesActives, financesDe, formaterDate, plafond, type DecisionEnAttente, type Scenario } from '../../engine';
 import { fichiersGrille2026 } from '../donnees';
-import { chargerAvecSecours, copier, enregistrer, existe } from '../../platform/navigateur/stockage';
+import { chargerAvecSecours, copier, demanderStockagePersistant, enregistrer, existe } from '../../platform/navigateur/stockage';
 import { avancer, commander, mesurerAppareil, ecurieJoueur, faitsVisibles, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, prochainGP, saisonCourante, type ArretAvance, type Partie } from './partie';
 import { EcranEquipe, EcranMarche, FichePersonne } from './Equipe';
 import { EcranActualites, EcranArchives, Image } from './Medias';
@@ -64,7 +64,8 @@ export function Jeu() {
       fin_de_partie: 'Le conseil vous a remplacé.', limite: 'Une saison s’est écoulée.', semaine: '',
     };
     setMessage(textes[r.arret] || null);
-    if (r.arret === 'fin_de_saison' || r.arret === 'fin_de_partie') void enregistrer(NOM_SAUVEGARDE, p.monde).catch(() => undefined);
+    // Audit 10.10 : un échec de la sauvegarde automatique est signalé (avant : ignoré en silence).
+    if (r.arret === 'fin_de_saison' || r.arret === 'fin_de_partie') void enregistrer(NOM_SAUVEGARDE, p.monde).catch((x) => setMessage(`Sauvegarde automatique impossible : ${x instanceof Error ? x.message : String(x)}. Libérez de l’espace puis sauvegardez dans Réglages.`));
     rafraichir();
   };
 
@@ -181,9 +182,12 @@ function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void
     if (!confirme && existante) { setConfirmation(true); return; }
     const r = commander(p, 'joueur.prendre_ecurie', { ecurie: choix, prenom, nom: nomManager });
     if (!r.ok) { setErreur(r.motif); return; }
-    if (existante) await copier(NOM_SAUVEGARDE, NOM_ANCIENNE).catch(() => false);
-    await enregistrer(NOM_SAUVEGARDE, p.monde).catch(() => undefined);
-    demarrer(p, existante ? 'Nouvelle partie commencée. La précédente est conservée : « Reprendre l’ancienne partie » sur l’accueil.' : undefined);
+    // Audit 10.10 : le message « conservée » n'est affiché que si la copie a vraiment réussi ; stockage persistant demandé.
+    void demanderStockagePersistant();
+    const conservee = existante ? await copier(NOM_SAUVEGARDE, NOM_ANCIENNE).catch(() => false) : false;
+    const enregistree = await enregistrer(NOM_SAUVEGARDE, p.monde).then(() => true, () => false);
+    demarrer(p, [existante ? (conservee ? 'Nouvelle partie commencée. La précédente est conservée : « Reprendre l’ancienne partie » sur l’accueil.' : 'Nouvelle partie commencée, mais la précédente n’a pas pu être mise de côté.') : '',
+      enregistree ? '' : 'Attention : la nouvelle partie n’a pas pu être sauvegardée (espace de stockage ?).'].filter(Boolean).join(' ') || undefined);
   };
   /** Reprend l'ancienne partie : les deux emplacements sont échangés (la partie reprise redevient la principale). */
   const reprendreAncienne = async () => {
