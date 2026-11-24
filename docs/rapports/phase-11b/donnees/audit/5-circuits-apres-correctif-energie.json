@@ -1,0 +1,157 @@
+{
+ "cir_mexico": {
+  "annee": 2026,
+  "niveauAilerons": 1,
+  "coupureKmh": 343,
+  "tempsModele": 77.1,
+  "tempsReel": 76.633,
+  "vmaxModele": 351,
+  "vmaxReel": 350,
+  "vminModele": 64,
+  "vminReel": 67,
+  "ecartMoyenKmh": 0.5,
+  "ecartAbsMoyenKmh": 10,
+  "virages": 16,
+  "ecartVitesseVirages": -12.3,
+  "parts": {
+   "virage": 20,
+   "freinage": 17,
+   "motricite": 25,
+   "puissance": 39,
+   "butee": 0
+  },
+  "sensibilites": {
+   "adherenceMecanique": 0.38,
+   "appui": 0.247,
+   "trainee": 0.073,
+   "puissance": 0.147,
+   "motricite": 0.043,
+   "freinage": 0.068
+  },
+  "calculMs": 37.6
+ },
+ "cir_monaco": {
+  "annee": 2026,
+  "niveauAilerons": 1,
+  "coupureKmh": null,
+  "tempsModele": 72.3,
+  "tempsReel": 72.279,
+  "vmaxModele": 308,
+  "vmaxReel": 286,
+  "vminModele": 49,
+  "vminReel": 48,
+  "ecartMoyenKmh": 5,
+  "ecartAbsMoyenKmh": 14.5,
+  "virages": 18,
+  "ecartVitesseVirages": -2.1,
+  "parts": {
+   "virage": 25,
+   "freinage": 16,
+   "motricite": 32,
+   "puissance": 27,
+   "butee": 0
+  },
+  "sensibilites": {
+   "adherenceMecanique": 0.423,
+   "appui": 0.317,
+   "trainee": 0.049,
+   "puissance": 0.078,
+   "motricite": 0.181,
+   "freinage": 0.059
+  },
+  "calculMs": 1.7
+ },
+ "cir_monza": {
+  "annee": 2026,
+  "niveauAilerons": 0.95,
+  "coupureKmh": 288,
+  "tempsModele": 80.1,
+  "tempsReel": 81.882,
+  "vmaxModele": 333,
+  "vmaxReel": 339,
+  "vminModele": 82,
+  "vminReel": 72,
+  "ecartMoyenKmh": 2.9,
+  "ecartAbsMoyenKmh": 14.4,
+  "virages": 13,
+  "ecartVitesseVirages": -7.7,
+  "parts": {
+   "virage": 7,
+   "freinage": 9,
+   "motricite": 8,
+   "puissance": 77,
+   "butee": 0
+  },
+  "sensibilites": {
+   "adherenceMecanique": 0.23,
+   "appui": 0.246,
+   "trainee": 0.189,
+   "puissance": 0.271,
+   "motricite": 0.035,
+   "freinage": 0.04
+  },
+  "calculMs": 21.3
+ },
+ "cir_singapour": {
+  "annee": 2026,
+  "niveauAilerons": 1,
+  "coupureKmh": 269,
+  "tempsModele": 91.7,
+  "tempsReel": 91.496,
+  "vmaxModele": 301,
+  "vmaxReel": 307,
+  "vminModele": 62,
+  "vminReel": 69,
+  "ecartMoyenKmh": 2.4,
+  "ecartAbsMoyenKmh": 10.9,
+  "virages": 18,
+  "ecartVitesseVirages": -8.1,
+  "parts": {
+   "virage": 17,
+   "freinage": 15,
+   "motricite": 28,
+   "puissance": 40,
+   "butee": 0
+  },
+  "sensibilites": {
+   "adherenceMecanique": 0.399,
+   "appui": 0.334,
+   "trainee": 0.097,
+   "puissance": 0.176,
+   "motricite": 0.16,
+   "freinage": 0.085
+  },
+  "calculMs": 17.3
+ },
+ "cir_suzuka": {
+  "annee": 2026,
+  "niveauAilerons": 1,
+  "coupureKmh": 260,
+  "tempsModele": 89.2,
+  "tempsReel": 89.132,
+  "vmaxModele": 316,
+  "vmaxReel": 323,
+  "vminModele": 73,
+  "vminReel": 77,
+  "ecartMoyenKmh": -0.9,
+  "ecartAbsMoyenKmh": 19.2,
+  "virages": 21,
+  "ecartVitesseVirages": -6.5,
+  "parts": {
+   "virage": 11,
+   "freinage": 7,
+   "motricite": 8,
+   "puissance": 74,
+   "butee": 0
+  },
+  "sensibilites": {
+   "adherenceMecanique": 0.317,
+   "appui": 0.526,
+   "trainee": 0.196,
+   "puissance": 0.303,
+   "motricite": 0.035,
+   "freinage": 0.025
+  },
+  "calculMs": 26
+ }
+}

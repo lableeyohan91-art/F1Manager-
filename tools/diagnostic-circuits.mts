@@ -10,7 +10,7 @@ import { VOITURE_REFERENCE } from '../src/engine/balance/profil';
 const sortie = process.argv[2] || undefined;
 const dossier = process.argv[3] ?? 'data/circuits';
 const res: Record<string, unknown> = {};
-for (const f of readdirSync(dossier).filter((x) => x.endsWith('.json')).sort()) {
+for (const f of readdirSync(dossier).filter((x) => x.startsWith('cir_') && x.endsWith('.json')).sort()) {
   const tr = JSON.parse(readFileSync(`${dossier}/${f}`, 'utf8')) as Trace & { tempsTourS: { mediane: number }; points: { v: number }[]; altitudeM: number; annee: number };
   const c = { altitudeM: tr.altitudeM ?? 0 };
   const t0 = performance.now();

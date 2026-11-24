@@ -27,6 +27,8 @@ export interface Profil {
   vitesses: number[]; // m/s
   /** Vitesse au-dessus de laquelle l'énergie électrique n'est plus déployée (budget par tour) ; null si le budget suffit partout. */
   coupureKmh: number | null;
+  /** Énergie électrique déployée sur le tour (J) : part de l'effort d'accélération au-delà du moteur thermique. */
+  energieElectriqueJ: number;
   limites: Limite[];
   courbures: number[]; // 1/m (absolue)
 }
@@ -79,23 +81,17 @@ export function profilVitesse(tr: Trace, v: VoiturePhysique, c: Conditions, k?: 
   // et moyennes (le gain par joule y est le plus grand), et coupe en bout de ligne droite (« clipping » observé en 2026).
   // On cherche donc la vitesse de coupure au-dessus de laquelle on ne déploie plus, telle que l'énergie dépensée égale le budget.
   let p = passeUnique(tr, v, c, kap, Infinity);
-  if (energieElectrique(tr, v, p, Infinity) <= v.energieElectriqueTourJ) return p;
+  if (p.energieElectriqueJ <= v.energieElectriqueTourJ) return p;
   let bas = 0, haut = v.vitesseMaxMs;
   for (let it = 0; it < PROFIL.iterationsEnergie; it++) {
     const milieu = (bas + haut) / 2;
     const q = passeUnique(tr, v, c, kap, milieu);
-    if (energieElectrique(tr, v, q, milieu) > v.energieElectriqueTourJ) haut = milieu; else { bas = milieu; p = q; }
+    if (q.energieElectriqueJ > v.energieElectriqueTourJ) haut = milieu; else { bas = milieu; p = q; }
   }
   if (bas === 0) p = passeUnique(tr, v, c, kap, 0);
   return p;
 }
 
-/** Énergie électrique déployée sur le tour (points limités par la puissance, sous la vitesse de coupure). */
-function energieElectrique(tr: Trace, v: VoiturePhysique, p: Profil, coupure: number): number {
-  let e = 0;
-  p.vitesses.forEach((x, i) => { if (p.limites[i] === 'puissance' && x < coupure) e += v.puissanceElectriqueW * partDeploiement(v, x) * (tr.pasM / Math.max(x, 1)); });
-  return e;
-}
 
 /** La voiture sur ce revêtement : toutes les adhérences pneu-piste multipliées par l'adhérence de la piste. */
 export function surPiste(v: VoiturePhysique, tr: Trace): VoiturePhysique {
@@ -119,6 +115,11 @@ function passeUnique(tr: Trace, v0: VoiturePhysique, c: Conditions, kap: number[
   }
   const vit = vmax.slice();
   const lim: Limite[] = vmax.map((x) => (x >= v.vitesseMaxMs ? 'butee' : 'virage'));
+  // Puissance électrique réellement utilisée au point (W) : seulement là où la voiture accélère, et seulement la part de l'effort
+  // qui dépasse le thermique. Limitée par la motricité, la voiture utilise moins d'électrique, mais pas zéro (correctif 24/11/2026 :
+  // auparavant ces points étaient gratuits, ce qui rendait un gain de motricité négatif).
+  const elec = new Array<number>(n).fill(0);
+  const pThermique = v.puissanceThermiqueW * Math.pow(rhoRel, PUISSANCE_ALTITUDE_EXPOSANT);
   for (let passe = 0; passe < PROFIL.passes; passe++) {
     // 2. Passe avant (accélération).
     for (let i = 1; i < 2 * n; i++) {
@@ -127,19 +128,22 @@ function passeUnique(tr: Trace, v0: VoiturePhysique, c: Conditions, kap: number[
       const fMotricite = v.muMotricite * (m * G + appui(vv, a));
       const f = Math.min(fPuissance, fMotricite) - trainee(vv, a);
       const suiv = Math.sqrt(Math.max(0, vv * vv + (2 * pas * f) / m));
-      if (suiv < vit[b]!) { vit[b] = suiv; lim[b] = fPuissance < fMotricite ? 'puissance' : 'motricite'; }
+      if (suiv < vit[b]!) {
+        vit[b] = suiv; lim[b] = fPuissance < fMotricite ? 'puissance' : 'motricite';
+        elec[b] = Math.max(0, Math.min(fPuissance, fMotricite) * vv - pThermique);
+      }
     }
     // 3. Passe arrière (freinage).
     for (let i = 2 * n; i > 0; i--) {
       const a = i % n, b = (i - 1) % n, vv = vit[a]!;
       const f = v.muFreinage * (m * G + appui(vv, a)) + trainee(vv, a);
       const prec = Math.sqrt(vv * vv + (2 * pas * f) / m);
-      if (prec < vit[b]!) { vit[b] = prec; lim[b] = 'freinage'; }
+      if (prec < vit[b]!) { vit[b] = prec; lim[b] = 'freinage'; elec[b] = 0; }
     }
   }
-  let t = 0;
-  for (const x of vit) t += pas / Math.max(x, 1);
-  return { tempsS: t, vitesses: vit, limites: lim, courbures: kap, coupureKmh: Number.isFinite(coupure) ? Math.round(coupure * 3.6) : null };
+  let t = 0, e = 0;
+  vit.forEach((x, i) => { t += pas / Math.max(x, 1); if (lim[i] === 'puissance' || lim[i] === 'motricite') e += elec[i]! * pas / Math.max(x, 1); });
+  return { tempsS: t, vitesses: vit, limites: lim, courbures: kap, coupureKmh: Number.isFinite(coupure) ? Math.round(coupure * 3.6) : null, energieElectriqueJ: e };
 }
 
 /** Voiture avec un niveau d'ailerons a (réglage du week-end). */

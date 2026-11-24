@@ -26,12 +26,15 @@ export const VOITURE_REFERENCE = {
   deploiement: { pleinJusquaKmh: 290, nulAKmh: 355 },
   // Calés le 24/11/2026 (tools/calage-profil.mts) sur 25 tours de qualification 2026 de 5 circuits, dans des bornes plausibles,
   // avec l'aérodynamique active, le déploiement électrique par vitesse de coupure et l'adhérence propre à chaque piste.
+  // Recalés le même jour après la correction de la comptabilité électrique (l'électrique utilisé en sortie de virage, limité par la
+  // motricité, est désormais compté), avec la contrainte publique « moins d'appui à Monza qu'à Monaco » (tools/calage-profil.mts).
+  // Valeurs précédentes et comparaison : docs/rapports/phase-11b/audit-apex-lab.md.
   cla: 2.59,
-  cda: 0.84,
-  muMeca: 1.25,
-  muAero: 2.02,
-  muMotricite: 0.95,
-  muFreinage: 1.51,
+  cda: 0.7338,
+  muMeca: 1.264,
+  muAero: 2.043,
+  muMotricite: 0.9607,
+  muFreinage: 1.647,
   vitesseMaxMs: 110,
   /** Énergie électrique déployable par tour (J) : au-delà, l'écurie coupe le déploiement au-dessus d'une vitesse de coupure (H, ordre de grandeur du règlement 2026). */
   energieElectriqueTourJ: 8_860_000,
@@ -40,7 +43,7 @@ export const VOITURE_REFERENCE = {
    * appui × (1 − reductionAppuiLigne). En virage et au freinage, configuration normale (H, approximation géométrique des zones).
    */
   reductionTraineeLigne: 0.54,
-  reductionAppuiLigne: 0.46,
+  reductionAppuiLigne: 0.6953,
 };
 
 /** Aérodynamique active : portion « ligne droite » si le rayon dépasse ce seuil (m) ; zones réelles désignées par la FIA, ici approchées par la géométrie (H). */

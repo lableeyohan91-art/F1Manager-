@@ -1,29 +1,43 @@
 /**
  * Phase 11b — calage reproductible de la voiture de référence sur les vitesses réelles médianes des circuits détaillés.
  * Une seule voiture pour tous les circuits (aucun réglage par circuit, sauf le niveau d'ailerons choisi par le calcul).
- * Critère : écart absolu moyen de vitesse (km/h) sur tous les points de tous les circuits. Recherche par coordonnées.
- * Usage : npx tsx tools/calage-profil.mts   (affiche les valeurs à reporter dans src/engine/balance/profil.ts)
+ * Critère : écart absolu moyen de vitesse (km/h) sur tous les points, plus l'écart moyen de temps au tour (%, poids 1 km/h par %). Recherche par coordonnées.
+ * Usage : npx tsx tools/calage-profil.mts [paramètres séparés par des virgules]   (affiche les valeurs à reporter dans src/engine/balance/profil.ts)
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { appuiNaturel, courbures, type Trace } from '../src/engine/circuits/profil';
 import { VOITURE_REFERENCE } from '../src/engine/balance/profil';
 
-const traces = readdirSync('data/circuits').filter((f) => f.endsWith('.json')).sort().map((f) => JSON.parse(readFileSync(`data/circuits/${f}`, 'utf8')) as Trace & { points: { v: number }[]; altitudeM: number });
+/** Poids de l'écart de temps au tour dans le critère : 1 km/h d'écart moyen de vitesse « vaut » 1 % d'écart de temps au tour (H). */
+const POIDS_TEMPS_KMH_PAR_POURCENT = 1;
+const traces = readdirSync('data/circuits').filter((f) => f.startsWith('cir_') && f.endsWith('.json')).sort().map((f) => JSON.parse(readFileSync(`data/circuits/${f}`, 'utf8')) as Trace & { points: { v: number }[]; altitudeM: number; tempsTourS: { mediane: number } });
 const ks = traces.map((t) => courbures(t));
 /** Adhérence de chaque piste, calée en même temps que la voiture (bornes 0,85–1,15), puis ramenée à une moyenne de 1. */
 const piste: number[] = traces.map((t) => t.adherencePiste?.valeur ?? 1);
 const BORNES_PISTE: [number, number] = [0.85, 1.15];
 type V = typeof VOITURE_REFERENCE;
+/**
+ * Contrainte de plausibilité (fait public, comme les bornes) : à Monza, les écuries mettent moins d'appui qu'à Monaco.
+ * Le calage rejette tout jeu de paramètres qui la viole ; il n'impose aucun niveau d'ailerons précis, seulement cet ordre.
+ */
+const CONTRAINTE_AILERONS: [string, string] = ['cir_monza', 'cir_monaco'];
 function erreur(v: V): number {
-  let s = 0, n = 0;
+  let s = 0, n = 0, eTemps = 0;
+  const niveaux: Record<string, number> = {};
   traces.forEach((t, i) => {
     const tp = { ...t, adherencePiste: { valeur: piste[i]!, statut: '' } };
-    const p = appuiNaturel(tp, v, { altitudeM: t.altitudeM ?? 0 }, ks[i]).profil;
-    p.vitesses.forEach((x, j) => { s += Math.abs(x * 3.6 - t.points[j]!.v); n++; });
+    const r = appuiNaturel(tp, v, { altitudeM: t.altitudeM ?? 0 }, ks[i]);
+    niveaux[t.circuit] = r.niveau;
+    r.profil.vitesses.forEach((x, j) => { s += Math.abs(x * 3.6 - t.points[j]!.v); n++; });
+    eTemps += (100 * Math.abs(r.profil.tempsS - t.tempsTourS.mediane)) / t.tempsTourS.mediane / traces.length;
   });
-  return s / n;
+  const [bas, haut] = CONTRAINTE_AILERONS;
+  if (niveaux[bas] !== undefined && niveaux[haut] !== undefined && niveaux[bas]! >= niveaux[haut]!) return Infinity;
+  return s / n + POIDS_TEMPS_KMH_PAR_POURCENT * eTemps;
 }
-const PARAMS: (keyof V)[] = ['cla', 'cda', 'muMeca', 'muAero', 'muMotricite', 'muFreinage', 'energieElectriqueTourJ', 'reductionTraineeLigne', 'reductionAppuiLigne'];
+const TOUS: (keyof V)[] = ['cla', 'cda', 'muMeca', 'muAero', 'muMotricite', 'muFreinage', 'energieElectriqueTourJ', 'reductionTraineeLigne', 'reductionAppuiLigne'];
+/** Paramètres recalés : tous par défaut, ou une liste (ex. « cda,muMotricite ») pour un recalage partiel après une correction ciblée. */
+const PARAMS: (keyof V)[] = process.argv[2] ? (process.argv[2].split(',') as (keyof V)[]) : TOUS;
 /** Bornes physiquement plausibles pour une F1 (H) : le calage ne peut pas compenser un effet absent du modèle par une valeur absurde. */
 const BORNES: Partial<Record<keyof V, [number, number]>> = {
   cla: [2.5, 5.5], cda: [0.6, 1.4], muMeca: [1.2, 1.9], muAero: [1.2, 2.2], muMotricite: [1.0, 1.7], muFreinage: [1.4, 2.4], energieElectriqueTourJ: [2e6, 9e6], reductionTraineeLigne: [0.1, 0.55], reductionAppuiLigne: [0.1, 0.7],
@@ -60,4 +74,4 @@ for (const pasRel of [0.16, 0.08, 0.04, 0.02]) {
 const moyP = piste.reduce((a, b) => a + b, 0) / piste.length;
 for (const k of ['muMeca', 'muAero', 'muMotricite', 'muFreinage'] as const) (v as Record<string, number>)[k] = v[k] * moyP;
 console.log('pistes', Object.fromEntries(traces.map((t, i) => [t.circuit, +(piste[i]! / moyP).toFixed(3)])));
-console.log('résultat', JSON.stringify(Object.fromEntries(PARAMS.map((k) => [k, +(v[k] as number).toPrecision(4)]))), 'écart moyen', e.toFixed(2), 'km/h');
+console.log('résultat', JSON.stringify(Object.fromEntries(TOUS.map((k) => [k, +(v[k] as number).toPrecision(4)]))), 'écart moyen', e.toFixed(2), 'km/h');
