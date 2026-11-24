@@ -513,3 +513,15 @@ Aucun code à ce stade.
 - Opérations exceptionnelles : déclenchées par le premier top 5, podium ou victoire de l'écurie depuis 3 saisons. Une seule par saison. Montants relevés pour le fond de grille (environ 14 M€ par opération acceptée).
 - Rumeurs de presse : fiabilité inchangée (décision du porteur).
 
+## [Phase 11b — audit APEX Lab] — 24/11/2026
+
+### Corrigé
+- GitHub Actions : délai justifié (60 s) pour le test D-157, assertions inchangées ; chaîne verte et site publié.
+- Profil de vitesse : électrique compté en sortie de virage (motricité jamais négative), recherche de la coupure plus fine (16 étapes).
+- Virages rapides : courbure lissée sur 0,25 s de trajet à la vitesse calculée. Validation (21 circuits jamais calés) : 4,8 % → 3,4 % d'écart de temps au tour.
+
+### Ajouté
+- Registre des caractéristiques (`src/engine/circuits/specialisation.ts`) : modélisées ou futures (non testées), compromis, canal météo unique.
+- Banc de spécialisation (`tools/banc-specialisation.mts`), étude de la normalisation (`tools/circuits/etude-normalisation.mts`), export APEX Lab (`tools/export-apex-lab.mts`, `export/apex-lab/`).
+- Outil de calage : écart de temps au tour dans le critère, contrainte « moins d'appui à Monza qu'à Monaco », recalage partiel (`pistes`).
+- Rapport `docs/rapports/phase-11b/audit-apex-lab.md` ; décisions D-162 et D-163 (à discuter) ; 8 tests.

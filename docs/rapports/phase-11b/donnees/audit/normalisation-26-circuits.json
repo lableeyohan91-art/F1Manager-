@@ -856,6 +856,38 @@
     ]
    },
    "negligeables": []
+  },
+  "cir_sepang": {
+   "test": false,
+   "calendrier": false,
+   "tempsS": 92.09,
+   "gainsS": {
+    "adherenceMecanique": 0.6,
+    "appui": 0.719,
+    "trainee": 0.151,
+    "puissance": 0.233,
+    "motricite": 0.084,
+    "freinage": 0.05
+   },
+   "essentiels": {
+    "brut": [
+     "appui",
+     "adherenceMecanique"
+    ],
+    "relatif": [
+     "appui",
+     "adherenceMecanique"
+    ],
+    "norm5": [
+     "appui",
+     "adherenceMecanique"
+    ],
+    "normCal": [
+     "appui",
+     "adherenceMecanique"
+    ]
+   },
+   "negligeables": []
   }
  }
 }

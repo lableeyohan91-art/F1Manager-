@@ -1,0 +1,169 @@
+{
+ "formatExport": 1,
+ "voitureReference": {
+  "masseKg": 850,
+  "puissanceThermiqueW": 400000,
+  "puissanceElectriqueW": 350000,
+  "deploiement": {
+   "pleinJusquaKmh": 290,
+   "nulAKmh": 355
+  },
+  "cla": 2.59,
+  "cda": 0.7338,
+  "muMeca": 1.264,
+  "muAero": 2.043,
+  "muMotricite": 0.9607,
+  "muFreinage": 1.647,
+  "vitesseMaxMs": 110,
+  "energieElectriqueTourJ": 8860000,
+  "reductionTraineeLigne": 0.54,
+  "reductionAppuiLigne": 0.6953
+ },
+ "dosageBancPourcent": {
+  "appui": 2.83,
+  "faibleTrainee": 6.77,
+  "adherenceMecanique": 2.87,
+  "motricite": 15.99,
+  "moteur": 3.37,
+  "freinage": 29.21,
+  "polyvalente": 0.76
+ },
+ "caracteristiques": [
+  {
+   "id": "appui",
+   "nom": "Appui aérodynamique",
+   "statut": "modelisee",
+   "phase": "11b",
+   "leviers": {
+    "cla": 1
+   },
+   "compromis": "Aucun dans le modèle actuel (la traînée ne dépend que du réglage d’ailerons) : limite connue, voir le rapport.",
+   "canalMeteo": "Densité de l’air (altitude, température) dans Conditions."
+  },
+  {
+   "id": "faibleTrainee",
+   "nom": "Faible traînée",
+   "statut": "modelisee",
+   "phase": "11b",
+   "leviers": {
+    "cda": 1
+   },
+   "compromis": "Aucun dans le modèle actuel ; en réalité, une carrosserie fine limite le refroidissement (phase 12).",
+   "canalMeteo": "Densité de l’air dans Conditions."
+  },
+  {
+   "id": "adherenceMecanique",
+   "nom": "Adhérence mécanique",
+   "statut": "modelisee",
+   "phase": "11b",
+   "leviers": {
+    "muMeca": 1
+   },
+   "compromis": "Aucun dans le modèle actuel ; en réalité, lié à l’usure des pneus (phase 13).",
+   "canalMeteo": "Adhérence de piste et, plus tard, température de piste (phase 13)."
+  },
+  {
+   "id": "motricite",
+   "nom": "Motricité",
+   "statut": "modelisee",
+   "phase": "11b",
+   "leviers": {
+    "muMotricite": 1
+   },
+   "compromis": "Consomme plus d’énergie électrique en sortie de virage (budget par tour).",
+   "canalMeteo": "Adhérence de piste (pluie : phase 13)."
+  },
+  {
+   "id": "moteur",
+   "nom": "Moteur et efficacité énergétique",
+   "statut": "modelisee",
+   "phase": "11b",
+   "leviers": {
+    "puissanceThermiqueW": 1,
+    "puissanceElectriqueW": 1,
+    "energieElectriqueTourJ": 1
+   },
+   "compromis": "Aucun dans le modèle actuel ; fiabilité et consommation en phase 12.",
+   "canalMeteo": "Densité de l’air (puissance thermique) dans Conditions."
+  },
+  {
+   "id": "freinage",
+   "nom": "Freinage",
+   "statut": "modelisee",
+   "phase": "11b",
+   "leviers": {
+    "muFreinage": 1
+   },
+   "compromis": "Aucun dans le modèle actuel ; refroidissement des freins en phase 12.",
+   "canalMeteo": "Adhérence de piste."
+  },
+  {
+   "id": "polyvalente",
+   "nom": "Polyvalente",
+   "statut": "modelisee",
+   "phase": "11b",
+   "leviers": {
+    "cla": 1,
+    "cda": 1,
+    "muMeca": 1,
+    "muMotricite": 1,
+    "muFreinage": 1,
+    "puissanceThermiqueW": 1,
+    "puissanceElectriqueW": 1,
+    "energieElectriqueTourJ": 1
+   },
+   "compromis": "Progrès réparti, sans point fort.",
+   "canalMeteo": "Ceux des caractéristiques qui la composent."
+  },
+  {
+   "id": "refroidissement",
+   "nom": "Refroidissement",
+   "statut": "future",
+   "phase": "12",
+   "leviers": {},
+   "compromis": "Prévu : plus de refroidissement = plus de traînée ; trop peu = perte de puissance par forte chaleur.",
+   "canalMeteo": "Température de l’air (Conditions.temperatureC) : seul canal."
+  },
+  {
+   "id": "pneus",
+   "nom": "Gestion des pneus",
+   "statut": "future",
+   "phase": "13",
+   "leviers": {},
+   "compromis": "Prévu : usure contre adhérence sur un relais (le profil d’un tour ne mesure pas l’usure).",
+   "canalMeteo": "Température de piste (phase 13) : seul canal."
+  }
+ ],
+ "circuits": [
+  {
+   "circuit": "cir_monza",
+   "tempsReelS": 81.882,
+   "tempsModeleS": 82.059,
+   "niveauAilerons": 0.85
+  },
+  {
+   "circuit": "cir_monaco",
+   "tempsReelS": 72.279,
+   "tempsModeleS": 72.441,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_suzuka",
+   "tempsReelS": 89.132,
+   "tempsModeleS": 89.001,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_singapour",
+   "tempsReelS": 91.496,
+   "tempsModeleS": 91.455,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_mexico",
+   "tempsReelS": 76.633,
+   "tempsModeleS": 76.689,
+   "niveauAilerons": 1
+  }
+ ]
+}

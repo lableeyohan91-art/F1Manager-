@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { appuiNaturel, avecAilerons, courbures, pointsEssentiels, profilVitesse, sensibilites, viragesDetectes, type Trace } from '../src/engine/circuits/profil';
 import { VOITURE_REFERENCE } from '../src/engine/balance/profil';
+import { CARACTERISTIQUES, voitureSpecialisee } from '../src/engine/circuits/specialisation';
 
 type TraceReelle = Trace & { viragesOfficiels: number; tempsTourS: { mediane: number }; points: { x: number; y: number; z: number; v: number }[] };
 const ALTITUDE: Record<string, number> = { cir_monza: 160, cir_monaco: 10, cir_suzuka: 45, cir_singapour: 10, cir_mexico: 2240 };
@@ -105,3 +106,31 @@ describe('Phase 11b — points essentiels (normalisation validée le 24/11/2026)
   });
 });
 
+
+describe('Phase 11b — audit APEX Lab (24/11/2026)', () => {
+  it.each(CIRCUITS)('%s : plus de motricité fait toujours gagner du temps (électrique compté en sortie de virage)', (c) => {
+    const t = lire(c);
+    const { niveau } = appuiNaturel(t, VOITURE_REFERENCE, cond(c));
+    expect(sensibilites(t, avecAilerons(VOITURE_REFERENCE, niveau), cond(c)).motricite).toBeGreaterThan(0);
+  });
+
+  it('le lissage temporel de la courbure utilise la vitesse calculée, jamais la vitesse réelle de la trace', () => {
+    const t = lire('cir_suzuka');
+    const fausse = { ...t, points: t.points.map((p) => ({ ...p, v: 100 })) };
+    expect(profilVitesse(fausse, VOITURE_REFERENCE, cond('cir_suzuka')).tempsS).toBe(profilVitesse(t, VOITURE_REFERENCE, cond('cir_suzuka')).tempsS);
+  });
+
+  it('une caractéristique future (refroidissement, pneus) ne change pas la voiture : non testée, jamais un effet inventé', () => {
+    for (const c of CARACTERISTIQUES.filter((x) => x.statut === 'future')) expect(voitureSpecialisee(VOITURE_REFERENCE, c, 0.1)).toEqual(VOITURE_REFERENCE);
+  });
+
+  it('spécialisations : la faible traînée rapporte plus à Monza qu’à Monaco, la motricité plus à Monaco qu’à Monza (sens mesuré)', () => {
+    const gain = (circuit: string, id: string) => {
+      const t = lire(circuit), k = courbures(t), { niveau } = appuiNaturel(t, VOITURE_REFERENCE, cond(circuit), k);
+      const v = voitureSpecialisee(VOITURE_REFERENCE, CARACTERISTIQUES.find((x) => x.id === id)!, 0.05);
+      return profilVitesse(t, avecAilerons(VOITURE_REFERENCE, niveau), cond(circuit), k).tempsS - profilVitesse(t, avecAilerons(v, niveau), cond(circuit), k).tempsS;
+    };
+    expect(gain('cir_monza', 'faibleTrainee')).toBeGreaterThan(gain('cir_monaco', 'faibleTrainee'));
+    expect(gain('cir_monaco', 'motricite')).toBeGreaterThan(gain('cir_monza', 'motricite'));
+  });
+});
