@@ -34,6 +34,8 @@ import { federation } from '../politique';
 import { POSTES_INDIVIDUALISES } from '../../balance/monde';
 import { ecuriesActives } from '../saison/performance';
 import { domainePoste, ecurieDuJoueur, iaDecide, type DomaineDelegue } from './acces';
+import type { Conference } from '../../model/types';
+import { LIBELLES_QUESTIONS } from '../medias/libelles';
 
 export * from './acces';
 
@@ -43,7 +45,7 @@ const ecurieDe = (monde: Monde, id: string) => table(monde, TABLES.ecuries)[id] 
 const personneDe = (monde: Monde, id: string) => table(monde, TABLES.personnes)[id] as unknown as Personne | undefined;
 
 /** Domaines que le joueur peut déléguer (les deux derniers ont leur drapeau propre, phases 8b et 8d). */
-export const DOMAINES_DELEGATION = ['pilotes', 'personnel', 'recherche', 'stands', 'academie', 'politique'] as const;
+export const DOMAINES_DELEGATION = ['pilotes', 'personnel', 'recherche', 'stands', 'academie', 'politique', 'communication'] as const;
 export type DomaineJoueur = (typeof DOMAINES_DELEGATION)[number];
 
 /** Le domaine est-il délégué (décidé par l'équipe avec les règles de l'IA) ? */
@@ -175,7 +177,9 @@ export const commandeBudgetDeveloppement: DefinitionCommande = {
 /* ------------------------------------------------------------------ Décisions en attente (consultation) */
 
 export interface DecisionEnAttente {
-  type: 'contre_offre' | 'augmentation' | 'depart' | 'fin_contrat' | 'poste_vacant' | 'offre_marche' | 'vote_reglement' | 'election' | 'vote_federation';
+  type: 'contre_offre' | 'augmentation' | 'depart' | 'fin_contrat' | 'poste_vacant' | 'offre_marche' | 'vote_reglement' | 'election' | 'vote_federation' | 'conference';
+  /** Phase 11 : question de la presse en attente (identifiant de la conférence). */
+  conference?: string;
   titre: string;
   detail: string;
   /** Ce qui se passe sans décision du joueur. */
@@ -257,6 +261,11 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
       const ech = { annee, semaine: AUTRES_VOTES.semaine };
       res.push({ type: 'vote_federation', titre: 'Vote de la fédération', detail: `Sujet : ${f.vote.sujet === 'plafondMEUR' ? 'plafond budgétaire' : f.vote.sujet === 'grandsPrix' ? 'nombre de Grands Prix' : 'restrictions aérodynamiques'}, valeur proposée ${f.vote.valeur}.`, consequence: 'Sans vote, l’écurie s’abstient.', echeance: ech, urgente: urgente(ech) });
     }
+  }
+  // Phase 11 : questions de la presse (communication non déléguée).
+  for (const c of Object.values(table(monde, TABLES.conferences)) as unknown as Conference[]) {
+    if (c.ecurie !== idEcurie) continue;
+    res.push({ type: 'conference', titre: 'La presse vous interroge', detail: LIBELLES_QUESTIONS[c.question], consequence: 'Sans réponse, le service de communication esquive la question.', echeance: c.echeance, urgente: urgente(c.echeance), conference: c.id, ...(c.sujet && personneDe(monde, c.sujet) ? { personne: c.sujet } : {}) });
   }
   return res.sort((a, b) => Number(b.urgente) - Number(a.urgente) || (a.echeance ? rang(a.echeance) : 1e9) - (b.echeance ? rang(b.echeance) : 1e9));
 }

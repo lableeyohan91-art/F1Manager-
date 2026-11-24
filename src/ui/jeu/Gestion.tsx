@@ -26,6 +26,7 @@ const LIB_DELEGATION: Record<DomaineJoueur, [string, string]> = {
   stands: ['Équipe des stands', 'Entraînement et recrutement (directeur sportif)'],
   academie: ['Académie', 'Places et missions de repérage'],
   politique: ['Politique', 'Votes du règlement et de la fédération, lobbying'],
+  communication: ['Communication', 'Réponses aux questions de la presse (service de communication)'],
 };
 
 function Delegation({ partie, domaine, nav }: { partie: Partie; domaine: DomaineJoueur; nav: Navigation }) {

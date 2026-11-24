@@ -45,6 +45,12 @@ export const TABLES = {
   federation: 'federation',
   alliances: 'alliances',
   archives: 'archives',
+  // Phase 11
+  medias: 'medias',
+  articles: 'articles',
+  conferences: 'conferences',
+  records: 'records',
+  etatMedias: 'etatMedias',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -106,7 +112,11 @@ export interface Ecurie {
   /** Phase 8b (D-132, question 9) : le joueur confie ses programmes de recherche à son directeur technique (décisions de l'IA). */
   delegationRecherche?: boolean;
   /** Phase 10 : domaines que le joueur confie à son équipe (règles de l'IA). Absent = le joueur décide (défauts inscrits à la prise de fonction). */
-  delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands', boolean>>;
+  delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands' | 'communication', boolean>>;
+  /** Phase 11 : image publique de l'écurie (−100 à 100, absente = 0). Lue par les sponsors, le conseil et les candidats. */
+  image?: number;
+  /** Phase 11 : objectif annoncé en conférence de presse pour une saison (« viser le titre » relève l'exigence du conseil). */
+  objectifAnnonce?: { annee: number; niveau: 'titre' | 'prudent' };
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -134,6 +144,10 @@ export interface Personne {
   id: string;
   /** Phase 10 : le manager incarné par le joueur (ses décisions ne sont jamais prises par l'IA). */
   joueur?: boolean;
+  /** Phase 11 : image publique (−100 à 100, absente = 0). Lue par la valeur commerciale et les candidats (via l'écurie). */
+  image?: number;
+  /** Phase 11 : exposition médiatique récente (0 à 100, s'efface). Lue par la popularité. */
+  exposition?: number;
   /** Phase 7b : en période de non-concurrence jusqu'à cette date (incluse) : ne contribue pas au développement de sa nouvelle écurie. */
   nonConcurrenceJusqua?: { annee: number; semaine: number };
   /** D-140 : écurie où la personne a déjà dit avoir besoin d'un nouveau défi (signal précurseur donné une fois par séjour). */
@@ -798,3 +812,5 @@ export interface HistoriqueRecherche {
 /** Phase 8b — découverte (rare, expliquée, sans quota), copiée progressivement par les autres. */
 export interface Decouverte { id: string; ecurie: string; domaine: string; reglement: string; saison: number; ampleur: number; diffusee: number }
 
+
+export * from './medias';

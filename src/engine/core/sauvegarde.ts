@@ -266,6 +266,13 @@ const MIGRATIONS: Record<number, Migration> = {
   },
   // v24 → v25 (phase 10) : joueur (champ facultatif `joueur`, délégations des écuries) ; rien à transformer.
   24: (m) => ({ ...m, versionFormat: 25 }),
+  // v25 → v26 (phase 11) : médias, articles, conférences, records. Une ancienne partie n'a pas de médias (ils viennent des données) :
+  // le système des médias y reste inactif ; l'image publique et l'exposition démarrent à 0.
+  25: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    for (const t of ['medias', 'articles', 'conferences', 'records', 'etatMedias']) tables[t] ??= {};
+    return { ...m, versionFormat: 26 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

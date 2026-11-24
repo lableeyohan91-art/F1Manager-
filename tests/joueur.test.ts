@@ -148,11 +148,11 @@ describe('Phase 10 — parties de contrôle', () => {
 });
 
 describe('Phase 10 — sauvegarde et rejouabilité', () => {
-  it('une sauvegarde au format 24 est migrée au format 25', () => {
+  it('une sauvegarde au format 24 est migrée (format 25, puis le format actuel)', () => {
     const m = sc.creerMonde(2);
     const texte = serialiser(m).replaceAll(`"versionFormat":${VERSION_FORMAT}`, '"versionFormat":24');
     const migre = deserialiser(texte);
-    expect(migre.versionFormat).toBe(25);
+    expect(migre.versionFormat).toBe(VERSION_FORMAT); // 24 → 25 → 26 (phase 11)
     expect(migre.joueur).toBeUndefined();
   });
 

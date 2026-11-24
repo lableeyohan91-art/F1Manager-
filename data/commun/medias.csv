@@ -1,0 +1,10 @@
+id;nom;type;nationalite;fiabilite;appetitRumeurs;verification
+med_quotidien;Le Paddock Quotidien;reference;;0.9;0.15;média fictif (phase 11)
+med_tabloid;Pit Lane Express;tabloid;;0.45;0.8;média fictif (phase 11)
+med_technique;Revue Aéro & Mécanique;technique;;0.85;0.3;média fictif (phase 11)
+med_nat_gbr;Grid Britannia;national;GBR;0.7;0.4;média fictif (phase 11)
+med_nat_ita;Corriere dei Box;national;ITA;0.7;0.45;média fictif (phase 11)
+med_nat_ger;Boxengasse Rundschau;national;GER;0.75;0.35;média fictif (phase 11)
+med_nat_ned;Pitstraat Dagblad;national;NED;0.7;0.4;média fictif (phase 11)
+med_nat_esp;Diario del Box;national;ESP;0.7;0.45;média fictif (phase 11)
+med_nat_fra;L'Écho des Stands;national;FRA;0.75;0.35;média fictif (phase 11)

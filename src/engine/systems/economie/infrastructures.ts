@@ -19,7 +19,11 @@ import { TABLES, type Ecurie, type Finances, type Installation, type ProjetInfra
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
 const LIB: Record<string, string> = {
-  soufflerie: 'soufflerie', cfd: 'centre de calcul (CFD)', simulateur: 'simulateur', bureau_etudes: "bureau d'études",
+  soufflerie: 'sa nouvelle soufflerie', cfd: 'son nouveau centre de calcul (CFD)', simulateur: 'son nouveau simulateur', bureau_etudes: "son nouveau bureau d'études",
+};
+/** Phase 11 (correction d'accord) : « l'agrandissement de sa soufflerie », « de son simulateur ». */
+const LIB_DE: Record<string, string> = {
+  soufflerie: 'de sa soufflerie', cfd: 'de son centre de calcul (CFD)', simulateur: 'de son simulateur', bureau_etudes: "de son bureau d'études",
 };
 
 /** Niveau effectif d'une installation : niveau × usure due à l'âge × état d'entretien. */
@@ -87,7 +91,7 @@ export function deciderProjet(monde: Monde, e: Ecurie, fi: Finances, reserveVise
   ajouterEvenement(monde, {
     type: 'infrastructure.lancement', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'public',
     contexte: { installation: meilleur.i.type, nature: p.nature, cout: p.coutPrevuMEUR, duree: p.dureePrevueSemaines },
-    texte: `${e.nom} lance ${p.nature === 'amelioration' ? "l'agrandissement" : 'la rénovation'} de sa ${LIB[meilleur.i.type] ?? meilleur.i.type} (${p.coutPrevuMEUR} M€ annoncés).`,
+    texte: `${e.nom} lance ${p.nature === 'amelioration' ? "l'agrandissement" : 'la rénovation'} ${LIB_DE[meilleur.i.type] ?? `de ${meilleur.i.type}`} (${p.coutPrevuMEUR} M€ annoncés).`,
   });
 }
 
@@ -145,7 +149,7 @@ export function avancerProjets(monde: Monde, e: Ecurie, fi: Finances): void {
           retardSemaines: Math.max(0, Math.round(semainesEcoulees(monde, p) - p.dureePrevueSemaines)),
           semainesTravail: Math.round(p.avancementSemaines), semainesSuspendues: Math.round(p.semainesSuspendues ?? 0),
         },
-        texte: `${e.nom} met en service sa nouvelle ${LIB[i?.type ?? ''] ?? 'installation'}${p.coutReelMEUR > p.coutPrevuMEUR + 0.1 ? ` (coût final ${p.coutReelMEUR} M€ au lieu de ${p.coutPrevuMEUR})` : ''}.`,
+        texte: `${e.nom} met en service ${LIB[i?.type ?? ''] ?? 'sa nouvelle installation'}${p.coutReelMEUR > p.coutPrevuMEUR + 0.1 ? ` (coût final ${p.coutReelMEUR} M€ au lieu de ${p.coutPrevuMEUR})` : ''}.`,
       });
     }
   }

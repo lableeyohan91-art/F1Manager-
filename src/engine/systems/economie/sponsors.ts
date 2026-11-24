@@ -23,6 +23,7 @@ import {
 } from '../../model/types';
 import { ecuriesActives, pilotesTitulaires } from '../saison/performance';
 import { forceEcurie } from '../humain/decision';
+import { attraitImage } from '../medias/acces';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -158,7 +159,9 @@ export function attrait(monde: Monde, e: Ecurie, s: Sponsor): number {
     w.popularite * (e.popularite / 20) + w.prestige * (e.prestige / 20) + w.resultats * forceEcurie(monde, e.id)
       + w.marketing * ((marketing?.niveauMoyen ?? 10) / 20) + w.nationalite * nat
       // Phase 7c (D-096) : motivations diversifiées — popularité des pilotes, jeune espoir.
-      + attraitPilotes(monde, e),
+      + attraitPilotes(monde, e)
+      // Phase 11 : une écurie mal vue fait fuir les sponsors, une écurie appréciée les attire.
+      + attraitImage(e),
     0, 1,
   );
 }

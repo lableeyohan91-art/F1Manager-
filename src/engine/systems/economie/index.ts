@@ -38,6 +38,8 @@ import { coutAnnuelAcademie } from '../juniors/academies';
 export * from './sponsors';
 export * from './crises';
 import { nombreGrandsPrix, regleVotee } from '../politique/acces';
+import { CONFERENCES } from '../../balance/medias';
+import { patienceImage } from '../medias/acces';
 export * from './infrastructures';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
@@ -326,9 +328,12 @@ function evaluerTeamPrincipal(monde: Monde, e: Ecurie): void {
   if (!tp || !p) return;
   const saisons = (Object.values(table(monde, TABLES.saisons)) as unknown as Saison[]).filter((s) => s.termine).sort((a, b) => b.annee - a.annee).slice(0, 2);
   const attendu = rangAttendu(monde, e.id);
-  const ecarts = saisons.map((s) => s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1 - attendu);
-  const grave = (ecarts[0] ?? 0) >= CONSEIL.ecartGrave && p.patience <= CONSEIL.patienceMaxGrave;
-  const repete = ecarts.length === 2 && ecarts.every((x) => x >= CONSEIL.ecartRepete) && p.patience <= CONSEIL.patienceMaxRepete;
+  // Phase 11 : « viser le titre » en conférence de presse relève l'exigence pour cette saison ; l'image pèse sur la patience.
+  const attenduSaison = (annee: number) => (e.objectifAnnonce?.annee === annee && e.objectifAnnonce.niveau === 'titre' ? Math.min(attendu, CONFERENCES.objectifTitreRangAttendu) : attendu);
+  const ecarts = saisons.map((s) => s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1 - attenduSaison(s.annee));
+  const patience = p.patience + patienceImage(e);
+  const grave = (ecarts[0] ?? 0) >= CONSEIL.ecartGrave && patience <= CONSEIL.patienceMaxGrave;
+  const repete = ecarts.length === 2 && ecarts.every((x) => x >= CONSEIL.ecartRepete) && patience <= CONSEIL.patienceMaxRepete;
   if (!(grave || repete)) return;
   if (!tirageLocal(monde, 'conseil.evaluation', e.id, monde.date.annee).chance(CONSEIL.probabilite)) return;
   const c = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((x) => x.personne === tp.id && x.statut === 'actif' && x.type === 'emploi');

@@ -26,6 +26,8 @@ import { ecuriesActives } from '../saison/performance';
 import { niveauMetier, valeurMarche } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
 import { emplacementsLibres, signerSponsor, sponsorsEngages } from '../economie/sponsors';
+import { EXPOSITION } from '../../balance/medias';
+import { facteurImageCommerciale } from '../medias/acces';
 
 const borner = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -59,7 +61,9 @@ export function evoluerPopularites(monde: Monde, annee: number): void {
     const titres = pal.filter((x) => x.championPilote === p.id).length;
     const anciennete = Math.min(POPULARITE.plafondAnciennete, POPULARITE.parSaisonF1 * (p.carriere?.saisonsF1 ?? 0));
     let cible = (rang >= 0 ? POPULARITE.parRang * (n - 1 - rang) : (p.reputationJeune ?? 0) * POPULARITE.junior)
-      + POPULARITE.parVictoire * victoires + POPULARITE.parTitre * titres + anciennete + POPULARITE.charisme * charisme(p);
+      + POPULARITE.parVictoire * victoires + POPULARITE.parTitre * titres + anciennete + POPULARITE.charisme * charisme(p)
+      // Phase 11 : être souvent dans les journaux rend plus connu, en bien ou en mal.
+      + EXPOSITION.popularite * ((p.exposition ?? 0) / 100);
     cible = borner(cible, 0, 100);
     const actuelle = popularite(p);
     const k = POPULARITE.inertie;
@@ -77,7 +81,8 @@ export function valeurCommerciale(monde: Monde, p: Personne): number {
   const compatriotes = titulaires(monde).filter((x) => x.id !== p.id && x.nationalite === p.nationalite).length;
   const rarete = 1 / (1 + compatriotes);
   const marche = TAILLE_MARCHE[p.nationalite] ?? TAILLE_MARCHE_DEFAUT;
-  return arrondi(VALEUR_COMMERCIALE.baseMEUR * (pop.internationale / 100 + VALEUR_COMMERCIALE.poidsNational * (pop.nationale / 100) * marche * rarete));
+  // Phase 11 : une personne mal vue vaut moins pour les sponsors, une personne appréciée un peu plus (D-149).
+  return arrondi(VALEUR_COMMERCIALE.baseMEUR * (pop.internationale / 100 + VALEUR_COMMERCIALE.poidsNational * (pop.nationale / 100) * marche * rarete) * facteurImageCommerciale(p));
 }
 
 /* ---------------------------------------------------------------- Sponsors personnels et pilotes payants */

@@ -3,6 +3,7 @@
  * Toutes les erreurs sont accumulées puis signalées ensemble, avec fichier, ligne et colonne.
  */
 
+import { TYPES_MEDIAS, type Media } from '../model/medias';
 import { ARCHETYPES } from '../balance/carriere';
 import { COMPETENCES_PILOTE } from '../balance/personnages';
 import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, TypeProprietaire, Voiture } from '../model/types';
@@ -14,7 +15,7 @@ import { ETIQUETTES } from '../balance/memoire';
 export type FichiersDonnees = Record<string, string>;
 
 export const FICHIERS_GRILLE = ['histoires.csv', 'finances.csv', 'voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
-export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv', 'secteurs.csv', 'entreprises.csv', 'ecuries-juniors.csv'] as const;
+export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv', 'secteurs.csv', 'entreprises.csv', 'ecuries-juniors.csv', 'medias.csv'] as const;
 
 const POSTES_DONNEES: readonly Poste[] = [
   'team_principal', 'directeur_technique', 'directeur_sportif', 'directeur_financier',
@@ -80,6 +81,8 @@ export interface DonneesInitiales {
   racinesEntreprises: string[];
   /** Phase 6b : noms fictifs des écuries juniors. */
   ecuriesJuniors: { nom: string; nationalite: string }[];
+  /** Phase 11 (D-149) : médias fictifs et leur ligne éditoriale (`data/commun/medias.csv`). */
+  medias: Media[];
 }
 
 export interface Secteur {
@@ -355,7 +358,21 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     if (n !== 1) problemes.push(`finances.csv : ${n} ligne(s) pour l'écurie ${e.id} (il en faut exactement 1)`);
   }
 
-  problemes.push(...rf.problemes, ...rv.problemes, ...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes, ...rh.problemes);
+  // Médias (phase 11).
+  const lmed = lireCsv('medias.csv', fichier(f, 'medias.csv'), ['id', 'nom', 'type', 'nationalite', 'fiabilite', 'appetitRumeurs']);
+  const rmed = new Lecteur('medias.csv');
+  const medias: Media[] = lmed.map((l) => ({
+    id: rmed.texte(l, 'id'),
+    nom: rmed.texte(l, 'nom'),
+    type: rmed.parmi(l, 'type', TYPES_MEDIAS),
+    ...(rmed.texte(l, 'nationalite', false) ? { nationalite: rmed.reference(l, 'nationalite', codesNat) } : {}),
+    fiabilite: rmed.decimal(l, 'fiabilite', 0, 1),
+    appetitRumeurs: rmed.decimal(l, 'appetitRumeurs', 0, 1),
+  }));
+  verifierIdsUniques('medias.csv', lmed.map((l, i) => ({ id: medias[i]!.id, numero: l.numero })), problemes);
+  for (const m of medias) if (m.type === 'national' && !m.nationalite) problemes.push(`medias.csv : le média national ${m.id} n'a pas de nationalité`);
+
+  problemes.push(...rmed.problemes, ...rf.problemes, ...rv.problemes, ...rn.problemes, ...rno.problemes, ...rm.problemes, ...re.problemes, ...rp.problemes, ...rc.problemes, ...rca.problemes, ...rpa.problemes, ...rci.problemes, ...rh.problemes);
   if (problemes.length > 0) throw new ErreurDonnees(problemes);
 
   // Sponsors fictifs (phase 5b).
@@ -375,5 +392,5 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   const ecuriesJuniors = ljun.map((l) => ({ nom: rj.texte(l, 'nom'), nationalite: rj.reference(l, 'nationalite', codesNat) }));
   if (ecuriesJuniors.length < 21) problemes.push('ecuries-juniors.csv : il faut au moins 21 noms (10 écuries Apex 3 + 11 écuries Apex 2)');
 
-  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, histoires, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises, ecuriesJuniors };
+  return { motoristes, ecuries, personnes, contrats, carrieres, palmares, histoires, circuits, voitures, finances, nationalites, noms, secteurs, racinesEntreprises, ecuriesJuniors, medias };
 }

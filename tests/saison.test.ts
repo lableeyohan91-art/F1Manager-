@@ -63,7 +63,9 @@ describe('Phase 3 — saison abstraite', () => {
     // Phase 6b-2 : relations et souvenirs nés des académies. Limite à 30 saisons inchangée (12 Mo, test humain).
     // Phase 8 : règlements, savoir, historique de recherche, faits suivis, équipes des stands (≈ 0,15 Mo) et relations des 11 chefs
     // d'équipe des stands : limite relevée de 4 à 4,5 Mo (mesuré : 4,17 Mo).
-    expect(serialiser(m).length).toBeLessThan(4_500_000);
+    // Phase 11 : articles (≈ 0,17 Mo, bornés à la saison en cours et la précédente, puis 20 importants par saison) et déclarations de presse :
+    // limite relevée de 4,5 à 5 Mo (mesuré : 4,62 Mo ; 4,30 Mo avant la phase 11). Critère compressé à 50 saisons vérifié à part.
+    expect(serialiser(m).length).toBeLessThan(5_000_000);
   }, 90_000); // référence locale ≈ 4 à 7 s
 
   it('tirages locaux : changer la météo d’une course ne change pas l’aléa des autres courses', () => {

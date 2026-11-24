@@ -211,7 +211,7 @@ function Accueil({ demarrer }: { demarrer: (p: Partie) => void }) {
 
 const LIB_DECISION: Record<DecisionEnAttente['type'], string> = {
   contre_offre: 'Négociation', augmentation: 'Augmentation', depart: 'Départ', fin_contrat: 'Contrat',
-  poste_vacant: 'Recrutement', offre_marche: 'Marché', vote_reglement: 'Règlement', election: 'Fédération', vote_federation: 'Fédération',
+  poste_vacant: 'Recrutement', offre_marche: 'Marché', vote_reglement: 'Règlement', election: 'Fédération', vote_federation: 'Fédération', conference: 'Presse',
 };
 
 function cibleDecision(d: DecisionEnAttente, nav: Navigation) {

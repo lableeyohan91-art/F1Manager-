@@ -34,3 +34,4 @@ export * from './systems/information';
 export * from './systems/stands';
 export * from './systems/politique';
 export * from './systems/joueur';
+export * from './systems/medias';

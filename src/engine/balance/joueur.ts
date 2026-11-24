@@ -5,9 +5,10 @@
 /**
  * Délégations par défaut d'une écurie dirigée par le joueur : `true` = l'équipe décide avec les règles de l'IA.
  * Au départ, le joueur gère lui-même ses pilotes ; tout le reste est délégué (il découvre le jeu sans être submergé).
+ * Phase 11 : `communication` (conférences de presse) ; délégué, le service de communication répond avec les règles de l'IA.
  * La recherche (directeur technique) et les stands (directeur sportif) ont leurs propres drapeaux (phases 8b et 8d-1).
  */
-export const DELEGATIONS_DEFAUT = { pilotes: false, personnel: true, academie: true, politique: true } as const;
+export const DELEGATIONS_DEFAUT = { pilotes: false, personnel: true, academie: true, politique: true, communication: true } as const;
 
 /** Recherche et stands délégués au départ (drapeaux des phases 8b et 8d). */
 export const DELEGATION_RECHERCHE_DEFAUT = true;

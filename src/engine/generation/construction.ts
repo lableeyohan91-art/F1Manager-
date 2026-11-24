@@ -346,6 +346,8 @@ function contratGenere(ctx: Contexte, p: Personne): Contrat {
 export function construireMonde(graine: number, d: DonneesInitiales, scenario: string): Monde {
   const monde = creerMondeVide(graine, scenario, DATE_DEPART);
   const ctx: Contexte = { monde, graine, d, nomsPris: new Set() };
+  // Phase 11 : médias fictifs (données).
+  for (const m of d.medias ?? []) table(monde, TABLES.medias)[m.id] = { ...m } as unknown as Entite;
   table(monde, TABLE_REFERENTIEL)['referentiel'] = { id: 'referentiel', nationalites: d.nationalites, noms: d.noms, secteurs: d.secteurs, racinesEntreprises: d.racinesEntreprises, ecuriesJuniors: d.ecuriesJuniors } satisfies Referentiel as unknown as Entite;
 
   for (const m of d.motoristes) ajouter(monde, TABLES.motoristes, { ...m });

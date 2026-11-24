@@ -18,6 +18,7 @@ import { potentielEstime } from '../carriere/estimation';
 import { AGENTS } from '../../balance/commercial';
 import { agentDe } from '../marche/commercial';
 import { ATTRAIT_POSTE_SUPERIEUR, LASSITUDE_PERSONNEL, LASSITUDE_PILOTE, PREDATEUR, RANG_POSTE, USURE_SUCCES } from '../../balance/marche';
+import { utiliteImage } from '../medias/acces';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
 
@@ -180,6 +181,8 @@ export function evaluerOffre(monde: Monde, p: Personne, o: Offre): Evaluation {
   if ((RANG_POSTE[o.poste] ?? 0) > (RANG_POSTE[p.poste] ?? 0)) u += ajouter('poste plus important', ATTRAIT_POSTE_SUPERIEUR * ((p.traits['ambition'] ?? 10) / 20));
   // Phase 7a : une écurie réputée prédatrice inspire de la méfiance (un coût, jamais une interdiction).
   if (!o.prolongation && eq?.reputationPredateur) u += ajouter('écurie réputée prédatrice', -Math.min(PREDATEUR.malusMax, PREDATEUR.malusParPoint * eq.reputationPredateur));
+  // Phase 11 : l'image publique de l'écurie (une écurie appréciée attire, une écurie mal vue rebute).
+  if (eq?.image) u += ajouter(eq.image >= 0 ? 'écurie bien vue' : 'écurie mal vue', utiliteImage(eq));
 
   // Relations (seul canal des souvenirs) ; réputation si l'on ne se connaît pas.
   const rd = relation(monde, p.id, o.decideur);
