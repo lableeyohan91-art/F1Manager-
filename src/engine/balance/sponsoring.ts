@@ -8,6 +8,9 @@
  * Conséquence voulue : un pari ne rapporte en moyenne que si l'écurie fait mieux que ce que le marché attend d'elle.
  */
 
+/** Nombre de Grands Prix des saisons sur lesquelles les tables de saison ont été mesurées (audit 5.8 : ramenées au calendrier réel). */
+export const GP_MESURE_SPONSORING = 24;
+
 /** Rang attendu public : poids de la dernière saison terminée et de l'avant-dernière (moyenne pondérée). */
 export const RANG_ATTENDU = { poidsDerniere: 2, poidsAvantDerniere: 1 };
 
@@ -128,8 +131,12 @@ export const ESTIMATION_GP = { demiLargeurMin: 0.04, demiLargeurMax: 0.2, biais:
  */
 export const CHOIX_EQUIPE = { diviseurAversion: 15, diviseurRisque: 5, seuilAudacieuse: 1.5, seuilEquilibree: 0.5 };
 
-/** Offres faites au joueur (domaine commercial non délégué) : délai de réponse (semaines), offres en plus des places libres. */
-export const OFFRES_JOUEUR = { delaiSemaines: 3, offresEnPlus: 2 };
+/**
+ * Offres faites au joueur (domaine commercial non délégué) : délai de réponse (semaines), offres en plus des places libres.
+ * Audit 5.6 : 2 semaines (échéance en semaine 3), pour que le contrat soit signé avant la première écriture comptable (semaine 4),
+ * comme ceux de l'IA (avant : échéance en semaine 4, après la comptabilité : une période de fixe perdue).
+ */
+export const OFFRES_JOUEUR = { delaiSemaines: 2, offresEnPlus: 2 };
 
 /**
  * Satisfaction et clauses (prolonge SATISFACTION_SPONSOR) : une clause ratée déçoit en proportion de la probabilité que le sponsor

@@ -299,8 +299,13 @@ export function placementSponsor(monde: Monde, idEcurie: string, annee: number, 
   const actifs = contratsSponsoring(monde).filter((c) => c.statut === 'actif' && c.ecurie === idEcurie && c.debut <= annee && c.fin >= annee && !exclus.has(c.id));
   const secteurDe = (c: ContratSponsoring) => (ts[c.sponsor] as unknown as Sponsor | undefined)?.secteur;
   const conflit = (sauf?: ContratSponsoring) => !!s && actifs.some((c) => c !== sauf && secteurDe(c) === s.secteur);
-  const libres = emplacementsLibres(monde, idEcurie, annee);
-  const rangLibre = montant >= SEUILS_RANG_SPONSOR.principal && libres.principal > 0 ? 'principal' : libres.secondaire > 0 ? 'secondaire' : libres.principal > 0 ? 'principal' : null;
+  const libres = { ...emplacementsLibres(monde, idEcurie, annee) };
+  // Audit 5.7 : les places visées par des offres encore en attente (écurie du joueur) sont réservées.
+  for (const o of Object.values(table(monde, TABLES.offresSponsors)) as unknown as { ecurie: string; annee: number; rang: string }[]) {
+    if (o.ecurie === idEcurie && o.annee === annee && (o.rang === 'principal' || o.rang === 'secondaire')) libres[o.rang] = Math.max(0, libres[o.rang] - 1);
+  }
+  // Audit 5.10 : un montant sous le seuil d'un rang principal ne prend jamais une place principale.
+  const rangLibre = montant >= SEUILS_RANG_SPONSOR.principal && libres.principal > 0 ? 'principal' : libres.secondaire > 0 ? 'secondaire' : null;
   if (rangLibre && !conflit()) {
     const m = montantAuRang(montant, rangLibre);
     return { rang: rangLibre, montant: m, indemniteRupture: 0, gainNet: m };

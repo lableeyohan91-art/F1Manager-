@@ -63,6 +63,8 @@ export function gererTresorerie(monde: Monde, e: Ecurie, fi: Finances, depensesP
     const r = Math.min(fi.detteMEUR, (fi.tresorerieMEUR - REMBOURSEMENT.seuilPeriodes * depensesPeriode) * REMBOURSEMENT.part);
     fi.detteMEUR -= r;
     fi.tresorerieMEUR -= r;
+    // Audit 5.12 : un remboursement est inscrit comme un fait.
+    if (r > 0.5) ajouterEvenement(monde, { type: 'finances.remboursement', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 1, visibilite: 'prive', contexte: { montant: arrondi(r), dette: arrondi(fi.detteMEUR) } });
   }
 
   const avant = fi.etatCrise;
@@ -92,7 +94,7 @@ function entrerEnCrise(monde: Monde, e: Ecurie, fi: Finances): void {
     const p = t[id] as unknown as Personne;
     if (p.statut === 'actif' && p.ecurie === e.id) p.etat.motivation = Math.max(0, p.etat.motivation - CRISE_MOTIVATION);
   }
-  void ev;
+  fi.evenementCrise = ev.id; // audit 5.12 : cause du sauvetage, de l'administration ou du rachat qui suivront
 }
 
 /** Sauvetage par le propriétaire, sinon administration puis rachat si la crise dure. */
@@ -106,7 +108,7 @@ function tenterSauvetage(monde: Monde, e: Ecurie, fi: Finances, depensesPeriode:
     fi.etatCrise = 'tension';
     fi.periodesEnCrise = 0;
     ajouterEvenement(monde, {
-      type: 'proprietaire.sauvetage', acteurs: [{ id: p.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 3, visibilite: 'public',
+      type: 'proprietaire.sauvetage', acteurs: [{ id: p.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], causes: fi.evenementCrise && monde.evenements[fi.evenementCrise] ? [fi.evenementCrise] : [], importance: 3, visibilite: 'public',
       contexte: { montant: arrondi(montant) }, texte: `Le propriétaire de ${e.nom} injecte ${arrondi(montant)} M€ pour sauver l'écurie.`,
     });
     return;
@@ -114,7 +116,7 @@ function tenterSauvetage(monde: Monde, e: Ecurie, fi: Finances, depensesPeriode:
   if (fi.periodesEnCrise >= PERIODES_CRISE_AVANT_ADMINISTRATION) {
     fi.etatCrise = 'administration';
     ajouterEvenement(monde, {
-      type: 'finances.administration', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 4, visibilite: 'public',
+      type: 'finances.administration', acteurs: [{ id: e.id, role: 'ecurie' }], causes: fi.evenementCrise && monde.evenements[fi.evenementCrise] ? [fi.evenementCrise] : [], importance: 4, visibilite: 'public',
       contexte: { dette: arrondi(fi.detteMEUR), tresorerie: arrondi(fi.tresorerieMEUR) }, texte: `${e.nom} est placée sous administration.`,
     });
     racheter(monde, e, fi, 'administration', depensesPeriode);
@@ -135,6 +137,7 @@ export function racheter(monde: Monde, e: Ecurie, fi: Finances, motif: 'administ
   };
   if (ancien) ancien.actif = false;
   table(monde, TABLES.proprietaires)[nouveau.id] = nouveau as unknown as Entite;
+  delete fi.chocApport; // audit 5.3 : le retrait de l'ancien propriétaire ne s'applique pas au nouveau
   const efface = RACHAT.partDetteEffacee * fi.detteMEUR;
   fi.detteMEUR -= efface;
   const injection = Math.max(0, -fi.tresorerieMEUR) + RACHAT.periodesReserveInjectees * depensesPeriode;

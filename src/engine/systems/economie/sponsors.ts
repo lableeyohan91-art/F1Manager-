@@ -196,7 +196,8 @@ function montantOffre(monde: Monde, s: Sponsor, a: number): number {
 function objectifPrudent(monde: Monde, s: Sponsor, e: Ecurie, annee: number): number {
   const rangActuel = rangPrecedentClassement(monde, e.id, annee - 1) ?? Math.round(1 + (1 - forceEcurie(monde, e.id)) * (ecuriesActives(monde).length - 1));
   const tolerance = Math.round((20 - s.exigence) / 5); // un sponsor exigeant ne tolère aucun recul
-  return borner(rangActuel + tolerance, 1, ecuriesActives(monde).length);
+  // Audit 5.11 : jamais le dernier rang (« finir dernier ou mieux » serait un cadeau certain).
+  return borner(rangActuel + tolerance, 1, Math.max(1, ecuriesActives(monde).length - 1));
 }
 
 /**
@@ -347,6 +348,9 @@ export function meilleurPlacement(monde: Monde, s: Sponsor, annee: number, exclu
     if (s.rancunes.some((r) => r.ecurie === e.id && r.jusqua >= annee)) continue;
     const actifs = contratsActifs(monde, annee, e.id);
     if (actifs.some((c) => (table(monde, TABLES.sponsors)[c.sponsor] as unknown as Sponsor | undefined)?.secteur === s.secteur)) continue; // exclusivité de secteur
+    // Audit 5.5 : les offres encore en attente comptent aussi (écurie du joueur : elle signe après la semaine 1).
+    if ((Object.values(table(monde, TABLES.offresSponsors)) as unknown as OffreSponsor[]).some((o) => o.ecurie === e.id && o.annee === annee && o.sponsor !== s.id
+      && (table(monde, TABLES.sponsors)[o.sponsor] as unknown as Sponsor | undefined)?.secteur === s.secteur)) continue;
     const a = borner(attrait(monde, e, s) + tirageLocal(monde, 'sponsor.choix', s.id, annee, e.id).normale(0, ALEA_CHOIX_SPONSOR), 0, 1);
     let montant = montantOffre(monde, s, a);
     const libresE = emplacementsLibres(monde, e.id, annee);

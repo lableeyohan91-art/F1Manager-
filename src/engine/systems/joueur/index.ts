@@ -188,6 +188,10 @@ export const commandeBudgetDeveloppement: DefinitionCommande = {
     if (typeof m !== 'number' || !Number.isFinite(m)) return 'Montant invalide.';
     if (m < DEVELOPPEMENT_MINIMUM) return `Le développement ne descend pas sous ${DEVELOPPEMENT_MINIMUM} M€ par an.`;
     if (m > budgetMaxJoueur(monde)) return `Au plus ${budgetMaxJoueur(monde)} M€ par an.`;
+    // Audit 5.1 : une modification par trimestre (sinon, budget haut juste avant chaque étape de développement et bas avant chaque
+    // écriture comptable : plafond contourné).
+    const choix = financesDe(monde, id)!.budget.choixTP;
+    if (choix && rangSemaine(monde.date) - rangSemaine(choix.le) < BUDGET_JOUEUR.delaiModificationSemaines) return `Le budget de développement se modifie au plus une fois toutes les ${BUDGET_JOUEUR.delaiModificationSemaines} semaines.`;
     return null;
   },
   appliquer({ monde }, c) {
@@ -196,6 +200,9 @@ export const commandeBudgetDeveloppement: DefinitionCommande = {
     const avant = fi.budget.developpementMEUR;
     fi.budget.developpementMEUR = r1(Number(c.parametres['montant']));
     fi.budget.strategie = 'choix_du_team_principal';
+    // Audit 10.2 : le choix vaut pour la saison en cours, ou pour la suivante si le budget annuel n'est pas encore bâti ; le budget
+    // annuel le garde au lieu de l'écraser.
+    fi.budget.choixTP = { annee: monde.date.annee, montantMEUR: fi.budget.developpementMEUR, le: { ...monde.date } };
     ajouterEvenement(monde, {
       type: 'finances.budget_modifie', acteurs: [{ id: c.auteur, role: 'auteur' }, { id, role: 'ecurie' }], importance: 1, visibilite: 'prive',
       contexte: { avant, apres: fi.budget.developpementMEUR },

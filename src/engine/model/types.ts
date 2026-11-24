@@ -776,6 +776,8 @@ export interface ComptesAnnee {
   apportsExceptionnels: number;
   /** Phase 6b-2 : académie (financement des affiliés) et missions de repérage, hors plafond. */
   academie?: number;
+  /** Audit 5.2 : plafond en vigueur pendant cette année (un plafond voté ne s'applique pas rétroactivement). */
+  plafondMEUR?: number;
   /** Phase 7a : indemnités de transfert reçues (rachat d'un pilote ou d'un affilié par une autre écurie), recette hors plafond. */
   transfertsRecus?: number;
 }
@@ -786,7 +788,11 @@ export interface Finances {
   tresorerieMEUR: number;
   revenusCommerciauxBaseMEUR: number;
   /** Budget de l'année en cours. */
-  budget: { annee: number; developpementMEUR: number; plafondVise: number; strategie: string };
+  budget: {
+    annee: number; developpementMEUR: number; plafondVise: number; strategie: string;
+    /** Audit 5.1 et 10.2 : choix du team principal (montant, saison visée, date) — gardé par le budget annuel, une modification par trimestre. */
+    choixTP?: { annee: number; montantMEUR: number; le: DateJeu };
+  };
   /** Comptes de l'année en cours (cumulés période par période). */
   comptes: ComptesAnnee;
   /** Bilans des années passées. */
@@ -800,6 +806,8 @@ export interface Finances {
   projets: ProjetInfrastructure[];
   /** Retrait du propriétaire en cours d'année (tiré au bilan, annoncé à la semaine indiquée). */
   chocApport?: { annee: number; semaine: number; facteur: number; annonce?: boolean };
+  /** Audit 5.12 : fait d'entrée dans la dernière crise (cause des suites). */
+  evenementCrise?: string;
   verification: string;
 }
 

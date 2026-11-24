@@ -6,7 +6,7 @@
  */
 
 import {
-  ARRIVEES_POINTS, PART_RANG_PUBLIC_GP, PROBA_GP, PROBA_PODIUM_SAISON, PROBA_RANG_SAISON, PROBA_VICTOIRE_SAISON, RANG_ATTENDU, SEUILS_GP,
+  ARRIVEES_POINTS, GP_MESURE_SPONSORING, PART_RANG_PUBLIC_GP, PROBA_GP, PROBA_PODIUM_SAISON, PROBA_RANG_SAISON, PROBA_VICTOIRE_SAISON, RANG_ATTENDU, SEUILS_GP,
 } from '../../balance/sponsoring';
 import { table, type Monde } from '../../core/monde';
 import { TABLES, type Circuit, type ClauseSponsor, type Ecurie, type GrandPrix, type Saison } from '../../model/types';
@@ -104,12 +104,19 @@ export function probaArriveesPoints(r: number, n: number, nGP: number, m: number
   return 1 - repartitionNormale((m - 0.5 - mu) / sd);
 }
 
+/** Probabilité « au moins une fois dans la saison » mesurée sur GP_MESURE Grands Prix, ramenée à nGP Grands Prix. */
+function auCalendrier(p24: number, nGP: number): number {
+  if (p24 >= 1 || nGP === GP_MESURE_SPONSORING) return p24;
+  return 1 - Math.pow(1 - p24, nGP / GP_MESURE_SPONSORING);
+}
+
 /** Probabilité d'une clause annuelle, vue par le sponsor (le seuil d'une progression est un rang à atteindre). */
 export function probaClause(type: ClauseSponsor['type'], seuil: number, r: number, n: number, nGP: number): number {
   switch (type) {
     case 'rang': case 'progression': return probaRangSaison(r, n, seuil);
-    case 'podium': return parRang(PROBA_PODIUM_SAISON, echelle(r, n));
-    case 'victoire': return parRang(PROBA_VICTOIRE_SAISON, echelle(r, n));
+    // Audit 5.8 : tables mesurées sur 24 Grands Prix, ramenées au calendrier réel (chaque course, une chance à peu près indépendante).
+    case 'podium': return auCalendrier(parRang(PROBA_PODIUM_SAISON, echelle(r, n)), nGP);
+    case 'victoire': return auCalendrier(parRang(PROBA_VICTOIRE_SAISON, echelle(r, n)), nGP);
     case 'arrivees_points': return probaArriveesPoints(r, n, nGP, seuil);
   }
 }

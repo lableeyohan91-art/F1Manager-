@@ -182,7 +182,8 @@ function cloturer(monde: Monde, e: Ecurie, fi: Finances): void {
   const c = fi.comptes;
   if (c.annee >= monde.date.annee) return;
   const plafonnees = totalPlafonne(c);
-  const cap = plafond(monde);
+  // Audit 5.2 : l'année écoulée est jugée avec SON plafond (voté l'année d'avant), pas avec celui qui vient d'entrer en vigueur.
+  const cap = c.plafondMEUR ?? plafond(monde);
   const depassement = Math.max(0, plafonnees - cap);
   fi.sanctionAero = 0;
   if (depassement > 0.01) {
@@ -215,6 +216,7 @@ function cloturer(monde: Monde, e: Ecurie, fi: Finances): void {
     type: 'finances.bilan', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 1,
     contexte: { annee: c.annee, recettes: arrondi(totalRecettes(c)), depenses: arrondi(totalDepenses(c)), plafonnees: arrondi(plafonnees), tresorerie: arrondi(fi.tresorerieMEUR) },
   });
+  fi.comptes = comptesVides(monde.date.annee); // audit 5.4 : nouvelle année ouverte tout de suite (plafond noté au budget annuel)
 }
 
 /**
@@ -263,8 +265,14 @@ export function deciderBudget(monde: Monde, e: Ecurie, fi: Finances): number {
   if (disponible < margeSousPlafond * 0.6) strategie = 'prudent';
   if (offensifDette) strategie = 'endettement';
   dev = Math.max(DEVELOPPEMENT_MINIMUM, dev);
-  fi.budget = { annee, developpementMEUR: arrondi(dev), plafondVise: arrondi(plafondVise), strategie };
-  fi.comptes = comptesVides(annee);
+  // Audit 10.2 : un choix du team principal pour cette saison (fait avant la construction du budget annuel) est respecté.
+  const choix = fi.budget.choixTP;
+  if (choix && choix.annee === annee) { dev = choix.montantMEUR; strategie = 'choix_du_team_principal'; }
+  fi.budget = { annee, developpementMEUR: arrondi(dev), plafondVise: arrondi(plafondVise), strategie, ...(choix ? { choixTP: choix } : {}) };
+  // Audit 5.4 : les comptes de la nouvelle année sont ouverts dès la clôture (les versements de la semaine 1 y sont inscrits) ;
+  // le plafond en vigueur cette année y est noté.
+  if (fi.comptes.annee !== annee) fi.comptes = comptesVides(annee);
+  fi.comptes.plafondMEUR = plafond(monde);
   tirerRetrait(monde, e, fi, annee);
   return reserve;
 }

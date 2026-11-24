@@ -115,7 +115,8 @@ function trancherOffres(monde: Monde): void {
       .sort((a, b) => b.variantes[0]!.valeurAttendueMEUR - a.variantes[0]!.valeurAttendueMEUR || (a.id < b.id ? -1 : 1));
     for (const x of lot) {
       if (!table(monde, TABLES.offresSponsors)[x.id]) continue;
-      if (emplacementsLibres(monde, e.id, x.annee)[x.rang] > 0) signerOffre(monde, x, choisirVarianteEquipe(monde, e, x.variantes).variante, 'equipe');
+      if (conflitSecteur(monde, x)) declinerOffre(monde, x, 'secteur déjà représenté');
+      else if (emplacementsLibres(monde, e.id, x.annee)[x.rang] > 0) signerOffre(monde, x, choisirVarianteEquipe(monde, e, x.variantes).variante, 'equipe');
       else declinerOffre(monde, x, 'place prise');
     }
   }
@@ -415,6 +416,12 @@ function validerTP(monde: Monde, auteur: string, idEcurie: string): string | nul
   return tp && tp.id === auteur ? null : 'Seul le team principal de l’écurie peut décider.';
 }
 
+/** Audit 5.5 : exclusivité de secteur, pour le joueur comme pour l'IA. */
+export function conflitSecteur(monde: Monde, o: OffreSponsor): boolean {
+  const secteur = (table(monde, TABLES.sponsors)[o.sponsor] as unknown as Sponsor | undefined)?.secteur;
+  return !!secteur && contratsActifs(monde, o.annee, o.ecurie).some((c) => c.sponsor !== o.sponsor && (table(monde, TABLES.sponsors)[c.sponsor] as unknown as Sponsor | undefined)?.secteur === secteur);
+}
+
 /** `sponsor.signer` : signer une variante d'une offre, ou la décliner (variante absente). */
 export const commandeSignerSponsor: DefinitionCommande = {
   type: 'sponsor.signer',
@@ -427,6 +434,7 @@ export const commandeSignerSponsor: DefinitionCommande = {
     if (variante === null || variante === undefined) return null;
     if (!o.variantes.some((x) => x.variante === variante)) return 'Variante inconnue pour cette offre.';
     if (emplacementsLibres(monde, o.ecurie, o.annee)[o.rang] <= 0) return 'Plus de place libre à ce rang.';
+    if (conflitSecteur(monde, o)) return 'Un sponsor du même secteur est déjà sous contrat (exclusivité).';
     return null;
   },
   appliquer({ monde }, c) {

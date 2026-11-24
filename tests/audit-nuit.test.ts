@@ -118,3 +118,28 @@ describe('Audit — phases 4 et 9', () => {
     expect(relationDe()).toBe(apresUn);
   });
 });
+
+describe('Audit — économie (phase 5 et sponsoring)', () => {
+  it('5.1 et 10.2 : le budget de développement se modifie au plus une fois par trimestre, et le budget annuel garde ce choix', () => {
+    const m = sc.creerMonde(12), moteur = sc.creerMoteur();
+    executerCommandeJoueur(moteur, m, { type: 'joueur.prendre_ecurie', auteur: 'joueur', parametres: { ecurie: 'eq_haas', prenom: 'Camille', nom: 'Essai' } });
+    const budget = (montant: number) => executerCommandeJoueur(moteur, m, { type: 'budget.developpement', auteur: m.joueur!.personne, parametres: { ecurie: 'eq_haas', montant } });
+    expect(budget(60).ok).toBe(true);
+    moteur.avancer(m, 2);
+    const fi = (Object.values(table(m, TABLES.finances)) as unknown as { ecurie: string; budget: { developpementMEUR: number } }[]).find((f) => f.ecurie === 'eq_haas')!;
+    expect(fi.budget.developpementMEUR).toBe(60); // non écrasé par le budget annuel de la semaine 1
+    expect(budget(200).ok).toBe(false); // deuxième modification dans le trimestre
+  });
+
+  it('5.2 : chaque année est jugée avec le plafond en vigueur cette année-là', () => {
+    const m = sc.creerMonde(13);
+    sc.creerMoteur().avancer(m, 2);
+    for (const f of Object.values(table(m, TABLES.finances)) as unknown as { comptes: { plafondMEUR?: number } }[]) expect(f.comptes.plafondMEUR).toBeGreaterThan(0);
+  });
+
+  it('5.8 : les probabilités de podium et de victoire suivent le nombre de Grands Prix', async () => {
+    const { probaClause } = await import('../src/engine/systems/economie/probabilites');
+    expect(probaClause('podium', 0, 6, 11, 20)).toBeLessThan(probaClause('podium', 0, 6, 11, 24));
+    expect(probaClause('victoire', 0, 4, 11, 24)).toBeCloseTo(probaClause('victoire', 0, 4, 11, 24), 10);
+  });
+});
