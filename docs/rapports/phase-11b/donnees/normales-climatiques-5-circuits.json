@@ -1,0 +1,517 @@
+{
+ "cir_monza": {
+  "page": "Monza",
+  "station": "Monza (reference: Milan Linate)",
+  "source": "Italian Air Force Meteorological Service (1971–2000)",
+  "mois": {
+   "Jan": {
+    "max": 6.1,
+    "min": 0.2,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 60.0,
+    "humidite": null
+   },
+   "Feb": {
+    "max": 7.8,
+    "min": 0.5,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 61.0,
+    "humidite": null
+   },
+   "Mar": {
+    "max": 13.1,
+    "min": 3.9,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 77.0,
+    "humidite": null
+   },
+   "Apr": {
+    "max": 17.8,
+    "min": 7.6,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 93.0,
+    "humidite": null
+   },
+   "May": {
+    "max": 22.1,
+    "min": 11.6,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 101.0,
+    "humidite": null
+   },
+   "Jun": {
+    "max": 25.9,
+    "min": 15.3,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 101.0,
+    "humidite": null
+   },
+   "Jul": {
+    "max": 28.5,
+    "min": 17.6,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 75.0,
+    "humidite": null
+   },
+   "Aug": {
+    "max": 27.2,
+    "min": 17.0,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 96.0,
+    "humidite": null
+   },
+   "Sep": {
+    "max": 23.6,
+    "min": 14.1,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 87.0,
+    "humidite": null
+   },
+   "Oct": {
+    "max": 17.1,
+    "min": 9.0,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 116.0,
+    "humidite": null
+   },
+   "Nov": {
+    "max": 10.7,
+    "min": 4.1,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 108.0,
+    "humidite": null
+   },
+   "Dec": {
+    "max": 6.1,
+    "min": 0.2,
+    "moy": null,
+    "jours_pluie": null,
+    "pluie_mm": 69.0,
+    "humidite": null
+   }
+  }
+ },
+ "cir_monaco": {
+  "page": "Monaco",
+  "station": "Monaco (1981–2010 averages, extremes 1966–present)",
+  "source": "Météo-France<ref>",
+  "mois": {
+   "Jan": {
+    "max": 13.0,
+    "min": 7.4,
+    "moy": 10.2,
+    "jours_pluie": 6.0,
+    "pluie_mm": 67.7,
+    "humidite": 71.0
+   },
+   "Feb": {
+    "max": 13.0,
+    "min": 7.4,
+    "moy": 10.2,
+    "jours_pluie": 4.9,
+    "pluie_mm": 48.4,
+    "humidite": 71.6
+   },
+   "Mar": {
+    "max": 14.9,
+    "min": 9.1,
+    "moy": 12.0,
+    "jours_pluie": 4.5,
+    "pluie_mm": 41.2,
+    "humidite": 72.6
+   },
+   "Apr": {
+    "max": 16.7,
+    "min": 10.9,
+    "moy": 13.8,
+    "jours_pluie": 7.3,
+    "pluie_mm": 71.3,
+    "humidite": 75.6
+   },
+   "May": {
+    "max": 20.4,
+    "min": 14.6,
+    "moy": 17.5,
+    "jours_pluie": 5.5,
+    "pluie_mm": 49.0,
+    "humidite": 78.7
+   },
+   "Jun": {
+    "max": 23.7,
+    "min": 18.0,
+    "moy": 20.9,
+    "jours_pluie": 4.1,
+    "pluie_mm": 32.6,
+    "humidite": 80.5
+   },
+   "Jul": {
+    "max": 26.6,
+    "min": 21.0,
+    "moy": 23.8,
+    "jours_pluie": 1.7,
+    "pluie_mm": 13.7,
+    "humidite": 78.8
+   },
+   "Aug": {
+    "max": 26.9,
+    "min": 21.4,
+    "moy": 24.2,
+    "jours_pluie": 2.5,
+    "pluie_mm": 26.5,
+    "humidite": 77.0
+   },
+   "Sep": {
+    "max": 24.0,
+    "min": 18.3,
+    "moy": 21.1,
+    "jours_pluie": 5.1,
+    "pluie_mm": 72.5,
+    "humidite": 73.8
+   },
+   "Oct": {
+    "max": 20.6,
+    "min": 15.2,
+    "moy": 17.9,
+    "jours_pluie": 7.3,
+    "pluie_mm": 128.7,
+    "humidite": 75.9
+   },
+   "Nov": {
+    "max": 16.5,
+    "min": 11.2,
+    "moy": 13.8,
+    "jours_pluie": 7.1,
+    "pluie_mm": 103.2,
+    "humidite": 72.0
+   },
+   "Dec": {
+    "max": 13.9,
+    "min": 8.5,
+    "moy": 11.2,
+    "jours_pluie": 6.5,
+    "pluie_mm": 88.8,
+    "humidite": 71.3
+   }
+  }
+ },
+ "cir_suzuka": {
+  "page": "Tsu, Mie (station JMA proche de Suzuka)",
+  "station": "Tsu (1991−2020 normals, extremes 1889−present)",
+  "source": "Japan Meteorological Agency",
+  "mois": {
+   "Jan": {
+    "max": 9.5,
+    "min": 2.4,
+    "moy": 5.7,
+    "jours_pluie": 6.4,
+    "pluie_mm": 48.5,
+    "humidite": 61.0
+   },
+   "Feb": {
+    "max": 10.0,
+    "min": 2.4,
+    "moy": 5.9,
+    "jours_pluie": 7.5,
+    "pluie_mm": 57.1,
+    "humidite": 61.0
+   },
+   "Mar": {
+    "max": 13.4,
+    "min": 5.2,
+    "moy": 9.0,
+    "jours_pluie": 10.5,
+    "pluie_mm": 104.5,
+    "humidite": 62.0
+   },
+   "Apr": {
+    "max": 18.6,
+    "min": 10.2,
+    "moy": 14.2,
+    "jours_pluie": 9.8,
+    "pluie_mm": 129.0,
+    "humidite": 64.0
+   },
+   "May": {
+    "max": 23.1,
+    "min": 15.4,
+    "moy": 19.0,
+    "jours_pluie": 10.9,
+    "pluie_mm": 167.3,
+    "humidite": 68.0
+   },
+   "Jun": {
+    "max": 26.2,
+    "min": 19.7,
+    "moy": 22.7,
+    "jours_pluie": 12.8,
+    "pluie_mm": 201.8,
+    "humidite": 74.0
+   },
+   "Jul": {
+    "max": 30.4,
+    "min": 24.0,
+    "moy": 26.8,
+    "jours_pluie": 12.3,
+    "pluie_mm": 173.9,
+    "humidite": 75.0
+   },
+   "Aug": {
+    "max": 31.6,
+    "min": 25.0,
+    "moy": 27.9,
+    "jours_pluie": 9.8,
+    "pluie_mm": 144.5,
+    "humidite": 73.0
+   },
+   "Sep": {
+    "max": 28.0,
+    "min": 21.4,
+    "moy": 24.4,
+    "jours_pluie": 12.3,
+    "pluie_mm": 276.6,
+    "humidite": 72.0
+   },
+   "Oct": {
+    "max": 22.6,
+    "min": 15.5,
+    "moy": 18.8,
+    "jours_pluie": 10.1,
+    "pluie_mm": 186.1,
+    "humidite": 69.0
+   },
+   "Nov": {
+    "max": 17.1,
+    "min": 9.5,
+    "moy": 13.2,
+    "jours_pluie": 6.8,
+    "pluie_mm": 76.4,
+    "humidite": 65.0
+   },
+   "Dec": {
+    "max": 12.0,
+    "min": 4.6,
+    "moy": 8.1,
+    "jours_pluie": 6.5,
+    "pluie_mm": 47.2,
+    "humidite": 63.0
+   }
+  }
+ },
+ "cir_singapour": {
+  "page": "Template:Singapore weatherbox",
+  "station": "Singapore (1991–2020 normals, extremes 1929–1941 and 1948–present)",
+  "source": "National Environment Agency<ref>",
+  "mois": {
+   "Jan": {
+    "max": 30.6,
+    "min": 24.3,
+    "moy": 26.8,
+    "jours_pluie": 13.0,
+    "pluie_mm": 221.6,
+    "humidite": 83.5
+   },
+   "Feb": {
+    "max": 31.5,
+    "min": 24.6,
+    "moy": 27.3,
+    "jours_pluie": 9.0,
+    "pluie_mm": 105.1,
+    "humidite": 81.2
+   },
+   "Mar": {
+    "max": 32.2,
+    "min": 24.9,
+    "moy": 27.8,
+    "jours_pluie": 12.0,
+    "pluie_mm": 151.7,
+    "humidite": 81.7
+   },
+   "Apr": {
+    "max": 32.4,
+    "min": 25.3,
+    "moy": 28.2,
+    "jours_pluie": 15.0,
+    "pluie_mm": 164.3,
+    "humidite": 82.6
+   },
+   "May": {
+    "max": 32.3,
+    "min": 25.7,
+    "moy": 28.6,
+    "jours_pluie": 15.0,
+    "pluie_mm": 164.3,
+    "humidite": 82.3
+   },
+   "Jun": {
+    "max": 31.9,
+    "min": 25.7,
+    "moy": 28.5,
+    "jours_pluie": 13.0,
+    "pluie_mm": 135.3,
+    "humidite": 80.9
+   },
+   "Jul": {
+    "max": 31.4,
+    "min": 25.4,
+    "moy": 28.2,
+    "jours_pluie": 14.0,
+    "pluie_mm": 146.6,
+    "humidite": 80.9
+   },
+   "Aug": {
+    "max": 31.4,
+    "min": 25.3,
+    "moy": 28.1,
+    "jours_pluie": 14.0,
+    "pluie_mm": 146.9,
+    "humidite": 80.7
+   },
+   "Sep": {
+    "max": 31.6,
+    "min": 25.2,
+    "moy": 28.0,
+    "jours_pluie": 13.0,
+    "pluie_mm": 124.9,
+    "humidite": 80.7
+   },
+   "Oct": {
+    "max": 31.8,
+    "min": 25.0,
+    "moy": 27.9,
+    "jours_pluie": 15.0,
+    "pluie_mm": 168.3,
+    "humidite": 81.5
+   },
+   "Nov": {
+    "max": 31.2,
+    "min": 24.6,
+    "moy": 27.2,
+    "jours_pluie": 19.0,
+    "pluie_mm": 252.3,
+    "humidite": 84.9
+   },
+   "Dec": {
+    "max": 30.5,
+    "min": 24.3,
+    "moy": 26.8,
+    "jours_pluie": 19.0,
+    "pluie_mm": 331.9,
+    "humidite": 85.5
+   }
+  }
+ },
+ "cir_mexico": {
+  "page": "Mexico City",
+  "station": "Ciudad de México ([[Tacubaya]]), normals 1991–2020, extremes 1877–2024",
+  "source": "Servicio Meteorológico Nacional (Mexico)|Servicio Meteorológico Nacional<ref name=\"SMN normales\">{{cite web",
+  "mois": {
+   "Jan": {
+    "max": 22.4,
+    "min": 8.5,
+    "moy": 15.4,
+    "jours_pluie": 2.7,
+    "pluie_mm": 11.9,
+    "humidite": 54.0
+   },
+   "Feb": {
+    "max": 24.3,
+    "min": 9.5,
+    "moy": 16.9,
+    "jours_pluie": 2.1,
+    "pluie_mm": 5.7,
+    "humidite": 48.0
+   },
+   "Mar": {
+    "max": 26.1,
+    "min": 11.1,
+    "moy": 18.6,
+    "jours_pluie": 3.8,
+    "pluie_mm": 11.8,
+    "humidite": 43.5
+   },
+   "Apr": {
+    "max": 27.5,
+    "min": 13.1,
+    "moy": 20.3,
+    "jours_pluie": 6.7,
+    "pluie_mm": 24.2,
+    "humidite": 45.2
+   },
+   "May": {
+    "max": 27.2,
+    "min": 13.7,
+    "moy": 20.4,
+    "jours_pluie": 11.1,
+    "pluie_mm": 59.4,
+    "humidite": 52.8
+   },
+   "Jun": {
+    "max": 25.8,
+    "min": 13.8,
+    "moy": 19.8,
+    "jours_pluie": 16.3,
+    "pluie_mm": 132.5,
+    "humidite": 63.7
+   },
+   "Jul": {
+    "max": 24.7,
+    "min": 13.0,
+    "moy": 18.8,
+    "jours_pluie": 21.8,
+    "pluie_mm": 174.0,
+    "humidite": 69.6
+   },
+   "Aug": {
+    "max": 24.6,
+    "min": 13.2,
+    "moy": 18.9,
+    "jours_pluie": 20.8,
+    "pluie_mm": 175.6,
+    "humidite": 69.2
+   },
+   "Sep": {
+    "max": 23.7,
+    "min": 13.1,
+    "moy": 18.4,
+    "jours_pluie": 18.2,
+    "pluie_mm": 158.1,
+    "humidite": 69.9
+   },
+   "Oct": {
+    "max": 23.5,
+    "min": 11.8,
+    "moy": 17.6,
+    "jours_pluie": 10.1,
+    "pluie_mm": 71.3,
+    "humidite": 64.0
+   },
+   "Nov": {
+    "max": 22.8,
+    "min": 9.9,
+    "moy": 16.4,
+    "jours_pluie": 3.7,
+    "pluie_mm": 17.4,
+    "humidite": 57.1
+   },
+   "Dec": {
+    "max": 22.4,
+    "min": 8.5,
+    "moy": 15.4,
+    "jours_pluie": 1.2,
+    "pluie_mm": 5.0,
+    "humidite": 55.3
+   }
+  }
+ }
+}
