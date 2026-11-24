@@ -39,7 +39,8 @@ Conséquence actuelle : deux pilotes coéquipiers depuis quatre ans ne se connai
 
 Pour chaque paire de personnes qui ont travaillé dans la même écurie la même année :
 
-- **Familiarité** : elle augmente avec les années passées ensemble, au même rythme qu'en jeu, puis l'oubli s'applique pour les collaborations anciennes. Le lien social (D-139) en découle tout seul : affinité naturelle et respect professionnel.
+- **Familiarité** : elle augmente avec le temps réellement passé ensemble (au mois près depuis l'audit du 24/11/2026 : un transfert en cours de saison ne compte que les mois partagés), au même rythme qu'en jeu. Le lien social (D-139) en découle : affinité naturelle et respect professionnel, en proportion de la familiarité.
+  - **Écart constaté lors de l'audit** : cette fiche annonçait que « l'oubli s'applique pour les collaborations anciennes ». Ce n'est pas le cas : l'oubli atténue les souvenirs, jamais la familiarité. Elle représente donc une **connaissance durable** (« on se connaît »). Comme elle multiplie aussi le lien social, deux anciens collègues séparés depuis longtemps restent aussi « proches » qu'au premier jour. Mesure au départ (20 graines) : 24 paires familières séparées depuis 5 ans ou plus, dont 9 avec un lien fort. Décision du porteur en attente (D-151).
 - **Souvenirs plausibles** : quelques faits privés par saison passée, tirés selon la situation connue et les personnalités (fictives, D-042) :
 
   | Situation connue (données) | Souvenirs possibles |

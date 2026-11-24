@@ -469,3 +469,15 @@ Aucun code à ce stade.
 
 ### Corrigé
 - Accord des phrases des infrastructures (« son nouveau simulateur »).
+
+## [Audit de la phase 9] — 24/11/2026
+
+### Corrigé (D-151)
+- Saisons juniors du passé simulées à leur vraie date, dans la chronologie du passé humain : titres juniors datés de 2024–2026 (et non 2027), rivalités juniors conservées au départ (0 → environ 6 par monde).
+- Horloge du passé : chaque souvenir ne vieillit que du temps écoulé depuis son fait, jusqu'au départ.
+- Transferts en cours de saison : colonnes `moisDe` et `moisA` de `carrieres.csv` (5 cas renseignés) ; familiarité au mois près ; expérience initiale sans double compte.
+- Validation de `carrieres.csv` et `histoires.csv` : messages explicites (fichier, ligne, raison).
+
+### Ajouté
+- `tests/audit-p9.test.ts` (22 tests, dont 13 échouent avec l'ancien code), `tools/diagnostic-histoire.mts`.
+- Mesures de D-150 (lassitude du public) ajoutées au rapport de la phase 11.
