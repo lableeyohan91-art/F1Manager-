@@ -11,6 +11,7 @@
 
 import { etatInitialFlux, Flux } from './hasard';
 import { VERSION_FORMAT, type Monde } from './monde';
+import { rangSemaine } from './calendrier';
 import { tirerCarriere } from '../systems/carriere/profil';
 import { EXIGENCES_PAR_TYPE } from '../balance/circuits';
 import { EXPERIENCE_HISTORIQUE } from '../balance/carriere';
@@ -272,6 +273,15 @@ const MIGRATIONS: Record<number, Migration> = {
     const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
     for (const t of ['medias', 'articles', 'conferences', 'records', 'etatMedias']) tables[t] ??= {};
     return { ...m, versionFormat: 26 };
+  },
+  // v26 → v27 (D-152) : date du dernier contact de chaque relation familière ; une ancienne partie la fixe à la date de la sauvegarde
+  // (la proximité commencera à s'estomper à partir de là).
+  26: (m) => {
+    const date = m['date'] as { annee: number; semaine: number };
+    const rang = rangSemaine(date);
+    const rel = ((m['tables'] as Record<string, Record<string, Record<string, unknown>>>)['relations'] ?? {});
+    for (const r of Object.values(rel)) if ((r['familiarite'] as number) > 0 && r['contact'] === undefined && String(r['vers']).startsWith('per')) r['contact'] = rang;
+    return { ...m, versionFormat: 27 };
   },
 };
 

@@ -13,7 +13,7 @@ import { ajouterEvenement, type Evenement } from '../../core/evenements';
 import { idsTries, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Ecurie, type Personne, type Saison } from '../../model/types';
-import { lireEvenement, reconcilier, relation, relationBrute } from '../memoire';
+import { noterContact, lireEvenement, reconcilier, relation, relationBrute } from '../memoire';
 import { contratEmploi, indemniteRupture, liberer, personneDe } from './contrats';
 import { niveauMetier, teamPrincipal, valeurMarche } from './decision';
 import { domainePoste, iaDecide } from '../joueur/acces';
@@ -89,7 +89,7 @@ export function reparer(monde: Monde, auteur: Personne, cible: Personne, type: '
   if (type !== 'discussionPrivee' && reduit > 0) lireEvenement(monde, cible.id, auteur.id, 'excuses_recues', evt.id, { facteur: (publique ? 1.2 : 1) * (recent ? 0.3 : 1) });
   if (type === 'discussionPrivee') {
     const r = relationBrute(monde, cible.id, auteur.id, true);
-    if (r) r.familiarite = Math.min(1, r.familiarite + (recent ? 0.01 : 0.05));
+    if (r) { r.familiarite = Math.min(1, r.familiarite + (recent ? 0.01 : 0.05)); noterContact(monde, r); }
   }
   return evt;
 }

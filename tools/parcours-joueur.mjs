@@ -107,6 +107,34 @@ async function parcours(nomAppareil, contexteOptions) {
   const deborde = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   if (deborde) throw new Error(`${nomAppareil} : la page déborde horizontalement`);
   ok(`${nomAppareil} : pas de débordement horizontal`);
+
+  // Audit de la phase 10 : import d'une sauvegarde téléchargée (vérifiée, puis confirmation).
+  await allerA('Réglages');
+  const [telechargement] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Télécharger la sauvegarde' }).click()]);
+  await page.getByLabel('Fichier de sauvegarde').setInputFiles(await telechargement.path());
+  await page.getByText('Partie trouvée').waitFor();
+  await page.getByRole('button', { name: 'Remplacer la partie en cours' }).click();
+  await page.getByText('Partie importée').waitFor();
+  ok(`${nomAppareil} : import d’une sauvegarde téléchargée`);
+
+  // Audit de la phase 10 : sauvegarde principale corrompue → reprise par le secours ; les deux corrompues → message clair.
+  const corrompre = (cles) => page.evaluate((cles) => new Promise((ok, ko) => {
+    const req = indexedDB.open('f1manager', 1);
+    req.onsuccess = () => { const tx = req.result.transaction('sauvegardes', 'readwrite'); for (const k of cles) tx.objectStore('sauvegardes').put(new Blob(['corrompu']), k); tx.oncomplete = () => ok(true); tx.onerror = () => ko(tx.error); };
+    req.onerror = () => ko(req.error);
+  }), cles);
+  await corrompre(['partie-joueur']);
+  await page.reload();
+  await page.getByRole('button', { name: 'Reprendre la partie' }).click();
+  await page.getByText('Partie récupérée depuis la sauvegarde de secours').waitFor({ timeout: 30_000 });
+  ok(`${nomAppareil} : principale corrompue, partie récupérée par le secours`);
+  await corrompre(['partie-joueur', 'partie-joueur::secours']);
+  await page.reload();
+  await page.getByRole('button', { name: 'Reprendre la partie' }).click();
+  await page.getByText('Sauvegardes illisibles').waitFor();
+  ok(`${nomAppareil} : principale et secours corrompues, refus expliqué`);
+  await page.getByRole('button', { name: 'Nouvelle partie' }).waitFor();
+
   await ctx.close();
 }
 

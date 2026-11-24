@@ -2,12 +2,12 @@
 import { useState } from 'preact/hooks';
 import {
   budgetMaxJoueur, candidatsPresidence, copierMonde, ecuriesActives, profilTechnique, DOMAINES_DELEGATION, equipeStands, estDelegue, federation, financesDe, plafond, programmes,
-  propositions, reglementEnVigueur, serialiser, table, TABLES, type DomaineJoueur, type Saison,
+  propositions, reglementEnVigueur, serialiser, table, TABLES, type DomaineJoueur, type Monde, type Saison,
 } from '../../engine';
 import { DOMAINES, LISTE_DOMAINES, ORIENTATIONS, PROGRAMMES } from '../../engine/balance/technique';
 import { ORIENTATIONS_STANDS } from '../../engine/balance/stands';
 import { DEVELOPPEMENT_MINIMUM } from '../../engine/balance/finances';
-import { enregistrer, exporter } from '../../platform/navigateur/stockage';
+import { enregistrer, exporter, importer } from '../../platform/navigateur/stockage';
 import { commander, ecurieJoueur, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, saisonCourante, type Partie } from './partie';
 import type { Navigation } from './Jeu';
 import { NOM_SAUVEGARDE } from './Jeu';
@@ -261,8 +261,22 @@ export function EcranDirection({ partie, nav }: { partie: Partie; nav: Navigatio
 
 /* ------------------------------------------------------------------ Réglages et mesure */
 
-export function EcranReglages({ partie, nav, quitter }: { partie: Partie; nav: Navigation; quitter: () => void }) {
+export function EcranReglages({ partie, nav, quitter, remplacer }: { partie: Partie; nav: Navigation; quitter: () => void; remplacer: (m: Monde) => void }) {
   const [msg, setMsg] = useState<string | null>(null);
+  const [importe, setImporte] = useState<Monde | null>(null);
+  /** Audit de la phase 10 : import d'une sauvegarde téléchargée (format vérifié et migré par le moteur), avec confirmation. */
+  const lireFichier = async (f: File | undefined) => {
+    setImporte(null);
+    if (!f) return;
+    try {
+      const m = await importer(f);
+      if (!m.joueur) { setMsg('Ce fichier ne contient pas de partie de joueur.'); return; }
+      setImporte(m);
+      setMsg(null);
+    } catch (x) {
+      setMsg(`Fichier refusé : ${x instanceof Error ? x.message : String(x)}`);
+    }
+  };
   const [mesure, setMesure] = useState<string | null>(null);
   const sauver = async () => {
     try { const o = await enregistrer(NOM_SAUVEGARDE, partie.monde); setMsg(`Partie sauvegardée (${Math.round(o / 1024)} Ko compressés).`); } catch (x) { setMsg(`Échec de la sauvegarde : ${String(x)}`); }
@@ -306,6 +320,21 @@ export function EcranReglages({ partie, nav, quitter }: { partie: Partie; nav: N
           <a class="btn" href="#diagnostic">Diagnostic</a>
         </div>
         {msg && <p class="retour">{msg}</p>}
+      </div>
+      <div class="carte">
+        <h3>Importer une sauvegarde</h3>
+        <p class="muted petit">Un fichier .sav téléchargé depuis ce jeu. Il est vérifié (et mis au format actuel) avant tout remplacement.</p>
+        <input type="file" accept=".sav" aria-label="Fichier de sauvegarde" onChange={(e) => void lireFichier((e.target as HTMLInputElement).files?.[0])} />
+        {importe && (
+          <div class="carte attention">
+            <p>Partie trouvée : <strong>{nomEcurie(importe, importe.joueur!.ecurie)}</strong>, {importe.date.annee}, semaine {importe.date.semaine}.</p>
+            <p class="muted petit">La partie en cours sera remplacée à l’écran. Sa dernière sauvegarde reste en place tant que vous ne sauvegardez pas.</p>
+            <div class="actions">
+              <button class="btn principal" onClick={() => { remplacer(importe); setImporte(null); }}>Remplacer la partie en cours</button>
+              <button class="btn" onClick={() => setImporte(null)}>Annuler</button>
+            </div>
+          </div>
+        )}
       </div>
       <div class="carte">
         <h3>Mesure des performances</h3>

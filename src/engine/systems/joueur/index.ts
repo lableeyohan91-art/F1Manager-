@@ -18,7 +18,7 @@ import { CALENDRIER_REGLEMENT } from '../../balance/technique';
 import { AUTRES_VOTES, FEDERATION } from '../../balance/politique';
 import { FENETRE } from '../../balance/marche';
 import type { Commande, DefinitionCommande, ResultatCommande } from '../../core/commandes';
-import type { DateJeu } from '../../core/calendrier';
+import { ajouterSemaines, rangSemaine, type DateJeu } from '../../core/calendrier';
 import { ajouterEvenement } from '../../core/evenements';
 import { idsTries, table, type Monde } from '../../core/monde';
 import type { Moteur, Systeme } from '../../core/moteur';
@@ -191,7 +191,7 @@ export interface DecisionEnAttente {
   poste?: Poste;
 }
 
-const rang = (d: DateJeu) => d.annee * 52 + d.semaine;
+const rang = (d: DateJeu) => rangSemaine(d);
 
 /** Ce qui attend une décision du joueur pour son écurie (aucun effet sur l'état). */
 export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde)): DecisionEnAttente[] {
@@ -219,8 +219,8 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
       res.push({ type: 'augmentation', titre: `${nomDe(p)} demande une augmentation`, detail: `Salaire actuel ${c.salaireMEUR} M€, demande ${c.demandeAugmentation} M€.`, consequence: 'La demande reste en attente ; la personne s’en souvient.', urgente: false, personne: p.id, contrat: c.id, poste: c.poste });
     }
     if (c.demandeDepart && !c.demandeDepart.refusee && !delegue) {
-      const s = rang(c.demandeDepart.depuis) + DEMANDES_DEPART.delaiReponseSemaines;
-      const ech = { annee: Math.floor(s / 52), semaine: s % 52 || 52 };
+      // Audit de la phase 10 : calendrier du moteur (avant : semaine 44 + 8 semaines donnait la semaine 52 de l'année suivante).
+      const ech = ajouterSemaines(c.demandeDepart.depuis, DEMANDES_DEPART.delaiReponseSemaines);
       res.push({ type: 'depart', titre: `${nomDe(p)} demande à partir`, detail: `Départ à l’amiable contre une indemnité de ${c.demandeDepart.indemnite} M€.`, consequence: `Sans réponse en ${DEMANDES_DEPART.delaiReponseSemaines} semaines, la demande vaut refus.`, echeance: ech, urgente: urgente(ech), personne: p.id, contrat: c.id, poste: c.poste });
     }
     if (c.fin === annee && !c.nonProlonge && !n && !delegue && monde.date.semaine < SEMAINE_FIN_CONTRATS) {
@@ -233,7 +233,8 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
   for (const { poste } of POSTES_INDIVIDUALISES) {
     if (poste === 'team_principal' || iaDecide(e, domainePoste(poste))) continue;
     const libres = placesLibres(monde, idEcurie, poste as Poste, suivante);
-    if (libres > 0 && monde.date.semaine < SEMAINE_FIN_CONTRATS) {
+    // Audit de la phase 10 : seulement tant que le marché permet d'agir (avant : affiché jusqu'en semaine 49, échéance dépassée).
+    if (libres > 0 && monde.date.semaine <= FENETRE.fin) {
       const ech = { annee, semaine: FENETRE.fin };
       res.push({ type: 'poste_vacant', titre: `${libres > 1 ? `${libres} places` : 'Une place'} à pourvoir en ${suivante} : ${String(poste).replace(/_/g, ' ')}`, detail: `Marché ouvert de la semaine ${FENETRE.debut} à la semaine ${FENETRE.fin}.`, consequence: 'Sans recrutement, un remplaçant est engagé d’office en fin de saison.', echeance: ech, urgente: urgente(ech), poste: poste as Poste });
     }

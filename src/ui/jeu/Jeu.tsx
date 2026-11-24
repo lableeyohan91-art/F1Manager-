@@ -5,7 +5,7 @@
 import { useRef, useState } from 'preact/hooks';
 import { creerScenarioGrille2026, decisionsEnAttente, ecuriesActives, financesDe, formaterDate, plafond, type DecisionEnAttente, type Scenario } from '../../engine';
 import { fichiersGrille2026 } from '../donnees';
-import { charger, enregistrer } from '../../platform/navigateur/stockage';
+import { chargerAvecSecours, enregistrer } from '../../platform/navigateur/stockage';
 import { avancer, commander, ecurieJoueur, faitsVisibles, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, prochainGP, saisonCourante, type ArretAvance, type Partie } from './partie';
 import { EcranEquipe, EcranMarche, FichePersonne } from './Equipe';
 import { EcranActualites, EcranArchives, Image } from './Medias';
@@ -47,7 +47,7 @@ export function Jeu() {
 
   const p = partie.current;
   if (!p || !p.monde.joueur) {
-    return <Accueil demarrer={(x) => { partie.current = x; setEcran('tableau'); rafraichir(); window.scrollTo(0, 0); }} />;
+    return <Accueil demarrer={(x, msg) => { partie.current = x; setEcran('tableau'); setMessage(msg ?? null); rafraichir(); window.scrollTo(0, 0); }} />;
   }
 
   const lancer = async (mode: 'semaine' | 'grand_prix' | 'decision') => {
@@ -104,7 +104,7 @@ export function Jeu() {
             {ecran === 'finances' && <EcranFinances partie={p} nav={nav} />}
             {ecran === 'championnat' && <EcranChampionnat partie={p} />}
             {ecran === 'direction' && <EcranDirection partie={p} nav={nav} />}
-            {ecran === 'reglages' && <EcranReglages partie={p} nav={nav} quitter={() => { partie.current = null; rafraichir(); }} />}
+            {ecran === 'reglages' && <EcranReglages partie={p} nav={nav} quitter={() => { partie.current = null; rafraichir(); }} remplacer={(m) => { partie.current = { monde: m, moteur: sc().creerMoteur() }; setMessage('Partie importée. Sauvegardez-la dans Réglages pour la garder.'); nav.aller('tableau'); }} />}
           </>
         )}
       </main>
@@ -114,7 +114,7 @@ export function Jeu() {
 
 /* ------------------------------------------------------------------ Accueil */
 
-function Accueil({ demarrer }: { demarrer: (p: Partie) => void }) {
+function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void }) {
   const [etape, setEtape] = useState<'menu' | 'choix' | 'preparation'>('menu');
   const [graine, setGraine] = useState(String(1 + Math.floor(Math.random() * 99999)));
   const [prenom, setPrenom] = useState('');
@@ -140,11 +140,14 @@ function Accueil({ demarrer }: { demarrer: (p: Partie) => void }) {
   const reprendre = async () => {
     setErreur(null);
     try {
-      const monde = await charger(NOM_SAUVEGARDE);
-      if (!monde) { setErreur('Aucune partie sauvegardée.'); return; }
-      demarrer({ monde, moteur: sc().creerMoteur() });
+      // Audit de la phase 10 : reprise par la sauvegarde de secours si la principale est illisible.
+      const r = await chargerAvecSecours(NOM_SAUVEGARDE);
+      if (!r) { setErreur('Aucune partie sauvegardée.'); return; }
+      demarrer({ monde: r.monde, moteur: sc().creerMoteur() }, r.depuisSecours
+        ? `Partie récupérée depuis la sauvegarde de secours : la sauvegarde principale était illisible (${r.erreur ?? 'erreur inconnue'}). Vérifiez la partie, puis sauvegardez-la dans Réglages.`
+        : undefined);
     } catch (x) {
-      setErreur(`Sauvegarde illisible : ${x instanceof Error ? x.message : String(x)}`);
+      setErreur(`Sauvegardes illisibles (principale et secours) : ${x instanceof Error ? x.message : String(x)}`);
     }
   };
   const valider = () => {

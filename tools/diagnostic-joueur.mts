@@ -17,7 +17,8 @@ const N = Number(process.argv[2] ?? 12), S = Number(process.argv[3] ?? 5);
 const sortie = process.argv[4];
 const sc = eng.creerScenarioGrille2026(lireDonneesGrille2026(racine));
 const ECURIES = ['eq_redbull', 'eq_ferrari', 'eq_mercedes', 'eq_mclaren', 'eq_aston', 'eq_alpine', 'eq_williams', 'eq_racingbulls', 'eq_haas', 'eq_audi', 'eq_cadillac'];
-const DOMAINES = ['pilotes', 'personnel', 'recherche', 'stands', 'academie', 'politique'];
+// Audit de la phase 10 : la liste vient du moteur (toute nouvelle délégation est incluse d'office).
+const DOMAINES: string[] = [...eng.DOMAINES_DELEGATION];
 type Variante = 'A' | 'B' | 'C' | 'D';
 const moy = (a: number[]) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN);
 const res: Record<Variante, { rang: number[]; points: number[]; tresorerie: number[]; office: number[]; incoherences: number; licencie: number; ms: number[] }> = {

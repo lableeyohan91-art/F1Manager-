@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   articles, calculerRecords, chargerDonnees, contratEmploi, creerScenarioGrille2026, decisionsEnAttente, deserialiser, executerCommandeJoueur, medias,
-  nomArchive, serialiser, texteArticle, titresConsecutifs, lassitudePublic, table, TABLES, teamPrincipal, valeurCommerciale, verifierCoherence, ajouterEvenement,
+  nomArchive, serialiser, texteArticle, VERSION_FORMAT, titresConsecutifs, lassitudePublic, table, TABLES, teamPrincipal, valeurCommerciale, verifierCoherence, ajouterEvenement,
   type Article, type Conference, type ContratSponsoring, type Ecurie, type Monde, type Personne,
 } from '../src/engine';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
@@ -30,7 +30,7 @@ describe('Phase 11 — données et sauvegarde', () => {
     const m = sc.creerMonde(2);
     const texte = serialiser(m).replace(/"versionFormat":\d+/g, '"versionFormat":25').replace(/"medias":\{[^]*?\}\},"articles"/, '"medias":{},"articles"');
     const migre = deserialiser(texte);
-    expect(migre.versionFormat).toBe(26);
+    expect(migre.versionFormat).toBe(VERSION_FORMAT); // 25 → 26 → … (format actuel)
     for (const k of Object.keys(migre.tables['medias'] ?? {})) delete migre.tables['medias']![k];
     sc.creerMoteur().avancer(migre, 3);
     expect(articles(migre)).toHaveLength(0);

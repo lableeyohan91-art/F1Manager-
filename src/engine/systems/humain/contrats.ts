@@ -488,6 +488,9 @@ export const systemeFinsDeContrat: Systeme = {
       const p = personneDe(monde, c.personne);
       if (p) liberer(monde, p, c, c.nonProlonge ? 'non_prolonge' : 'echeance', c.causeFin ? [c.causeFin] : []);
     }
+    // Audit de la phase 10 : une contre-proposition restée sans suite disparaît avec son contrat (volume borné).
+    const negos = table(monde, TABLE_NEGOCIATIONS);
+    for (const id of Object.keys(negos)) if ((table(monde, TABLES.contrats)[id] as unknown as Contrat | undefined)?.statut !== 'actif') delete negos[id];
     // Phase 7a : les contrats signés pendant la fenêtre prennent effet ; le remplacement provisoire n'est plus qu'un filet de sécurité.
     activerContratsSignes(monde);
     pourvoirPostes(monde);

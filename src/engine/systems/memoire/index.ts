@@ -10,7 +10,7 @@
 import {
   LIEN_SOCIAL,
   ETIQUETTES, FAMILIARITE_MENSUELLE, RECONCILIATION, RESIDU, RETOUR_BASE_MENSUEL, SATURATION, SEUIL_CREATION_SOUVENIR,
-  SEUIL_EFFACEMENT_SOUVENIR, SOUVENIRS_MAX_PAR_PERSONNE, TRAIT_OUBLI,
+  SEUIL_EFFACEMENT_SOUVENIR, SOUVENIRS_MAX_PAR_PERSONNE, TRAIT_OUBLI, PROXIMITE,
 } from '../../balance/memoire';
 import { rangSemaine, type DateJeu } from '../../core/calendrier';
 import { nouvelIdentifiant } from '../../core/identifiants';
@@ -19,6 +19,7 @@ import type { Systeme } from '../../core/moteur';
 import { TABLES, type Personne } from '../../model/types';
 import { COMPETENCES_TRANSVERSALES, VALEURS } from '../../balance/personnages';
 import { niveauPilote } from '../saison/performance';
+import { SEMAINES_PAR_AN } from '../../balance/calendrier';
 
 export const TABLE_SOUVENIRS = 'souvenirs';
 export const TABLE_RELATIONS = 'relations';
@@ -49,8 +50,25 @@ export interface Relation {
   vers: string;
   /** Part durable de chaque axe (nourrie par les résidus, revient lentement vers 0). */
   base: Axes;
-  /** Connaissance de l'autre (0 à 1). Amplifie les souvenirs, grandit en travaillant ensemble. */
+  /** Connaissance de l'autre (0 à 1). Amplifie les souvenirs, grandit en travaillant ensemble. Durable : on ne « désapprend » pas quelqu'un. */
   familiarite: number;
+  /**
+   * D-152 : dernière collaboration ou interaction directe (rang de semaine, `rangSemaine`). Absent = proximité entière.
+   * La proximité (part du lien social) s'estompe avec les années sans contact ; la familiarité, elle, reste.
+   */
+  contact?: number;
+}
+
+/** D-152 : note un contact entre deux personnes (collaboration, interaction directe) à la date courante. */
+export function noterContact(monde: Monde, r: Relation): void {
+  r.contact = rangSemaine(monde.date);
+}
+
+/** D-152 : proximité actuelle (0 à 1) : moitié tous les `PROXIMITE.demiVieAnnees` ans sans contact. */
+export function proximite(monde: Monde, r: Relation | undefined): number {
+  if (!r || r.contact === undefined) return 1;
+  const annees = Math.max(0, rangSemaine(monde.date) - r.contact) / SEMAINES_PAR_AN;
+  return Math.pow(0.5, annees / PROXIMITE.demiVieAnnees);
 }
 
 export interface RelationCalculee extends Axes {
@@ -108,13 +126,15 @@ export function relation(monde: Monde, de: string, vers: string, souvenirsDuPort
     res.affinite += effet * def.axes.affinite;
   }
   // D-139 : lien social entre deux personnes (affinité naturelle et respect professionnel, en proportion de la familiarité).
+  // D-152 : pondéré par la proximité actuelle (les années sans travailler ensemble l'estompent ; la familiarité reste).
   if (res.familiarite > 0) {
     const a = table(monde, TABLES.personnes)[de] as unknown as Personne | undefined;
     const b = a ? (table(monde, TABLES.personnes)[vers] as unknown as Personne | undefined) : undefined;
     if (a && b) {
       const l = lienNaturel(a, b);
-      res.affinite += l.affinite * res.familiarite;
-      res.respect += l.respect * res.familiarite;
+      const k = res.familiarite * proximite(monde, r);
+      res.affinite += l.affinite * k;
+      res.respect += l.respect * k;
     }
   }
   res.confiance = borner(res.confiance);
@@ -296,6 +316,7 @@ function familiariserUnMois(monde: Monde): void {
         if (a === b) continue;
         const r = relationBrute(monde, a, b, true) as Relation;
         r.familiarite = Math.min(1, r.familiarite + FAMILIARITE_MENSUELLE);
+        noterContact(monde, r);
       }
     }
   }

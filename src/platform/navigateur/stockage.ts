@@ -29,14 +29,40 @@ function ouvrir(): Promise<IDBDatabase> {
 
 const SECOURS = '::secours';
 
+async function lisible(blob: Blob): Promise<boolean> {
+  try { deserialiser(await decompresser(blob)); return true; } catch { return false; }
+}
+
+/** Une sauvegarde existe-t-elle sous ce nom (principale ou secours) ? */
+export async function existe(nom: string): Promise<boolean> {
+  const db = await ouvrir();
+  return !!(await lireBlob(db, nom)) || !!(await lireBlob(db, nom + SECOURS));
+}
+
+/** Audit de la phase 10 : copie une sauvegarde sous un autre nom (partie remplacée conservée, récupérable). */
+export async function copier(de: string, vers: string): Promise<boolean> {
+  const db = await ouvrir();
+  const blob = await lireBlob(db, de);
+  if (!blob) return false;
+  await new Promise<void>((resoudre, rejeter) => {
+    const tx = db.transaction(MAGASIN, 'readwrite');
+    tx.objectStore(MAGASIN).put(blob, vers);
+    tx.oncomplete = () => resoudre();
+    tx.onerror = () => rejeter(tx.error);
+  });
+  return true;
+}
+
 export async function enregistrer(nom: string, monde: Monde): Promise<number> {
   const blob = await compresser(serialiser(monde));
   const db = await ouvrir();
   const precedent = await lireBlob(db, nom);
+  // Audit de la phase 10 : une sauvegarde principale illisible ne remplace jamais une sauvegarde de secours valide.
+  const precedentLisible = precedent ? await lisible(precedent) : false;
   await new Promise<void>((resoudre, rejeter) => {
     const tx = db.transaction(MAGASIN, 'readwrite');
     // Audit n°4 : la sauvegarde précédente devient la sauvegarde de secours (même transaction).
-    if (precedent) tx.objectStore(MAGASIN).put(precedent, nom + SECOURS);
+    if (precedent && precedentLisible) tx.objectStore(MAGASIN).put(precedent, nom + SECOURS);
     tx.objectStore(MAGASIN).put(blob, nom);
     tx.oncomplete = () => resoudre();
     tx.onerror = () => rejeter(tx.error);

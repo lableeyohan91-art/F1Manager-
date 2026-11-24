@@ -111,3 +111,10 @@ export const RECONCILIATION = { excuses: 0.3, reconnaissanceErreur: 0.35, discus
  */
 export const LIEN_SOCIAL = { poidsAffinite: 2, compatibiliteNeutre: 0.75, sociabiliteBase: 0.5, niveauNeutre: 12, echelleNiveau: 8 };
 
+
+/**
+ * D-152 (choix B du porteur) — proximité : le lien social (affinité naturelle et respect professionnel, D-139) diminue de moitié tous les
+ * `demiVieAnnees` ans sans travailler ensemble ni interagir directement ; il revient dès qu'on retravaille ensemble. La familiarité
+ * (« se connaître ») et les souvenirs marquants ne sont pas touchés.
+ */
+export const PROXIMITE = { demiVieAnnees: 5 };

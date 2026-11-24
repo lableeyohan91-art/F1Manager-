@@ -481,3 +481,15 @@ Aucun code à ce stade.
 ### Ajouté
 - `tests/audit-p9.test.ts` (22 tests, dont 13 échouent avec l'ancien code), `tools/diagnostic-histoire.mts`.
 - Mesures de D-150 (lassitude du public) ajoutées au rapport de la phase 11.
+
+## [D-152, audit de la phase 10] — 24/11/2026
+
+### Modifié (D-152)
+- Proximité : le lien social s'estompe (moitié en 5 ans) sans contact ; la familiarité reste. Format de sauvegarde 27.
+
+### Corrigé (D-153)
+- Échéance des demandes de départ en fin d'année ; échéance des questions de la presse en fin d'année.
+- Reprise par la sauvegarde de secours (avec message) ; une sauvegarde illisible ne remplace plus le secours.
+- Places à pourvoir signalées seulement tant que le marché est ouvert ; contre-propositions orphelines effacées.
+- Import d'une sauvegarde téléchargée (Réglages). Outil `diagnostic-joueur` : toutes les délégations.
+- Tests `tests/audit-p10.test.ts` (13) ; parcours navigateur : 26 étapes (import, secours, double corruption).

@@ -13,6 +13,8 @@
 import { ERES, HISTOIRES_REELLES, PASSE, SITUATIONS_PASSE } from '../balance/histoire';
 import { ETIQUETTES, FAMILIARITE_MENSUELLE, SEUIL_EFFACEMENT_SOUVENIR } from '../balance/memoire';
 import { ajouterEvenement } from '../core/evenements';
+import { rangSemaine } from '../core/calendrier';
+import { SEMAINES_PAR_AN } from '../balance/calendrier';
 import { table, type Monde } from '../core/monde';
 import { tirageLocal } from '../core/moteur';
 import { TABLES, type Carriere, type Ecurie, type Palmares, type Personne } from '../model/types';
@@ -119,6 +121,9 @@ export function construirePasse(monde: Monde, histoires: HistoireDonnees[], finD
           if (!partages) continue;
           const r = relationBrute(monde, a, b, true)!;
           r.familiarite = Math.min(1, r.familiarite + partages * FAMILIARITE_MENSUELLE);
+          // D-152 : dernière collaboration = dernier mois partagé cette saison (la proximité s'estompera ensuite).
+          const dernierMois = 31 - Math.clz32(pa.mois & l.get(b)!.mois); // 0 = janvier
+          r.contact = rangSemaine({ annee, semaine: Math.min(SEMAINES_PAR_AN, Math.round(((dernierMois + 1) * SEMAINES_PAR_AN) / 12)) });
         }
       }
     }

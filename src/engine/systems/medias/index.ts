@@ -14,7 +14,7 @@ import {
   ARTICLES, CONFERENCES, EXPOSITION, IMAGE, IMAGE_PAR_FAIT, LASSITUDE_PUBLIC, IMAGE_PAR_REPONSE, LIGNES_EDITORIALES, RUMEURS_MEDIAS, SCANDALE, SCANDALES, TYPES_IGNORES,
 } from '../../balance/medias';
 import { FENETRE } from '../../balance/marche';
-import type { DateJeu } from '../../core/calendrier';
+import { ajouterSemaines, rangSemaine, type DateJeu } from '../../core/calendrier';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement, type Evenement } from '../../core/evenements';
 import { nouvelIdentifiant } from '../../core/identifiants';
@@ -39,7 +39,7 @@ export * from './acces';
 export * from './archives';
 export * from './libelles';
 
-const rang = (d: DateJeu) => d.annee * 52 + d.semaine;
+const rang = (d: DateJeu) => rangSemaine(d);
 const nomDe = (p: Personne) => `${p.prenom} ${p.nom}`;
 const ETAT = 'etat';
 
@@ -260,11 +260,11 @@ const STYLE: Record<ReponseConference, 'agressif' | 'chaleureux' | 'prudent' | '
   attaquer_rival: 'agressif', respecter: 'chaleureux', critiquer_federation: 'agressif', soutenir_federation: 'chaleureux', esquiver: 'neutre',
 };
 
-function poserQuestion(m: Monde, e: Ecurie, question: QuestionConference, sujet?: string, cause?: string): void {
+export function poserQuestion(m: Monde, e: Ecurie, question: QuestionConference, sujet?: string, cause?: string): void {
   if (conferences(m, e.id).length) return; // une question à la fois
   const c: Conference = {
     id: nouvelIdentifiant(m, 'cnf'), ecurie: e.id, question, ...(sujet ? { sujet } : {}), ...(cause ? { cause } : {}),
-    date: { ...m.date }, echeance: { annee: m.date.annee, semaine: Math.min(52, m.date.semaine + CONFERENCES.delaiSemaines) }, options: OPTIONS[question],
+    date: { ...m.date }, echeance: ajouterSemaines(m.date, CONFERENCES.delaiSemaines), options: OPTIONS[question],
   };
   table(m, TABLES.conferences)[c.id] = c as unknown as Entite;
 }
