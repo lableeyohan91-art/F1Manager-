@@ -1,6 +1,6 @@
 # Phase 11b — Circuits : identité technique, segments, conditions, histoire
 
-> Statut : **ÉTUDE ET CONCEPTION, À VALIDER** (D-159). Aucun code de jeu avant validation des décisions du §13.
+> Statut : **VALIDÉE** par le porteur le 24/11/2026 (D-159, réponses au §13 ; D-160, §14). Démarrage par la sous-phase 11b-1 sur 5 circuits relus par le porteur.
 > Fiche d'intention : `docs/echanges/2026-11-24-intention-phase-11b-circuits.md`.
 > Étude menée le 24/11/2026 par Claude Code. Les essais de calcul sont des **prototypes jetables** (scripts hors du dépôt), pas du code du jeu.
 
@@ -401,3 +401,60 @@ La direction de course, les dépassements, l'énergie, la thermique et la course
 9. **Historique avant la phase 13** : afficher les neutralisations **réelles** dès la phase 11b, et « non simulé » pour les saisons jouées jusqu'à la phase 13 ? *Recommandé.*
 10. **Données de pluie issues des récits Wikipédia** (comme APEX Lab) : licence CC BY-SA. Les utiliser seulement pour **vérifier** le moteur, ou les intégrer aux données du jeu, avec le partage à l'identique que cela impose ?
 11. **Fichiers annexes d'APEX Lab** (`historique-circuits.csv`, `campagne-48000-courses.json`) : si tu les as, dépose-les. Ils permettraient de recouper circuit par circuit.
+
+**Réponses du porteur (24/11/2026)** : toutes les recommandations retenues. Précisions :
+- **20 Grands Prix** et 10 permanents historiques et variés (§8.3) ; Paul-Ricard est le 30e circuit.
+- **« Pas besoin de 100 % de vrai »** : on prend toutes les données réelles accessibles, et le reste est estimé avec soin. Chaque valeur garde son statut (V, R, E, H).
+- **Vitesses réelles** : base de départ seulement ; les performances futures dépendront de nos voitures.
+- **Pluie tirée de Wikipédia** : vérification seulement (le plus simple, aucune contrainte de licence sur nos données).
+- **Accès** accordé aux sources gratuites : FIA, formula1.com, Wikipédia, OpenF1, archives météo Open-Meteo, base historique, TracingInsights.
+
+### 8.3 Les 10 circuits permanents proposés
+
+Historiques, et couvrant tous les profils : chacun pousse une caractéristique différente au premier rang.
+
+| Circuit (nom altéré) | Pourquoi |
+| --- | --- |
+| Monacco | Virages lents, motricité, bosses, mur partout, qualification décisive |
+| Monzza | Vitesse de pointe, faible traînée, gros freinages |
+| Silverston | Grandes courbes rapides, appui, météo changeante |
+| Spa-Francorchamp | Efficacité aéro, dénivelé, météo très variable |
+| Suzuca | Enchaînements rapides, pneus, effort physique |
+| Interlagoss | Pluie fréquente, dénivelé, Safety Cars nombreuses |
+| Gilles-Villeneuves | Freinage et motricité, murs proches, VSC fréquentes |
+| Marinna Bay | Chaleur, humidité, nuit, virages lents, effort physique maximal |
+| Hermanos Rodrigues | Altitude : air peu dense, refroidissement, appui réduit |
+| Hungarorring | Virages lents, chaleur, dépassement difficile |
+
+Les 20 autres circuits du vivier tournent sur les 10 places restantes, selon une règle connue de tous. Un circuit qui sort garde son historique.
+
+## 14. Caractéristiques et réglages de voiture liés aux circuits (D-160)
+
+Le porteur demande des caractéristiques qui « jouent avec nos circuits », par exemple la hauteur de caisse, même sans effet immédiat. Vérifications faites :
+- **Parc fermé (règle réelle)** : à partir de la première sortie en qualifications et jusqu'au départ de la course, les écuries ne peuvent plus modifier la voiture, **hauteur de caisse comprise**. Seul l'aileron avant peut être ajusté. La hauteur se règle donc en essais libres, en un **compromis entre qualifications (peu d'essence) et course (voiture lourde)**. Elle ne se change pas pendant la course.
+- **Hauteur et patin** : les voitures à effet de sol (2022–2025) étaient très sensibles à la hauteur ; rouler trop bas use le patin sous la voiture. Exemple réel : deux voitures disqualifiées pour usure excessive du patin au Grand Prix des États-Unis 2023.
+- **Règlement 2026** : un fond plus simple, avec moins d'effet de sol. La hauteur optimale est plus élevée et la sensibilité moindre (selon la FIA).
+
+### 14.1 Deux familles, à ne pas confondre
+
+| Famille | Exemples | Quand elle agit |
+| --- | --- | --- |
+| **Conception** (développée à l'usine, phase 12) | Appui, traînée, efficacité aéro, adhérence mécanique, suspension (bosses et vibreurs), freins (stabilité, refroidissement), refroidissement du moteur et coût en traînée des ouvertures, gestion thermique des pneus, efficacité énergétique, fiabilité, sensibilité à l'air perturbé, fenêtre d'exploitation | Phase 12 ; lue par le profil de vitesse et, en phase 13, par les modèles thermique et d'énergie |
+| **Réglages du week-end** (choisis en essais libres, figés au parc fermé) | **Hauteur de caisse**, niveau d'appui (ailerons de la semaine), raideur de suspension, ouvertures de refroidissement des freins et du moteur, aileron avant (seul réglage modifiable ensuite, aux arrêts) | Phase 13 (week-end de course) ; le circuit indique le réglage « naturel » et ses risques |
+
+### 14.2 La hauteur de caisse, exemple complet
+
+| Question | Réponse proposée |
+| --- | --- |
+| Ce qui la sollicite sur le circuit | Bosses et vibreurs par élément ; part du tour en virages rapides (où l'appui du fond compte) ; quantité d'essence en course |
+| Le compromis | Plus bas = plus d'appui, mais talonnage sur les bosses (perte d'adhérence locale), usure du patin (risque de disqualification au contrôle) ; plus haut = moins d'appui, voiture stable |
+| Ce qui la lira | Profil de vitesse (appui effectif par élément) ; usure du patin pendant la course ; contrôle d'après course |
+| Interactions | Raideur de suspension ; sensibilité de la voiture à la hauteur (conception, phase 12) ; règlement (fond 2022 ou 2026) ; essence |
+| Ce qu'en fait le joueur | Il règle en essais libres, aidé par l'ingénieur et le retour technique du pilote (compétence existante, enfin utile) |
+| Phase active | Données du circuit (bosses, vibreurs) : **11b**. Réglage et effets : **13**. Sensibilité de la voiture : **12** |
+
+### 14.3 Ce que le circuit fournit dès la phase 11b pour ces réglages
+
+- Par élément : bosses, vibreurs, part de l'appui dans la vitesse de passage.
+- Pour le circuit : niveau d'appui « naturel » (calculé : le compromis appui et traînée qui donne le meilleur tour à la voiture de référence), énergie de freinage (refroidissement des freins), température et altitude (refroidissement).
+- Sur la fiche : « Réglage typique : appui faible, voiture haute (bosses) », **étiqueté comme indication**, jusqu'à ce que les réglages existent.
