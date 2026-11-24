@@ -3,8 +3,10 @@
  * faits visibles par le joueur. Le moteur reste la seule source de vérité.
  */
 import { FENETRE } from '../../engine/balance/marche';
+import { rangSemaine } from '../../engine/core/calendrier';
+import { exporter } from '../../platform/navigateur/stockage';
 import {
-  decisionsEnAttente, executerCommandeJoueur, iaDecide, managerJoueur, table, TABLES,
+  copierMonde, decisionsEnAttente, executerCommandeJoueur, iaDecide, managerJoueur, serialiser, table, TABLES,
   type DecisionEnAttente, type Ecurie, type Evenement, type GrandPrix, type Monde, type Moteur, type Personne, type ResultatCommande, type Saison,
 } from '../../engine';
 
@@ -65,7 +67,7 @@ export function faitsVisibles(m: Monde, portee: 'ecurie' | 'paddock', limite = 8
   return res;
 }
 
-export type ArretAvance = 'decision' | 'urgence' | 'marche' | 'grand_prix' | 'fin_de_saison' | 'fin_de_partie' | 'limite' | 'semaine';
+export type ArretAvance = 'decision' | 'urgence' | 'derniere_chance' | 'marche' | 'grand_prix' | 'fin_de_saison' | 'fin_de_partie' | 'limite' | 'semaine';
 
 /**
  * Avance le temps semaine par semaine, en rendant la main à l'écran entre deux semaines (calcul par tranches, D-147).
@@ -77,6 +79,9 @@ export async function avancer(p: Partie, mode: 'semaine' | 'grand_prix' | 'decis
   const depart = decisionsEnAttente(m);
   const avant = new Set(depart.map(cle));
   const urgentesAvant = new Set(depart.filter((d) => d.urgente).map(cle));
+  // Audit de la phase 10 (arbitrage du porteur) : quel que soit le bouton, l'avance s'arrête la dernière semaine avant une échéance.
+  const derniereChance = (d: DecisionEnAttente) => !!d.echeance && rangSemaine(d.echeance) - rangSemaine(m.date) <= 1;
+  const derniereChanceAvant = new Set(depart.filter(derniereChance).map(cle));
   const gpAvant = grandsPrix(m).filter((g) => g.termine).length;
   let n = 0;
   let total = 0;
@@ -90,9 +95,10 @@ export async function avancer(p: Partie, mode: 'semaine' | 'grand_prix' | 'decis
     if (m.joueur?.etat === 'licencie') return { arret: 'fin_de_partie', semaines: n, msParSemaine: total / n };
     if (mode === 'semaine') return { arret: 'semaine', semaines: n, msParSemaine: total / n };
     if (m.date.annee !== annee || m.date.semaine === 50) return { arret: 'fin_de_saison', semaines: n, msParSemaine: total / n };
-    if (mode === 'grand_prix' && m.date.annee === annee && grandsPrix(m).filter((g) => g.termine).length > gpAvant) return { arret: 'grand_prix', semaines: n, msParSemaine: total / n };
     const maintenant = decisionsEnAttente(m);
+    if (maintenant.some((d) => derniereChance(d) && !derniereChanceAvant.has(cle(d)))) return { arret: 'derniere_chance', semaines: n, msParSemaine: total / n };
     if (maintenant.some((d) => !avant.has(cle(d)))) return { arret: 'decision', semaines: n, msParSemaine: total / n };
+    if (mode === 'grand_prix' && m.date.annee === annee && grandsPrix(m).filter((g) => g.termine).length > gpAvant) return { arret: 'grand_prix', semaines: n, msParSemaine: total / n };
     // Une décision déjà connue dont l'échéance approche : on s'arrête aussi (le joueur ne la laisse pas filer sans le savoir).
     if (maintenant.some((d) => d.urgente && !urgentesAvant.has(cle(d)))) return { arret: 'urgence', semaines: n, msParSemaine: total / n };
     if (m.date.semaine === FENETRE.debut && !iaDecide(ecurieJoueur(m)!, 'pilotes')) return { arret: 'marche', semaines: n, msParSemaine: total / n };
@@ -104,3 +110,25 @@ export async function avancer(p: Partie, mode: 'semaine' | 'grand_prix' | 'decis
 
 export const r1 = (x: number) => Math.round(x * 10) / 10;
 export const meur = (x: number) => `${r1(x).toLocaleString('fr-FR')} M€`;
+
+/**
+ * Page de mesure (D-110) : simule des semaines sur une copie du monde (la partie n'avance pas) et rend une ligne lisible.
+ * Utilisable depuis une partie (Réglages) ou depuis l'accueil (monde de test).
+ */
+export async function mesurerAppareil(p: Partie, semaines: number): Promise<string> {
+  await new Promise((r) => setTimeout(r, 30));
+  const copie = copierMonde(p.monde);
+  const t0 = performance.now();
+  const temps: number[] = [];
+  for (let i = 0; i < semaines; i++) {
+    const a = performance.now();
+    p.moteur.avancerUneSemaine(copie);
+    temps.push(performance.now() - a);
+    if (i % 4 === 3) await new Promise((r) => setTimeout(r, 0));
+  }
+  const total = performance.now() - t0;
+  temps.sort((x, y) => x - y);
+  const taille = new Blob([serialiser(p.monde)]).size;
+  const comp = (await exporter(p.monde)).size;
+  return `${semaines} semaines en ${(total / 1000).toFixed(1)} s · médiane ${temps[Math.floor(semaines / 2)]!.toFixed(0)} ms, pire ${temps[semaines - 1]!.toFixed(0)} ms par semaine · saison estimée ${((total / semaines) * 52 / 1000).toFixed(1)} s · sauvegarde ${(taille / 1048576).toFixed(1)} Mo (${(comp / 1048576).toFixed(2)} Mo compressés) · ${navigator.userAgent.includes('Mobile') ? 'appareil mobile' : 'ordinateur'}`;
+}

@@ -71,3 +71,17 @@ tr.moi td { color: var(--text); font-weight: 700; background: rgba(225,6,0,.12);
 .jeu-page { overflow-x: hidden; }
 .jeu-page table.compact td { white-space: normal; }
 .carte.retour[role="status"] { position: sticky; top: 96px; z-index: 15; box-shadow: 0 4px 12px rgba(0,0,0,.5); }
+/* Audit des phases 10–11 (Android) : réglages toujours accessibles dans l'en-tête ; en-tête tenu sur les écrans étroits (320 px). */
+.jeu-avance .btn.reglages { padding: 8px 10px; font-size: 1.05rem; }
+@media (max-width: 380px) {
+  .jeu-entete { gap: 6px; padding: 8px; }
+  .jeu-avance { gap: 4px; }
+  .jeu-avance .btn { padding: 8px 7px; font-size: .9rem; }
+  .jeu-entete .marque { display: none; }
+}
+/* Paysage sur téléphone : barre du bas compacte. */
+@media (max-height: 420px) and (max-width: 899px) {
+  .jeu-nav button { min-height: 40px; padding: 4px 2px; }
+  .jeu-nav button .lib { font-size: .62rem; }
+  .jeu { padding-bottom: 56px; }
+}

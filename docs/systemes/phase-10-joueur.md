@@ -39,7 +39,7 @@ Le joueur choisit ce qu'il gère lui-même. Un domaine délégué est décidé p
 ### 2.3 Nouvelles commandes
 
 - `joueur.prendre_ecurie`, `joueur.deleguer` (§2.1, §2.2).
-- `budget.developpement` : le team principal fixe le budget de développement de l'année, de 0 au maximum que permet la trésorerie (même borne que l'IA). Le dépassement volontaire du plafond reste possible, avec les mêmes sanctions.
+- `budget.developpement` : le team principal fixe le budget de développement de l'année, du minimum réglementaire jusqu'au **plafond budgétaire** (option a choisie par le porteur après l'audit, D-154 ; la fiche annonçait à tort « la même borne que l'IA »). Un budget agressif reste un choix possible ; ses conséquences tombent avec les mêmes règles que pour l'IA : la direction financière coupe le développement si la trésorerie de fin d'année s'annonce négative, et un dépassement du plafond est sanctionné (test : écurie riche contre écurie pauvre).
 
 Toutes les autres actions du joueur utilisent des commandes **qui existent déjà** et que l'IA utilise : prolongation, non-prolongation, licenciement, réponses aux demandes, interactions (soutenir, critiquer, féliciter…), offres du marché, programmes de recherche, plan des stands, votes, lobbying, missions de repérage.
 

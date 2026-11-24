@@ -146,3 +146,55 @@ describe('Audit phases 10–11 — départs répétés (cause des doublons de la
     expect([...acceptes.values()].filter((n) => n > 1)).toEqual([]);
   }, 180_000);
 });
+
+describe('Audit P10 — arbitrages du porteur', () => {
+  it('2. déléguer le personnel confie la négociation en cours à l’équipe, qui décide aussitôt si son moment habituel est passé', () => {
+    const { m, manager } = partie();
+    m.date = { annee: 2027, semaine: 35 };
+    const p = autre(m);
+    const c = contratEmploi(m, p.id)!;
+    c.fin = 2027;
+    table(m, TABLE_NEGOCIATIONS)[c.id] = { id: c.id, contrat: c.id, salaireDemande: 9, dureeAnnees: 2, promesses: [], evenement: '' } as never;
+    expect(decisionsEnAttente(m).some((d) => d.type === 'contre_offre')).toBe(true);
+    expect(executerCommandeJoueur(sc.creerMoteur(), m, { type: 'joueur.deleguer', auteur: manager.id, parametres: { ecurie: ID, domaine: 'personnel', actif: true } })).toEqual({ ok: true });
+    expect(table(m, TABLE_NEGOCIATIONS)[c.id]).toBeUndefined();
+    expect(Object.values(m.evenements).some((e) => e.type === 'negociation.confiee')).toBe(true);
+    // L'équipe a tranché : prolongation, contre-offre réglée ou non-prolongation, mais plus rien n'attend le joueur.
+    expect(Object.values(m.evenements).some((e) => e.type.startsWith('negociation.') && e.type !== 'negociation.confiee' && e.acteurs.some((a) => a.id === p.id)) || contratEmploi(m, p.id)!.nonProlonge || contratEmploi(m, p.id)!.fin > 2027).toBe(true);
+    expect(decisionsEnAttente(m).some((d) => d.personne === p.id)).toBe(false);
+  });
+
+  it('3. « Jusqu’au Grand Prix » s’arrête la dernière semaine avant une échéance, même si la décision était déjà connue', async () => {
+    const { avancer } = await import('../src/ui/jeu/partie');
+    const { m } = partie();
+    const moteur = sc.creerMoteur();
+    moteur.avancer(m, 3);
+    contratEmploi(m, autre(m).id)!.demandeDepart = { indemnite: 0.2, depuis: { ...m.date } };
+    const echeance = decisionsEnAttente(m).find((d) => d.type === 'depart')!.echeance!;
+    const r = await avancer({ monde: m, moteur }, 'grand_prix', () => undefined, 30);
+    expect(['derniere_chance', 'urgence', 'decision', 'grand_prix']).toContain(r.arret);
+    // Quoi qu'il arrive, on n'a pas dépassé l'échéance.
+    expect(m.date.annee * 52 + m.date.semaine).toBeLessThanOrEqual(echeance.annee * 52 + echeance.semaine);
+    for (let i = 0; i < 10 && m.date.semaine < echeance.semaine - 1; i++) await avancer({ monde: m, moteur }, 'grand_prix', () => undefined, 30);
+    expect(m.date.annee * 52 + m.date.semaine).toBeLessThanOrEqual(echeance.annee * 52 + echeance.semaine);
+  }, 120_000);
+
+  it('4. budget agressif (option a) : possible, mais coupé par la direction financière si la trésorerie s’effondre ; une écurie riche le tient mieux', () => {
+    const essai = (idEcurie: string) => {
+      const m = sc.creerMonde(6);
+      const moteur = sc.creerMoteur();
+      executerCommandeJoueur(moteur, m, { type: 'joueur.prendre_ecurie', auteur: 'joueur', parametres: { ecurie: idEcurie, prenom: 'B', nom: 'Udget' } });
+      moteur.avancer(m, 1);
+      const tp = teamPrincipal(m, idEcurie)!;
+      expect(executerCommandeJoueur(moteur, m, { type: 'budget.developpement', auteur: tp.id, parametres: { ecurie: idEcurie, montant: 215 } })).toEqual({ ok: true });
+      moteur.avancer(m, 50);
+      const fi = (Object.values(table(m, TABLES.finances)) as unknown as { ecurie: string; tresorerieMEUR: number; budget: { developpementMEUR: number } }[]).find((f) => f.ecurie === idEcurie)!;
+      const coupes = Object.values(m.evenements).filter((e) => e.type === 'finances.coupe_budget' && e.acteurs.some((a) => a.id === idEcurie)).length;
+      return { coupes, dev: fi.budget.developpementMEUR, tresorerie: fi.tresorerieMEUR };
+    };
+    const pauvre = essai('eq_haas'), riche = essai('eq_ferrari');
+    expect(pauvre.coupes).toBeGreaterThan(0); // la même règle que pour l'IA coupe le développement
+    expect(pauvre.dev).toBeLessThan(215);
+    expect(riche.tresorerie).toBeGreaterThan(pauvre.tresorerie);
+  }, 120_000);
+});

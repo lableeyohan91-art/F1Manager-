@@ -545,10 +545,11 @@ function planIA(monde: Monde, liste: Personne[], commander: Commander): void {
 }
 
 /** Ouverture de la fenêtre : décisions de prolongation des titulaires dont le contrat finit cette année (IA), face au marché. */
-function prolongationsTitulaires(monde: Monde, liste: Personne[]): void {
+function prolongationsTitulaires(monde: Monde, liste: Personne[], seulement?: string): void {
   const idx = indexerContrats(monde);
   for (const c of contratsTries(monde)) {
     if (c.statut !== 'actif' || c.type !== 'emploi' || c.poste !== POSTE_MARCHE || c.fin !== monde.date.annee || c.nonProlonge) continue;
+    if (seulement && c.organisation !== seulement) continue;
     const e = ecurie(monde, c.organisation);
     if (!e || !iaDecide(e, 'pilotes')) continue;
     const tp = teamPrincipal(monde, e.id);
@@ -652,6 +653,15 @@ export function cloturerFenetre(monde: Monde): void {
       texte: `La fenêtre de transferts se ferme : l'offre de ${nom(monde, o.ecurie)} à ${nom(monde, o.personne)} expire sans accord.`,
     });
   }
+}
+
+/**
+ * Audit de la phase 10 (arbitrage du porteur) : quand le joueur délègue ses pilotes pendant la fenêtre du marché, son équipe reprend
+ * aussitôt les décisions de prolongation que l'IA prend à l'ouverture (même règle que l'IA).
+ */
+export function reprendreProlongationsPilotes(monde: Monde, idEcurie: string): void {
+  if (monde.date.semaine < FENETRE.debut || monde.date.semaine > FENETRE.fin) return;
+  prolongationsTitulaires(monde, vivier(monde), idEcurie);
 }
 
 export const systemeMarche: Systeme = {

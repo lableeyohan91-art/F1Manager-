@@ -12,7 +12,7 @@
 import { BUDGET_JOUEUR, DELEGATION_RECHERCHE_DEFAUT, DELEGATION_STANDS_DEFAUT, DELEGATIONS_DEFAUT, MANAGER_JOUEUR, URGENCE_SEMAINES } from '../../balance/joueur';
 import { DEVELOPPEMENT_MINIMUM } from '../../balance/finances';
 import { COMPETENCES_PAR_POSTE, COMPETENCES_TRANSVERSALES } from '../../balance/personnages';
-import { SEMAINE_FIN_CONTRATS } from '../../balance/contrats';
+import { SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS } from '../../balance/contrats';
 import { DEMANDES_DEPART } from '../../balance/departs';
 import { CALENDRIER_REGLEMENT } from '../../balance/technique';
 import { AUTRES_VOTES, FEDERATION } from '../../balance/politique';
@@ -24,7 +24,8 @@ import { idsTries, table, type Monde } from '../../core/monde';
 import type { Moteur, Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Ecurie, type Personne, type Poste } from '../../model/types';
 import { genererPersonne } from '../../generation/construction';
-import { contratEmploi, creerContrat, liberer, pourvoirPostes, TABLE_NEGOCIATIONS, type NegociationEnCours } from '../humain/contrats';
+import { contratEmploi, creerContrat, deciderProlongation, liberer, pourvoirPostes, TABLE_NEGOCIATIONS, type NegociationEnCours } from '../humain/contrats';
+import { reprendreProlongationsPilotes } from '../marche';
 import { teamPrincipal, valeurMarche } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
 import { financesDe, plafond } from '../economie';
@@ -139,8 +140,37 @@ export const commandeDeleguerJoueur: DefinitionCommande = {
       const eq = domaine === 'stands' ? equipeStands(monde, e.id) : undefined;
       if (eq) eq.delegation = actif;
     }
+    if (actif && (domaine === 'pilotes' || domaine === 'personnel')) reprendreDossiers(monde, e, domaine, c.auteur);
   },
 };
+
+/**
+ * Audit de la phase 10 (arbitrage du porteur) : en déléguant les pilotes ou le personnel, le joueur confie aussi ses négociations
+ * en cours (elles sont abandonnées, avec un fait qui le dit) ; son équipe reprend les fins de contrat de la saison si leur moment
+ * habituel est déjà passé (personnel : semaine des négociations ; pilotes : ouverture du marché).
+ */
+function reprendreDossiers(monde: Monde, e: Ecurie, domaine: 'pilotes' | 'personnel', auteur: string): void {
+  const negos = table(monde, TABLE_NEGOCIATIONS) as unknown as Record<string, NegociationEnCours>;
+  for (const id of Object.keys(negos).sort()) {
+    const c = table(monde, TABLES.contrats)[id] as unknown as Contrat | undefined;
+    if (!c || c.organisation !== e.id || domainePoste(c.poste) !== domaine) continue;
+    delete negos[id];
+    const p = personneDe(monde, c.personne);
+    ajouterEvenement(monde, {
+      type: 'negociation.confiee', acteurs: [{ id: auteur, role: 'auteur' }, { id: c.personne, role: 'personne' }, { id: e.id, role: 'organisation' }],
+      importance: 1, visibilite: 'prive', contexte: { contrat: id, domaine },
+      texte: `La négociation avec ${p ? nomDe(p) : c.personne} est confiée à l'équipe (domaine délégué).`,
+    });
+  }
+  const tp = teamPrincipal(monde, e.id);
+  if (!tp) return;
+  if (domaine === 'personnel' && monde.date.semaine > SEMAINE_NEGOCIATIONS && monde.date.semaine < SEMAINE_FIN_CONTRATS) {
+    for (const c of (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).filter((x) => x.organisation === e.id && x.type === 'emploi' && x.statut === 'actif' && x.fin === monde.date.annee && !x.nonProlonge && domainePoste(x.poste) === 'personnel' && x.personne !== tp.id).sort((a, b) => (a.id < b.id ? -1 : 1))) {
+      deciderProlongation(monde, c, tp);
+    }
+  }
+  if (domaine === 'pilotes') reprendreProlongationsPilotes(monde, e.id);
+}
 
 /** Borne haute du budget de développement que le joueur peut fixer (M€). */
 export function budgetMaxJoueur(monde: Monde): number {

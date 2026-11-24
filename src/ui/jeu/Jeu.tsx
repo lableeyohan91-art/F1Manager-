@@ -2,11 +2,11 @@
  * Phase 10 — interface du joueur (docs/systemes/phase-10-joueur.md) : mobile d'abord, utilisable sur ordinateur.
  * Le diagnostic reste accessible à l'adresse #diagnostic.
  */
-import { useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { creerScenarioGrille2026, decisionsEnAttente, ecuriesActives, financesDe, formaterDate, plafond, type DecisionEnAttente, type Scenario } from '../../engine';
 import { fichiersGrille2026 } from '../donnees';
-import { chargerAvecSecours, enregistrer } from '../../platform/navigateur/stockage';
-import { avancer, commander, ecurieJoueur, faitsVisibles, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, prochainGP, saisonCourante, type ArretAvance, type Partie } from './partie';
+import { chargerAvecSecours, copier, enregistrer, existe } from '../../platform/navigateur/stockage';
+import { avancer, commander, mesurerAppareil, ecurieJoueur, faitsVisibles, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, prochainGP, saisonCourante, type ArretAvance, type Partie } from './partie';
 import { EcranEquipe, EcranMarche, FichePersonne } from './Equipe';
 import { EcranActualites, EcranArchives, Image } from './Medias';
 import { EcranChampionnat, EcranDirection, EcranFinances, EcranReglages, EcranTechnique } from './Gestion';
@@ -20,6 +20,8 @@ const NAV: [Ecran, string, string][] = [
   ['finances', 'Finances', '€'], ['championnat', 'Championnat', '🏁'], ['archives', 'Archives', '★'], ['direction', 'Direction', '⚖'], ['reglages', 'Réglages', '⋯'],
 ];
 export const NOM_SAUVEGARDE = 'partie-joueur';
+/** Audit de la phase 10 : partie remplacée par une nouvelle, conservée et récupérable. */
+export const NOM_ANCIENNE = 'partie-joueur-ancienne';
 
 let scenario: Scenario | null = null;
 const sc = () => (scenario ??= creerScenarioGrille2026(fichiersGrille2026()));
@@ -56,7 +58,7 @@ export function Jeu() {
     const r = await avancer(p, mode, (n) => setCalcul(`Simulation… ${n} semaine(s)`));
     setCalcul(null);
     const textes: Record<ArretAvance, string> = {
-      decision: 'Arrêt : une décision vous attend.', urgence: 'Arrêt : l’échéance d’une décision approche.', marche: 'Le marché des transferts est ouvert.',
+      decision: 'Arrêt : une décision vous attend.', urgence: 'Arrêt : l’échéance d’une décision approche.', derniere_chance: 'Arrêt : dernière semaine pour répondre à une décision.', marche: 'Le marché des transferts est ouvert.',
       grand_prix: 'Grand Prix couru.', fin_de_saison: 'Fin de saison.',
       fin_de_partie: 'Le conseil vous a remplacé.', limite: 'Une saison s’est écoulée.', semaine: '',
     };
@@ -77,6 +79,7 @@ export function Jeu() {
           <span class="muted">{formaterDate(p.monde.date)}</span>
         </div>
         <div class="jeu-avance">
+          <button class="btn reglages" onClick={() => nav.aller('reglages')} title="Réglages : sauvegarde, import, mesure des performances" aria-label="Réglages">⚙</button>
           <button class="btn" disabled={!!calcul} onClick={() => lancer('semaine')} title="Avancer d'une semaine">+1 sem.</button>
           <button class="btn principal" disabled={!!calcul} onClick={() => lancer('decision')} title="Avancer jusqu'à la prochaine décision">Continuer ▸</button>
         </div>
@@ -122,6 +125,22 @@ function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void
   const [choix, setChoix] = useState<string | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
   const apercu = useRef<Partie | null>(null);
+  const [mesure, setMesure] = useState<string | null>(null);
+  const [existante, setExistante] = useState(false);
+  const [ancienne, setAncienne] = useState(false);
+  const [confirmation, setConfirmation] = useState(false);
+  useEffect(() => {
+    void existe(NOM_SAUVEGARDE).then(setExistante).catch(() => undefined);
+    void existe(NOM_ANCIENNE).then(setAncienne).catch(() => undefined);
+  }, []);
+  /** Mesure des performances depuis l'accueil (monde de test de la graine choisie ; aucune partie n'est créée ni sauvegardée). */
+  const mesurerIci = async () => {
+    setMesure('Mesure en cours… (préparation du monde, puis 8 semaines)');
+    await new Promise((r) => setTimeout(r, 30));
+    const g = Number.parseInt(graine, 10);
+    const p = { monde: sc().creerMonde(Number.isInteger(g) ? g : 1), moteur: sc().creerMoteur() };
+    setMesure(await mesurerAppareil(p, 8));
+  };
 
   const preparer = () => {
     setErreur(null);
@@ -150,13 +169,33 @@ function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void
       setErreur(`Sauvegardes illisibles (principale et secours) : ${x instanceof Error ? x.message : String(x)}`);
     }
   };
-  const valider = () => {
+  /**
+   * Audit de la phase 10 (arbitrage du porteur) : une nouvelle partie ne détruit jamais l'ancienne sans confirmation ;
+   * la partie remplacée est gardée dans l'emplacement « ancienne partie », récupérable depuis l'accueil.
+   */
+  const valider = async (confirme = false) => {
     const p = apercu.current;
     if (!p || !choix) return;
+    if (!confirme && existante) { setConfirmation(true); return; }
     const r = commander(p, 'joueur.prendre_ecurie', { ecurie: choix, prenom, nom: nomManager });
     if (!r.ok) { setErreur(r.motif); return; }
-    void enregistrer(NOM_SAUVEGARDE, p.monde).catch(() => undefined);
-    demarrer(p);
+    if (existante) await copier(NOM_SAUVEGARDE, NOM_ANCIENNE).catch(() => false);
+    await enregistrer(NOM_SAUVEGARDE, p.monde).catch(() => undefined);
+    demarrer(p, existante ? 'Nouvelle partie commencée. La précédente est conservée : « Reprendre l’ancienne partie » sur l’accueil.' : undefined);
+  };
+  /** Reprend l'ancienne partie : les deux emplacements sont échangés (la partie reprise redevient la principale). */
+  const reprendreAncienne = async () => {
+    setErreur(null);
+    try {
+      const r = await chargerAvecSecours(NOM_ANCIENNE);
+      if (!r) { setErreur('Aucune ancienne partie.'); return; }
+      await copier(NOM_SAUVEGARDE, `${NOM_SAUVEGARDE}::echange`);
+      await copier(NOM_ANCIENNE, NOM_SAUVEGARDE);
+      await copier(`${NOM_SAUVEGARDE}::echange`, NOM_ANCIENNE);
+      demarrer({ monde: r.monde, moteur: sc().creerMoteur() }, 'Ancienne partie reprise ; l’autre partie devient à son tour l’« ancienne partie ».');
+    } catch (x) {
+      setErreur(`Ancienne partie illisible : ${x instanceof Error ? x.message : String(x)}`);
+    }
   };
 
   return (
@@ -171,8 +210,13 @@ function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void
             <div class="actions">
               <button class="btn principal" onClick={preparer}>Nouvelle partie</button>
               <button class="btn" onClick={reprendre}>Reprendre la partie</button>
+              {ancienne && <button class="btn" onClick={reprendreAncienne}>Reprendre l’ancienne partie</button>}
               <a class="btn" href="#diagnostic">Diagnostic</a>
             </div>
+            <div class="actions">
+              <button class="btn" disabled={!!mesure && mesure.startsWith('Mesure en cours')} onClick={mesurerIci}>Mesurer les performances de cet appareil</button>
+            </div>
+            {mesure && <p class="num petit" role="status">{mesure}</p>}
             {erreur && <p class="erreur">{erreur}</p>}
           </div>
         )}
@@ -202,8 +246,17 @@ function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void
             </div>
             <div class="actions collant">
               <button class="btn" onClick={() => setEtape('menu')}>Retour</button>
-              <button class="btn principal" disabled={!choix || !prenom.trim() || !nomManager.trim()} onClick={valider}>Prendre la tête de l’écurie</button>
+              <button class="btn principal" disabled={!choix || !prenom.trim() || !nomManager.trim()} onClick={() => void valider()}>Prendre la tête de l’écurie</button>
             </div>
+            {confirmation && (
+              <div class="carte attention" role="alertdialog">
+                <p><strong>Une partie est déjà sauvegardée.</strong> Elle ne sera pas perdue : elle devient l’« ancienne partie », récupérable depuis l’accueil. Une seule ancienne partie est gardée.</p>
+                <div class="actions">
+                  <button class="btn principal" onClick={() => { setConfirmation(false); void valider(true); }}>Confirmer et commencer</button>
+                  <button class="btn" onClick={() => setConfirmation(false)}>Annuler</button>
+                </div>
+              </div>
+            )}
             {erreur && <p class="erreur">{erreur}</p>}
           </>
         )}
@@ -250,7 +303,7 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
         </div>
         <div class="carte">
           <h3>Prochain Grand Prix</h3>
-          {gp ? <p>{nomCircuit(m, gp.circuit)} <span class="muted">· manche {gp.manche}, semaine {gp.semaine}</span></p> : <p class="muted">Aucun d’ici la fin de saison.</p>}
+          {gp ? <p>{nomCircuit(m, gp.circuit)} <span class="muted">· manche {gp.manche}, semaine {gp.semaine}</span></p> : <p class="muted">{grandsPrix(m).length ? 'Aucun d’ici la fin de saison.' : 'Le calendrier de la saison sera publié la semaine prochaine.'}</p>}
           {derniers && <p class="muted">Dernier : {nomCircuit(m, derniers.circuit)}, vainqueur {nom(personne(m, derniers.resultats.find((r) => r.position === 1)?.pilote ?? ''))}</p>}
           <button class="btn" disabled={occupe || !gp} onClick={() => lancer('grand_prix')}>Jusqu’au Grand Prix ▸</button>
         </div>

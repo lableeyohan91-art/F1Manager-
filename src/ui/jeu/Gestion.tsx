@@ -8,7 +8,7 @@ import { DOMAINES, LISTE_DOMAINES, ORIENTATIONS, PROGRAMMES } from '../../engine
 import { ORIENTATIONS_STANDS } from '../../engine/balance/stands';
 import { DEVELOPPEMENT_MINIMUM } from '../../engine/balance/finances';
 import { enregistrer, exporter, importer } from '../../platform/navigateur/stockage';
-import { commander, ecurieJoueur, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, saisonCourante, type Partie } from './partie';
+import { commander, ecurieJoueur, mesurerAppareil, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, saisonCourante, type Partie } from './partie';
 import type { Navigation } from './Jeu';
 import { NOM_SAUVEGARDE } from './Jeu';
 
@@ -290,24 +290,7 @@ export function EcranReglages({ partie, nav, quitter, remplacer }: { partie: Par
     URL.revokeObjectURL(a.href);
   };
   /** Page de mesure (D-110) : temps de calcul sur une copie du monde, sans toucher à la partie. */
-  const mesurer = async (semaines: number) => {
-    setMesure('Mesure en cours…');
-    await new Promise((r) => setTimeout(r, 30));
-    const copie = copierMonde(partie.monde);
-    const t0 = performance.now();
-    const temps: number[] = [];
-    for (let i = 0; i < semaines; i++) {
-      const a = performance.now();
-      partie.moteur.avancerUneSemaine(copie);
-      temps.push(performance.now() - a);
-      if (i % 4 === 3) await new Promise((r) => setTimeout(r, 0));
-    }
-    const total = performance.now() - t0;
-    temps.sort((x, y) => x - y);
-    const taille = new Blob([serialiser(partie.monde)]).size;
-    const comp = (await exporter(partie.monde)).size;
-    setMesure(`${semaines} semaines en ${(total / 1000).toFixed(1)} s · médiane ${temps[Math.floor(semaines / 2)]!.toFixed(0)} ms, pire ${temps[semaines - 1]!.toFixed(0)} ms par semaine · saison estimée ${((total / semaines) * 52 / 1000).toFixed(1)} s · sauvegarde ${(taille / 1048576).toFixed(1)} Mo (${(comp / 1048576).toFixed(2)} Mo compressés) · ${navigator.userAgent.includes('Mobile') ? 'appareil mobile' : 'ordinateur'}`);
-  };
+  const mesurer = async (semaines: number) => { setMesure('Mesure en cours…'); setMesure(await mesurerAppareil(partie, semaines)); };
   return (
     <>
       <div class="carte">

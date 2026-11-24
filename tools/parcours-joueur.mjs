@@ -117,6 +117,30 @@ async function parcours(nomAppareil, contexteOptions) {
   await page.getByText('Partie importée').waitFor();
   ok(`${nomAppareil} : import d’une sauvegarde téléchargée`);
 
+  // Audit de la phase 10 : nouvelle partie alors qu'une partie existe → confirmation, annulation possible, ancienne partie récupérable.
+  await allerA('Réglages');
+  await page.getByRole('button', { name: 'Sauvegarder' }).click();
+  await page.getByText('Partie sauvegardée').waitFor({ timeout: 30_000 });
+  await page.getByRole('button', { name: 'Quitter vers l’accueil' }).click();
+  await page.getByRole('button', { name: 'Nouvelle partie' }).click();
+  await page.getByText('Votre manager').waitFor({ timeout: 60_000 });
+  await page.getByLabel('Prénom').fill('Deuxième');
+  await page.getByLabel('Nom', { exact: true }).fill('Partie');
+  await page.locator('.carte-choix').first().click();
+  await page.getByRole('button', { name: 'Prendre la tête de l’écurie' }).click();
+  await page.getByText('Une partie est déjà sauvegardée.').waitFor();
+  await page.getByRole('button', { name: 'Annuler' }).click();
+  if (await page.getByText('Une partie est déjà sauvegardée.').isVisible()) throw new Error('la confirmation ne s’est pas fermée');
+  await page.getByRole('button', { name: 'Prendre la tête de l’écurie' }).click();
+  await page.getByRole('button', { name: 'Confirmer et commencer' }).click();
+  await page.getByText('La précédente est conservée').waitFor({ timeout: 30_000 });
+  ok(`${nomAppareil} : nouvelle partie avec confirmation (annulation puis confirmation)`);
+  await allerA('Réglages');
+  await page.getByRole('button', { name: 'Quitter vers l’accueil' }).click();
+  await page.getByRole('button', { name: 'Reprendre l’ancienne partie' }).click();
+  await page.getByText('Ancienne partie reprise').waitFor({ timeout: 30_000 });
+  ok(`${nomAppareil} : ancienne partie récupérée`);
+
   // Audit de la phase 10 : sauvegarde principale corrompue → reprise par le secours ; les deux corrompues → message clair.
   const corrompre = (cles) => page.evaluate((cles) => new Promise((ok, ko) => {
     const req = indexedDB.open('f1manager', 1);
