@@ -64,8 +64,13 @@ export const NIVEAUX_AILERONS = { min: -0.5, max: 1.0, pas: 0.05, trainee: 1.35 
  */
 export const PUISSANCE_ALTITUDE_EXPOSANT = 0.35;
 
-/** Calcul du profil : lissage de la courbure (points de chaque côté) et nombre de tours de calcul pour boucler. */
-export const PROFIL = { demiFenetreCourbure: 3, lissageCourbure: 3, passes: 2, iterationsEnergie: 10 };
+/**
+ * Calcul du profil : lissage de la courbure (points de chaque côté), nombre de tours de calcul pour boucler, étapes de la recherche
+ * de la vitesse de coupure électrique (16 : précision ≈ 0,006 km/h, sinon le bruit rendait certains gains faussement négatifs),
+ * lissage temporel de la courbure (s de trajet à la vitesse calculée ; 0 = désactivé ; H, corrige le biais des virages rapides,
+ * voir docs/rapports/phase-11b/audit-apex-lab.md).
+ */
+export const PROFIL = { demiFenetreCourbure: 3, lissageCourbure: 3, passes: 2, iterationsEnergie: 16, lissageTemporelS: 0.25 };
 /** Pas de la trace (m) pour lequel la fenêtre de courbure est réglée (traces construites tous les 5 m). */
 export const PAS_TRACE_M = 5;
 

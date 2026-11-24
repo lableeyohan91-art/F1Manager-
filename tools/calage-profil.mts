@@ -2,7 +2,7 @@
  * Phase 11b — calage reproductible de la voiture de référence sur les vitesses réelles médianes des circuits détaillés.
  * Une seule voiture pour tous les circuits (aucun réglage par circuit, sauf le niveau d'ailerons choisi par le calcul).
  * Critère : écart absolu moyen de vitesse (km/h) sur tous les points, plus l'écart moyen de temps au tour (%, poids 1 km/h par %). Recherche par coordonnées.
- * Usage : npx tsx tools/calage-profil.mts [paramètres séparés par des virgules]   (affiche les valeurs à reporter dans src/engine/balance/profil.ts)
+ * Usage : npx tsx tools/calage-profil.mts [paramètres séparés par des virgules | pistes (adhérences des pistes seules)]   (affiche les valeurs à reporter dans src/engine/balance/profil.ts)
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { appuiNaturel, courbures, type Trace } from '../src/engine/circuits/profil';
@@ -37,7 +37,7 @@ function erreur(v: V): number {
 }
 const TOUS: (keyof V)[] = ['cla', 'cda', 'muMeca', 'muAero', 'muMotricite', 'muFreinage', 'energieElectriqueTourJ', 'reductionTraineeLigne', 'reductionAppuiLigne'];
 /** Paramètres recalés : tous par défaut, ou une liste (ex. « cda,muMotricite ») pour un recalage partiel après une correction ciblée. */
-const PARAMS: (keyof V)[] = process.argv[2] ? (process.argv[2].split(',') as (keyof V)[]) : TOUS;
+const PARAMS: (keyof V)[] = process.argv[2] === 'pistes' ? [] : process.argv[2] ? (process.argv[2].split(',') as (keyof V)[]) : TOUS;
 /** Bornes physiquement plausibles pour une F1 (H) : le calage ne peut pas compenser un effet absent du modèle par une valeur absurde. */
 const BORNES: Partial<Record<keyof V, [number, number]>> = {
   cla: [2.5, 5.5], cda: [0.6, 1.4], muMeca: [1.2, 1.9], muAero: [1.2, 2.2], muMotricite: [1.0, 1.7], muFreinage: [1.4, 2.4], energieElectriqueTourJ: [2e6, 9e6], reductionTraineeLigne: [0.1, 0.55], reductionAppuiLigne: [0.1, 0.7],
@@ -71,7 +71,7 @@ for (const pasRel of [0.16, 0.08, 0.04, 0.02]) {
   }
 }
 // Moyenne des adhérences de piste ramenée à 1 : l'écart est reporté sur les adhérences de la voiture (équivalent physiquement).
-const moyP = piste.reduce((a, b) => a + b, 0) / piste.length;
+const moyP = PARAMS.length === 0 ? 1 : piste.reduce((a, b) => a + b, 0) / piste.length;
 for (const k of ['muMeca', 'muAero', 'muMotricite', 'muFreinage'] as const) (v as Record<string, number>)[k] = v[k] * moyP;
 console.log('pistes', Object.fromEntries(traces.map((t, i) => [t.circuit, +(piste[i]! / moyP).toFixed(3)])));
 console.log('résultat', JSON.stringify(Object.fromEntries(TOUS.map((k) => [k, +(v[k] as number).toPrecision(4)]))), 'écart moyen', e.toFixed(2), 'km/h');

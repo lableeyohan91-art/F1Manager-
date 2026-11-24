@@ -76,7 +76,27 @@ export function puissance(v: VoiturePhysique, vitesseMs: number, rhoRel: number,
 }
 
 export function profilVitesse(tr: Trace, v: VoiturePhysique, c: Conditions, k?: number[]): Profil {
-  const kap = (k ?? courbures(tr)).map(Math.abs);
+  const kap0 = (k ?? courbures(tr)).map(Math.abs);
+  // Courbure effective : lissée sur une durée de trajet (PROFIL.lissageTemporelS), pas sur une distance fixe. À haute vitesse,
+  // la voiture traverse un pic de courbure court (bruit de mesure, petite correction de trajectoire) sans devoir ralentir.
+  // La durée est convertie en distance avec la vitesse CALCULÉE de cette voiture (premier profil), jamais la vitesse réelle.
+  if (PROFIL.lissageTemporelS <= 0) return profilDeploye(tr, v, c, kap0);
+  // Premier profil approché (un seul passage, sans budget d'énergie) : il ne sert qu'à convertir la durée en distance.
+  const premier = passeUnique(tr, v, c, kap0, Infinity);
+  return profilDeploye(tr, v, c, lisseSurDuree(kap0, premier.vitesses, tr.pasM, PROFIL.lissageTemporelS));
+}
+
+/** Moyenne glissante de la courbure sur ± (vitesse × durée) mètres autour de chaque point. */
+function lisseSurDuree(kap: number[], vitesses: number[], pas: number, dureeS: number): number[] {
+  const n = kap.length, cumul = new Float64Array(3 * n + 1);
+  for (let i = 0; i < 3 * n; i++) cumul[i + 1] = cumul[i]! + kap[i % n]!; // tracé déroulé trois fois : fenêtres qui bouclent sans cas particulier
+  return kap.map((_, i) => {
+    const h = Math.min(n - 1, Math.max(0, Math.round((vitesses[i]! * dureeS) / pas)));
+    return (cumul[n + i + h + 1]! - cumul[n + i - h]!) / (2 * h + 1);
+  });
+}
+
+function profilDeploye(tr: Trace, v: VoiturePhysique, c: Conditions, kap: number[]): Profil {
   // Budget d'énergie électrique par tour. Une écurie dépense son énergie là où elle rapporte le plus de temps : aux vitesses basses
   // et moyennes (le gain par joule y est le plus grand), et coupe en bout de ligne droite (« clipping » observé en 2026).
   // On cherche donc la vitesse de coupure au-dessus de laquelle on ne déploie plus, telle que l'énergie dépensée égale le budget.
