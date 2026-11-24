@@ -100,11 +100,18 @@ export const ESTIMATION = { demiLargeurJeune: 3, demiLargeurVeteran: 0.8, ageVet
 export const RETRAITE = {
   base: 0.01, parAnneeApresPlateau: 0.07, declinRessenti: 2, parSaisonLibre: 0.25, ambition: 0.01, envieTitre: 0.08,
   ageMinimalPilote: 30, ageMinimalPersonnel: 52, ageMaximal: 75, facteurSousContrat: 0.3,
+  /**
+   * Audit 6.4 : au-delà de cet âge, un pilote n'est plus « protégé » par son contrat (facteur sous contrat, contrat signé pour la
+   * suite) : sinon, prolongé ou recruté chaque été, un pilote demandé ne terminait jamais son contrat (titulaire à 51 ans). (H)
+   */
+  ageFinProtectionPilote: 41,
 };
 /** Retour après une retraite (D-072) : années maximales, ambition et niveau minimaux, probabilité annuelle. */
 export const RETOUR = { anneesMax: 2, ambitionMin: 14, niveauMin: 14, probabilite: 0.15 };
 /** Abandon des jeunes pilotes qui n'ont jamais eu de baquet en F1 (D-101) : probabilité annuelle par âge. */
 export const ABANDON_JEUNES: Record<number, number> = { 23: 0.2, 24: 0.35, 25: 0.5, 26: 0.7 };
+/** Âge à partir duquel un jeune sans baquet en F1 peut abandonner (première clé d'ABANDON_JEUNES). */
+export const ABANDON_AGE_MIN = 23;
 export const ABANDON_AGE_QUASI_CERTAIN = 27;
 export const ABANDON_PROBABILITE_MAX = 0.95;
 /** Reconversion à la retraite (§8) : âge maximal, leadership minimal, probabilité de base (+ aspirations). */

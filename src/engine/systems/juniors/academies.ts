@@ -8,6 +8,7 @@
  * Toutes les écuries suivent les mêmes règles ; pour l'instant, l'IA gère aussi l'académie de l'écurie du joueur (délégation).
  */
 
+import { budgetFamille } from './index';
 import {
   ACADEMIE, AFFILIATION, CATEGORIES_JUNIORS, CONNAISSANCE, MECENE, MEMOIRE_ACADEMIE, PROMESSE_ACADEMIE, RENOUVELLEMENT_AFFILIATION, REPERAGE, REPUTATION_ACADEMIE,
 } from '../../balance/juniors';
@@ -195,7 +196,9 @@ function affilier(monde: Monde, e: Ecurie, p: Personne, centre: number, annee: n
     .filter((x) => x.type === 'emploi' && x.statut === 'actif' && x.organisation === e.id && x.poste === 'pilote_titulaire' && x.fin < echeance && !x.nonProlonge)
     .sort((a, b) => a.fin - b.fin || (a.id < b.id ? -1 : 1))[0];
   const dejaPromis = (Object.values(table(monde, TABLE_PROMESSES)) as unknown as Promesse[]).filter((x) => x.type === 'titularisation' && x.statut === 'en_cours' && x.organisation === e.id).length;
-  if (tp && sortant && dejaPromis === 0 && centre >= PROMESSE_ACADEMIE.potentielMin && annee - p.anneeNaissance >= PROMESSE_ACADEMIE.ageMin && f.chance(PROMESSE_ACADEMIE.probabilite)) {
+  // Audit 6.2 : dans l'écurie du joueur, aucune décision sur ses pilotes n'est prise à sa place (promesse et non-prolongation
+  // réservées à l'IA, ou à une écurie qui a délégué ses pilotes).
+  if (tp && sortant && dejaPromis === 0 && iaDecide(e, 'pilotes') && centre >= PROMESSE_ACADEMIE.potentielMin && annee - p.anneeNaissance >= PROMESSE_ACADEMIE.ageMin && f.chance(PROMESSE_ACADEMIE.probabilite)) {
     // Engagement réel : l'écurie décide de ne pas prolonger le titulaire sortant pour libérer le baquet promis.
     nePasProlonger(monde, sortant, tp.id, 'baquet promis à un jeune de l’académie', [ev.id]);
     faireUnePromesse(monde, {
@@ -210,7 +213,8 @@ function affilier(monde: Monde, e: Ecurie, p: Personne, centre: number, annee: n
 function chercherMecenes(monde: Monde, annee: number): void {
   for (const p of personnes(monde)) {
     if (p.statut !== 'libre' || !p.poste.startsWith('pilote') || (p.carriere?.saisonsF1 ?? 0) > 0 || (p.mecene && p.mecene.jusqua >= annee)) continue;
-    if ((p.budgetFamilleMEUR ?? 0) > MECENE.budgetFamilleMax || affiliationDe(monde, p.id)) continue;
+    // Audit 6.5 : le budget familial est tiré à la demande (avant : lu avant d'être tiré, donc 0, et des familles aisées recevaient un mécène).
+    if (budgetFamille(monde, p) > MECENE.budgetFamilleMax || affiliationDe(monde, p.id)) continue;
     if ((p.reputationJeune ?? 0) < MECENE.reputationMin && potentielEstime(monde, null, p).centre < MECENE.potentielMin) continue;
     const f = tirageLocal(monde, 'mecene', p.id, annee);
     if (!f.chance(MECENE.probabilite)) continue;

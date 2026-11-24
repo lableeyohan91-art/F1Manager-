@@ -143,3 +143,30 @@ describe('Audit — économie (phase 5 et sponsoring)', () => {
     expect(probaClause('victoire', 0, 4, 11, 24)).toBeCloseTo(probaClause('victoire', 0, 4, 11, 24), 10);
   });
 });
+
+describe('Audit — phases 6 et 7', () => {
+  it('6.1 : une personne qui a signé ailleurs ne peut plus être prolongée par son employeur actuel', async () => {
+    const { proposerProlongation, contratEmploi } = await import('../src/engine');
+    const m = sc.creerMonde(21);
+    sc.creerMoteur().avancer(m, 30);
+    const contrats = Object.values(table(m, TABLES.contrats)) as unknown as { personne: string; statut: string; type: string; organisation: string }[];
+    const signe = contrats.find((c) => c.type === 'emploi' && c.statut === 'signe' && contratEmploi(m, c.personne) && contratEmploi(m, c.personne)!.organisation !== c.organisation);
+    expect(signe).toBeDefined();
+    const actuel = contratEmploi(m, signe!.personne)!;
+    const finAvant = actuel.fin;
+    const r = proposerProlongation(m, actuel, actuel.organisation, actuel.salaireMEUR * 2, 2, [], 0);
+    expect(r.issue).toBe('refus');
+    expect(actuel.fin).toBe(finAvant);
+  }, 60_000);
+
+  it('6.4 : passé l’âge de fin de protection, un pilote n’est plus retenu par son contrat dans sa décision de retraite', async () => {
+    const { probabiliteRetraite } = await import('../src/engine');
+    const { RETRAITE } = await import('../src/engine/balance/carriere');
+    const m = sc.creerMonde(22);
+    const pilote = (Object.values(table(m, TABLES.personnes)) as unknown as { id: string; poste: string; statut: string; anneeNaissance: number; carriere?: unknown }[])
+      .find((p) => p.poste === 'pilote_titulaire' && p.statut === 'actif' && p.carriere)!;
+    const age = (a: number) => { pilote.anneeNaissance = m.date.annee - a; return probabiliteRetraite(m, pilote as never); };
+    const jeune = age(RETRAITE.ageFinProtectionPilote - 1), vieux = age(RETRAITE.ageFinProtectionPilote);
+    expect(vieux).toBeGreaterThan(jeune);
+  });
+});

@@ -3,6 +3,7 @@
  * renouvellement du réservoir. Toutes les actions passent par des commandes (mêmes règles pour le joueur et l'IA).
  */
 
+import { RACHAT } from '../../balance/marche';
 import { causesConnues, dernierFait, noterFaitDepart } from './causes';
 import {
   BORNES_CONTRAT, INDEMNITE_RUPTURE, OFFRE_SALAIRE, PRIME_CONTINUITE, RESERVOIR_MINIMUM, SEUIL_PROLONGATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS, TOURS_RECRUTEMENT,
@@ -27,7 +28,7 @@ import {
 import { faireUnePromesse, motifPromesseInvalide, motifPromesseSansObjet, type TypePromesse } from './promesses';
 import { evenementsDeType } from '../../core/evenements';
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, motifRefusEffectif } from './effectifs';
-import { activerContratsSignes, clotureMarche } from '../marche';
+import { activerContratsSignes, clotureMarche, contratSigne } from '../marche';
 import { domainePoste, iaDecide } from '../joueur/acces';
 
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -84,7 +85,8 @@ export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, s
   const finAvant = c.fin;
   // Audit n°3 : garde commune à toutes les prolongations (joueur, IA, conseil, contre-attaque) — pas de dépassement d'effectif.
   // Phase 10 (correction) : des prolongations successives ne cumulent pas leurs durées au-delà de la durée maximale d'un contrat.
-  const effectif = motifRefusEffectif(monde, c.organisation, c.personne, c.poste, c.fin + 1, Math.max(c.fin, monde.date.annee) + duree)
+  // Audit 6.1 : une personne qui a déjà signé ailleurs pour la suite ne peut plus être prolongée (deux contrats sur la même saison).
+  const effectif = motifDejaSigne(monde, c) ?? motifRefusEffectif(monde, c.organisation, c.personne, c.poste, c.fin + 1, Math.max(c.fin, monde.date.annee) + duree)
     ?? (Math.max(c.fin, monde.date.annee) + duree > monde.date.annee + BORNES_CONTRAT.dureeMax ? `Un contrat ne peut pas aller au-delà de ${monde.date.annee + BORNES_CONTRAT.dureeMax}.` : null);
   if (effectif) {
     const evt = ajouterEvenement(monde, {
@@ -115,6 +117,8 @@ export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, s
     const ancienSalaire = c.salaireMEUR;
     c.fin = Math.max(c.fin, monde.date.annee) + duree;
     c.salaireMEUR = arrondi(salaire);
+    // Audit 6.8 : la clause de rachat suit le nouveau contrat (salaire × années restantes), comme à la signature.
+    if (c.clauses.rachatMEUR !== undefined) c.clauses.rachatMEUR = arrondi(c.salaireMEUR * Math.max(1, c.fin - monde.date.annee) * RACHAT.multiple);
     if (promesses.includes('statut_n1')) c.clauses.statutN1 = true;
     const evt = ajouterEvenement(monde, {
       type: 'negociation.accord', acteurs, importance: 2, visibilite: 'public', causes: [offreEvt.id],
@@ -154,6 +158,12 @@ function parametresPromesse(t: TypePromesse, salaire: number, finAvant: number, 
   if (t === 'prolongation') return { finAvant };
   if (t === 'ne_pas_recruter') return cibles['ne_pas_recruter'] ? { personne: cibles['ne_pas_recruter'] } : {};
   return {};
+}
+
+/** Audit 6.1 : la personne a-t-elle déjà signé (ailleurs ou ici) un contrat qui commence plus tard ? */
+function motifDejaSigne(monde: Monde, c: Contrat): string | null {
+  const signe = contratSigne(monde, c.personne);
+  return signe ? `${nomDe(monde, c.personne)} a déjà signé pour la suite avec ${nomDe(monde, signe.organisation)}.` : null;
 }
 
 /** Audit 4.4 : une offre de prolongation a-t-elle déjà été faite cette semaine pour ce contrat ? */
@@ -556,7 +566,7 @@ export const commandeProposerProlongation: DefinitionCommande = {
     if (enCours && tour === 0) return 'Une négociation est déjà en cours : répondez à la contre-offre.';
     if (!enCours && tour > 0) return 'Aucune contre-offre en attente : la négociation s’ouvre au tour 0.';
     if (!enCours && offreCetteSemaine(monde, contrat.id)) return 'Une offre a déjà été faite cette semaine à cette personne.';
-    const effectif = motifRefusEffectif(monde, contrat.organisation, contrat.personne, contrat.poste, contrat.fin + 1, Math.max(contrat.fin, monde.date.annee) + cond.duree);
+    const effectif = motifDejaSigne(monde, contrat) ?? motifRefusEffectif(monde, contrat.organisation, contrat.personne, contrat.poste, contrat.fin + 1, Math.max(contrat.fin, monde.date.annee) + cond.duree);
     if (effectif) return effectif;
     if (Math.max(contrat.fin, monde.date.annee) + cond.duree > monde.date.annee + BORNES_CONTRAT.dureeMax) return `Un contrat ne peut pas aller au-delà de ${monde.date.annee + BORNES_CONTRAT.dureeMax}.`;
     const promesses = c.parametres['promesses'] ?? [];

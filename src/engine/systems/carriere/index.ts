@@ -9,7 +9,7 @@
  */
 
 import {
-  ABANDON_AGE_QUASI_CERTAIN, ABANDON_JEUNES, ABANDON_PROBABILITE_MAX, ALEA_PROGRESSION, ARCHETYPES, DECLIC, DECLIN, ENCADREMENT,
+  ABANDON_AGE_MIN, ABANDON_AGE_QUASI_CERTAIN, ABANDON_JEUNES, ABANDON_PROBABILITE_MAX, ALEA_PROGRESSION, ARCHETYPES, DECLIC, DECLIN, ENCADREMENT,
   MENTOR, MOTIVATION_PROGRESSION, NATURE_COMPETENCE, NATURES, PROGRESSION_PLATEAU, RECONVERSION, RETOUR, RETRAITE, STAGNATION, TAUX_PROGRESSION,
   TEMPS_DE_JEU, TRAVAIL, ARCHIVAGE,
 } from '../../balance/carriere';
@@ -172,7 +172,8 @@ export function probabiliteRetraite(monde: Monde, p: Personne): number {
   let pr = RETRAITE.base + RETRAITE.parAnneeApresPlateau * Math.max(0, age - k.finApogee) + RETRAITE.declinRessenti * declinRessenti
     + RETRAITE.parSaisonLibre * libre - RETRAITE.ambition * ((p.traits['ambition'] ?? 10) - 10) - reveTitre;
   const c = contratActif(monde, p);
-  if (c && c.fin > monde.date.annee) pr *= RETRAITE.facteurSousContrat; // on termine en général son contrat
+  // On termine en général son contrat ; plus au-delà d'un âge réaliste de fin de carrière (audit 6.4).
+  if (c && c.fin > monde.date.annee && !(estPilote(p) && age >= RETRAITE.ageFinProtectionPilote)) pr *= RETRAITE.facteurSousContrat;
   return borner(pr, 0, 1);
 }
 
@@ -234,7 +235,7 @@ export function bilanCarrieres(monde: Monde): void {
     }
     tirerPhaseSpeciale(monde, p);
     // Phase 7a : on ne quitte pas le métier juste après avoir signé un contrat qui commence bientôt.
-    const vientDeSigner = signes.has(p.id);
+    const vientDeSigner = signes.has(p.id) && !(estPilote(p) && annee - p.anneeNaissance >= RETRAITE.ageFinProtectionPilote); // audit 6.4
     if (p.statut === 'actif') {
       k.saisonsActives++;
       if (p.poste === 'pilote_titulaire') k.saisonsF1++;
@@ -242,7 +243,7 @@ export function bilanCarrieres(monde: Monde): void {
     const age = annee - p.anneeNaissance;
     const f = tirageLocal(monde, 'carriere.fin', p.id, annee);
     // Abandon des jeunes qui n'ont pas percé (D-101) : jamais titulaire en F1, sans baquet.
-    if (estPilote(p) && p.statut === 'libre' && k.saisonsF1 === 0 && age >= 23 && !vientDeSigner) {
+    if (estPilote(p) && p.statut === 'libre' && k.saisonsF1 === 0 && age >= ABANDON_AGE_MIN && !vientDeSigner) {
       const pr = age >= ABANDON_AGE_QUASI_CERTAIN ? ABANDON_PROBABILITE_MAX : (ABANDON_JEUNES[age] ?? 0);
       if (f.chance(pr)) {
         prendreRetraite(monde, p, 'abandon : pas de baquet en F1');

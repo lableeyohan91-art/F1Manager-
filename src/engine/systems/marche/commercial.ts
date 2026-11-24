@@ -10,6 +10,7 @@
  * - Agents : clients bornés, commission négociée, surenchère en négociation, poussée vers les transferts, démarchage des écuries.
  */
 
+import { budgetFamille } from '../juniors';
 import {
   AGENTS, ATTRAIT_PILOTES, ENGAGEMENT_JUNIOR, ENTREPRISES_LIEES, PILOTES_PAYANTS, REMPLACEMENT_SPONSOR, POPULARITE, SPONSORS_PERSONNELS, TAILLE_MARCHE, TAILLE_MARCHE_DEFAUT, VALEUR_COMMERCIALE,
 } from '../../balance/commercial';
@@ -253,11 +254,11 @@ function engagementsJuniors(monde: Monde, annee: number, engages: Set<string>): 
     if (age < ENGAGEMENT_JUNIOR.ageMin || age > ENGAGEMENT_JUNIOR.ageMax) continue;
     if (p.engagementF1 && p.engagementF1.jusqua >= annee) continue;
     delete p.engagementF1;
-    const famille = (p.budgetFamilleMEUR ?? 0) >= SPONSORS_PERSONNELS.seuilFamilleMEUR;
+    const famille = budgetFamille(monde, p) >= SPONSORS_PERSONNELS.seuilFamilleMEUR;
     const valeur = valeurCommerciale(monde, p);
     if (!famille && valeur < ENGAGEMENT_JUNIOR.seuilValeurMEUR) continue;
     if (!tirageLocal(monde, 'sponsor.engagement_junior', p.id, annee).chance(ENGAGEMENT_JUNIOR.probabilite)) continue;
-    const montantVise = arrondi(famille ? (p.budgetFamilleMEUR ?? 0) * SPONSORS_PERSONNELS.partFamille : valeur * SPONSORS_PERSONNELS.part);
+    const montantVise = arrondi(famille ? budgetFamille(monde, p) * SPONSORS_PERSONNELS.partFamille : valeur * SPONSORS_PERSONNELS.part);
     const s = entrepriseLiee(monde, p, famille ? 'fam' : 'nat', montantVise);
     if (!s || engages.has(s.id)) continue;
     const montant = arrondi(Math.min(montantVise, s.budgetMEUR * ENTREPRISES_LIEES.partMaxBudget));

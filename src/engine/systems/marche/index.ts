@@ -583,6 +583,13 @@ export function activerContratsSignes(monde: Monde): void {
       if (x.fin > annee && x.organisation !== c.organisation) { x.statut = 'rompu'; x.motifFin = 'rachat'; }
       else { x.statut = 'termine'; x.motifFin = 'echeance'; }
     }
+    // Audit 6.3 et 6.10 : arrivé en F1 sous contrat, un affilié quitte son académie tout de suite (avant : jusqu'à un an de plus,
+    // financement compris), avec un fait.
+    const aff = affiliationDe(monde, p.id);
+    if (aff && c.poste.startsWith('pilote')) {
+      aff.statut = 'termine'; aff.motifFin = 'echeance';
+      ajouterEvenement(monde, { type: 'academie.fin_affiliation', acteurs: [{ id: p.id, role: 'personne' }, { id: aff.organisation, role: 'organisation' }], importance: 1, visibilite: 'public', contexte: { contrat: aff.id, motif: 'arrivee_en_f1', ecurie: e.id } });
+    }
     const ancienne = p.ecurie;
     const ancienPoste = p.poste;
     // Phase 7b : la personne remplacée est libérée (licenciement, indemnité versée par le paiement centralisé).
