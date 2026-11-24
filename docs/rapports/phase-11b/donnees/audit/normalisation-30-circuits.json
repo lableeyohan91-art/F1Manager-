@@ -8,12 +8,12 @@
   "freinage": 0.05521920664885442
  },
  "moyennesCalendrier": {
-  "adherenceMecanique": 0.3549325264274105,
-  "appui": 0.3547724518412956,
-  "trainee": 0.15864529397253513,
-  "puissance": 0.22584733280457372,
-  "motricite": 0.08093895100691266,
-  "freinage": 0.04748093767997297
+  "adherenceMecanique": 0.37017773654131975,
+  "appui": 0.36549510482208186,
+  "trainee": 0.1545268131937893,
+  "puissance": 0.22190313899753988,
+  "motricite": 0.08696844892720416,
+  "freinage": 0.049230226152026546
  },
  "seuil": {
   "gainNegligeableS": 0.05,
@@ -47,7 +47,7 @@
     ],
     "normCal": [
      "trainee",
-     "freinage"
+     "puissance"
     ]
    },
    "negligeables": []
@@ -413,7 +413,7 @@
     ],
     "normCal": [
      "appui",
-     "adherenceMecanique"
+     "puissance"
     ]
    },
    "negligeables": [
@@ -448,7 +448,7 @@
     ],
     "normCal": [
      "puissance",
-     "motricite"
+     "trainee"
     ]
    },
    "negligeables": [
@@ -517,7 +517,7 @@
     ],
     "normCal": [
      "trainee",
-     "appui"
+     "puissance"
     ]
    },
    "negligeables": [
@@ -685,7 +685,7 @@
     ],
     "normCal": [
      "motricite",
-     "adherenceMecanique"
+     "puissance"
     ]
    },
    "negligeables": []
@@ -764,12 +764,12 @@
    "calendrier": true,
    "tempsS": 89.53,
    "gainsS": {
-    "adherenceMecanique": 0.61,
+    "adherenceMecanique": 0.609,
     "appui": 0.657,
     "trainee": 0.142,
     "puissance": 0.26,
     "motricite": 0.094,
-    "freinage": 0.047
+    "freinage": 0.043
    },
    "essentiels": {
     "brut": [
@@ -819,15 +819,15 @@
      "trainee"
     ],
     "normCal": [
-     "adherenceMecanique",
-     "puissance"
+     "puissance",
+     "trainee"
     ]
    },
    "negligeables": []
   },
   "cir_imola": {
    "test": false,
-   "calendrier": false,
+   "calendrier": true,
    "tempsS": 77.15,
    "gainsS": {
     "adherenceMecanique": 0.272,
@@ -859,7 +859,7 @@
   },
   "cir_sepang": {
    "test": false,
-   "calendrier": false,
+   "calendrier": true,
    "tempsS": 92.09,
    "gainsS": {
     "adherenceMecanique": 0.6,
@@ -885,6 +885,136 @@
     "normCal": [
      "appui",
      "adherenceMecanique"
+    ]
+   },
+   "negligeables": []
+  },
+  "cir_portimao": {
+   "test": false,
+   "calendrier": true,
+   "tempsS": 82.79,
+   "gainsS": {
+    "adherenceMecanique": 0.434,
+    "appui": 0.411,
+    "trainee": 0.13,
+    "puissance": 0.193,
+    "motricite": 0.146,
+    "freinage": 0.041
+   },
+   "essentiels": {
+    "brut": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "relatif": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "norm5": [
+     "motricite",
+     "appui"
+    ],
+    "normCal": [
+     "motricite",
+     "adherenceMecanique"
+    ]
+   },
+   "negligeables": [
+    "freinage"
+   ]
+  },
+  "cir_istanbul": {
+   "test": false,
+   "calendrier": true,
+   "tempsS": 95.21,
+   "gainsS": {
+    "adherenceMecanique": 0.411,
+    "appui": 0.357,
+    "trainee": 0.166,
+    "puissance": 0.217,
+    "motricite": 0.137,
+    "freinage": 0.057
+   },
+   "essentiels": {
+    "brut": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "relatif": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "norm5": [
+     "motricite",
+     "trainee"
+    ],
+    "normCal": [
+     "motricite",
+     "adherenceMecanique"
+    ]
+   },
+   "negligeables": []
+  },
+  "cir_kyalami": {
+   "test": false,
+   "calendrier": true,
+   "tempsS": 82.92,
+   "gainsS": {
+    "adherenceMecanique": 0.399,
+    "appui": 0.33,
+    "trainee": 0.064,
+    "puissance": 0.117,
+    "motricite": 0.139,
+    "freinage": 0.075
+   },
+   "essentiels": {
+    "brut": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "relatif": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "norm5": [
+     "motricite",
+     "adherenceMecanique"
+    ],
+    "normCal": [
+     "motricite",
+     "adherenceMecanique"
+    ]
+   },
+   "negligeables": []
+  },
+  "cir_paulricard": {
+   "test": false,
+   "calendrier": true,
+   "tempsS": 103.55,
+   "gainsS": {
+    "adherenceMecanique": 0.471,
+    "appui": 0.35,
+    "trainee": 0.162,
+    "puissance": 0.257,
+    "motricite": 0.103,
+    "freinage": 0.065
+   },
+   "essentiels": {
+    "brut": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "relatif": [
+     "adherenceMecanique",
+     "appui"
+    ],
+    "norm5": [
+     "puissance",
+     "adherenceMecanique"
+    ],
+    "normCal": [
+     "adherenceMecanique",
+     "motricite"
     ]
    },
    "negligeables": []

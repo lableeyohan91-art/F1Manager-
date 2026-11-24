@@ -20,13 +20,13 @@
   "reductionAppuiLigne": 0.6953
  },
  "dosageBancPourcent": {
-  "appui": 2.83,
-  "faibleTrainee": 6.77,
-  "adherenceMecanique": 2.87,
-  "motricite": 15.99,
-  "moteur": 3.37,
-  "freinage": 29.21,
-  "polyvalente": 0.76
+  "appui": 2.78,
+  "faibleTrainee": 7.06,
+  "adherenceMecanique": 2.77,
+  "motricite": 14.27,
+  "moteur": 3.43,
+  "freinage": 27.94,
+  "polyvalente": 0.74
  },
  "caracteristiques": [
   {
@@ -163,6 +163,156 @@
    "circuit": "cir_mexico",
    "tempsReelS": 76.633,
    "tempsModeleS": 76.689,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_albert",
+   "tempsReelS": 79.303,
+   "tempsModeleS": 80.387,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_shanghai",
+   "tempsReelS": 92.415,
+   "tempsModeleS": 98.256,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_sakhir",
+   "tempsReelS": 90.175,
+   "tempsModeleS": 87.79,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_jeddah",
+   "tempsReelS": 87.407,
+   "tempsModeleS": 89.017,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_miami",
+   "tempsReelS": 88.143,
+   "tempsModeleS": 87.699,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_montreal",
+   "tempsReelS": 72.729,
+   "tempsModeleS": 67.039,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_barcelone",
+   "tempsReelS": 74.998,
+   "tempsModeleS": 72.709,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_spielberg",
+   "tempsReelS": 66.408,
+   "tempsModeleS": 66.334,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_silverstone",
+   "tempsReelS": 88.458,
+   "tempsModeleS": 89.881,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_spa",
+   "tempsReelS": 104.801,
+   "tempsModeleS": 107.537,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_hungaroring",
+   "tempsReelS": 77.445,
+   "tempsModeleS": 76.413,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_zandvoort",
+   "tempsReelS": 71.296,
+   "tempsModeleS": 76.677,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_madrid",
+   "tempsReelS": 91.964,
+   "tempsModeleS": 95.297,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_bakou",
+   "tempsReelS": 103.364,
+   "tempsModeleS": 101.57,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_austin",
+   "tempsReelS": 94.214,
+   "tempsModeleS": 94.954,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_interlagos",
+   "tempsReelS": 69.755,
+   "tempsModeleS": 70.652,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_lasvegas",
+   "tempsReelS": 94.224,
+   "tempsModeleS": 91.538,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_lusail",
+   "tempsReelS": 79.651,
+   "tempsModeleS": 89.535,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_yasmarina",
+   "tempsReelS": 82.437,
+   "tempsModeleS": 86.232,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_imola",
+   "tempsReelS": 74.807,
+   "tempsModeleS": 77.154,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_sepang",
+   "tempsReelS": 95.558,
+   "tempsModeleS": 92.089,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_portimao",
+   "tempsReelS": 78.481,
+   "tempsModeleS": 82.787,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_istanbul",
+   "tempsReelS": 83.196,
+   "tempsModeleS": 95.209,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_kyalami",
+   "tempsReelS": 82.923,
+   "tempsModeleS": 82.923,
+   "niveauAilerons": 1
+  },
+  {
+   "circuit": "cir_paulricard",
+   "tempsReelS": 91.176,
+   "tempsModeleS": 103.553,
    "niveauAilerons": 1
   }
  ]

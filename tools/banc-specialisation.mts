@@ -22,8 +22,10 @@ import { CARACTERISTIQUES, voitureSpecialisee, type Caracteristique } from '../s
 const GAIN_CIBLE_S = 0.5;
 const TEST = ['cir_monza', 'cir_monaco', 'cir_suzuka', 'cir_singapour', 'cir_mexico'];
 const calendrier = readFileSync('data/grille-2026/circuits.csv', 'utf8').trim().split('\n').slice(1).map((l) => l.split(';')[0]!);
-const fichier = (id: string) => (existsSync(`data/circuits/${id}.json`) ? `data/circuits/${id}.json` : `data/circuits/validation/${id}.json`);
-const ids = [...new Set([...TEST, ...calendrier, 'cir_madrid', 'cir_imola', 'cir_sepang'])].filter((id) => existsSync(fichier(id)));
+const fichier = (id: string) => ['data/circuits', 'data/circuits/validation', 'data/circuits/reconstruits'].map((d) => `${d}/${id}.json`).find(existsSync) ?? `data/circuits/${id}.json`;
+/** Vivier complet (30 circuits) : data/circuits/caracteres.csv. */
+const vivier = readFileSync('data/circuits/caracteres.csv', 'utf8').trim().split('\n').slice(1).map((l) => l.split(';')[0]!);
+const ids = [...new Set([...TEST, ...calendrier, ...vivier])].filter((id) => existsSync(fichier(id)));
 
 type T = Trace & { altitudeM: number; tempsTourS: { mediane: number } };
 const circ = Object.fromEntries(ids.map((id) => {

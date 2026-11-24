@@ -98,3 +98,14 @@ describe('Phase 11b — les 30 circuits du vivier', () => {
     expect(fiches.circuits[id]!.B.essentiels.map((e) => e.id)).toEqual(r.essentiels);
   });
 });
+
+describe('Phase 11b — export pour APEX Lab', () => {
+  it('l’export couvre les 30 circuits, avec la fiche du jeu et le banc (mêmes calculs que le moteur)', () => {
+    const index = JSON.parse(readFileSync('export/apex-lab/index.json', 'utf8')) as { circuits: { circuit: string }[]; caracteristiques: unknown[] };
+    expect(index.circuits.map((c) => c.circuit).sort()).toEqual([...ids].sort());
+    for (const id of ids) {
+      const e = JSON.parse(readFileSync(`export/apex-lab/${id}.json`, 'utf8')) as { fiche: unknown; banc: unknown; points: unknown[]; modele: { tempsTourS: number } };
+      expect(e.fiche).not.toBeNull(); expect(e.banc).not.toBeNull(); expect(e.points.length).toBeGreaterThan(500); expect(e.modele.tempsTourS).toBeGreaterThan(50);
+    }
+  });
+});

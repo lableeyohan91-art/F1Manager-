@@ -8,6 +8,7 @@
  *  - circuits : pour chacun, longueur, adhérence de piste, altitude, temps réel, réglage d'ailerons calculé, temps au tour,
  *    sensibilités (+2 %), parts du tour par limite, et la trace point par point (abscisse, x, y, courbure effective, vitesse
  *    réelle, vitesse du modèle, limite) ;
+ *  - fiche : la fiche du jeu (virages, contraintes, climat, historique, stratégie, incidents, statut de chaque donnée) ;
  *  - banc : temps et écarts de chaque voiture spécialisée, gains par portion (issus de tools/banc-specialisation.mts).
  * Chaque valeur est marquée « reel » (relevé OpenF1 dérivé) ou « modele » (calculé par le moteur).
  * Usage : npx tsx tools/export-apex-lab.mts [dossier de sortie, défaut export/apex-lab] [circuits séparés par des virgules | tous]
@@ -22,8 +23,11 @@ const dossier = process.argv[2] ?? 'export/apex-lab';
 const TEST = ['cir_monza', 'cir_monaco', 'cir_suzuka', 'cir_singapour', 'cir_mexico'];
 const choix = process.argv[3] ?? TEST.join(',');
 const calendrier = readFileSync('data/grille-2026/circuits.csv', 'utf8').trim().split('\n').slice(1).map((l) => l.split(';')[0]!);
-const fichier = (id: string) => (existsSync(`data/circuits/${id}.json`) ? `data/circuits/${id}.json` : `data/circuits/validation/${id}.json`);
-const ids = (choix === 'tous' ? [...new Set([...TEST, ...calendrier, 'cir_madrid', 'cir_imola', 'cir_sepang'])] : choix.split(',')).filter((id) => existsSync(fichier(id)));
+const fichier = (id: string) => ['data/circuits', 'data/circuits/validation', 'data/circuits/reconstruits'].map((d) => `${d}/${id}.json`).find(existsSync) ?? `data/circuits/${id}.json`;
+/** Vivier complet (30 circuits) : data/circuits/caracteres.csv. */
+const vivier = readFileSync('data/circuits/caracteres.csv', 'utf8').trim().split('\n').slice(1).map((l) => l.split(';')[0]!);
+const ids = (choix === 'tous' ? [...new Set([...TEST, ...calendrier, ...vivier])] : choix.split(',')).filter((id) => existsSync(fichier(id)));
+const fiches = JSON.parse(readFileSync('data/grille-2026/circuits-fiches.json', 'utf8')) as { circuits: Record<string, unknown> };
 const banc = existsSync('docs/rapports/phase-11b/donnees/audit/banc-specialisation.json')
   ? (JSON.parse(readFileSync('docs/rapports/phase-11b/donnees/audit/banc-specialisation.json', 'utf8')) as { dosage: Record<string, number>; circuits: Record<string, unknown> })
   : null;
@@ -52,6 +56,8 @@ for (const id of ids) {
       partsDuTour: Object.fromEntries(Object.entries(partsDuTour(t, p)).map(([a, b]) => [a, +b.toFixed(4)])),
     },
     banc: banc?.circuits[id] ?? null,
+    /** Fiche du jeu (même moteur) : virages, contraintes pour les phases 12–13, conditions et climat, historique, stratégie, incidents. */
+    fiche: fiches.circuits[id] ?? null,
     /** Colonnes de la trace : s (m), x, y (m), courbure effective (1/m), vitesse réelle (km/h), vitesse modèle (km/h), limite du modèle. */
     colonnes: ['s', 'x', 'y', 'courbure', 'vReelleKmh', 'vModeleKmh', 'limite'],
     points: t.points.map((q, i) => [i * t.pasM, +q.x.toFixed(1), +q.y.toFixed(1), +p.courbures[i]!.toExponential(3), Math.round(q.v), Math.round(p.vitesses[i]! * 3.6), p.limites[i]]),

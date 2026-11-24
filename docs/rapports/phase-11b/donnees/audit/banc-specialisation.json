@@ -1,13 +1,13 @@
 {
  "gainCibleS": 0.5,
  "dosage": {
-  "appui": 2.83,
-  "faibleTrainee": 6.77,
-  "adherenceMecanique": 2.87,
-  "motricite": 15.99,
-  "moteur": 3.37,
-  "freinage": 29.21,
-  "polyvalente": 0.76
+  "appui": 2.78,
+  "faibleTrainee": 7.06,
+  "adherenceMecanique": 2.77,
+  "motricite": 14.27,
+  "moteur": 3.43,
+  "freinage": 27.94,
+  "polyvalente": 0.74
  },
  "nonTestees": [
   {
@@ -23,107 +23,107 @@
  ],
  "syntheseFixe": {
   "domination": {
-   "faibleTrainee": 7,
-   "motricite": 5,
-   "appui": 5,
-   "freinage": 5,
+   "faibleTrainee": 8,
+   "motricite": 7,
+   "freinage": 6,
    "moteur": 3,
-   "adherenceMecanique": 1
+   "appui": 4,
+   "adherenceMecanique": 2
   },
   "meilleurCircuit": {
    "appui": "cir_sepang (+0.23 s)",
-   "faibleTrainee": "cir_jeddah (+0.42 s)",
-   "adherenceMecanique": "cir_lusail (+0.20 s)",
-   "motricite": "cir_monaco (+0.55 s)",
-   "moteur": "cir_jeddah (+0.24 s)",
-   "freinage": "cir_shanghai (+0.28 s)",
+   "faibleTrainee": "cir_jeddah (+0.45 s)",
+   "adherenceMecanique": "cir_lusail (+0.14 s)",
+   "motricite": "cir_monaco (+0.48 s)",
+   "moteur": "cir_jeddah (+0.25 s)",
+   "freinage": "cir_shanghai (+0.27 s)",
    "polyvalente": "cir_sepang (+0.13 s)"
   },
   "pireCircuit": {
-   "appui": "cir_bakou (-0.17 s)",
-   "faibleTrainee": "cir_monaco (-0.34 s)",
-   "adherenceMecanique": "cir_jeddah (-0.18 s)",
-   "motricite": "cir_jeddah (-0.27 s)",
-   "moteur": "cir_monaco (-0.37 s)",
-   "freinage": "cir_silverstone (-0.24 s)",
-   "polyvalente": "cir_bakou (-0.09 s)"
+   "appui": "cir_monza (-0.16 s)",
+   "faibleTrainee": "cir_monaco (-0.32 s)",
+   "adherenceMecanique": "cir_jeddah (-0.19 s)",
+   "motricite": "cir_spa (-0.27 s)",
+   "moteur": "cir_monaco (-0.35 s)",
+   "freinage": "cir_spa (-0.25 s)",
+   "polyvalente": "cir_bakou (-0.08 s)"
   },
   "inversions": "21/21",
   "pairesInversees": [
-   "appui/faibleTrainee (10–12)",
-   "appui/adherenceMecanique (8–13)",
-   "appui/motricite (12–13)",
-   "appui/moteur (12–14)",
-   "appui/freinage (11–13)",
-   "appui/polyvalente (10–13)",
-   "faibleTrainee/adherenceMecanique (12–12)",
-   "faibleTrainee/motricite (13–12)",
+   "appui/faibleTrainee (13–16)",
+   "appui/adherenceMecanique (9–17)",
+   "appui/motricite (13–16)",
+   "appui/moteur (14–15)",
+   "appui/freinage (12–16)",
+   "appui/polyvalente (10–16)",
+   "faibleTrainee/adherenceMecanique (13–13)",
+   "faibleTrainee/motricite (14–15)",
    "faibleTrainee/moteur (8–14)",
-   "faibleTrainee/freinage (12–14)",
-   "faibleTrainee/polyvalente (10–14)",
-   "adherenceMecanique/motricite (13–11)",
-   "adherenceMecanique/moteur (9–14)",
-   "adherenceMecanique/freinage (11–12)",
-   "adherenceMecanique/polyvalente (9–12)",
-   "motricite/moteur (11–14)",
-   "motricite/freinage (11–12)",
-   "motricite/polyvalente (11–13)",
-   "moteur/freinage (13–11)",
-   "moteur/polyvalente (12–10)",
-   "freinage/polyvalente (11–14)"
+   "faibleTrainee/freinage (12–18)",
+   "faibleTrainee/polyvalente (12–14)",
+   "adherenceMecanique/motricite (14–12)",
+   "adherenceMecanique/moteur (13–16)",
+   "adherenceMecanique/freinage (12–14)",
+   "adherenceMecanique/polyvalente (12–13)",
+   "motricite/moteur (12–15)",
+   "motricite/freinage (11–14)",
+   "motricite/polyvalente (11–15)",
+   "moteur/freinage (15–14)",
+   "moteur/polyvalente (14–13)",
+   "freinage/polyvalente (14–15)"
   ],
   "optimaleSystematique": []
  },
  "syntheseOptimise": {
   "domination": {
-   "faibleTrainee": 7,
-   "motricite": 5,
-   "appui": 5,
-   "freinage": 5,
+   "faibleTrainee": 8,
+   "motricite": 7,
+   "freinage": 6,
    "moteur": 3,
-   "adherenceMecanique": 1
+   "appui": 4,
+   "adherenceMecanique": 2
   },
   "meilleurCircuit": {
    "appui": "cir_sepang (+0.23 s)",
-   "faibleTrainee": "cir_jeddah (+0.42 s)",
-   "adherenceMecanique": "cir_lusail (+0.20 s)",
-   "motricite": "cir_monaco (+0.55 s)",
-   "moteur": "cir_jeddah (+0.24 s)",
-   "freinage": "cir_shanghai (+0.28 s)",
+   "faibleTrainee": "cir_jeddah (+0.45 s)",
+   "adherenceMecanique": "cir_lusail (+0.14 s)",
+   "motricite": "cir_monaco (+0.48 s)",
+   "moteur": "cir_jeddah (+0.25 s)",
+   "freinage": "cir_shanghai (+0.27 s)",
    "polyvalente": "cir_sepang (+0.13 s)"
   },
   "pireCircuit": {
-   "appui": "cir_bakou (-0.17 s)",
-   "faibleTrainee": "cir_monaco (-0.34 s)",
-   "adherenceMecanique": "cir_jeddah (-0.18 s)",
-   "motricite": "cir_jeddah (-0.27 s)",
-   "moteur": "cir_monaco (-0.37 s)",
-   "freinage": "cir_silverstone (-0.24 s)",
-   "polyvalente": "cir_bakou (-0.09 s)"
+   "appui": "cir_monza (-0.16 s)",
+   "faibleTrainee": "cir_monaco (-0.32 s)",
+   "adherenceMecanique": "cir_jeddah (-0.19 s)",
+   "motricite": "cir_spa (-0.27 s)",
+   "moteur": "cir_monaco (-0.35 s)",
+   "freinage": "cir_spa (-0.25 s)",
+   "polyvalente": "cir_bakou (-0.08 s)"
   },
   "inversions": "21/21",
   "pairesInversees": [
-   "appui/faibleTrainee (10–12)",
-   "appui/adherenceMecanique (8–13)",
-   "appui/motricite (12–13)",
-   "appui/moteur (12–14)",
-   "appui/freinage (11–13)",
-   "appui/polyvalente (10–13)",
-   "faibleTrainee/adherenceMecanique (12–12)",
-   "faibleTrainee/motricite (13–12)",
+   "appui/faibleTrainee (13–16)",
+   "appui/adherenceMecanique (9–17)",
+   "appui/motricite (13–16)",
+   "appui/moteur (14–15)",
+   "appui/freinage (12–16)",
+   "appui/polyvalente (10–16)",
+   "faibleTrainee/adherenceMecanique (13–13)",
+   "faibleTrainee/motricite (14–15)",
    "faibleTrainee/moteur (8–14)",
-   "faibleTrainee/freinage (12–14)",
-   "faibleTrainee/polyvalente (10–14)",
-   "adherenceMecanique/motricite (13–11)",
-   "adherenceMecanique/moteur (9–14)",
-   "adherenceMecanique/freinage (11–11)",
-   "adherenceMecanique/polyvalente (9–12)",
-   "motricite/moteur (11–14)",
-   "motricite/freinage (11–12)",
-   "motricite/polyvalente (10–13)",
-   "moteur/freinage (13–11)",
-   "moteur/polyvalente (12–10)",
-   "freinage/polyvalente (11–14)"
+   "faibleTrainee/freinage (12–18)",
+   "faibleTrainee/polyvalente (12–14)",
+   "adherenceMecanique/motricite (15–12)",
+   "adherenceMecanique/moteur (13–16)",
+   "adherenceMecanique/freinage (12–13)",
+   "adherenceMecanique/polyvalente (12–13)",
+   "motricite/moteur (12–15)",
+   "motricite/freinage (11–14)",
+   "motricite/polyvalente (11–15)",
+   "moteur/freinage (15–14)",
+   "moteur/polyvalente (14–13)",
+   "freinage/polyvalente (14–15)"
   ],
   "optimaleSystematique": []
  },
@@ -137,8 +137,8 @@
     "moteur",
     "freinage",
     "polyvalente",
-    "motricite",
     "adherenceMecanique",
+    "motricite",
     "appui"
    ],
    "classementOptimise": [
@@ -152,45 +152,45 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 81.748,
-     "tempsOptimiseS": 81.735,
+     "tempsFixeS": 81.755,
+     "tempsOptimiseS": 81.741,
      "ailerons": 0.8,
-     "gainFixeS": 0.31,
-     "gainOptimiseS": 0.324,
+     "gainFixeS": 0.304,
+     "gainOptimiseS": 0.317,
      "vmaxKmh": 339,
      "gainsParPortionS": {
-      "lignesDroites": 0.042,
-      "freinages": 0.101,
+      "lignesDroites": 0.04,
+      "freinages": 0.099,
       "viragesLents": 0.013,
-      "sortiesDeVirage": 0.092,
-      "viragesMoyens": 0.062
+      "sortiesDeVirage": 0.09,
+      "viragesMoyens": 0.061
      },
      "sensibilites": {
       "adherenceMecanique": 0.247,
-      "appui": 0.238,
+      "appui": 0.237,
       "trainee": 0.205,
       "puissance": 0.265,
-      "motricite": 0.053,
+      "motricite": 0.054,
       "freinage": 0.054
      }
     },
     "faibleTrainee": {
-     "tempsFixeS": 81.4,
-     "tempsOptimiseS": 81.4,
+     "tempsFixeS": 81.377,
+     "tempsOptimiseS": 81.377,
      "ailerons": 0.85,
-     "gainFixeS": 0.659,
-     "gainOptimiseS": 0.659,
+     "gainFixeS": 0.681,
+     "gainOptimiseS": 0.681,
      "vmaxKmh": 345,
      "gainsParPortionS": {
-      "lignesDroites": 0.657,
-      "freinages": -0.017,
+      "lignesDroites": 0.679,
+      "freinages": -0.018,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.02,
+      "sortiesDeVirage": 0.021,
       "viragesMoyens": 0
      },
      "sensibilites": {
       "adherenceMecanique": 0.201,
-      "appui": 0.183,
+      "appui": 0.189,
       "trainee": 0.185,
       "puissance": 0.253,
       "motricite": 0.053,
@@ -198,110 +198,110 @@
      }
     },
     "adherenceMecanique": {
-     "tempsFixeS": 81.723,
-     "tempsOptimiseS": 81.691,
+     "tempsFixeS": 81.734,
+     "tempsOptimiseS": 81.703,
      "ailerons": 0.8,
-     "gainFixeS": 0.336,
-     "gainOptimiseS": 0.368,
+     "gainFixeS": 0.324,
+     "gainOptimiseS": 0.356,
      "vmaxKmh": 339,
      "gainsParPortionS": {
-      "lignesDroites": 0.048,
-      "freinages": 0.089,
-      "viragesLents": 0.037,
-      "sortiesDeVirage": 0.101,
-      "viragesMoyens": 0.061
+      "lignesDroites": 0.045,
+      "freinages": 0.087,
+      "viragesLents": 0.036,
+      "sortiesDeVirage": 0.097,
+      "viragesMoyens": 0.059
      },
      "sensibilites": {
       "adherenceMecanique": 0.244,
       "appui": 0.218,
-      "trainee": 0.182,
+      "trainee": 0.198,
       "puissance": 0.27,
-      "motricite": 0.064,
+      "motricite": 0.073,
       "freinage": 0.056
      }
     },
     "motricite": {
-     "tempsFixeS": 81.708,
-     "tempsOptimiseS": 81.708,
+     "tempsFixeS": 81.739,
+     "tempsOptimiseS": 81.739,
      "ailerons": 0.85,
-     "gainFixeS": 0.35,
-     "gainOptimiseS": 0.35,
+     "gainFixeS": 0.319,
+     "gainOptimiseS": 0.319,
      "vmaxKmh": 338,
      "gainsParPortionS": {
-      "lignesDroites": 0.051,
+      "lignesDroites": 0.046,
       "freinages": 0,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.3,
+      "sortiesDeVirage": 0.273,
       "viragesMoyens": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.213,
-      "appui": 0.204,
-      "trainee": 0.202,
-      "puissance": 0.29,
-      "motricite": 0.051,
+      "adherenceMecanique": 0.228,
+      "appui": 0.203,
+      "trainee": 0.199,
+      "puissance": 0.27,
+      "motricite": 0.037,
       "freinage": 0.046
      }
     },
     "moteur": {
-     "tempsFixeS": 81.413,
-     "tempsOptimiseS": 81.413,
+     "tempsFixeS": 81.395,
+     "tempsOptimiseS": 81.395,
      "ailerons": 0.85,
-     "gainFixeS": 0.645,
-     "gainOptimiseS": 0.645,
+     "gainFixeS": 0.664,
+     "gainOptimiseS": 0.664,
      "vmaxKmh": 343,
      "gainsParPortionS": {
-      "lignesDroites": 0.64,
+      "lignesDroites": 0.658,
       "freinages": 0,
       "viragesLents": 0,
       "sortiesDeVirage": 0.006,
       "viragesMoyens": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.222,
-      "appui": 0.206,
-      "trainee": 0.21,
-      "puissance": 0.261,
-      "motricite": 0.068,
-      "freinage": 0.029
+      "adherenceMecanique": 0.212,
+      "appui": 0.196,
+      "trainee": 0.2,
+      "puissance": 0.257,
+      "motricite": 0.072,
+      "freinage": 0.033
      }
     },
     "freinage": {
-     "tempsFixeS": 81.474,
-     "tempsOptimiseS": 81.474,
+     "tempsFixeS": 81.495,
+     "tempsOptimiseS": 81.495,
      "ailerons": 0.85,
-     "gainFixeS": 0.585,
-     "gainOptimiseS": 0.585,
+     "gainFixeS": 0.564,
+     "gainOptimiseS": 0.564,
      "vmaxKmh": 339,
      "gainsParPortionS": {
       "lignesDroites": -0.056,
-      "freinages": 0.641,
+      "freinages": 0.62,
       "viragesLents": 0,
       "sortiesDeVirage": 0,
       "viragesMoyens": 0
      },
      "sensibilites": {
       "adherenceMecanique": 0.235,
-      "appui": 0.2,
+      "appui": 0.201,
       "trainee": 0.216,
-      "puissance": 0.272,
+      "puissance": 0.271,
       "motricite": 0.064,
-      "freinage": 0.04
+      "freinage": 0.042
      }
     },
     "polyvalente": {
-     "tempsFixeS": 81.626,
-     "tempsOptimiseS": 81.588,
+     "tempsFixeS": 81.635,
+     "tempsOptimiseS": 81.598,
      "ailerons": 0.8,
-     "gainFixeS": 0.433,
-     "gainOptimiseS": 0.47,
+     "gainFixeS": 0.423,
+     "gainOptimiseS": 0.461,
      "vmaxKmh": 340,
      "gainsParPortionS": {
-      "lignesDroites": 0.246,
-      "freinages": 0.068,
+      "lignesDroites": 0.241,
+      "freinages": 0.066,
       "viragesLents": 0.013,
-      "sortiesDeVirage": 0.073,
-      "viragesMoyens": 0.033
+      "sortiesDeVirage": 0.071,
+      "viragesMoyens": 0.032
      },
      "sensibilites": {
       "adherenceMecanique": 0.227,
@@ -338,40 +338,40 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 71.954,
-     "tempsOptimiseS": 71.954,
+     "tempsFixeS": 71.962,
+     "tempsOptimiseS": 71.962,
      "ailerons": 1,
-     "gainFixeS": 0.488,
-     "gainOptimiseS": 0.488,
+     "gainFixeS": 0.48,
+     "gainOptimiseS": 0.48,
      "vmaxKmh": 307,
      "gainsParPortionS": {
-      "lignesDroites": 0.075,
-      "freinages": 0.133,
-      "viragesLents": 0.07,
-      "sortiesDeVirage": 0.154,
-      "viragesMoyens": 0.056
+      "lignesDroites": 0.074,
+      "freinages": 0.131,
+      "viragesLents": 0.069,
+      "sortiesDeVirage": 0.151,
+      "viragesMoyens": 0.055
      },
      "sensibilites": {
       "adherenceMecanique": 0.418,
-      "appui": 0.444,
+      "appui": 0.443,
       "trainee": 0.053,
-      "puissance": 0.083,
+      "puissance": 0.082,
       "motricite": 0.158,
       "freinage": 0.047
      }
     },
     "faibleTrainee": {
-     "tempsFixeS": 72.277,
-     "tempsOptimiseS": 72.277,
+     "tempsFixeS": 72.27,
+     "tempsOptimiseS": 72.27,
      "ailerons": 1,
-     "gainFixeS": 0.164,
-     "gainOptimiseS": 0.164,
-     "vmaxKmh": 310,
+     "gainFixeS": 0.171,
+     "gainOptimiseS": 0.171,
+     "vmaxKmh": 311,
      "gainsParPortionS": {
-      "lignesDroites": 0.13,
+      "lignesDroites": 0.136,
       "freinages": -0.016,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.05,
+      "sortiesDeVirage": 0.052,
       "viragesMoyens": 0
      },
      "sensibilites": {
@@ -379,27 +379,27 @@
       "appui": 0.355,
       "trainee": 0.048,
       "puissance": 0.078,
-      "motricite": 0.176,
+      "motricite": 0.175,
       "freinage": 0.059
      }
     },
     "adherenceMecanique": {
-     "tempsFixeS": 71.805,
-     "tempsOptimiseS": 71.805,
+     "tempsFixeS": 71.825,
+     "tempsOptimiseS": 71.825,
      "ailerons": 1,
-     "gainFixeS": 0.636,
-     "gainOptimiseS": 0.636,
+     "gainFixeS": 0.617,
+     "gainOptimiseS": 0.617,
      "vmaxKmh": 307,
      "gainsParPortionS": {
-      "lignesDroites": 0.05,
-      "freinages": 0.131,
-      "viragesLents": 0.216,
-      "sortiesDeVirage": 0.186,
-      "viragesMoyens": 0.054
+      "lignesDroites": 0.048,
+      "freinages": 0.127,
+      "viragesLents": 0.21,
+      "sortiesDeVirage": 0.18,
+      "viragesMoyens": 0.052
      },
      "sensibilites": {
       "adherenceMecanique": 0.428,
-      "appui": 0.319,
+      "appui": 0.32,
       "trainee": 0.053,
       "puissance": 0.081,
       "motricite": 0.17,
@@ -407,37 +407,37 @@
      }
     },
     "motricite": {
-     "tempsFixeS": 71.384,
-     "tempsOptimiseS": 71.384,
+     "tempsFixeS": 71.471,
+     "tempsOptimiseS": 71.471,
      "ailerons": 1,
-     "gainFixeS": 1.058,
-     "gainOptimiseS": 1.058,
-     "vmaxKmh": 295,
+     "gainFixeS": 0.97,
+     "gainOptimiseS": 0.97,
+     "vmaxKmh": 296,
      "gainsParPortionS": {
-      "lignesDroites": 0.18,
-      "freinages": -0.007,
+      "lignesDroites": 0.169,
+      "freinages": -0.006,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.885,
+      "sortiesDeVirage": 0.808,
       "viragesMoyens": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.45,
-      "appui": 0.317,
-      "trainee": 0.057,
-      "puissance": 0.103,
-      "motricite": 0.115,
+      "adherenceMecanique": 0.451,
+      "appui": 0.318,
+      "trainee": 0.064,
+      "puissance": 0.099,
+      "motricite": 0.116,
       "freinage": 0.058
      }
     },
     "moteur": {
-     "tempsFixeS": 72.31,
-     "tempsOptimiseS": 72.31,
+     "tempsFixeS": 72.307,
+     "tempsOptimiseS": 72.307,
      "ailerons": 1,
-     "gainFixeS": 0.132,
-     "gainOptimiseS": 0.132,
+     "gainFixeS": 0.134,
+     "gainOptimiseS": 0.134,
      "vmaxKmh": 310,
      "gainsParPortionS": {
-      "lignesDroites": 0.127,
+      "lignesDroites": 0.129,
       "freinages": 0,
       "viragesLents": 0,
       "sortiesDeVirage": 0.005,
@@ -453,48 +453,48 @@
      }
     },
     "freinage": {
-     "tempsFixeS": 71.831,
-     "tempsOptimiseS": 71.831,
+     "tempsFixeS": 71.845,
+     "tempsOptimiseS": 71.845,
      "ailerons": 1,
-     "gainFixeS": 0.611,
-     "gainOptimiseS": 0.611,
-     "vmaxKmh": 301,
+     "gainFixeS": 0.596,
+     "gainOptimiseS": 0.596,
+     "vmaxKmh": 302,
      "gainsParPortionS": {
-      "lignesDroites": -0.041,
-      "freinages": 0.652,
+      "lignesDroites": -0.035,
+      "freinages": 0.631,
       "viragesLents": 0,
       "sortiesDeVirage": 0,
       "viragesMoyens": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.428,
-      "appui": 0.32,
-      "trainee": 0.07,
-      "puissance": 0.104,
-      "motricite": 0.163,
-      "freinage": 0.037
+      "adherenceMecanique": 0.425,
+      "appui": 0.317,
+      "trainee": 0.075,
+      "puissance": 0.103,
+      "motricite": 0.157,
+      "freinage": 0.036
      }
     },
     "polyvalente": {
-     "tempsFixeS": 71.984,
-     "tempsOptimiseS": 71.984,
+     "tempsFixeS": 71.994,
+     "tempsOptimiseS": 71.994,
      "ailerons": 1,
-     "gainFixeS": 0.457,
-     "gainOptimiseS": 0.457,
+     "gainFixeS": 0.448,
+     "gainOptimiseS": 0.448,
      "vmaxKmh": 308,
      "gainsParPortionS": {
-      "lignesDroites": 0.099,
-      "freinages": 0.102,
-      "viragesLents": 0.078,
-      "sortiesDeVirage": 0.146,
+      "lignesDroites": 0.097,
+      "freinages": 0.101,
+      "viragesLents": 0.077,
+      "sortiesDeVirage": 0.143,
       "viragesMoyens": 0.031
      },
      "sensibilites": {
-      "adherenceMecanique": 0.425,
+      "adherenceMecanique": 0.426,
       "appui": 0.324,
       "trainee": 0.052,
       "puissance": 0.081,
-      "motricite": 0.178,
+      "motricite": 0.179,
       "freinage": 0.056
      }
     }
@@ -505,8 +505,8 @@
    "tempsReferenceS": 89.001,
    "aileronsReference": 1,
    "classementFixe": [
-    "appui",
     "faibleTrainee",
+    "appui",
     "moteur",
     "polyvalente",
     "adherenceMecanique",
@@ -514,8 +514,8 @@
     "motricite"
    ],
    "classementOptimise": [
-    "appui",
     "faibleTrainee",
+    "appui",
     "moteur",
     "polyvalente",
     "adherenceMecanique",
@@ -524,110 +524,110 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 88.357,
-     "tempsOptimiseS": 88.357,
+     "tempsFixeS": 88.366,
+     "tempsOptimiseS": 88.366,
      "ailerons": 1,
-     "gainFixeS": 0.644,
-     "gainOptimiseS": 0.644,
+     "gainFixeS": 0.634,
+     "gainOptimiseS": 0.634,
      "vmaxKmh": 317,
      "gainsParPortionS": {
-      "lignesDroites": 0.311,
-      "freinages": 0.085,
-      "viragesRapides": 0.04,
-      "viragesMoyens": 0.099,
-      "sortiesDeVirage": 0.073,
+      "lignesDroites": 0.306,
+      "freinages": 0.084,
+      "viragesRapides": 0.039,
+      "viragesMoyens": 0.098,
+      "sortiesDeVirage": 0.072,
       "viragesLents": 0.035
      },
      "sensibilites": {
       "adherenceMecanique": 0.388,
       "appui": 0.5,
-      "trainee": 0.213,
+      "trainee": 0.234,
       "puissance": 0.329,
       "motricite": 0.032,
       "freinage": 0.027
      }
     },
     "faibleTrainee": {
-     "tempsFixeS": 88.359,
-     "tempsOptimiseS": 88.359,
+     "tempsFixeS": 88.352,
+     "tempsOptimiseS": 88.352,
      "ailerons": 1,
-     "gainFixeS": 0.641,
-     "gainOptimiseS": 0.641,
+     "gainFixeS": 0.649,
+     "gainOptimiseS": 0.649,
      "vmaxKmh": 322,
      "gainsParPortionS": {
-      "lignesDroites": 0.639,
+      "lignesDroites": 0.646,
       "freinages": -0.008,
       "viragesRapides": 0,
       "viragesMoyens": 0,
-      "sortiesDeVirage": 0.01,
+      "sortiesDeVirage": 0.011,
       "viragesLents": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.355,
-      "appui": 0.496,
-      "trainee": 0.199,
-      "puissance": 0.261,
-      "motricite": 0.032,
+      "adherenceMecanique": 0.396,
+      "appui": 0.504,
+      "trainee": 0.217,
+      "puissance": 0.282,
+      "motricite": 0.053,
       "freinage": 0.029
      }
     },
     "adherenceMecanique": {
-     "tempsFixeS": 88.507,
-     "tempsOptimiseS": 88.507,
+     "tempsFixeS": 88.522,
+     "tempsOptimiseS": 88.522,
      "ailerons": 1,
-     "gainFixeS": 0.493,
-     "gainOptimiseS": 0.493,
+     "gainFixeS": 0.479,
+     "gainOptimiseS": 0.479,
      "vmaxKmh": 317,
      "gainsParPortionS": {
-      "lignesDroites": 0.184,
-      "freinages": 0.062,
+      "lignesDroites": 0.179,
+      "freinages": 0.06,
       "viragesRapides": 0.015,
-      "viragesMoyens": 0.075,
-      "sortiesDeVirage": 0.082,
-      "viragesLents": 0.075
+      "viragesMoyens": 0.073,
+      "sortiesDeVirage": 0.079,
+      "viragesLents": 0.073
      },
      "sensibilites": {
-      "adherenceMecanique": 0.397,
+      "adherenceMecanique": 0.347,
       "appui": 0.482,
-      "trainee": 0.201,
-      "puissance": 0.294,
+      "trainee": 0.2,
+      "puissance": 0.292,
       "motricite": 0.029,
       "freinage": 0.028
      }
     },
     "motricite": {
-     "tempsFixeS": 88.776,
-     "tempsOptimiseS": 88.776,
+     "tempsFixeS": 88.787,
+     "tempsOptimiseS": 88.787,
      "ailerons": 1,
-     "gainFixeS": 0.224,
-     "gainOptimiseS": 0.224,
+     "gainFixeS": 0.213,
+     "gainOptimiseS": 0.213,
      "vmaxKmh": 317,
      "gainsParPortionS": {
-      "lignesDroites": 0.022,
+      "lignesDroites": 0.03,
       "freinages": 0,
       "viragesRapides": 0,
       "viragesMoyens": 0,
-      "sortiesDeVirage": 0.202,
+      "sortiesDeVirage": 0.183,
       "viragesLents": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.335,
-      "appui": 0.432,
-      "trainee": 0.201,
-      "puissance": 0.287,
-      "motricite": 0.021,
+      "adherenceMecanique": 0.323,
+      "appui": 0.422,
+      "trainee": 0.202,
+      "puissance": 0.266,
+      "motricite": 0.009,
       "freinage": 0.028
      }
     },
     "moteur": {
-     "tempsFixeS": 88.398,
-     "tempsOptimiseS": 88.398,
+     "tempsFixeS": 88.388,
+     "tempsOptimiseS": 88.388,
      "ailerons": 1,
-     "gainFixeS": 0.603,
-     "gainOptimiseS": 0.603,
+     "gainFixeS": 0.613,
+     "gainOptimiseS": 0.613,
      "vmaxKmh": 321,
      "gainsParPortionS": {
-      "lignesDroites": 0.601,
+      "lignesDroites": 0.611,
       "freinages": 0,
       "viragesRapides": 0,
       "viragesMoyens": 0,
@@ -636,23 +636,23 @@
      },
      "sensibilites": {
       "adherenceMecanique": 0.361,
-      "appui": 0.465,
-      "trainee": 0.206,
-      "puissance": 0.286,
-      "motricite": 0.034,
+      "appui": 0.466,
+      "trainee": 0.204,
+      "puissance": 0.285,
+      "motricite": 0.032,
       "freinage": 0.029
      }
     },
     "freinage": {
-     "tempsFixeS": 88.73,
-     "tempsOptimiseS": 88.73,
+     "tempsFixeS": 88.74,
+     "tempsOptimiseS": 88.74,
      "ailerons": 1,
-     "gainFixeS": 0.27,
-     "gainOptimiseS": 0.27,
+     "gainFixeS": 0.26,
+     "gainOptimiseS": 0.26,
      "vmaxKmh": 317,
      "gainsParPortionS": {
       "lignesDroites": -0.031,
-      "freinages": 0.301,
+      "freinages": 0.291,
       "viragesRapides": 0,
       "viragesMoyens": 0,
       "sortiesDeVirage": 0,
@@ -664,28 +664,28 @@
       "trainee": 0.213,
       "puissance": 0.272,
       "motricite": 0.028,
-      "freinage": 0.018
+      "freinage": 0.019
      }
     },
     "polyvalente": {
-     "tempsFixeS": 88.459,
-     "tempsOptimiseS": 88.459,
+     "tempsFixeS": 88.471,
+     "tempsOptimiseS": 88.471,
      "ailerons": 1,
-     "gainFixeS": 0.542,
-     "gainOptimiseS": 0.542,
+     "gainFixeS": 0.53,
+     "gainOptimiseS": 0.53,
      "vmaxKmh": 319,
      "gainsParPortionS": {
-      "lignesDroites": 0.359,
-      "freinages": 0.051,
-      "viragesRapides": 0.015,
-      "viragesMoyens": 0.044,
-      "sortiesDeVirage": 0.046,
-      "viragesLents": 0.027
+      "lignesDroites": 0.351,
+      "freinages": 0.05,
+      "viragesRapides": 0.014,
+      "viragesMoyens": 0.043,
+      "sortiesDeVirage": 0.045,
+      "viragesLents": 0.026
      },
      "sensibilites": {
       "adherenceMecanique": 0.343,
       "appui": 0.523,
-      "trainee": 0.2,
+      "trainee": 0.201,
       "puissance": 0.286,
       "motricite": 0.037,
       "freinage": 0.028
@@ -717,156 +717,156 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 90.969,
-     "tempsOptimiseS": 90.969,
+     "tempsFixeS": 90.979,
+     "tempsOptimiseS": 90.979,
      "ailerons": 1,
-     "gainFixeS": 0.486,
-     "gainOptimiseS": 0.486,
+     "gainFixeS": 0.476,
+     "gainOptimiseS": 0.476,
      "vmaxKmh": 301,
      "gainsParPortionS": {
-      "lignesDroites": 0.027,
-      "freinages": 0.131,
-      "viragesMoyens": 0.07,
-      "viragesLents": 0.073,
-      "sortiesDeVirage": 0.186
+      "lignesDroites": 0.025,
+      "freinages": 0.129,
+      "viragesMoyens": 0.068,
+      "viragesLents": 0.072,
+      "sortiesDeVirage": 0.182
      },
      "sensibilites": {
       "adherenceMecanique": 0.393,
       "appui": 0.332,
       "trainee": 0.098,
-      "puissance": 0.174,
-      "motricite": 0.137,
+      "puissance": 0.187,
+      "motricite": 0.138,
       "freinage": 0.065
      }
     },
     "faibleTrainee": {
-     "tempsFixeS": 91.138,
-     "tempsOptimiseS": 91.138,
+     "tempsFixeS": 91.125,
+     "tempsOptimiseS": 91.125,
      "ailerons": 1,
-     "gainFixeS": 0.318,
-     "gainOptimiseS": 0.318,
+     "gainFixeS": 0.33,
+     "gainOptimiseS": 0.33,
      "vmaxKmh": 305,
      "gainsParPortionS": {
-      "lignesDroites": 0.281,
-      "freinages": -0.022,
+      "lignesDroites": 0.292,
+      "freinages": -0.023,
       "viragesMoyens": 0,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.058
+      "sortiesDeVirage": 0.061
      },
      "sensibilites": {
-      "adherenceMecanique": 0.408,
+      "adherenceMecanique": 0.404,
       "appui": 0.347,
       "trainee": 0.088,
       "puissance": 0.168,
       "motricite": 0.132,
-      "freinage": 0.065
+      "freinage": 0.066
      }
     },
     "adherenceMecanique": {
-     "tempsFixeS": 90.862,
-     "tempsOptimiseS": 90.862,
+     "tempsFixeS": 90.883,
+     "tempsOptimiseS": 90.883,
      "ailerons": 1,
-     "gainFixeS": 0.593,
-     "gainOptimiseS": 0.593,
+     "gainFixeS": 0.572,
+     "gainOptimiseS": 0.572,
      "vmaxKmh": 302,
      "gainsParPortionS": {
-      "lignesDroites": 0.044,
-      "freinages": 0.12,
-      "viragesMoyens": 0.064,
-      "viragesLents": 0.167,
-      "sortiesDeVirage": 0.199
+      "lignesDroites": 0.041,
+      "freinages": 0.116,
+      "viragesMoyens": 0.062,
+      "viragesLents": 0.161,
+      "sortiesDeVirage": 0.193
      },
      "sensibilites": {
       "adherenceMecanique": 0.394,
-      "appui": 0.331,
+      "appui": 0.332,
       "trainee": 0.094,
-      "puissance": 0.172,
-      "motricite": 0.144,
-      "freinage": 0.044
+      "puissance": 0.175,
+      "motricite": 0.157,
+      "freinage": 0.049
      }
     },
     "motricite": {
-     "tempsFixeS": 90.518,
-     "tempsOptimiseS": 90.518,
+     "tempsFixeS": 90.578,
+     "tempsOptimiseS": 90.578,
      "ailerons": 1,
-     "gainFixeS": 0.938,
-     "gainOptimiseS": 0.938,
+     "gainFixeS": 0.877,
+     "gainOptimiseS": 0.877,
      "vmaxKmh": 298,
      "gainsParPortionS": {
-      "lignesDroites": -0.028,
+      "lignesDroites": -0.003,
       "freinages": -0.001,
       "viragesMoyens": 0,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.967
+      "sortiesDeVirage": 0.88
      },
      "sensibilites": {
-      "adherenceMecanique": 0.402,
-      "appui": 0.33,
-      "trainee": 0.098,
-      "puissance": 0.19,
-      "motricite": 0.095,
+      "adherenceMecanique": 0.404,
+      "appui": 0.312,
+      "trainee": 0.086,
+      "puissance": 0.201,
+      "motricite": 0.08,
       "freinage": 0.081
      }
     },
     "moteur": {
-     "tempsFixeS": 91.061,
-     "tempsOptimiseS": 91.061,
+     "tempsFixeS": 91.056,
+     "tempsOptimiseS": 91.056,
      "ailerons": 1,
-     "gainFixeS": 0.394,
-     "gainOptimiseS": 0.394,
+     "gainFixeS": 0.399,
+     "gainOptimiseS": 0.399,
      "vmaxKmh": 306,
      "gainsParPortionS": {
-      "lignesDroites": 0.382,
+      "lignesDroites": 0.387,
       "freinages": 0,
       "viragesMoyens": 0,
       "viragesLents": 0,
       "sortiesDeVirage": 0.012
      },
      "sensibilites": {
-      "adherenceMecanique": 0.412,
+      "adherenceMecanique": 0.429,
       "appui": 0.362,
-      "trainee": 0.097,
+      "trainee": 0.105,
       "puissance": 0.163,
-      "motricite": 0.173,
+      "motricite": 0.174,
       "freinage": 0.078
      }
     },
     "freinage": {
-     "tempsFixeS": 90.658,
-     "tempsOptimiseS": 90.658,
+     "tempsFixeS": 90.685,
+     "tempsOptimiseS": 90.685,
      "ailerons": 1,
-     "gainFixeS": 0.798,
-     "gainOptimiseS": 0.798,
+     "gainFixeS": 0.77,
+     "gainOptimiseS": 0.77,
      "vmaxKmh": 302,
      "gainsParPortionS": {
       "lignesDroites": -0.082,
-      "freinages": 0.88,
+      "freinages": 0.852,
       "viragesMoyens": 0,
       "viragesLents": 0,
       "sortiesDeVirage": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.406,
-      "appui": 0.311,
+      "adherenceMecanique": 0.407,
+      "appui": 0.317,
       "trainee": 0.101,
       "puissance": 0.18,
-      "motricite": 0.146,
-      "freinage": 0.036
+      "motricite": 0.147,
+      "freinage": 0.051
      }
     },
     "polyvalente": {
-     "tempsFixeS": 90.933,
-     "tempsOptimiseS": 90.933,
+     "tempsFixeS": 90.946,
+     "tempsOptimiseS": 90.946,
      "ailerons": 1,
-     "gainFixeS": 0.522,
-     "gainOptimiseS": 0.522,
+     "gainFixeS": 0.509,
+     "gainOptimiseS": 0.509,
      "vmaxKmh": 303,
      "gainsParPortionS": {
-      "lignesDroites": 0.157,
-      "freinages": 0.096,
-      "viragesMoyens": 0.036,
-      "viragesLents": 0.067,
-      "sortiesDeVirage": 0.166
+      "lignesDroites": 0.153,
+      "freinages": 0.094,
+      "viragesMoyens": 0.035,
+      "viragesLents": 0.065,
+      "sortiesDeVirage": 0.162
      },
      "sensibilites": {
       "adherenceMecanique": 0.385,
@@ -885,8 +885,8 @@
    "aileronsReference": 1,
    "classementFixe": [
     "freinage",
-    "motricite",
     "adherenceMecanique",
+    "motricite",
     "polyvalente",
     "appui",
     "moteur",
@@ -894,8 +894,8 @@
    ],
    "classementOptimise": [
     "freinage",
-    "motricite",
     "adherenceMecanique",
+    "motricite",
     "polyvalente",
     "appui",
     "moteur",
@@ -903,110 +903,110 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 76.313,
-     "tempsOptimiseS": 76.313,
+     "tempsFixeS": 76.319,
+     "tempsOptimiseS": 76.319,
      "ailerons": 1,
-     "gainFixeS": 0.376,
-     "gainOptimiseS": 0.376,
+     "gainFixeS": 0.37,
+     "gainOptimiseS": 0.37,
      "vmaxKmh": 350,
      "gainsParPortionS": {
-      "lignesDroites": 0.05,
-      "freinages": 0.098,
-      "viragesLents": 0.066,
-      "sortiesDeVirage": 0.13,
+      "lignesDroites": 0.049,
+      "freinages": 0.097,
+      "viragesLents": 0.065,
+      "sortiesDeVirage": 0.128,
       "viragesMoyens": 0.02,
-      "viragesRapides": 0.012
+      "viragesRapides": 0.011
      },
      "sensibilites": {
-      "adherenceMecanique": 0.363,
+      "adherenceMecanique": 0.353,
       "appui": 0.239,
-      "trainee": 0.081,
-      "puissance": 0.15,
+      "trainee": 0.083,
+      "puissance": 0.152,
       "motricite": 0.08,
       "freinage": 0.061
      }
     },
     "faibleTrainee": {
-     "tempsFixeS": 76.465,
-     "tempsOptimiseS": 76.465,
+     "tempsFixeS": 76.458,
+     "tempsOptimiseS": 76.458,
      "ailerons": 1,
-     "gainFixeS": 0.224,
-     "gainOptimiseS": 0.224,
+     "gainFixeS": 0.231,
+     "gainOptimiseS": 0.231,
      "vmaxKmh": 358,
      "gainsParPortionS": {
-      "lignesDroites": 0.213,
+      "lignesDroites": 0.219,
       "freinages": -0.017,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.028,
+      "sortiesDeVirage": 0.029,
       "viragesMoyens": 0,
       "viragesRapides": 0
      },
      "sensibilites": {
       "adherenceMecanique": 0.434,
-      "appui": 0.308,
+      "appui": 0.311,
       "trainee": 0.051,
       "puissance": 0.109,
-      "motricite": 0.119,
+      "motricite": 0.122,
       "freinage": 0.07
      }
     },
     "adherenceMecanique": {
-     "tempsFixeS": 76.117,
-     "tempsOptimiseS": 76.117,
+     "tempsFixeS": 76.133,
+     "tempsOptimiseS": 76.133,
      "ailerons": 1,
-     "gainFixeS": 0.572,
-     "gainOptimiseS": 0.572,
+     "gainFixeS": 0.556,
+     "gainOptimiseS": 0.556,
      "vmaxKmh": 351,
      "gainsParPortionS": {
       "lignesDroites": 0.051,
-      "freinages": 0.115,
-      "viragesLents": 0.19,
-      "sortiesDeVirage": 0.184,
-      "viragesMoyens": 0.026,
+      "freinages": 0.112,
+      "viragesLents": 0.184,
+      "sortiesDeVirage": 0.178,
+      "viragesMoyens": 0.025,
       "viragesRapides": 0.005
      },
      "sensibilites": {
-      "adherenceMecanique": 0.379,
-      "appui": 0.238,
-      "trainee": 0.084,
-      "puissance": 0.15,
-      "motricite": 0.069,
-      "freinage": 0.063
+      "adherenceMecanique": 0.38,
+      "appui": 0.25,
+      "trainee": 0.083,
+      "puissance": 0.147,
+      "motricite": 0.067,
+      "freinage": 0.06
      }
     },
     "motricite": {
-     "tempsFixeS": 76.114,
-     "tempsOptimiseS": 76.114,
+     "tempsFixeS": 76.147,
+     "tempsOptimiseS": 76.147,
      "ailerons": 1,
-     "gainFixeS": 0.575,
-     "gainOptimiseS": 0.575,
+     "gainFixeS": 0.542,
+     "gainOptimiseS": 0.542,
      "vmaxKmh": 346,
      "gainsParPortionS": {
-      "lignesDroites": -0.088,
-      "freinages": -0.003,
+      "lignesDroites": -0.062,
+      "freinages": -0.002,
       "viragesLents": 0,
-      "sortiesDeVirage": 0.665,
+      "sortiesDeVirage": 0.606,
       "viragesMoyens": 0,
       "viragesRapides": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.42,
-      "appui": 0.278,
-      "trainee": 0.076,
-      "puissance": 0.153,
-      "motricite": 0.057,
+      "adherenceMecanique": 0.409,
+      "appui": 0.281,
+      "trainee": 0.067,
+      "puissance": 0.149,
+      "motricite": 0.042,
       "freinage": 0.07
      }
     },
     "moteur": {
-     "tempsFixeS": 76.454,
-     "tempsOptimiseS": 76.454,
+     "tempsFixeS": 76.45,
+     "tempsOptimiseS": 76.45,
      "ailerons": 1,
-     "gainFixeS": 0.235,
-     "gainOptimiseS": 0.235,
+     "gainFixeS": 0.239,
+     "gainOptimiseS": 0.239,
      "vmaxKmh": 356,
      "gainsParPortionS": {
-      "lignesDroites": 0.235,
+      "lignesDroites": 0.239,
       "freinages": 0,
       "viragesLents": 0,
       "sortiesDeVirage": 0,
@@ -1023,41 +1023,41 @@
      }
     },
     "freinage": {
-     "tempsFixeS": 76.069,
-     "tempsOptimiseS": 76.069,
+     "tempsFixeS": 76.086,
+     "tempsOptimiseS": 76.086,
      "ailerons": 1,
-     "gainFixeS": 0.62,
-     "gainOptimiseS": 0.62,
+     "gainFixeS": 0.603,
+     "gainOptimiseS": 0.603,
      "vmaxKmh": 349,
      "gainsParPortionS": {
-      "lignesDroites": -0.125,
-      "freinages": 0.745,
+      "lignesDroites": -0.12,
+      "freinages": 0.723,
       "viragesLents": 0,
       "sortiesDeVirage": 0,
       "viragesMoyens": 0,
       "viragesRapides": 0
      },
      "sensibilites": {
-      "adherenceMecanique": 0.415,
-      "appui": 0.287,
-      "trainee": 0.093,
-      "puissance": 0.159,
-      "motricite": 0.109,
-      "freinage": 0.044
+      "adherenceMecanique": 0.41,
+      "appui": 0.283,
+      "trainee": 0.088,
+      "puissance": 0.154,
+      "motricite": 0.104,
+      "freinage": 0.04
      }
     },
     "polyvalente": {
-     "tempsFixeS": 76.243,
-     "tempsOptimiseS": 76.243,
+     "tempsFixeS": 76.252,
+     "tempsOptimiseS": 76.252,
      "ailerons": 1,
-     "gainFixeS": 0.446,
-     "gainOptimiseS": 0.446,
+     "gainFixeS": 0.437,
+     "gainOptimiseS": 0.437,
      "vmaxKmh": 353,
      "gainsParPortionS": {
-      "lignesDroites": 0.144,
-      "freinages": 0.081,
-      "viragesLents": 0.071,
-      "sortiesDeVirage": 0.134,
+      "lignesDroites": 0.141,
+      "freinages": 0.079,
+      "viragesLents": 0.07,
+      "sortiesDeVirage": 0.131,
       "viragesMoyens": 0.012,
       "viragesRapides": 0.004
      },
@@ -1065,7 +1065,7 @@
       "adherenceMecanique": 0.371,
       "appui": 0.245,
       "trainee": 0.08,
-      "puissance": 0.145,
+      "puissance": 0.144,
       "motricite": 0.06,
       "freinage": 0.063
      }
@@ -1096,60 +1096,60 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 79.93,
-     "tempsOptimiseS": 79.93,
+     "tempsFixeS": 79.938,
+     "tempsOptimiseS": 79.938,
      "ailerons": 1,
-     "gainFixeS": 0.457,
-     "gainOptimiseS": 0.457,
+     "gainFixeS": 0.449,
+     "gainOptimiseS": 0.449,
      "vmaxKmh": 316
     },
     "faibleTrainee": {
-     "tempsFixeS": 79.73,
-     "tempsOptimiseS": 79.73,
+     "tempsFixeS": 79.706,
+     "tempsOptimiseS": 79.706,
      "ailerons": 1,
-     "gainFixeS": 0.657,
-     "gainOptimiseS": 0.657,
+     "gainFixeS": 0.681,
+     "gainOptimiseS": 0.681,
      "vmaxKmh": 321
     },
     "adherenceMecanique": {
-     "tempsFixeS": 79.984,
-     "tempsOptimiseS": 79.984,
+     "tempsFixeS": 79.997,
+     "tempsOptimiseS": 79.997,
      "ailerons": 1,
-     "gainFixeS": 0.402,
-     "gainOptimiseS": 0.402,
+     "gainFixeS": 0.39,
+     "gainOptimiseS": 0.39,
      "vmaxKmh": 316
     },
     "motricite": {
-     "tempsFixeS": 80.154,
-     "tempsOptimiseS": 80.154,
+     "tempsFixeS": 80.175,
+     "tempsOptimiseS": 80.175,
      "ailerons": 1,
-     "gainFixeS": 0.233,
-     "gainOptimiseS": 0.233,
+     "gainFixeS": 0.212,
+     "gainOptimiseS": 0.212,
      "vmaxKmh": 316
     },
     "moteur": {
-     "tempsFixeS": 79.809,
-     "tempsOptimiseS": 79.809,
+     "tempsFixeS": 79.802,
+     "tempsOptimiseS": 79.802,
      "ailerons": 1,
-     "gainFixeS": 0.578,
-     "gainOptimiseS": 0.578,
+     "gainFixeS": 0.585,
+     "gainOptimiseS": 0.585,
      "vmaxKmh": 320
     },
     "freinage": {
-     "tempsFixeS": 79.972,
-     "tempsOptimiseS": 79.972,
+     "tempsFixeS": 79.986,
+     "tempsOptimiseS": 79.986,
      "ailerons": 1,
-     "gainFixeS": 0.415,
-     "gainOptimiseS": 0.415,
+     "gainFixeS": 0.401,
+     "gainOptimiseS": 0.401,
      "vmaxKmh": 316
     },
     "polyvalente": {
-     "tempsFixeS": 79.903,
-     "tempsOptimiseS": 79.903,
+     "tempsFixeS": 79.913,
+     "tempsOptimiseS": 79.913,
      "ailerons": 1,
-     "gainFixeS": 0.484,
-     "gainOptimiseS": 0.484,
-     "vmaxKmh": 318
+     "gainFixeS": 0.474,
+     "gainOptimiseS": 0.474,
+     "vmaxKmh": 317
     }
    }
   },
@@ -1177,59 +1177,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 97.608,
-     "tempsOptimiseS": 97.608,
+     "tempsFixeS": 97.606,
+     "tempsOptimiseS": 97.606,
      "ailerons": 1,
-     "gainFixeS": 0.648,
-     "gainOptimiseS": 0.648,
+     "gainFixeS": 0.65,
+     "gainOptimiseS": 0.65,
      "vmaxKmh": 329
     },
     "faibleTrainee": {
-     "tempsFixeS": 97.866,
-     "tempsOptimiseS": 97.866,
+     "tempsFixeS": 97.852,
+     "tempsOptimiseS": 97.852,
      "ailerons": 1,
-     "gainFixeS": 0.389,
-     "gainOptimiseS": 0.389,
+     "gainFixeS": 0.404,
+     "gainOptimiseS": 0.404,
      "vmaxKmh": 335
     },
     "adherenceMecanique": {
-     "tempsFixeS": 97.549,
-     "tempsOptimiseS": 97.549,
+     "tempsFixeS": 97.573,
+     "tempsOptimiseS": 97.573,
      "ailerons": 1,
-     "gainFixeS": 0.706,
-     "gainOptimiseS": 0.706,
+     "gainFixeS": 0.683,
+     "gainOptimiseS": 0.683,
      "vmaxKmh": 329
     },
     "motricite": {
-     "tempsFixeS": 97.383,
-     "tempsOptimiseS": 97.383,
+     "tempsFixeS": 97.436,
+     "tempsOptimiseS": 97.436,
      "ailerons": 1,
-     "gainFixeS": 0.873,
-     "gainOptimiseS": 0.873,
+     "gainFixeS": 0.82,
+     "gainOptimiseS": 0.82,
      "vmaxKmh": 329
     },
     "moteur": {
-     "tempsFixeS": 97.825,
-     "tempsOptimiseS": 97.825,
+     "tempsFixeS": 97.819,
+     "tempsOptimiseS": 97.819,
      "ailerons": 1,
-     "gainFixeS": 0.431,
-     "gainOptimiseS": 0.431,
+     "gainFixeS": 0.437,
+     "gainOptimiseS": 0.437,
      "vmaxKmh": 333
     },
     "freinage": {
-     "tempsFixeS": 97.324,
-     "tempsOptimiseS": 97.324,
+     "tempsFixeS": 97.353,
+     "tempsOptimiseS": 97.353,
      "ailerons": 1,
-     "gainFixeS": 0.932,
-     "gainOptimiseS": 0.932,
+     "gainFixeS": 0.903,
+     "gainOptimiseS": 0.903,
      "vmaxKmh": 329
     },
     "polyvalente": {
-     "tempsFixeS": 97.676,
-     "tempsOptimiseS": 97.676,
+     "tempsFixeS": 97.69,
+     "tempsOptimiseS": 97.69,
      "ailerons": 1,
-     "gainFixeS": 0.579,
-     "gainOptimiseS": 0.579,
+     "gainFixeS": 0.566,
+     "gainOptimiseS": 0.566,
      "vmaxKmh": 331
     }
    }
@@ -1243,8 +1243,8 @@
     "motricite",
     "moteur",
     "polyvalente",
-    "adherenceMecanique",
     "faibleTrainee",
+    "adherenceMecanique",
     "appui"
    ],
    "classementOptimise": [
@@ -1252,65 +1252,65 @@
     "motricite",
     "moteur",
     "polyvalente",
-    "adherenceMecanique",
     "faibleTrainee",
+    "adherenceMecanique",
     "appui"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 87.338,
-     "tempsOptimiseS": 87.338,
+     "tempsFixeS": 87.358,
+     "tempsOptimiseS": 87.358,
      "ailerons": 1,
-     "gainFixeS": 0.452,
-     "gainOptimiseS": 0.452,
+     "gainFixeS": 0.432,
+     "gainOptimiseS": 0.432,
      "vmaxKmh": 324
     },
     "faibleTrainee": {
-     "tempsFixeS": 87.337,
-     "tempsOptimiseS": 87.337,
+     "tempsFixeS": 87.32,
+     "tempsOptimiseS": 87.32,
      "ailerons": 1,
-     "gainFixeS": 0.453,
-     "gainOptimiseS": 0.453,
+     "gainFixeS": 0.47,
+     "gainOptimiseS": 0.47,
      "vmaxKmh": 329
     },
     "adherenceMecanique": {
-     "tempsFixeS": 87.311,
-     "tempsOptimiseS": 87.311,
+     "tempsFixeS": 87.327,
+     "tempsOptimiseS": 87.327,
      "ailerons": 1,
-     "gainFixeS": 0.479,
-     "gainOptimiseS": 0.479,
+     "gainFixeS": 0.463,
+     "gainOptimiseS": 0.463,
      "vmaxKmh": 324
     },
     "motricite": {
-     "tempsFixeS": 87.226,
-     "tempsOptimiseS": 87.226,
+     "tempsFixeS": 87.246,
+     "tempsOptimiseS": 87.246,
      "ailerons": 1,
-     "gainFixeS": 0.564,
-     "gainOptimiseS": 0.564,
+     "gainFixeS": 0.545,
+     "gainOptimiseS": 0.545,
      "vmaxKmh": 324
     },
     "moteur": {
-     "tempsFixeS": 87.269,
-     "tempsOptimiseS": 87.269,
+     "tempsFixeS": 87.261,
+     "tempsOptimiseS": 87.261,
      "ailerons": 1,
-     "gainFixeS": 0.521,
-     "gainOptimiseS": 0.521,
-     "vmaxKmh": 327
+     "gainFixeS": 0.529,
+     "gainOptimiseS": 0.529,
+     "vmaxKmh": 328
     },
     "freinage": {
-     "tempsFixeS": 87.119,
-     "tempsOptimiseS": 87.119,
+     "tempsFixeS": 87.14,
+     "tempsOptimiseS": 87.14,
      "ailerons": 1,
-     "gainFixeS": 0.671,
-     "gainOptimiseS": 0.671,
+     "gainFixeS": 0.65,
+     "gainOptimiseS": 0.65,
      "vmaxKmh": 325
     },
     "polyvalente": {
-     "tempsFixeS": 87.305,
-     "tempsOptimiseS": 87.305,
+     "tempsFixeS": 87.316,
+     "tempsOptimiseS": 87.316,
      "ailerons": 1,
-     "gainFixeS": 0.485,
-     "gainOptimiseS": 0.485,
+     "gainFixeS": 0.474,
+     "gainOptimiseS": 0.474,
      "vmaxKmh": 325
     }
    }
@@ -1322,8 +1322,8 @@
    "classementFixe": [
     "faibleTrainee",
     "moteur",
-    "polyvalente",
     "appui",
+    "polyvalente",
     "adherenceMecanique",
     "freinage",
     "motricite"
@@ -1331,67 +1331,67 @@
    "classementOptimise": [
     "faibleTrainee",
     "moteur",
-    "polyvalente",
     "appui",
+    "polyvalente",
     "adherenceMecanique",
     "freinage",
     "motricite"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 88.512,
-     "tempsOptimiseS": 88.512,
+     "tempsFixeS": 88.522,
+     "tempsOptimiseS": 88.522,
      "ailerons": 1,
-     "gainFixeS": 0.505,
-     "gainOptimiseS": 0.505,
+     "gainFixeS": 0.495,
+     "gainOptimiseS": 0.495,
      "vmaxKmh": 322
     },
     "faibleTrainee": {
-     "tempsFixeS": 88.094,
-     "tempsOptimiseS": 88.094,
+     "tempsFixeS": 88.06,
+     "tempsOptimiseS": 88.06,
      "ailerons": 1,
-     "gainFixeS": 0.923,
-     "gainOptimiseS": 0.923,
+     "gainFixeS": 0.957,
+     "gainOptimiseS": 0.957,
      "vmaxKmh": 327
     },
     "adherenceMecanique": {
-     "tempsFixeS": 88.694,
-     "tempsOptimiseS": 88.694,
+     "tempsFixeS": 88.705,
+     "tempsOptimiseS": 88.705,
      "ailerons": 1,
-     "gainFixeS": 0.323,
-     "gainOptimiseS": 0.323,
+     "gainFixeS": 0.312,
+     "gainOptimiseS": 0.312,
      "vmaxKmh": 322
     },
     "motricite": {
-     "tempsFixeS": 88.79,
-     "tempsOptimiseS": 88.79,
+     "tempsFixeS": 88.781,
+     "tempsOptimiseS": 88.781,
      "ailerons": 1,
-     "gainFixeS": 0.227,
-     "gainOptimiseS": 0.227,
+     "gainFixeS": 0.237,
+     "gainOptimiseS": 0.237,
      "vmaxKmh": 322
     },
     "moteur": {
-     "tempsFixeS": 88.279,
-     "tempsOptimiseS": 88.279,
+     "tempsFixeS": 88.268,
+     "tempsOptimiseS": 88.268,
      "ailerons": 1,
-     "gainFixeS": 0.738,
-     "gainOptimiseS": 0.738,
+     "gainFixeS": 0.749,
+     "gainOptimiseS": 0.749,
      "vmaxKmh": 325
     },
     "freinage": {
-     "tempsFixeS": 88.727,
-     "tempsOptimiseS": 88.727,
+     "tempsFixeS": 88.737,
+     "tempsOptimiseS": 88.737,
      "ailerons": 1,
-     "gainFixeS": 0.291,
-     "gainOptimiseS": 0.291,
+     "gainFixeS": 0.28,
+     "gainOptimiseS": 0.28,
      "vmaxKmh": 322
     },
     "polyvalente": {
-     "tempsFixeS": 88.511,
-     "tempsOptimiseS": 88.511,
+     "tempsFixeS": 88.523,
+     "tempsOptimiseS": 88.523,
      "ailerons": 1,
-     "gainFixeS": 0.506,
-     "gainOptimiseS": 0.506,
+     "gainFixeS": 0.495,
+     "gainOptimiseS": 0.495,
      "vmaxKmh": 323
     }
    }
@@ -1403,8 +1403,8 @@
    "classementFixe": [
     "faibleTrainee",
     "moteur",
-    "motricite",
     "polyvalente",
+    "motricite",
     "adherenceMecanique",
     "freinage",
     "appui"
@@ -1412,67 +1412,67 @@
    "classementOptimise": [
     "faibleTrainee",
     "moteur",
-    "motricite",
     "polyvalente",
+    "motricite",
     "adherenceMecanique",
     "freinage",
     "appui"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 87.354,
-     "tempsOptimiseS": 87.354,
+     "tempsFixeS": 87.362,
+     "tempsOptimiseS": 87.362,
      "ailerons": 1,
-     "gainFixeS": 0.345,
-     "gainOptimiseS": 0.345,
+     "gainFixeS": 0.337,
+     "gainOptimiseS": 0.337,
      "vmaxKmh": 329
     },
     "faibleTrainee": {
-     "tempsFixeS": 87.094,
-     "tempsOptimiseS": 87.094,
+     "tempsFixeS": 87.068,
+     "tempsOptimiseS": 87.068,
      "ailerons": 1,
-     "gainFixeS": 0.605,
-     "gainOptimiseS": 0.605,
+     "gainFixeS": 0.631,
+     "gainOptimiseS": 0.631,
      "vmaxKmh": 335
     },
     "adherenceMecanique": {
-     "tempsFixeS": 87.275,
-     "tempsOptimiseS": 87.275,
+     "tempsFixeS": 87.292,
+     "tempsOptimiseS": 87.292,
      "ailerons": 1,
-     "gainFixeS": 0.425,
-     "gainOptimiseS": 0.425,
+     "gainFixeS": 0.407,
+     "gainOptimiseS": 0.407,
      "vmaxKmh": 329
     },
     "motricite": {
-     "tempsFixeS": 87.239,
-     "tempsOptimiseS": 87.239,
+     "tempsFixeS": 87.277,
+     "tempsOptimiseS": 87.277,
      "ailerons": 1,
-     "gainFixeS": 0.46,
-     "gainOptimiseS": 0.46,
+     "gainFixeS": 0.422,
+     "gainOptimiseS": 0.422,
      "vmaxKmh": 329
     },
     "moteur": {
-     "tempsFixeS": 87.134,
-     "tempsOptimiseS": 87.134,
+     "tempsFixeS": 87.127,
+     "tempsOptimiseS": 87.127,
      "ailerons": 1,
-     "gainFixeS": 0.565,
-     "gainOptimiseS": 0.565,
+     "gainFixeS": 0.573,
+     "gainOptimiseS": 0.573,
      "vmaxKmh": 333
     },
     "freinage": {
-     "tempsFixeS": 87.282,
-     "tempsOptimiseS": 87.282,
+     "tempsFixeS": 87.298,
+     "tempsOptimiseS": 87.298,
      "ailerons": 1,
-     "gainFixeS": 0.417,
-     "gainOptimiseS": 0.417,
+     "gainFixeS": 0.402,
+     "gainOptimiseS": 0.402,
      "vmaxKmh": 329
     },
     "polyvalente": {
-     "tempsFixeS": 87.246,
-     "tempsOptimiseS": 87.246,
+     "tempsFixeS": 87.257,
+     "tempsOptimiseS": 87.257,
      "ailerons": 1,
-     "gainFixeS": 0.454,
-     "gainOptimiseS": 0.454,
+     "gainFixeS": 0.443,
+     "gainOptimiseS": 0.443,
      "vmaxKmh": 330
     }
    }
@@ -1501,59 +1501,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 66.654,
-     "tempsOptimiseS": 66.654,
+     "tempsFixeS": 66.661,
+     "tempsOptimiseS": 66.661,
      "ailerons": 1,
-     "gainFixeS": 0.385,
-     "gainOptimiseS": 0.385,
+     "gainFixeS": 0.378,
+     "gainOptimiseS": 0.378,
      "vmaxKmh": 328
     },
     "faibleTrainee": {
-     "tempsFixeS": 66.611,
-     "tempsOptimiseS": 66.611,
+     "tempsFixeS": 66.596,
+     "tempsOptimiseS": 66.596,
      "ailerons": 1,
-     "gainFixeS": 0.428,
-     "gainOptimiseS": 0.428,
+     "gainFixeS": 0.443,
+     "gainOptimiseS": 0.443,
      "vmaxKmh": 333
     },
     "adherenceMecanique": {
-     "tempsFixeS": 66.706,
-     "tempsOptimiseS": 66.706,
+     "tempsFixeS": 66.717,
+     "tempsOptimiseS": 66.717,
      "ailerons": 1,
-     "gainFixeS": 0.333,
-     "gainOptimiseS": 0.333,
+     "gainFixeS": 0.322,
+     "gainOptimiseS": 0.322,
      "vmaxKmh": 327
     },
     "motricite": {
-     "tempsFixeS": 66.767,
-     "tempsOptimiseS": 66.767,
+     "tempsFixeS": 66.78,
+     "tempsOptimiseS": 66.78,
      "ailerons": 1,
-     "gainFixeS": 0.272,
-     "gainOptimiseS": 0.272,
+     "gainFixeS": 0.259,
+     "gainOptimiseS": 0.259,
      "vmaxKmh": 327
     },
     "moteur": {
-     "tempsFixeS": 66.593,
-     "tempsOptimiseS": 66.593,
+     "tempsFixeS": 66.586,
+     "tempsOptimiseS": 66.586,
      "ailerons": 1,
-     "gainFixeS": 0.445,
-     "gainOptimiseS": 0.445,
+     "gainFixeS": 0.452,
+     "gainOptimiseS": 0.452,
      "vmaxKmh": 331
     },
     "freinage": {
-     "tempsFixeS": 66.646,
-     "tempsOptimiseS": 66.646,
+     "tempsFixeS": 66.657,
+     "tempsOptimiseS": 66.657,
      "ailerons": 1,
-     "gainFixeS": 0.393,
-     "gainOptimiseS": 0.393,
+     "gainFixeS": 0.382,
+     "gainOptimiseS": 0.382,
      "vmaxKmh": 328
     },
     "polyvalente": {
-     "tempsFixeS": 66.663,
-     "tempsOptimiseS": 66.663,
+     "tempsFixeS": 66.672,
+     "tempsOptimiseS": 66.672,
      "ailerons": 1,
-     "gainFixeS": 0.375,
-     "gainOptimiseS": 0.375,
+     "gainFixeS": 0.367,
+     "gainOptimiseS": 0.367,
      "vmaxKmh": 329
     }
    }
@@ -1565,76 +1565,76 @@
    "classementFixe": [
     "appui",
     "polyvalente",
-    "adherenceMecanique",
     "moteur",
+    "adherenceMecanique",
     "faibleTrainee",
-    "motricite",
-    "freinage"
+    "freinage",
+    "motricite"
    ],
    "classementOptimise": [
     "appui",
     "polyvalente",
-    "adherenceMecanique",
     "moteur",
+    "adherenceMecanique",
     "faibleTrainee",
-    "motricite",
-    "freinage"
+    "freinage",
+    "motricite"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 72.064,
-     "tempsOptimiseS": 72.064,
+     "tempsFixeS": 72.077,
+     "tempsOptimiseS": 72.077,
      "ailerons": 1,
-     "gainFixeS": 0.645,
-     "gainOptimiseS": 0.645,
+     "gainFixeS": 0.632,
+     "gainOptimiseS": 0.632,
      "vmaxKmh": 327
     },
     "faibleTrainee": {
-     "tempsFixeS": 72.293,
-     "tempsOptimiseS": 72.293,
+     "tempsFixeS": 72.277,
+     "tempsOptimiseS": 72.277,
      "ailerons": 1,
-     "gainFixeS": 0.416,
-     "gainOptimiseS": 0.416,
+     "gainFixeS": 0.432,
+     "gainOptimiseS": 0.432,
      "vmaxKmh": 332
     },
     "adherenceMecanique": {
-     "tempsFixeS": 72.259,
-     "tempsOptimiseS": 72.259,
+     "tempsFixeS": 72.276,
+     "tempsOptimiseS": 72.276,
      "ailerons": 1,
-     "gainFixeS": 0.45,
-     "gainOptimiseS": 0.45,
+     "gainFixeS": 0.432,
+     "gainOptimiseS": 0.432,
      "vmaxKmh": 327
     },
     "motricite": {
-     "tempsFixeS": 72.447,
-     "tempsOptimiseS": 72.447,
+     "tempsFixeS": 72.476,
+     "tempsOptimiseS": 72.476,
      "ailerons": 1,
-     "gainFixeS": 0.262,
-     "gainOptimiseS": 0.262,
+     "gainFixeS": 0.233,
+     "gainOptimiseS": 0.233,
      "vmaxKmh": 326
     },
     "moteur": {
-     "tempsFixeS": 72.278,
-     "tempsOptimiseS": 72.278,
+     "tempsFixeS": 72.272,
+     "tempsOptimiseS": 72.272,
      "ailerons": 1,
-     "gainFixeS": 0.431,
-     "gainOptimiseS": 0.431,
+     "gainFixeS": 0.437,
+     "gainOptimiseS": 0.437,
      "vmaxKmh": 330
     },
     "freinage": {
-     "tempsFixeS": 72.459,
-     "tempsOptimiseS": 72.459,
+     "tempsFixeS": 72.468,
+     "tempsOptimiseS": 72.468,
      "ailerons": 1,
-     "gainFixeS": 0.249,
-     "gainOptimiseS": 0.249,
+     "gainFixeS": 0.241,
+     "gainOptimiseS": 0.241,
      "vmaxKmh": 326
     },
     "polyvalente": {
-     "tempsFixeS": 72.244,
-     "tempsOptimiseS": 72.244,
+     "tempsFixeS": 72.255,
+     "tempsOptimiseS": 72.255,
      "ailerons": 1,
-     "gainFixeS": 0.465,
-     "gainOptimiseS": 0.465,
+     "gainFixeS": 0.454,
+     "gainOptimiseS": 0.454,
      "vmaxKmh": 328
     }
    }
@@ -1647,8 +1647,8 @@
     "freinage",
     "moteur",
     "faibleTrainee",
-    "motricite",
     "polyvalente",
+    "motricite",
     "adherenceMecanique",
     "appui"
    ],
@@ -1656,66 +1656,66 @@
     "freinage",
     "moteur",
     "faibleTrainee",
-    "motricite",
     "polyvalente",
+    "motricite",
     "adherenceMecanique",
     "appui"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 66.036,
-     "tempsOptimiseS": 66.036,
+     "tempsFixeS": 66.042,
+     "tempsOptimiseS": 66.042,
      "ailerons": 1,
-     "gainFixeS": 0.298,
-     "gainOptimiseS": 0.298,
+     "gainFixeS": 0.292,
+     "gainOptimiseS": 0.292,
      "vmaxKmh": 318
     },
     "faibleTrainee": {
-     "tempsFixeS": 65.968,
-     "tempsOptimiseS": 65.968,
+     "tempsFixeS": 65.955,
+     "tempsOptimiseS": 65.955,
      "ailerons": 1,
-     "gainFixeS": 0.366,
-     "gainOptimiseS": 0.366,
+     "gainFixeS": 0.379,
+     "gainOptimiseS": 0.379,
      "vmaxKmh": 322
     },
     "adherenceMecanique": {
-     "tempsFixeS": 66.009,
-     "tempsOptimiseS": 66.009,
+     "tempsFixeS": 66.02,
+     "tempsOptimiseS": 66.02,
      "ailerons": 1,
-     "gainFixeS": 0.325,
-     "gainOptimiseS": 0.325,
+     "gainFixeS": 0.314,
+     "gainOptimiseS": 0.314,
      "vmaxKmh": 318
     },
     "motricite": {
-     "tempsFixeS": 65.968,
-     "tempsOptimiseS": 65.968,
+     "tempsFixeS": 66.008,
+     "tempsOptimiseS": 66.008,
      "ailerons": 1,
-     "gainFixeS": 0.366,
-     "gainOptimiseS": 0.366,
+     "gainFixeS": 0.326,
+     "gainOptimiseS": 0.326,
      "vmaxKmh": 318
     },
     "moteur": {
-     "tempsFixeS": 65.893,
-     "tempsOptimiseS": 65.893,
+     "tempsFixeS": 65.886,
+     "tempsOptimiseS": 65.886,
      "ailerons": 1,
-     "gainFixeS": 0.44,
-     "gainOptimiseS": 0.44,
+     "gainFixeS": 0.448,
+     "gainOptimiseS": 0.448,
      "vmaxKmh": 322
     },
     "freinage": {
-     "tempsFixeS": 65.849,
-     "tempsOptimiseS": 65.849,
+     "tempsFixeS": 65.864,
+     "tempsOptimiseS": 65.864,
      "ailerons": 1,
-     "gainFixeS": 0.485,
-     "gainOptimiseS": 0.485,
+     "gainFixeS": 0.47,
+     "gainOptimiseS": 0.47,
      "vmaxKmh": 319
     },
     "polyvalente": {
-     "tempsFixeS": 65.979,
-     "tempsOptimiseS": 65.979,
+     "tempsFixeS": 65.987,
+     "tempsOptimiseS": 65.987,
      "ailerons": 1,
-     "gainFixeS": 0.355,
-     "gainOptimiseS": 0.355,
+     "gainFixeS": 0.347,
+     "gainOptimiseS": 0.347,
      "vmaxKmh": 320
     }
    }
@@ -1744,59 +1744,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 89.44,
-     "tempsOptimiseS": 89.44,
+     "tempsFixeS": 89.448,
+     "tempsOptimiseS": 89.448,
      "ailerons": 1,
-     "gainFixeS": 0.442,
-     "gainOptimiseS": 0.442,
+     "gainFixeS": 0.433,
+     "gainOptimiseS": 0.433,
      "vmaxKmh": 318
     },
     "faibleTrainee": {
-     "tempsFixeS": 89.078,
-     "tempsOptimiseS": 89.078,
+     "tempsFixeS": 89.044,
+     "tempsOptimiseS": 89.044,
      "ailerons": 1,
-     "gainFixeS": 0.803,
-     "gainOptimiseS": 0.803,
+     "gainFixeS": 0.837,
+     "gainOptimiseS": 0.837,
      "vmaxKmh": 323
     },
     "adherenceMecanique": {
-     "tempsFixeS": 89.451,
-     "tempsOptimiseS": 89.451,
+     "tempsFixeS": 89.452,
+     "tempsOptimiseS": 89.452,
      "ailerons": 1,
-     "gainFixeS": 0.43,
-     "gainOptimiseS": 0.43,
+     "gainFixeS": 0.429,
+     "gainOptimiseS": 0.429,
      "vmaxKmh": 318
     },
     "motricite": {
-     "tempsFixeS": 89.612,
-     "tempsOptimiseS": 89.612,
+     "tempsFixeS": 89.647,
+     "tempsOptimiseS": 89.647,
      "ailerons": 1,
-     "gainFixeS": 0.269,
-     "gainOptimiseS": 0.269,
+     "gainFixeS": 0.234,
+     "gainOptimiseS": 0.234,
      "vmaxKmh": 317
     },
     "moteur": {
-     "tempsFixeS": 89.196,
-     "tempsOptimiseS": 89.196,
+     "tempsFixeS": 89.186,
+     "tempsOptimiseS": 89.186,
      "ailerons": 1,
-     "gainFixeS": 0.685,
-     "gainOptimiseS": 0.685,
+     "gainFixeS": 0.695,
+     "gainOptimiseS": 0.695,
      "vmaxKmh": 322
     },
     "freinage": {
-     "tempsFixeS": 89.643,
-     "tempsOptimiseS": 89.643,
+     "tempsFixeS": 89.651,
+     "tempsOptimiseS": 89.651,
      "ailerons": 1,
-     "gainFixeS": 0.238,
-     "gainOptimiseS": 0.238,
+     "gainFixeS": 0.23,
+     "gainOptimiseS": 0.23,
      "vmaxKmh": 318
     },
     "polyvalente": {
-     "tempsFixeS": 89.378,
-     "tempsOptimiseS": 89.378,
+     "tempsFixeS": 89.39,
+     "tempsOptimiseS": 89.39,
      "ailerons": 1,
-     "gainFixeS": 0.503,
-     "gainOptimiseS": 0.503,
+     "gainFixeS": 0.491,
+     "gainOptimiseS": 0.491,
      "vmaxKmh": 319
     }
    }
@@ -1825,59 +1825,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 106.739,
-     "tempsOptimiseS": 106.739,
+     "tempsFixeS": 106.754,
+     "tempsOptimiseS": 106.754,
      "ailerons": 1,
-     "gainFixeS": 0.798,
-     "gainOptimiseS": 0.798,
+     "gainFixeS": 0.783,
+     "gainOptimiseS": 0.783,
      "vmaxKmh": 324
     },
     "faibleTrainee": {
-     "tempsFixeS": 106.696,
-     "tempsOptimiseS": 106.696,
+     "tempsFixeS": 106.661,
+     "tempsOptimiseS": 106.661,
      "ailerons": 1,
-     "gainFixeS": 0.841,
-     "gainOptimiseS": 0.841,
+     "gainFixeS": 0.877,
+     "gainOptimiseS": 0.877,
      "vmaxKmh": 329
     },
     "adherenceMecanique": {
-     "tempsFixeS": 106.931,
-     "tempsOptimiseS": 106.931,
+     "tempsFixeS": 106.949,
+     "tempsOptimiseS": 106.949,
      "ailerons": 1,
-     "gainFixeS": 0.606,
-     "gainOptimiseS": 0.606,
+     "gainFixeS": 0.588,
+     "gainOptimiseS": 0.588,
      "vmaxKmh": 323
     },
     "motricite": {
-     "tempsFixeS": 107.144,
-     "tempsOptimiseS": 107.144,
+     "tempsFixeS": 107.172,
+     "tempsOptimiseS": 107.172,
      "ailerons": 1,
-     "gainFixeS": 0.393,
-     "gainOptimiseS": 0.393,
+     "gainFixeS": 0.365,
+     "gainOptimiseS": 0.365,
      "vmaxKmh": 323
     },
     "moteur": {
-     "tempsFixeS": 106.798,
-     "tempsOptimiseS": 106.798,
+     "tempsFixeS": 106.786,
+     "tempsOptimiseS": 106.786,
      "ailerons": 1,
-     "gainFixeS": 0.74,
-     "gainOptimiseS": 0.74,
+     "gainFixeS": 0.751,
+     "gainOptimiseS": 0.751,
      "vmaxKmh": 327
     },
     "freinage": {
-     "tempsFixeS": 107.135,
-     "tempsOptimiseS": 107.135,
+     "tempsFixeS": 107.15,
+     "tempsOptimiseS": 107.15,
      "ailerons": 1,
-     "gainFixeS": 0.402,
-     "gainOptimiseS": 0.402,
+     "gainFixeS": 0.387,
+     "gainOptimiseS": 0.387,
      "vmaxKmh": 323
     },
     "polyvalente": {
-     "tempsFixeS": 106.812,
-     "tempsOptimiseS": 106.812,
+     "tempsFixeS": 106.827,
+     "tempsOptimiseS": 106.827,
      "ailerons": 1,
-     "gainFixeS": 0.725,
-     "gainOptimiseS": 0.725,
+     "gainFixeS": 0.71,
+     "gainOptimiseS": 0.71,
      "vmaxKmh": 325
     }
    }
@@ -1906,59 +1906,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 75.787,
-     "tempsOptimiseS": 75.787,
+     "tempsFixeS": 75.8,
+     "tempsOptimiseS": 75.8,
      "ailerons": 1,
-     "gainFixeS": 0.626,
-     "gainOptimiseS": 0.626,
+     "gainFixeS": 0.613,
+     "gainOptimiseS": 0.613,
      "vmaxKmh": 316
     },
     "faibleTrainee": {
-     "tempsFixeS": 76.131,
-     "tempsOptimiseS": 76.131,
+     "tempsFixeS": 76.117,
+     "tempsOptimiseS": 76.117,
      "ailerons": 1,
-     "gainFixeS": 0.282,
-     "gainOptimiseS": 0.282,
+     "gainFixeS": 0.295,
+     "gainOptimiseS": 0.295,
      "vmaxKmh": 320
     },
     "adherenceMecanique": {
-     "tempsFixeS": 75.855,
-     "tempsOptimiseS": 75.855,
+     "tempsFixeS": 75.873,
+     "tempsOptimiseS": 75.873,
      "ailerons": 1,
-     "gainFixeS": 0.557,
-     "gainOptimiseS": 0.557,
+     "gainFixeS": 0.539,
+     "gainOptimiseS": 0.539,
      "vmaxKmh": 316
     },
     "motricite": {
-     "tempsFixeS": 76.041,
-     "tempsOptimiseS": 76.041,
+     "tempsFixeS": 76.062,
+     "tempsOptimiseS": 76.062,
      "ailerons": 1,
-     "gainFixeS": 0.371,
-     "gainOptimiseS": 0.371,
+     "gainFixeS": 0.35,
+     "gainOptimiseS": 0.35,
      "vmaxKmh": 315
     },
     "moteur": {
-     "tempsFixeS": 76.037,
-     "tempsOptimiseS": 76.037,
+     "tempsFixeS": 76.032,
+     "tempsOptimiseS": 76.032,
      "ailerons": 1,
-     "gainFixeS": 0.375,
-     "gainOptimiseS": 0.375,
-     "vmaxKmh": 319
+     "gainFixeS": 0.381,
+     "gainOptimiseS": 0.381,
+     "vmaxKmh": 320
     },
     "freinage": {
-     "tempsFixeS": 76.081,
-     "tempsOptimiseS": 76.081,
+     "tempsFixeS": 76.093,
+     "tempsOptimiseS": 76.093,
      "ailerons": 1,
-     "gainFixeS": 0.331,
-     "gainOptimiseS": 0.331,
+     "gainFixeS": 0.319,
+     "gainOptimiseS": 0.319,
      "vmaxKmh": 315
     },
     "polyvalente": {
-     "tempsFixeS": 75.95,
-     "tempsOptimiseS": 75.95,
+     "tempsFixeS": 75.96,
+     "tempsOptimiseS": 75.96,
      "ailerons": 1,
-     "gainFixeS": 0.462,
-     "gainOptimiseS": 0.462,
+     "gainFixeS": 0.452,
+     "gainOptimiseS": 0.452,
      "vmaxKmh": 317
     }
    }
@@ -1987,60 +1987,60 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 76.126,
-     "tempsOptimiseS": 76.126,
+     "tempsFixeS": 76.135,
+     "tempsOptimiseS": 76.135,
      "ailerons": 1,
-     "gainFixeS": 0.551,
-     "gainOptimiseS": 0.551,
+     "gainFixeS": 0.542,
+     "gainOptimiseS": 0.542,
      "vmaxKmh": 309
     },
     "faibleTrainee": {
-     "tempsFixeS": 76.354,
-     "tempsOptimiseS": 76.354,
+     "tempsFixeS": 76.343,
+     "tempsOptimiseS": 76.343,
      "ailerons": 1,
-     "gainFixeS": 0.324,
-     "gainOptimiseS": 0.324,
+     "gainFixeS": 0.334,
+     "gainOptimiseS": 0.334,
      "vmaxKmh": 313
     },
     "adherenceMecanique": {
-     "tempsFixeS": 76.115,
-     "tempsOptimiseS": 76.115,
+     "tempsFixeS": 76.134,
+     "tempsOptimiseS": 76.134,
      "ailerons": 1,
-     "gainFixeS": 0.562,
-     "gainOptimiseS": 0.562,
+     "gainFixeS": 0.543,
+     "gainOptimiseS": 0.543,
      "vmaxKmh": 309
     },
     "motricite": {
-     "tempsFixeS": 76.139,
-     "tempsOptimiseS": 76.139,
+     "tempsFixeS": 76.198,
+     "tempsOptimiseS": 76.198,
      "ailerons": 1,
-     "gainFixeS": 0.538,
-     "gainOptimiseS": 0.538,
+     "gainFixeS": 0.479,
+     "gainOptimiseS": 0.479,
      "vmaxKmh": 308
     },
     "moteur": {
-     "tempsFixeS": 76.305,
-     "tempsOptimiseS": 76.305,
+     "tempsFixeS": 76.299,
+     "tempsOptimiseS": 76.299,
      "ailerons": 1,
-     "gainFixeS": 0.372,
-     "gainOptimiseS": 0.372,
+     "gainFixeS": 0.378,
+     "gainOptimiseS": 0.378,
      "vmaxKmh": 313
     },
     "freinage": {
-     "tempsFixeS": 76.274,
-     "tempsOptimiseS": 76.274,
+     "tempsFixeS": 76.289,
+     "tempsOptimiseS": 76.289,
      "ailerons": 1,
-     "gainFixeS": 0.403,
-     "gainOptimiseS": 0.403,
+     "gainFixeS": 0.388,
+     "gainOptimiseS": 0.388,
      "vmaxKmh": 309
     },
     "polyvalente": {
-     "tempsFixeS": 76.199,
-     "tempsOptimiseS": 76.199,
+     "tempsFixeS": 76.21,
+     "tempsOptimiseS": 76.21,
      "ailerons": 1,
-     "gainFixeS": 0.478,
-     "gainOptimiseS": 0.478,
-     "vmaxKmh": 311
+     "gainFixeS": 0.467,
+     "gainOptimiseS": 0.467,
+     "vmaxKmh": 310
     }
    }
   },
@@ -2049,78 +2049,78 @@
    "tempsReferenceS": 95.297,
    "aileronsReference": 1,
    "classementFixe": [
-    "motricite",
     "freinage",
-    "adherenceMecanique",
+    "motricite",
     "appui",
+    "adherenceMecanique",
     "polyvalente",
     "moteur",
     "faibleTrainee"
    ],
    "classementOptimise": [
-    "motricite",
     "freinage",
-    "adherenceMecanique",
+    "motricite",
     "appui",
+    "adherenceMecanique",
     "polyvalente",
     "moteur",
     "faibleTrainee"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 94.71,
-     "tempsOptimiseS": 94.71,
+     "tempsFixeS": 94.721,
+     "tempsOptimiseS": 94.721,
      "ailerons": 1,
-     "gainFixeS": 0.587,
-     "gainOptimiseS": 0.587,
+     "gainFixeS": 0.575,
+     "gainOptimiseS": 0.575,
      "vmaxKmh": 296
     },
     "faibleTrainee": {
-     "tempsFixeS": 94.89,
-     "tempsOptimiseS": 94.89,
+     "tempsFixeS": 94.874,
+     "tempsOptimiseS": 94.874,
      "ailerons": 1,
-     "gainFixeS": 0.406,
-     "gainOptimiseS": 0.406,
+     "gainFixeS": 0.423,
+     "gainOptimiseS": 0.423,
      "vmaxKmh": 299
     },
     "adherenceMecanique": {
-     "tempsFixeS": 94.707,
-     "tempsOptimiseS": 94.707,
+     "tempsFixeS": 94.727,
+     "tempsOptimiseS": 94.727,
      "ailerons": 1,
-     "gainFixeS": 0.589,
-     "gainOptimiseS": 0.589,
+     "gainFixeS": 0.569,
+     "gainOptimiseS": 0.569,
      "vmaxKmh": 296
     },
     "motricite": {
-     "tempsFixeS": 94.595,
-     "tempsOptimiseS": 94.595,
+     "tempsFixeS": 94.671,
+     "tempsOptimiseS": 94.671,
      "ailerons": 1,
-     "gainFixeS": 0.702,
-     "gainOptimiseS": 0.702,
+     "gainFixeS": 0.626,
+     "gainOptimiseS": 0.626,
      "vmaxKmh": 295
     },
     "moteur": {
-     "tempsFixeS": 94.828,
-     "tempsOptimiseS": 94.828,
+     "tempsFixeS": 94.822,
+     "tempsOptimiseS": 94.822,
      "ailerons": 1,
-     "gainFixeS": 0.468,
-     "gainOptimiseS": 0.468,
+     "gainFixeS": 0.475,
+     "gainOptimiseS": 0.475,
      "vmaxKmh": 300
     },
     "freinage": {
-     "tempsFixeS": 94.635,
-     "tempsOptimiseS": 94.635,
+     "tempsFixeS": 94.658,
+     "tempsOptimiseS": 94.658,
      "ailerons": 1,
-     "gainFixeS": 0.661,
-     "gainOptimiseS": 0.661,
+     "gainFixeS": 0.638,
+     "gainOptimiseS": 0.638,
      "vmaxKmh": 296
     },
     "polyvalente": {
-     "tempsFixeS": 94.751,
-     "tempsOptimiseS": 94.751,
+     "tempsFixeS": 94.764,
+     "tempsOptimiseS": 94.764,
      "ailerons": 1,
-     "gainFixeS": 0.546,
-     "gainOptimiseS": 0.546,
+     "gainFixeS": 0.533,
+     "gainOptimiseS": 0.533,
      "vmaxKmh": 297
     }
    }
@@ -2132,76 +2132,76 @@
    "classementFixe": [
     "motricite",
     "freinage",
-    "polyvalente",
     "moteur",
-    "adherenceMecanique",
     "faibleTrainee",
+    "polyvalente",
+    "adherenceMecanique",
     "appui"
    ],
    "classementOptimise": [
     "motricite",
     "freinage",
-    "polyvalente",
     "moteur",
-    "adherenceMecanique",
     "faibleTrainee",
+    "polyvalente",
+    "adherenceMecanique",
     "appui"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 101.09,
-     "tempsOptimiseS": 101.09,
+     "tempsFixeS": 101.1,
+     "tempsOptimiseS": 101.1,
      "ailerons": 1,
-     "gainFixeS": 0.48,
-     "gainOptimiseS": 0.48,
+     "gainFixeS": 0.471,
+     "gainOptimiseS": 0.471,
      "vmaxKmh": 331
     },
     "faibleTrainee": {
-     "tempsFixeS": 101.042,
-     "tempsOptimiseS": 101.042,
+     "tempsFixeS": 101.019,
+     "tempsOptimiseS": 101.019,
      "ailerons": 1,
-     "gainFixeS": 0.528,
-     "gainOptimiseS": 0.528,
+     "gainFixeS": 0.552,
+     "gainOptimiseS": 0.552,
      "vmaxKmh": 337
     },
     "adherenceMecanique": {
-     "tempsFixeS": 101.04,
-     "tempsOptimiseS": 101.04,
+     "tempsFixeS": 101.059,
+     "tempsOptimiseS": 101.059,
      "ailerons": 1,
-     "gainFixeS": 0.53,
-     "gainOptimiseS": 0.53,
+     "gainFixeS": 0.512,
+     "gainOptimiseS": 0.512,
      "vmaxKmh": 330
     },
     "motricite": {
-     "tempsFixeS": 100.448,
-     "tempsOptimiseS": 100.448,
+     "tempsFixeS": 100.536,
+     "tempsOptimiseS": 100.536,
      "ailerons": 1,
-     "gainFixeS": 1.123,
-     "gainOptimiseS": 1.123,
+     "gainFixeS": 1.034,
+     "gainOptimiseS": 1.034,
      "vmaxKmh": 330
     },
     "moteur": {
-     "tempsFixeS": 101.018,
-     "tempsOptimiseS": 101.018,
+     "tempsFixeS": 101.011,
+     "tempsOptimiseS": 101.011,
      "ailerons": 1,
-     "gainFixeS": 0.553,
-     "gainOptimiseS": 0.553,
+     "gainFixeS": 0.559,
+     "gainOptimiseS": 0.559,
      "vmaxKmh": 334
     },
     "freinage": {
-     "tempsFixeS": 100.795,
-     "tempsOptimiseS": 100.795,
+     "tempsFixeS": 100.824,
+     "tempsOptimiseS": 100.824,
      "ailerons": 1,
-     "gainFixeS": 0.776,
-     "gainOptimiseS": 0.776,
+     "gainFixeS": 0.747,
+     "gainOptimiseS": 0.747,
      "vmaxKmh": 331
     },
     "polyvalente": {
-     "tempsFixeS": 101.01,
-     "tempsOptimiseS": 101.01,
+     "tempsFixeS": 101.023,
+     "tempsOptimiseS": 101.023,
      "ailerons": 1,
-     "gainFixeS": 0.56,
-     "gainOptimiseS": 0.56,
+     "gainFixeS": 0.547,
+     "gainOptimiseS": 0.547,
      "vmaxKmh": 332
     }
    }
@@ -2213,8 +2213,8 @@
    "classementFixe": [
     "motricite",
     "freinage",
-    "adherenceMecanique",
     "moteur",
+    "adherenceMecanique",
     "polyvalente",
     "faibleTrainee",
     "appui"
@@ -2222,67 +2222,67 @@
    "classementOptimise": [
     "motricite",
     "freinage",
-    "adherenceMecanique",
     "moteur",
+    "adherenceMecanique",
     "polyvalente",
     "faibleTrainee",
     "appui"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 94.467,
-     "tempsOptimiseS": 94.467,
+     "tempsFixeS": 94.476,
+     "tempsOptimiseS": 94.476,
      "ailerons": 1,
-     "gainFixeS": 0.487,
-     "gainOptimiseS": 0.487,
+     "gainFixeS": 0.478,
+     "gainOptimiseS": 0.478,
      "vmaxKmh": 324
     },
     "faibleTrainee": {
-     "tempsFixeS": 94.462,
-     "tempsOptimiseS": 94.462,
+     "tempsFixeS": 94.443,
+     "tempsOptimiseS": 94.443,
      "ailerons": 1,
-     "gainFixeS": 0.492,
-     "gainOptimiseS": 0.492,
+     "gainFixeS": 0.511,
+     "gainOptimiseS": 0.511,
      "vmaxKmh": 329
     },
     "adherenceMecanique": {
-     "tempsFixeS": 94.414,
-     "tempsOptimiseS": 94.414,
+     "tempsFixeS": 94.432,
+     "tempsOptimiseS": 94.432,
      "ailerons": 1,
-     "gainFixeS": 0.541,
-     "gainOptimiseS": 0.541,
+     "gainFixeS": 0.523,
+     "gainOptimiseS": 0.523,
      "vmaxKmh": 324
     },
     "motricite": {
-     "tempsFixeS": 94.327,
-     "tempsOptimiseS": 94.327,
+     "tempsFixeS": 94.385,
+     "tempsOptimiseS": 94.385,
      "ailerons": 1,
-     "gainFixeS": 0.627,
-     "gainOptimiseS": 0.627,
+     "gainFixeS": 0.57,
+     "gainOptimiseS": 0.57,
      "vmaxKmh": 324
     },
     "moteur": {
-     "tempsFixeS": 94.414,
-     "tempsOptimiseS": 94.414,
+     "tempsFixeS": 94.407,
+     "tempsOptimiseS": 94.407,
      "ailerons": 1,
-     "gainFixeS": 0.54,
-     "gainOptimiseS": 0.54,
+     "gainFixeS": 0.548,
+     "gainOptimiseS": 0.548,
      "vmaxKmh": 328
     },
     "freinage": {
-     "tempsFixeS": 94.388,
-     "tempsOptimiseS": 94.388,
+     "tempsFixeS": 94.386,
+     "tempsOptimiseS": 94.386,
      "ailerons": 1,
-     "gainFixeS": 0.566,
-     "gainOptimiseS": 0.566,
+     "gainFixeS": 0.569,
+     "gainOptimiseS": 0.569,
      "vmaxKmh": 325
     },
     "polyvalente": {
-     "tempsFixeS": 94.42,
-     "tempsOptimiseS": 94.42,
+     "tempsFixeS": 94.433,
+     "tempsOptimiseS": 94.433,
      "ailerons": 1,
-     "gainFixeS": 0.534,
-     "gainOptimiseS": 0.534,
+     "gainFixeS": 0.521,
+     "gainOptimiseS": 0.521,
      "vmaxKmh": 326
     }
    }
@@ -2311,59 +2311,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 70.286,
-     "tempsOptimiseS": 70.286,
+     "tempsFixeS": 70.294,
+     "tempsOptimiseS": 70.294,
      "ailerons": 1,
-     "gainFixeS": 0.366,
-     "gainOptimiseS": 0.366,
+     "gainFixeS": 0.358,
+     "gainOptimiseS": 0.358,
      "vmaxKmh": 323
     },
     "faibleTrainee": {
-     "tempsFixeS": 70.22,
-     "tempsOptimiseS": 70.22,
+     "tempsFixeS": 70.205,
+     "tempsOptimiseS": 70.205,
      "ailerons": 1,
-     "gainFixeS": 0.432,
-     "gainOptimiseS": 0.432,
+     "gainFixeS": 0.447,
+     "gainOptimiseS": 0.447,
      "vmaxKmh": 328
     },
     "adherenceMecanique": {
-     "tempsFixeS": 70.242,
-     "tempsOptimiseS": 70.242,
+     "tempsFixeS": 70.256,
+     "tempsOptimiseS": 70.256,
      "ailerons": 1,
-     "gainFixeS": 0.409,
-     "gainOptimiseS": 0.409,
+     "gainFixeS": 0.396,
+     "gainOptimiseS": 0.396,
      "vmaxKmh": 323
     },
     "motricite": {
-     "tempsFixeS": 70.379,
-     "tempsOptimiseS": 70.379,
+     "tempsFixeS": 70.415,
+     "tempsOptimiseS": 70.415,
      "ailerons": 1,
-     "gainFixeS": 0.273,
-     "gainOptimiseS": 0.273,
+     "gainFixeS": 0.237,
+     "gainOptimiseS": 0.237,
      "vmaxKmh": 321
     },
     "moteur": {
-     "tempsFixeS": 70.193,
-     "tempsOptimiseS": 70.193,
+     "tempsFixeS": 70.187,
+     "tempsOptimiseS": 70.187,
      "ailerons": 1,
-     "gainFixeS": 0.458,
-     "gainOptimiseS": 0.458,
+     "gainFixeS": 0.464,
+     "gainOptimiseS": 0.464,
      "vmaxKmh": 327
     },
     "freinage": {
-     "tempsFixeS": 70.321,
-     "tempsOptimiseS": 70.321,
+     "tempsFixeS": 70.332,
+     "tempsOptimiseS": 70.332,
      "ailerons": 1,
-     "gainFixeS": 0.331,
-     "gainOptimiseS": 0.331,
+     "gainFixeS": 0.319,
+     "gainOptimiseS": 0.319,
      "vmaxKmh": 322
     },
     "polyvalente": {
-     "tempsFixeS": 70.278,
-     "tempsOptimiseS": 70.278,
+     "tempsFixeS": 70.287,
+     "tempsOptimiseS": 70.287,
      "ailerons": 1,
-     "gainFixeS": 0.374,
-     "gainOptimiseS": 0.374,
+     "gainFixeS": 0.365,
+     "gainOptimiseS": 0.365,
      "vmaxKmh": 324
     }
    }
@@ -2384,74 +2384,74 @@
    "classementOptimise": [
     "faibleTrainee",
     "moteur",
-    "motricite",
     "polyvalente",
-    "freinage",
+    "motricite",
     "adherenceMecanique",
+    "freinage",
     "appui"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 91.187,
-     "tempsOptimiseS": 91.16,
+     "tempsFixeS": 91.178,
+     "tempsOptimiseS": 91.167,
      "ailerons": 0.95,
-     "gainFixeS": 0.351,
-     "gainOptimiseS": 0.378,
+     "gainFixeS": 0.36,
+     "gainOptimiseS": 0.371,
      "vmaxKmh": 338
     },
     "faibleTrainee": {
-     "tempsFixeS": 90.827,
-     "tempsOptimiseS": 90.827,
+     "tempsFixeS": 90.803,
+     "tempsOptimiseS": 90.803,
      "ailerons": 1,
-     "gainFixeS": 0.712,
-     "gainOptimiseS": 0.712,
+     "gainFixeS": 0.736,
+     "gainOptimiseS": 0.736,
      "vmaxKmh": 345
     },
     "adherenceMecanique": {
-     "tempsFixeS": 91.134,
-     "tempsOptimiseS": 91.107,
+     "tempsFixeS": 91.148,
+     "tempsOptimiseS": 91.104,
      "ailerons": 0.95,
-     "gainFixeS": 0.404,
-     "gainOptimiseS": 0.431,
+     "gainFixeS": 0.39,
+     "gainOptimiseS": 0.434,
      "vmaxKmh": 338
     },
     "motricite": {
-     "tempsFixeS": 91.025,
-     "tempsOptimiseS": 91.025,
+     "tempsFixeS": 91.052,
+     "tempsOptimiseS": 91.052,
      "ailerons": 1,
-     "gainFixeS": 0.513,
-     "gainOptimiseS": 0.513,
+     "gainFixeS": 0.486,
+     "gainOptimiseS": 0.486,
      "vmaxKmh": 338
     },
     "moteur": {
-     "tempsFixeS": 90.894,
-     "tempsOptimiseS": 90.894,
+     "tempsFixeS": 90.885,
+     "tempsOptimiseS": 90.885,
      "ailerons": 1,
-     "gainFixeS": 0.645,
-     "gainOptimiseS": 0.645,
+     "gainFixeS": 0.653,
+     "gainOptimiseS": 0.653,
      "vmaxKmh": 342
     },
     "freinage": {
-     "tempsFixeS": 91.102,
-     "tempsOptimiseS": 91.102,
+     "tempsFixeS": 91.114,
+     "tempsOptimiseS": 91.114,
      "ailerons": 1,
-     "gainFixeS": 0.437,
-     "gainOptimiseS": 0.437,
+     "gainFixeS": 0.424,
+     "gainOptimiseS": 0.424,
      "vmaxKmh": 338
     },
     "polyvalente": {
-     "tempsFixeS": 91.049,
-     "tempsOptimiseS": 91.039,
+     "tempsFixeS": 91.06,
+     "tempsOptimiseS": 91.051,
      "ailerons": 0.95,
-     "gainFixeS": 0.489,
-     "gainOptimiseS": 0.499,
+     "gainFixeS": 0.478,
+     "gainOptimiseS": 0.488,
      "vmaxKmh": 340
     }
    }
   },
   "cir_lusail": {
    "test": false,
-   "tempsReferenceS": 89.531,
+   "tempsReferenceS": 89.535,
    "aileronsReference": 1,
    "classementFixe": [
     "appui",
@@ -2473,59 +2473,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 88.703,
-     "tempsOptimiseS": 88.703,
+     "tempsFixeS": 88.719,
+     "tempsOptimiseS": 88.719,
      "ailerons": 1,
-     "gainFixeS": 0.827,
-     "gainOptimiseS": 0.827,
+     "gainFixeS": 0.816,
+     "gainOptimiseS": 0.816,
      "vmaxKmh": 322
     },
     "faibleTrainee": {
-     "tempsFixeS": 89.076,
-     "tempsOptimiseS": 89.076,
+     "tempsFixeS": 89.063,
+     "tempsOptimiseS": 89.063,
      "ailerons": 1,
-     "gainFixeS": 0.455,
-     "gainOptimiseS": 0.455,
+     "gainFixeS": 0.472,
+     "gainOptimiseS": 0.472,
      "vmaxKmh": 327
     },
     "adherenceMecanique": {
-     "tempsFixeS": 88.712,
-     "tempsOptimiseS": 88.712,
-     "ailerons": 1,
-     "gainFixeS": 0.819,
-     "gainOptimiseS": 0.819,
-     "vmaxKmh": 322
-    },
-    "motricite": {
-     "tempsFixeS": 89.102,
-     "tempsOptimiseS": 89.102,
-     "ailerons": 1,
-     "gainFixeS": 0.428,
-     "gainOptimiseS": 0.428,
-     "vmaxKmh": 322
-    },
-    "moteur": {
-     "tempsFixeS": 88.993,
-     "tempsOptimiseS": 88.993,
-     "ailerons": 1,
-     "gainFixeS": 0.538,
-     "gainOptimiseS": 0.538,
-     "vmaxKmh": 326
-    },
-    "freinage": {
-     "tempsFixeS": 88.994,
-     "tempsOptimiseS": 88.994,
-     "ailerons": 1,
-     "gainFixeS": 0.537,
-     "gainOptimiseS": 0.537,
-     "vmaxKmh": 322
-    },
-    "polyvalente": {
-     "tempsFixeS": 88.78,
-     "tempsOptimiseS": 88.78,
+     "tempsFixeS": 88.784,
+     "tempsOptimiseS": 88.784,
      "ailerons": 1,
      "gainFixeS": 0.75,
      "gainOptimiseS": 0.75,
+     "vmaxKmh": 322
+    },
+    "motricite": {
+     "tempsFixeS": 89.131,
+     "tempsOptimiseS": 89.131,
+     "ailerons": 1,
+     "gainFixeS": 0.404,
+     "gainOptimiseS": 0.404,
+     "vmaxKmh": 322
+    },
+    "moteur": {
+     "tempsFixeS": 88.992,
+     "tempsOptimiseS": 88.992,
+     "ailerons": 1,
+     "gainFixeS": 0.543,
+     "gainOptimiseS": 0.543,
+     "vmaxKmh": 326
+    },
+    "freinage": {
+     "tempsFixeS": 89.016,
+     "tempsOptimiseS": 89.016,
+     "ailerons": 1,
+     "gainFixeS": 0.519,
+     "gainOptimiseS": 0.519,
+     "vmaxKmh": 322
+    },
+    "polyvalente": {
+     "tempsFixeS": 88.796,
+     "tempsOptimiseS": 88.796,
+     "ailerons": 1,
+     "gainFixeS": 0.738,
+     "gainOptimiseS": 0.738,
      "vmaxKmh": 323
     }
    }
@@ -2536,77 +2536,77 @@
    "aileronsReference": 1,
    "classementFixe": [
     "freinage",
+    "moteur",
     "motricite",
     "polyvalente",
-    "moteur",
-    "adherenceMecanique",
     "faibleTrainee",
+    "adherenceMecanique",
     "appui"
    ],
    "classementOptimise": [
     "freinage",
+    "moteur",
     "motricite",
     "polyvalente",
-    "moteur",
-    "adherenceMecanique",
     "faibleTrainee",
+    "adherenceMecanique",
     "appui"
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 85.792,
-     "tempsOptimiseS": 85.792,
+     "tempsFixeS": 85.8,
+     "tempsOptimiseS": 85.8,
      "ailerons": 1,
-     "gainFixeS": 0.44,
-     "gainOptimiseS": 0.44,
+     "gainFixeS": 0.432,
+     "gainOptimiseS": 0.432,
      "vmaxKmh": 326
     },
     "faibleTrainee": {
-     "tempsFixeS": 85.772,
-     "tempsOptimiseS": 85.772,
+     "tempsFixeS": 85.755,
+     "tempsOptimiseS": 85.755,
      "ailerons": 1,
-     "gainFixeS": 0.46,
-     "gainOptimiseS": 0.46,
+     "gainFixeS": 0.477,
+     "gainOptimiseS": 0.477,
      "vmaxKmh": 331
     },
     "adherenceMecanique": {
-     "tempsFixeS": 85.756,
-     "tempsOptimiseS": 85.756,
+     "tempsFixeS": 85.768,
+     "tempsOptimiseS": 85.768,
      "ailerons": 1,
-     "gainFixeS": 0.476,
-     "gainOptimiseS": 0.476,
+     "gainFixeS": 0.464,
+     "gainOptimiseS": 0.464,
      "vmaxKmh": 326
     },
     "motricite": {
-     "tempsFixeS": 85.696,
-     "tempsOptimiseS": 85.696,
+     "tempsFixeS": 85.747,
+     "tempsOptimiseS": 85.747,
      "ailerons": 1,
-     "gainFixeS": 0.536,
-     "gainOptimiseS": 0.536,
+     "gainFixeS": 0.485,
+     "gainOptimiseS": 0.485,
      "vmaxKmh": 326
     },
     "moteur": {
-     "tempsFixeS": 85.75,
-     "tempsOptimiseS": 85.75,
+     "tempsFixeS": 85.743,
+     "tempsOptimiseS": 85.743,
      "ailerons": 1,
-     "gainFixeS": 0.482,
-     "gainOptimiseS": 0.482,
+     "gainFixeS": 0.489,
+     "gainOptimiseS": 0.489,
      "vmaxKmh": 330
     },
     "freinage": {
-     "tempsFixeS": 85.681,
-     "tempsOptimiseS": 85.681,
+     "tempsFixeS": 85.701,
+     "tempsOptimiseS": 85.701,
      "ailerons": 1,
-     "gainFixeS": 0.551,
-     "gainOptimiseS": 0.551,
+     "gainFixeS": 0.531,
+     "gainOptimiseS": 0.531,
      "vmaxKmh": 326
     },
     "polyvalente": {
-     "tempsFixeS": 85.738,
-     "tempsOptimiseS": 85.738,
+     "tempsFixeS": 85.749,
+     "tempsOptimiseS": 85.749,
      "ailerons": 1,
-     "gainFixeS": 0.494,
-     "gainOptimiseS": 0.494,
+     "gainFixeS": 0.483,
+     "gainOptimiseS": 0.483,
      "vmaxKmh": 327
     }
    }
@@ -2635,59 +2635,59 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 76.755,
-     "tempsOptimiseS": 76.755,
+     "tempsFixeS": 76.763,
+     "tempsOptimiseS": 76.763,
      "ailerons": 1,
-     "gainFixeS": 0.399,
-     "gainOptimiseS": 0.399,
+     "gainFixeS": 0.391,
+     "gainOptimiseS": 0.391,
      "vmaxKmh": 306
     },
     "faibleTrainee": {
-     "tempsFixeS": 76.707,
-     "tempsOptimiseS": 76.707,
+     "tempsFixeS": 76.689,
+     "tempsOptimiseS": 76.689,
      "ailerons": 1,
-     "gainFixeS": 0.447,
-     "gainOptimiseS": 0.447,
+     "gainFixeS": 0.465,
+     "gainOptimiseS": 0.465,
      "vmaxKmh": 310
     },
     "adherenceMecanique": {
-     "tempsFixeS": 76.756,
-     "tempsOptimiseS": 76.756,
+     "tempsFixeS": 76.769,
+     "tempsOptimiseS": 76.769,
      "ailerons": 1,
-     "gainFixeS": 0.398,
-     "gainOptimiseS": 0.398,
+     "gainFixeS": 0.385,
+     "gainOptimiseS": 0.385,
      "vmaxKmh": 306
     },
     "motricite": {
-     "tempsFixeS": 76.801,
-     "tempsOptimiseS": 76.801,
+     "tempsFixeS": 76.816,
+     "tempsOptimiseS": 76.816,
      "ailerons": 1,
-     "gainFixeS": 0.353,
-     "gainOptimiseS": 0.353,
+     "gainFixeS": 0.338,
+     "gainOptimiseS": 0.338,
      "vmaxKmh": 304
     },
     "moteur": {
-     "tempsFixeS": 76.644,
-     "tempsOptimiseS": 76.644,
+     "tempsFixeS": 76.637,
+     "tempsOptimiseS": 76.637,
      "ailerons": 1,
-     "gainFixeS": 0.51,
-     "gainOptimiseS": 0.51,
+     "gainFixeS": 0.517,
+     "gainOptimiseS": 0.517,
      "vmaxKmh": 310
     },
     "freinage": {
-     "tempsFixeS": 76.742,
-     "tempsOptimiseS": 76.742,
+     "tempsFixeS": 76.759,
+     "tempsOptimiseS": 76.759,
      "ailerons": 1,
-     "gainFixeS": 0.411,
-     "gainOptimiseS": 0.411,
+     "gainFixeS": 0.395,
+     "gainOptimiseS": 0.395,
      "vmaxKmh": 306
     },
     "polyvalente": {
-     "tempsFixeS": 76.72,
-     "tempsOptimiseS": 76.72,
+     "tempsFixeS": 76.736,
+     "tempsOptimiseS": 76.736,
      "ailerons": 1,
-     "gainFixeS": 0.434,
-     "gainOptimiseS": 0.434,
+     "gainFixeS": 0.418,
+     "gainOptimiseS": 0.418,
      "vmaxKmh": 307
     }
    }
@@ -2716,60 +2716,384 @@
    ],
    "voitures": {
     "appui": {
-     "tempsFixeS": 91.225,
-     "tempsOptimiseS": 91.225,
+     "tempsFixeS": 91.234,
+     "tempsOptimiseS": 91.234,
      "ailerons": 1,
-     "gainFixeS": 0.864,
-     "gainOptimiseS": 0.864,
+     "gainFixeS": 0.855,
+     "gainOptimiseS": 0.855,
      "vmaxKmh": 318
     },
     "faibleTrainee": {
-     "tempsFixeS": 91.641,
-     "tempsOptimiseS": 91.641,
+     "tempsFixeS": 91.623,
+     "tempsOptimiseS": 91.623,
      "ailerons": 1,
-     "gainFixeS": 0.448,
-     "gainOptimiseS": 0.448,
+     "gainFixeS": 0.466,
+     "gainOptimiseS": 0.466,
      "vmaxKmh": 322
     },
     "adherenceMecanique": {
-     "tempsFixeS": 91.311,
-     "tempsOptimiseS": 91.311,
+     "tempsFixeS": 91.33,
+     "tempsOptimiseS": 91.33,
      "ailerons": 1,
-     "gainFixeS": 0.778,
-     "gainOptimiseS": 0.778,
+     "gainFixeS": 0.759,
+     "gainOptimiseS": 0.759,
      "vmaxKmh": 318
     },
     "motricite": {
-     "tempsFixeS": 91.515,
-     "tempsOptimiseS": 91.515,
+     "tempsFixeS": 91.568,
+     "tempsOptimiseS": 91.568,
      "ailerons": 1,
-     "gainFixeS": 0.573,
-     "gainOptimiseS": 0.573,
+     "gainFixeS": 0.521,
+     "gainOptimiseS": 0.521,
      "vmaxKmh": 318
     },
     "moteur": {
-     "tempsFixeS": 91.579,
-     "tempsOptimiseS": 91.579,
+     "tempsFixeS": 91.572,
+     "tempsOptimiseS": 91.572,
      "ailerons": 1,
-     "gainFixeS": 0.51,
-     "gainOptimiseS": 0.51,
+     "gainFixeS": 0.517,
+     "gainOptimiseS": 0.517,
      "vmaxKmh": 321
     },
     "freinage": {
-     "tempsFixeS": 91.579,
-     "tempsOptimiseS": 91.579,
+     "tempsFixeS": 91.596,
+     "tempsOptimiseS": 91.596,
      "ailerons": 1,
-     "gainFixeS": 0.51,
-     "gainOptimiseS": 0.51,
+     "gainFixeS": 0.493,
+     "gainOptimiseS": 0.493,
      "vmaxKmh": 317
     },
     "polyvalente": {
-     "tempsFixeS": 91.32,
-     "tempsOptimiseS": 91.32,
+     "tempsFixeS": 91.332,
+     "tempsOptimiseS": 91.332,
      "ailerons": 1,
-     "gainFixeS": 0.769,
-     "gainOptimiseS": 0.769,
+     "gainFixeS": 0.756,
+     "gainOptimiseS": 0.756,
      "vmaxKmh": 319
+    }
+   }
+  },
+  "cir_portimao": {
+   "test": false,
+   "tempsReferenceS": 82.787,
+   "aileronsReference": 1,
+   "classementFixe": [
+    "motricite",
+    "adherenceMecanique",
+    "polyvalente",
+    "appui",
+    "freinage",
+    "moteur",
+    "faibleTrainee"
+   ],
+   "classementOptimise": [
+    "motricite",
+    "adherenceMecanique",
+    "polyvalente",
+    "appui",
+    "freinage",
+    "moteur",
+    "faibleTrainee"
+   ],
+   "voitures": {
+    "appui": {
+     "tempsFixeS": 82.282,
+     "tempsOptimiseS": 82.282,
+     "ailerons": 1,
+     "gainFixeS": 0.506,
+     "gainOptimiseS": 0.506,
+     "vmaxKmh": 299
+    },
+    "faibleTrainee": {
+     "tempsFixeS": 82.398,
+     "tempsOptimiseS": 82.398,
+     "ailerons": 1,
+     "gainFixeS": 0.389,
+     "gainOptimiseS": 0.389,
+     "vmaxKmh": 302
+    },
+    "adherenceMecanique": {
+     "tempsFixeS": 82.225,
+     "tempsOptimiseS": 82.225,
+     "ailerons": 1,
+     "gainFixeS": 0.562,
+     "gainOptimiseS": 0.562,
+     "vmaxKmh": 299
+    },
+    "motricite": {
+     "tempsFixeS": 82.073,
+     "tempsOptimiseS": 82.073,
+     "ailerons": 1,
+     "gainFixeS": 0.715,
+     "gainOptimiseS": 0.715,
+     "vmaxKmh": 298
+    },
+    "moteur": {
+     "tempsFixeS": 82.366,
+     "tempsOptimiseS": 82.366,
+     "ailerons": 1,
+     "gainFixeS": 0.421,
+     "gainOptimiseS": 0.421,
+     "vmaxKmh": 302
+    },
+    "freinage": {
+     "tempsFixeS": 82.315,
+     "tempsOptimiseS": 82.315,
+     "ailerons": 1,
+     "gainFixeS": 0.473,
+     "gainOptimiseS": 0.473,
+     "vmaxKmh": 298
+    },
+    "polyvalente": {
+     "tempsFixeS": 82.258,
+     "tempsOptimiseS": 82.258,
+     "ailerons": 1,
+     "gainFixeS": 0.529,
+     "gainOptimiseS": 0.529,
+     "vmaxKmh": 300
+    }
+   }
+  },
+  "cir_istanbul": {
+   "test": false,
+   "tempsReferenceS": 95.209,
+   "aileronsReference": 1,
+   "classementFixe": [
+    "motricite",
+    "freinage",
+    "adherenceMecanique",
+    "polyvalente",
+    "appui",
+    "moteur",
+    "faibleTrainee"
+   ],
+   "classementOptimise": [
+    "motricite",
+    "freinage",
+    "adherenceMecanique",
+    "polyvalente",
+    "appui",
+    "moteur",
+    "faibleTrainee"
+   ],
+   "voitures": {
+    "appui": {
+     "tempsFixeS": 94.709,
+     "tempsOptimiseS": 94.709,
+     "ailerons": 1,
+     "gainFixeS": 0.5,
+     "gainOptimiseS": 0.5,
+     "vmaxKmh": 320
+    },
+    "faibleTrainee": {
+     "tempsFixeS": 94.731,
+     "tempsOptimiseS": 94.731,
+     "ailerons": 1,
+     "gainFixeS": 0.478,
+     "gainOptimiseS": 0.478,
+     "vmaxKmh": 325
+    },
+    "adherenceMecanique": {
+     "tempsFixeS": 94.636,
+     "tempsOptimiseS": 94.636,
+     "ailerons": 1,
+     "gainFixeS": 0.573,
+     "gainOptimiseS": 0.573,
+     "vmaxKmh": 320
+    },
+    "motricite": {
+     "tempsFixeS": 94.408,
+     "tempsOptimiseS": 94.408,
+     "ailerons": 1,
+     "gainFixeS": 0.802,
+     "gainOptimiseS": 0.802,
+     "vmaxKmh": 319
+    },
+    "moteur": {
+     "tempsFixeS": 94.719,
+     "tempsOptimiseS": 94.719,
+     "ailerons": 1,
+     "gainFixeS": 0.49,
+     "gainOptimiseS": 0.49,
+     "vmaxKmh": 323
+    },
+    "freinage": {
+     "tempsFixeS": 94.513,
+     "tempsOptimiseS": 94.513,
+     "ailerons": 1,
+     "gainFixeS": 0.696,
+     "gainOptimiseS": 0.696,
+     "vmaxKmh": 321
+    },
+    "polyvalente": {
+     "tempsFixeS": 94.678,
+     "tempsOptimiseS": 94.678,
+     "ailerons": 1,
+     "gainFixeS": 0.531,
+     "gainOptimiseS": 0.531,
+     "vmaxKmh": 321
+    }
+   }
+  },
+  "cir_kyalami": {
+   "test": false,
+   "tempsReferenceS": 82.923,
+   "aileronsReference": 1,
+   "classementFixe": [
+    "motricite",
+    "freinage",
+    "adherenceMecanique",
+    "appui",
+    "polyvalente",
+    "moteur",
+    "faibleTrainee"
+   ],
+   "classementOptimise": [
+    "motricite",
+    "freinage",
+    "adherenceMecanique",
+    "appui",
+    "polyvalente",
+    "moteur",
+    "faibleTrainee"
+   ],
+   "voitures": {
+    "appui": {
+     "tempsFixeS": 82.459,
+     "tempsOptimiseS": 82.459,
+     "ailerons": 1,
+     "gainFixeS": 0.463,
+     "gainOptimiseS": 0.463,
+     "vmaxKmh": 315
+    },
+    "faibleTrainee": {
+     "tempsFixeS": 82.686,
+     "tempsOptimiseS": 82.686,
+     "ailerons": 1,
+     "gainFixeS": 0.237,
+     "gainOptimiseS": 0.237,
+     "vmaxKmh": 319
+    },
+    "adherenceMecanique": {
+     "tempsFixeS": 82.382,
+     "tempsOptimiseS": 82.382,
+     "ailerons": 1,
+     "gainFixeS": 0.54,
+     "gainOptimiseS": 0.54,
+     "vmaxKmh": 315
+    },
+    "motricite": {
+     "tempsFixeS": 82.105,
+     "tempsOptimiseS": 82.105,
+     "ailerons": 1,
+     "gainFixeS": 0.818,
+     "gainOptimiseS": 0.818,
+     "vmaxKmh": 313
+    },
+    "moteur": {
+     "tempsFixeS": 82.634,
+     "tempsOptimiseS": 82.634,
+     "ailerons": 1,
+     "gainFixeS": 0.289,
+     "gainOptimiseS": 0.289,
+     "vmaxKmh": 319
+    },
+    "freinage": {
+     "tempsFixeS": 82.162,
+     "tempsOptimiseS": 82.162,
+     "ailerons": 1,
+     "gainFixeS": 0.76,
+     "gainOptimiseS": 0.76,
+     "vmaxKmh": 316
+    },
+    "polyvalente": {
+     "tempsFixeS": 82.478,
+     "tempsOptimiseS": 82.478,
+     "ailerons": 1,
+     "gainFixeS": 0.445,
+     "gainOptimiseS": 0.445,
+     "vmaxKmh": 316
+    }
+   }
+  },
+  "cir_paulricard": {
+   "test": false,
+   "tempsReferenceS": 103.553,
+   "aileronsReference": 1,
+   "classementFixe": [
+    "adherenceMecanique",
+    "freinage",
+    "motricite",
+    "polyvalente",
+    "moteur",
+    "faibleTrainee",
+    "appui"
+   ],
+   "classementOptimise": [
+    "adherenceMecanique",
+    "freinage",
+    "motricite",
+    "polyvalente",
+    "moteur",
+    "faibleTrainee",
+    "appui"
+   ],
+   "voitures": {
+    "appui": {
+     "tempsFixeS": 103.05,
+     "tempsOptimiseS": 103.05,
+     "ailerons": 1,
+     "gainFixeS": 0.502,
+     "gainOptimiseS": 0.502,
+     "vmaxKmh": 327
+    },
+    "faibleTrainee": {
+     "tempsFixeS": 103.028,
+     "tempsOptimiseS": 103.028,
+     "ailerons": 1,
+     "gainFixeS": 0.524,
+     "gainOptimiseS": 0.524,
+     "vmaxKmh": 332
+    },
+    "adherenceMecanique": {
+     "tempsFixeS": 102.932,
+     "tempsOptimiseS": 102.932,
+     "ailerons": 1,
+     "gainFixeS": 0.62,
+     "gainOptimiseS": 0.62,
+     "vmaxKmh": 327
+    },
+    "motricite": {
+     "tempsFixeS": 102.955,
+     "tempsOptimiseS": 102.955,
+     "ailerons": 1,
+     "gainFixeS": 0.597,
+     "gainOptimiseS": 0.597,
+     "vmaxKmh": 326
+    },
+    "moteur": {
+     "tempsFixeS": 102.999,
+     "tempsOptimiseS": 102.999,
+     "ailerons": 1,
+     "gainFixeS": 0.554,
+     "gainOptimiseS": 0.554,
+     "vmaxKmh": 330
+    },
+    "freinage": {
+     "tempsFixeS": 102.948,
+     "tempsOptimiseS": 102.948,
+     "ailerons": 1,
+     "gainFixeS": 0.605,
+     "gainOptimiseS": 0.605,
+     "vmaxKmh": 327
+    },
+    "polyvalente": {
+     "tempsFixeS": 102.971,
+     "tempsOptimiseS": 102.971,
+     "ailerons": 1,
+     "gainFixeS": 0.581,
+     "gainOptimiseS": 0.581,
+     "vmaxKmh": 328
     }
    }
   }
