@@ -128,7 +128,20 @@ décroissants rapprochent les retardataires, le barème de soufflerie l'aide, l'
 **baisse**. Avec elle, ta trajectoire « FM » n'est pas réalisable aujourd'hui. À corriger en priorité pour le plaisir de jouer, par des
 mécanismes réels et visibles : primes et droits commerciaux qui récompensent la progression (pas seulement la place), sponsors
 d'opportunité et pilotes payants (§7), contrats moteur moins chers pour les clients (§5), objectifs gradués du propriétaire. À mesurer
-avant/après. Je n'ai pas encore cherché pourquoi son budget baisse (recettes ? frais fixes ?) : c'est la première chose à faire.
+avant/après.
+
+**Pourquoi Haas s'appauvrit** (graines 1 et 2, comptes annuels) : recettes stables autour de 190 M€ (primes 55–77, droits commerciaux ≈ 40,
+sponsors 17–40, apport du propriétaire 55–65 M€, contre 130–180 M€ pour Cadillac) ; les **primes baissent** quand elle recule (77 → 55 M€) ;
+les **salaires des pilotes** (hors plafond) montent de 21 à 40 M€ ; le propriétaire **prélève des dividendes** (3 à 14 M€ par an) même quand
+le développement baisse. Le développement est ce qui reste : 48–53 M€ en 2027, 21–35 M€ ensuite. C'est un cercle vicieux réaliste
+(classement → primes → développement → classement), **sans porte de sortie** aujourd'hui.
+
+Portes de sortie possibles (réelles, visibles, mêmes règles pour tous ; décision du porteur) :
+1. Un propriétaire qui suspend ses dividendes quand l'écurie décline (selon sa personnalité : patient ou rentier).
+2. Des pilotes payants et des sponsors d'opportunité (§7) qui ciblent justement les écuries en difficulté.
+3. Des contrats moteur moins chers pour les clients modestes (§5).
+4. Des objectifs gradués du propriétaire, avec un bonus d'apport quand l'écurie progresse.
+5. Une répartition des primes un peu plus resserrée (choix réglementaire déclaré, D-169).
 
 **Le joueur peut faire mieux que l'IA** : Cadillac sur 4 saisons (8 graines), soufflerie entièrement sur la voiture : place moyenne 8,81
 contre 9,75 sous l'IA (gain d'indice 6,5 contre 5,8). Les choix comptent ; ce n'est pas trivial (une place en 4 saisons).
