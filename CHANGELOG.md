@@ -595,3 +595,12 @@ Aucun code à ce stade.
 - `docs/systemes/phase-12-fatigue-evenements.md` : fatigue, stress, alertes, événements de conception et de recherche, découvertes, exploitations et parades.
 - D-169 (projet de reformulation de D-081) et D-170, toutes deux à discuter.
 
+## [Phase 12 — conception validée] — 25/11/2026
+
+### Modifié
+- D-169 validée : D-081 est nuancée (équilibrage déclaré des opportunités et des moyens, jamais des résultats).
+- D-170 validée avec les réponses du porteur :
+  - ADUO conservé comme futur levier d'équilibrage ;
+  - surcoût de l'intensif variable ;
+  - dilemmes techniques bloquants, à confirmer.
+

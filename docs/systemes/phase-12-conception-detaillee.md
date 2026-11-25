@@ -1,6 +1,6 @@
 # Phase 12 — Conception détaillée : département technique, pièces, soufflerie, fabrication, renouvellement des hiérarchies
 
-> **Statut : PROPOSITION de Claude Code (25/11/2026), soumise au porteur. Rien n'est validé ni codé.**
+> **Statut : VALIDÉE par le porteur le 25/11/2026 (D-170), sauf la question 10 à confirmer.** Pas encore codée. Réponses aux questions : `docs/decisions.md`, D-170 ; D-081 nuancée par D-169.
 > Demandes du porteur : messages « Phase 12 — conception et recherche des monoplaces », « Développement des monoplaces : conception, recherche, soufflerie, fatigue et innovations » et « Complément : équilibrage, renouvellement des hiérarchies et révolutions techniques » (25/11/2026).
 > Fiche compagnon : `phase-12-fatigue-evenements.md` (fatigue, stress, alertes, événements, découvertes).
 > Cadre validé : D-109 (orientations), D-114 (fondations techniques), D-128 et D-132 (recherche de la phase 8), D-140 (usure du succès), D-160 et D-161 (caractéristiques et réglages), D-162 et D-163 (profil de vitesse et refonte aérodynamique), D-166 (budget payé).

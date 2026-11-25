@@ -1,6 +1,6 @@
 # Phase 12 — Fatigue, stress, alertes, événements techniques et découvertes
 
-> **Statut : PROPOSITION de Claude Code (25/11/2026), soumise au porteur. Rien n'est validé ni codé.**
+> **Statut : VALIDÉE par le porteur le 25/11/2026 (D-170), sauf la question 10 à confirmer.** Pas encore codée. Réponses aux questions : `docs/decisions.md`, D-170 ; D-081 nuancée par D-169.
 > Fiche principale : `phase-12-conception-detaillee.md` (capacité, pièces, soufflerie, fabrication, renouvellement des hiérarchies).
 > Toutes les valeurs sont **initiales** et seront mesurées en laboratoire (D-076, D-120). Les taux de 5–10 % et de 15–25 % sont des **cibles de game design** du porteur, à vérifier, pas des valeurs figées.
 
