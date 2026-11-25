@@ -675,3 +675,4 @@ Aucun code à ce stade.
 ### Modifié (interface, D-177)
 - Jeu exclusivement en paysage : barre latérale permanente, cartes en colonnes, invitation à tourner l'appareil en portrait,
   manifeste `public/manifest.webmanifest` (orientation paysage) ; outils de parcours passés en paysage.
+- Bilan préparatoire de la phase 13 : `docs/systemes/phase-13-bilan-preparatoire.md` ; trajectoires Haas et Audi, laboratoire Cadillac.

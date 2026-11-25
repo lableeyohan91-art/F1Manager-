@@ -25,8 +25,10 @@ for (let g = 1; g <= N; g++) {
     for (const id of sa.calendrier) for (const r of (m.tables['grandsprix'][id] as { resultats: { ecurie: string; position: number | null }[] }).resultats) if (r.ecurie === ID && r.position) meilleur = Math.min(meilleur, r.position);
     const eq = eng.ecuriesActives(m) as { id: string }[];
     const rangVoiture = [...eq].sort((a, b) => eng.indiceMoyen(m, b) - eng.indiceMoyen(m, a)).findIndex((e) => e.id === ID) + 1;
-    const fi = (Object.values(m.tables['finances']) as { ecurie: string; historique: { developpement: number }[] }[]).find((f) => f.ecurie === ID);
-    (parSaison[s] ??= []).push({ place, points, meilleur, rangVoiture, dev: fi?.historique.at(-1)?.developpement ?? 0 });
+    // Développement payé de la saison : comptes en cours (le bilan de l'année n'est archivé qu'en début d'année suivante).
+    const fi = (Object.values(m.tables['finances']) as { ecurie: string; comptes: { annee: number; developpement: number }; historique: { annee: number; developpement: number }[] }[]).find((f) => f.ecurie === ID);
+    const dev = fi?.comptes.annee === annee ? fi.comptes.developpement : fi?.historique.find((h) => h.annee === annee)?.developpement ?? 0;
+    (parSaison[s] ??= []).push({ place, points, meilleur, rangVoiture, dev });
   }
 }
 const moy = (v: number[]) => v.reduce((a, b) => a + b, 0) / Math.max(1, v.length);

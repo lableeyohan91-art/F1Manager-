@@ -18,9 +18,9 @@
    (en secondes) et la « maturité du règlement », pas des notes absolues.
 3. **Équilibre** : nettement mieux avec la 12c (6,8 champions sur 30 saisons, titre ouvert 34 %, dernière écurie qui marque 68 %) ; restent
    trop fréquentes les **dynasties** (60 % des séries ont 5 titres de suite ; objectif 0–25 %) et les **dominations** (9 %, objectif < 5 %).
-4. **Cadillac dirigée par l'IA remonte déjà** : 10,8e en 2027, 6,8e en moyenne en 2036, des points chaque saison dès 2031, un podium
-   médian dès 2032. Le joueur a donc une vraie trajectoire possible ; reste à vérifier qu'un joueur **meilleur que l'IA** va plus vite, et
-   pas trop vite.
+4. **Cadillac et Audi dirigées par l'IA remontent** (Cadillac : 10,8e en 2027, 6,8e en 2036, un podium médian dès 2032) ; **Haas, pauvre,
+   stagne puis recule** (budget de développement en baisse) : **piège de la pauvreté confirmé**, priorité pour le plaisir de jouer.
+   Un choix « de joueur » fait mieux que l'IA (une place gagnée en moyenne sur 4 saisons).
 5. **Moteurs** : aujourd'hui, le motoriste est figé par les données, le client a exactement la même puissance que l'usine, il n'y a ni
    contrat, ni coût, ni changement possible. C'est un vrai manque ; proposition de **contrats moteur** (choix à chaque cycle).
 6. **Nouveau motoriste scénarisé** : faisable et pertinent, à condition que ce soit un événement du monde (il peut aller à une écurie de
@@ -116,8 +116,22 @@ peut-être la victoire ») **existe déjà**, même sous l'IA, avec une forte di
 Cadillac a un gros budget (≈ 92 M€ de développement payés en 2027, plus que Mercédès, car ses frais fixes sont bas), les rendements
 décroissants rapprochent les retardataires, le barème de soufflerie l'aide, l'ADUO aide son motoriste en retard.
 
-**À vérifier** (prochaine mesure) : la même trajectoire avec une écurie **pauvre** (Haas, Audi) et avec des choix « de joueur » (laboratoire
-de conception) : un bon joueur doit aller **nettement plus vite que l'IA**, sans que ce soit trivial.
+**Mesures complémentaires (même méthode)** :
+
+| Écurie (IA) | Développement payé par an | Place 2027 → 2031 → 2036 (moyenne) | Lecture |
+| --- | --- | --- | --- |
+| Cadillac | ≈ 85–90 M€ | 10,8 → 8,5 → 6,8 | remonte nettement |
+| Audi | ≈ 80–86 M€ | 10,0 → 8,9 → 7,8 | remonte |
+| **Haas** | **59 → 40 M€ (en baisse)** | 8,3 → 9,1 → **10,0** | **stagne, puis recule** |
+
+**Problème confirmé : un piège de la pauvreté.** Une écurie pauvre (Haas) ne progresse pas en 10 saisons et son budget de développement
+**baisse**. Avec elle, ta trajectoire « FM » n'est pas réalisable aujourd'hui. À corriger en priorité pour le plaisir de jouer, par des
+mécanismes réels et visibles : primes et droits commerciaux qui récompensent la progression (pas seulement la place), sponsors
+d'opportunité et pilotes payants (§7), contrats moteur moins chers pour les clients (§5), objectifs gradués du propriétaire. À mesurer
+avant/après. Je n'ai pas encore cherché pourquoi son budget baisse (recettes ? frais fixes ?) : c'est la première chose à faire.
+
+**Le joueur peut faire mieux que l'IA** : Cadillac sur 4 saisons (8 graines), soufflerie entièrement sur la voiture : place moyenne 8,81
+contre 9,75 sous l'IA (gain d'indice 6,5 contre 5,8). Les choix comptent ; ce n'est pas trivial (une place en 4 saisons).
 
 ### L'IA fait-elle des erreurs ? Oui, et elles sont honnêtes (elle n'a pas la vérité)
 
