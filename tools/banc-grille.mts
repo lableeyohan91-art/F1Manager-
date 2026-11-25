@@ -38,6 +38,20 @@ for (const e of parMoyenne) {
   const r = rangs[e.id]!;
   console.log(`| ${nom(e.id)} | ${eng.indiceMoyen(m, e).toFixed(2)} | ${victoires[e.id]?.length ?? 0} | ${Math.min(...r)} | ${Math.max(...r)} | ${moy(r).toFixed(1)} | ${(victoires[e.id] ?? []).join(', ')} |`);
 }
+// Pièces de départ (efficacité, concept) et caractéristiques physiques qui en résultent (% par rapport à la voiture de référence).
+const types = ['chassis', 'aileron_avant', 'aileron_arriere', 'pontons', 'fond_plat', 'suspensions'];
+console.log(`\n| Voiture | ${types.map((t) => `${t} (eff. / concept)`).join(' | ')} |\n| --- |${types.map(() => ' --- |').join('')}`);
+for (const e of parMoyenne) {
+  const pcs = eng.piecesInstallees(m, e.id) as { type: string; efficacite: number; concept: number }[];
+  console.log(`| ${nom(e.id)} | ${types.map((t) => { const x = pcs.find((q) => q.type === t)!; return `${x.efficacite.toFixed(1)} / ${x.concept >= 0 ? '+' : ''}${x.concept.toFixed(2)}`; }).join(' | ')} |`);
+}
+const cles = ['cla', 'cda', 'masseKg', 'muMeca', 'muMotricite', 'muFreinage', 'puissance', 'refroidissement'];
+console.log(`\n| Voiture | ${cles.join(' | ')} |\n| --- |${cles.map(() => ' --- |').join('')}`);
+for (const e of parMoyenne) {
+  const p = eng.parametresVoiture(m, e) as Record<string, number>;
+  console.log(`| ${nom(e.id)} | ${cles.map((k) => `${p[k]! >= 0 ? '+' : ''}${p[k]!.toFixed(2)}`).join(' | ')} |`);
+}
+console.log('(appui cla, traînée cda, masse, adhérences et puissance en % d\'écart à la référence : + = plus ; pour la traînée et la masse, + est défavorable. Refroidissement : marge en points.)');
 // Inversions : paires (A meilleure en moyenne que B) où B bat A sur au moins un circuit.
 let paires = 0, inversees = 0;
 for (let i = 0; i < parMoyenne.length; i++) for (let j = i + 1; j < parMoyenne.length; j++) {
