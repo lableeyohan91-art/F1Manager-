@@ -52,6 +52,9 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
     setMsg(r.ok ? ok : `Impossible : ${(r as { motif: string }).motif}`);
     nav.rafraichir();
   };
+  // Phase 12c : le gain estimé d'une pièce, en secondes par tour (écart en % × temps moyen d'un tour des circuits à venir).
+  const tempsMoyen = circuits.length ? circuits.reduce((a, c) => a + (c.sensibilites?.tempsS ?? 85), 0) / circuits.length : 85;
+  const secondes = (pct: number) => `${(Math.round((pct / 100) * tempsMoyen * 1000) / 1000).toLocaleString('fr-FR')} s`;
   const enAttente = dilemmes(m, e.id);
   const souff = allocationPeriode(m, e.id);
   const partRech = e.souffleriePartRecherche ?? SOUFFLERIE.partRechercheDefaut;
@@ -134,7 +137,7 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
             </div>
             <p class="muted petit">
               {PIECES[type].conceptionJours} jours de conception, {PIECES[type].fabricationJours} jours de fabrication, {meur(coutTotal(type))} en tout.
-              Avis du responsable : {estime.gain > 0.005 ? `un gain probable sur les circuits à venir avec un concept ${libConcept(type, estime.concept)}` : 'peu à gagner sur cette pièce pour l’instant'} ;
+              Avis du responsable : {estime.gain > 0.005 ? `environ ${secondes(estime.gain)} par tour sur les circuits à venir avec un concept ${libConcept(type, estime.concept)}` : 'peu à gagner sur cette pièce pour l’instant'} ;
               efficacité visée {efficaciteAttendue(m, e, type, Number(concept)) >= (pieces.find((x) => x.type === type)?.efficacite ?? 0) ? 'en progrès' : 'en recul (concept trop différent de l’actuel)'}.
             </p>
             <div class="actions"><button class="btn principal" onClick={() => agir('conception.lancer', { ecurie: e.id, type, concept: Number(concept) }, 'Projet lancé.')}>Lancer le projet</button></div>
