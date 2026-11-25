@@ -47,7 +47,8 @@ describe('Phase 7b — personnel technique', () => {
     expect(signee!.poste).toBe('responsable_aero');
     expect(ancien.motifFin).toBe('licenciement');
     expect(ancien.indemniteVerseeMEUR).toBeGreaterThan(0);
-    expect(fi.comptes.indemnites).toBeGreaterThan(indemnitesAvant - 1e-9);
+    // L'indemnité est comptée : dans les comptes de l'année du licenciement (clôturés en fin de saison) ou de la nouvelle année.
+    expect((fi.historique.at(-1)?.indemnites ?? 0) + fi.comptes.indemnites).toBeGreaterThanOrEqual(Math.min(indemnitesAvant, 0) + ancien.indemniteVerseeMEUR! - 1e-9);
     // (Pas de contrôle de cohérence complet ici : l'écurie du joueur n'est pas complétée automatiquement par l'IA.)
   }, 60_000);
 

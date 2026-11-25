@@ -15,6 +15,7 @@ import { installerCarriere } from './systems/carriere';
 import { installerDeveloppeur } from './systems/developpeur';
 import { installerJuniors } from './systems/juniors';
 import { installerTechnique } from './systems/technique';
+import { installerMonoplaces } from './systems/monoplaces';
 import { installerInformation } from './systems/information';
 import { installerStands } from './systems/stands';
 import { installerPolitique } from './systems/politique';
@@ -69,6 +70,6 @@ export function creerScenarioGrille2026(fichiers: FichiersDonnees): Scenario {
     nom: 'grille-2026',
     description: 'Départ en 2027 avec la grille inspirée de 2026 (data/grille-2026).',
     creerMonde: (graine) => construireMonde(graine, donnees, 'grille-2026'),
-    creerMoteur: () => installerSponsoring(installerMedias(installerJoueur(installerDeveloppeur(installerStands(installerInformation(installerJuniors(installerCarriere(installerHumain(installerPolitique(installerTechnique(installerSaison(installerEconomie(new Moteur()))))))))))))),
+    creerMoteur: () => installerSponsoring(installerMedias(installerJoueur(installerDeveloppeur(installerStands(installerInformation(installerJuniors(installerCarriere(installerHumain(installerPolitique(installerMonoplaces(installerTechnique(installerSaison(installerEconomie(new Moteur())))))))))))))),
   };
 }

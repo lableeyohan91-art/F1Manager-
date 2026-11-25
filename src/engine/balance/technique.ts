@@ -71,18 +71,11 @@ export const SAVOIR = { gainBase: 2.2, rendementK: 40, partVoisins: 0.15, partFo
 export const PROGRAMMES = { emplacements: 2, partMin: 0.05, partMax: 0.35, partTotaleMax: 0.5, periodeSemaines: 4 };
 
 /**
- * Effets PROVISOIRES du savoir sur les voitures (D-132, question 1 : modérés, isolés dans `systems/technique/conception.ts`) :
- * - bonusDeveloppement : efficacité du développement de la saison, × (1 + bonusDeveloppement × savoir lié à la caractéristique / echelle) ;
- * - reconception à l'entrée d'un règlement ou d'une évolution mineure, pour chaque caractéristique d'intensité I (moyenne pondérée
- *   des domaines liés) : valeur = ancienne × (1 − I) + I × qualité, où qualité = moyenne de la grille
- *   + parPointSavoir × écart de savoir à la moyenne (borné à ± plafondEcartSavoir)
- *   + parPointCompetence × écart de compétence (sur 20) à la moyenne + aléa d'exécution
- *   (écart type ecartExecution, réduit de reductionEcartParSavoir par point de savoir). Relatif à la grille : une réforme ne fait
- *   ni monter ni baisser l'ensemble du plateau, elle rebat la hiérarchie selon la préparation ;
- * - parPointPreparation : points de caractéristique par point de savoir préparé « pour la saison suivante », appliqués à l'intersaison
- *   (avec les rendements décroissants du plafond technique).
+ * Effet PROVISOIRE du savoir sur le développement abstrait des deux notes que le profil de vitesse ne couvre pas encore (fiabilité,
+ * gestion des pneus) : × (1 + bonusDeveloppement × savoir lié / echelle). Phase 12a : la reconception et la préparation provisoires
+ * (relatives à la moyenne de la grille) sont remplacées par la conception des pièces (balance/monoplaces.ts).
  */
-export const CONCEPTION_PROVISOIRE = { echelle: 50, bonusDeveloppement: 0.25, parPointSavoir: 0.12, plafondEcartSavoir: 40, parPointCompetence: 0.15, ecartExecution: 1.2, reductionEcartParSavoir: 0.01, parPointPreparation: 0.12 };
+export const CONCEPTION_PROVISOIRE = { echelle: 50, bonusDeveloppement: 0.25 };
 
 /**
  * Découvertes (D-128 : rares, expliquées, sans quota) : à chaque période, probabilité = base × (savoir fondamental du domaine / echelle) ×

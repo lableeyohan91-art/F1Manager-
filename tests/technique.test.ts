@@ -1,11 +1,10 @@
 /** Phases 8a et 8b — règlements et recherche (D-128, D-132). */
 import { describe, expect, it } from 'vitest';
 import {
-  copierMonde, creerScenarioGrille2026, deserialiser, empreinte, entreeEnVigueur, partRecherche, programmes, propositions, reglementAnnonce, reglementEnVigueur,
+  copierMonde, creerScenarioGrille2026, deserialiser, empreinte, enveloppeRestante, entreeEnVigueur, partRecherche, piecesInstallees, programmes, propositions, reconcevoir, reglementAnnonce, reglementEnVigueur,
   reglements, rejeter, savoir, serialiser, table, TABLES, teamPrincipal, VERSION_FORMAT, voitureDe, type Ecurie, type Monde, type Personne, type Reglement,
 } from '../src/engine';
 import { CONCEPTION_PROVISOIRE, LISTE_DOMAINES, PROGRAMMES, SAVOIR } from '../src/engine/balance/technique';
-import { reconcevoirGrille } from '../src/engine/systems/technique/conception';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 
 const sc = creerScenarioGrille2026(lireDonneesGrille2026());
@@ -58,22 +57,18 @@ describe('Phase 8a — règlements', () => {
     expect(reglementEnVigueur(m)!.id).toBe('reg_test');
   });
 
-  it('reconception neutre pour la grille, qui rebat la hiérarchie selon la préparation (contrefactuel)', () => {
+  it('phase 12a : reconception absolue — la préparation paie, et ne dépend pas des autres écuries (contrefactuel)', () => {
     const { m } = mondeJoueur();
     const reg = reglementEnVigueur(m)!;
     const intensites = Object.fromEntries(LISTE_DOMAINES.map((d) => [d, 0.6]));
     const ecuries = (Object.values(table(m, TABLES.ecuries)) as unknown as Ecurie[]).filter((e) => e.statut === 'active');
-    const moyenne = (mm: Monde, c: (typeof CARACS)[number]) => ecuries.reduce((a, e) => a + voitureDe(mm, e.id)[c], 0) / ecuries.length;
-    const a = copierMonde(m);
-    const b = copierMonde(m);
+    const a = copierMonde(m), b = copierMonde(m), c = copierMonde(m);
     for (const d of LISTE_DOMAINES) savoir(b, 'eq_cadillac', d).parReglement[reg.id] = 40; // seule différence : la préparation
-    const avant = CARACS.map((c) => moyenne(m, c));
-    reconcevoirGrille(a, ecuries, intensites, reg.id, 'test');
-    reconcevoirGrille(b, ecuries, intensites, reg.id, 'test');
-    // Le niveau du plateau ne monte ni ne baisse d'office (seul l'aléa d'exécution, de moyenne nulle, le fait varier).
-    CARACS.forEach((c, i) => expect(Math.abs(moyenne(a, c) - avant[i]!)).toBeLessThan(1));
-    // La préparation paie : à aléa identique, l'écurie préparée est meilleure partout.
-    for (const c of CARACS) expect(voitureDe(b, 'eq_cadillac')[c]).toBeGreaterThan(voitureDe(a, 'eq_cadillac')[c]);
+    for (const d of LISTE_DOMAINES) savoir(c, 'eq_mercedes', d).parReglement[reg.id] = 40; // une AUTRE écurie se prépare
+    for (const x of [a, b, c]) reconcevoir(x, ecuries, intensites, reg, 'test');
+    const eff = (mm: Monde, id: string) => piecesInstallees(mm, id).map((p) => p.efficacite);
+    eff(b, 'eq_cadillac').forEach((v, i) => expect(v).toBeGreaterThan(eff(a, 'eq_cadillac')[i]!));
+    expect(eff(c, 'eq_cadillac')).toEqual(eff(a, 'eq_cadillac')); // rien de relatif à la grille
   });
 
   it('vote du joueur par commande ; sans vote ni délégation, son écurie s’abstient', () => {
@@ -148,17 +143,15 @@ describe('Phase 8b — recherche', () => {
     expect(s2.fondamental).toBeCloseTo(f0 + 20 * SAVOIR.partFondamentalRejet, 3);
   }, 60_000);
 
-  it('la recherche coûte du développement aujourd’hui (contrefactuel)', () => {
+  it('la recherche coûte du développement aujourd’hui : elle réduit l’enveloppe des projets de pièces (contrefactuel)', () => {
     const { m, moteur, tp } = mondeJoueur();
     const a = copierMonde(m);
     const b = copierMonde(m);
     moteur.commandes.executer(b, { type: 'recherche.programme', auteur: tp.id, source: 'exterieur', parametres: { ecurie: 'eq_williams', emplacement: 1, domaine: 'energie', horizon: 'suivante', part: 0.35 } });
     moteur.avancer(a, 20);
     moteur.avancer(b, 20);
-    const somme = (mm: Monde) => CARACS.reduce((x, c) => x + voitureDe(mm, 'eq_williams')[c], 0);
-    expect(somme(b)).toBeLessThan(somme(a));
+    expect(enveloppeRestante(b, 'eq_williams')).toBeLessThan(enveloppeRestante(a, 'eq_williams'));
     expect(savoir(b, 'eq_williams', 'energie').pourSaisonSuivante).toBeGreaterThan(0);
-    expect(CONCEPTION_PROVISOIRE.parPointPreparation).toBeGreaterThan(0);
   }, 60_000);
 });
 

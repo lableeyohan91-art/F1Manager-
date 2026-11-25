@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   copierMonde, creerScenarioGrille2026, deserialiser, empreinte, facteurBudgetDeveloppement, financesDe, restrictionAero, serialiser,
   contratsActifs, sponsors, table, TABLES, totalPlafonne, type Sponsor, verifierCoherence, VERSION_FORMAT, type Ecurie, type Finances, type Monde,
-} from '../src/engine';
+ depenser } from '../src/engine';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 
 const sc = creerScenarioGrille2026(lireDonneesGrille2026());
@@ -44,7 +44,8 @@ describe('Phase 5a — économie', () => {
     const moteur = sc.creerMoteur();
     moteur.avancer(m, 10);
     const fi = financesDe(m, 'eq_mercedes') as Finances;
-    fi.budget.developpementMEUR += 60; // la direction décide de dépasser franchement
+    // Phase 12a : dépasser, c'est DÉPENSER (projets et fabrication), pas seulement annoncer un budget.
+    depenser(m, 'eq_mercedes', 60); // la direction décide de dépasser franchement
     moteur.avancer(m, S - 9);
     expect(fi.historique[0]!.depassement).toBeGreaterThan(0.05 * 215);
     expect(fi.historique[0]!.amendes).toBeGreaterThan(0);

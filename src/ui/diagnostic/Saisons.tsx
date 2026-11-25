@@ -1,8 +1,9 @@
 import { useState } from 'preact/hooks';
 import { SEUIL_SURPRISE_PCT } from '../../engine/balance/course';
-import { CARACTERISTIQUES_VITESSE } from '../../engine/balance/circuits';
+import { ECART_VOITURE_PAR_POINT } from '../../engine/balance/course';
+import { EFFICACITE_REFERENCE, PIECES, TYPES_PIECES } from '../../engine/balance/monoplaces';
 import {
-  indicateursSaison, indicateursSerie, motorisation,
+  indicateursSaison, indicateursSerie, indiceMoyen, motorisation, piecesInstallees,
   type Circuit, type GrandPrix, type Monde, type Saison, type Voiture,
 } from '../../engine';
 import { annuaire, Carte, ecuries, Lien, liste, nomComplet, Note, personnes } from './outils';
@@ -161,28 +162,33 @@ function FicheGrandPrix({ monde, id, retour, ouvrir }: { monde: Monde; id: strin
   );
 }
 
-/** Caractéristiques actuelles des voitures (D-056). */
+/** Voitures (phase 12a) : pièces installées (efficacité, concept), motoriste, notes provisoires, indice moyen. */
 export function VueVoitures({ monde }: { monde: Monde }) {
   const eqs = ecuries(monde);
   const voitures = new Map(liste<Voiture>(monde, 'voitures').map((v) => [v.ecurie, v]));
-  const caracs = [...CARACTERISTIQUES_VITESSE, 'fiabilite'] as const;
   return (
     <div class="defile">
       <table>
-        <thead><tr><th>Écurie</th>{caracs.map((c) => <th key={c}>{LIB_CARAC[c]}</th>)}</tr></thead>
+        <thead><tr><th>Écurie</th>{TYPES_PIECES.map((t) => <th key={t}>{PIECES[t].libelle}</th>)}<th>Motoriste</th><th>Fiabilité</th><th>Pneus</th><th>Indice</th></tr></thead>
         <tbody>
           {eqs.map((e) => {
             const v = voitures.get(e.id);
             if (!v) return null;
+            const pieces = new Map(piecesInstallees(monde, e.id).map((p) => [p.type, p]));
             return (
               <tr key={e.id}>
                 <td><b>{e.nom}</b></td>
-                {caracs.map((c) => <td key={c}><Note v={Math.round((c === 'motorisation' ? motorisation(monde, e) : v[c]) * 10) / 10} /></td>)}
+                {TYPES_PIECES.map((t) => { const p = pieces.get(t); return <td key={t}>{p ? `${p.efficacite.toFixed(1)} (${p.concept >= 0 ? '+' : ''}${p.concept.toFixed(2)}) v${p.version}` : '—'}</td>; })}
+                <td><Note v={motorisation(monde, e)} /></td>
+                <td><Note v={Math.round(v.fiabilite * 10) / 10} /></td>
+                <td><Note v={Math.round(v.gestionPneus * 10) / 10} /></td>
+                <td>{indiceMoyen(monde, e).toFixed(2)}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      <p class="muted" style={{ fontSize: '.8rem' }}>Pièces : efficacité (référence {EFFICACITE_REFERENCE}) et concept (−1 à +1), version installée. Indice : points équivalents (1 point = {ECART_VOITURE_PAR_POINT} % de temps au tour).</p>
     </div>
   );
 }

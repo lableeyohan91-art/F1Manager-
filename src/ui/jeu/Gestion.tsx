@@ -12,6 +12,7 @@ import { commander, ecurieJoueur, mesurerAppareil, grandsPrix, meur, nom, nomCir
 import type { Navigation } from './Jeu';
 import { NOM_SAUVEGARDE } from './Jeu';
 import { Sponsors } from './Sponsors';
+import { CarteVoiture } from './Voiture';
 
 const pct = (x: number) => `${Math.round(x * 100)} %`;
 
@@ -23,7 +24,7 @@ function useRetour(): [string | null, (r: { ok: boolean; motif?: string }, succe
 const LIB_DELEGATION: Record<DomaineJoueur, [string, string]> = {
   pilotes: ['Pilotes', 'Prolongations, marché des pilotes, réponses à leurs demandes'],
   personnel: ['Personnel', 'Recrutements, prolongations, demandes d’augmentation et de départ'],
-  recherche: ['Recherche', 'Programmes de recherche (directeur technique)'],
+  recherche: ['Recherche et conception', 'Programmes de recherche, projets de pièces, architecture (directeur technique)'],
   stands: ['Équipe des stands', 'Entraînement et recrutement (directeur sportif)'],
   academie: ['Académie', 'Places et missions de repérage'],
   politique: ['Politique', 'Votes du règlement et de la fédération, lobbying'],
@@ -63,6 +64,7 @@ export function EcranTechnique({ partie, nav }: { partie: Partie; nav: Navigatio
   return (
     <>
       {msg && <div class="carte retour" role="status">{msg}</div>}
+      <CarteVoiture partie={partie} nav={nav} />
       <div class="carte">
         <h3>Savoir technique</h3>
         <p class="muted petit">Règlement en vigueur : {actuel ? `${ORIENTATIONS[actuel.orientation as keyof typeof ORIENTATIONS]?.libelle ?? 'règlement de départ'}, jusqu’en ${actuel.fin}` : '—'}.</p>

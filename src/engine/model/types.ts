@@ -55,6 +55,9 @@ export const TABLES = {
   offresSponsors: 'offresSponsors',
   objectifsGP: 'objectifsGP',
   operationsSponsors: 'operationsSponsors',
+  // Phase 12a : pièces des voitures (versions) et projets de conception.
+  pieces: 'pieces',
+  projetsConception: 'projetsConception',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -121,6 +124,8 @@ export interface Ecurie {
   image?: number;
   /** Phase 11 : objectif annoncé en conférence de presse pour une saison (« viser le titre » relève l'exigence du conseil). */
   objectifAnnonce?: { annee: number; niveau: 'titre' | 'prudent' };
+  /** Phase 12a : famille d'architecture choisie pour chaque règlement (pari de concept, D-170 Q7). */
+  architectures?: Record<string, string>;
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -408,6 +413,14 @@ export interface Circuit {
   vivier?: VivierCircuit;
   /** Phase 11b : probabilité de pluie pendant la course pour chaque mois (12 valeurs, climat réel ; lue par la simulation du Grand Prix). */
   pluieMensuelle?: number[];
+  /** Phase 12a : température de l'air pendant la course pour chaque mois (12 valeurs, °C ; lue par le besoin de refroidissement). */
+  temperatureMensuelle?: number[];
+  /**
+   * Phase 12a : sensibilités du temps au tour aux paramètres physiques de la voiture (profil de vitesse sur le tracé réel,
+   * data/grille-2026/sensibilites-circuits.csv) : temps de la voiture de référence et dérivées première et seconde (s par %).
+   * Le niveau d'ailerons interne n'est jamais montré au joueur (D-161).
+   */
+  sensibilites?: { tempsS: number; niveauAileron: number; d1: Record<string, number>; d2: Record<string, number> };
 }
 
 export interface VivierCircuit {
@@ -482,7 +495,8 @@ export interface DateNaissanceInfo {
 }
 
 /** Caractéristiques d'une monoplace (D-056), décimales en interne, échelle ≈ 1–20. */
-export interface Voiture {
+/** Ligne de voitures.csv : notes de départ (phase 3), converties en pièces à la création du monde (phase 12a). */
+export interface VoitureDonnees {
   id: string;
   ecurie: string;
   viragesLents: number;
@@ -491,8 +505,61 @@ export interface Voiture {
   efficaciteAero: number;
   fiabilite: number;
   gestionPneus: number;
-  /** La motorisation n'est pas stockée : c'est le niveau du motoriste de l'écurie. */
   verification: string;
+}
+
+/**
+ * Voiture d'une écurie dans le monde. Phase 12a : sa vitesse vient de ses PIÈCES (table `pieces`) et du motoriste, à travers les
+ * sensibilités physiques des circuits. Restent ici, provisoirement, deux notes que le profil de vitesse ne couvre pas encore :
+ * la fiabilité (abandons ; la durabilité des pièces la remplacera en 12c) et la gestion des pneus (la phase 13 la remplacera).
+ */
+export interface Voiture {
+  id: string;
+  ecurie: string;
+  fiabilite: number;
+  gestionPneus: number;
+  verification: string;
+}
+
+/**
+ * Phase 12a : une version de pièce d'une écurie (D-170). Les paramètres physiques de la voiture sont la référence modifiée par ses
+ * pièces installées : efficacité (au-dessus ou en dessous de la référence) et concept (−1 à +1, point choisi sur la frontière).
+ */
+export interface PieceVoiture {
+  id: string;
+  ecurie: string;
+  type: string;
+  /** Numéro de version (1, 2, …) propre à l'écurie et au type de pièce. */
+  version: number;
+  /** Efficacité (points) ; la voiture de référence a toutes ses pièces à EFFICACITE_REFERENCE. */
+  efficacite: number;
+  /** Concept, de −1 à +1 (sens donné par les libellés de la pièce, balance/monoplaces.ts). */
+  concept: number;
+  /** Règlement sous lequel la pièce a été conçue (obsolescence lors d'une réforme). */
+  reglement: string;
+  /** Saison de conception. */
+  saison: number;
+  installee: boolean;
+}
+
+/** Phase 12a : projet de conception d'une nouvelle version de pièce (conception simplifiée : rythme normal, sans événement). */
+export interface ProjetConception {
+  id: string;
+  ecurie: string;
+  type: string;
+  /** Concept visé (−1 à +1). */
+  concept: number;
+  /** Jours de conception restants (7 par semaine à productivité 1). */
+  joursRestants: number;
+  joursTotal: number;
+  debut: DateJeu;
+  /** Coût payé au lancement (M€), comme dans F1 Manager. */
+  coutMEUR: number;
+  /** Phase de fabrication (jours restants) une fois la conception terminée ; installation à la fin. */
+  fabricationJoursRestants?: number;
+  /** Efficacité obtenue (fixée à la fin de la conception). */
+  efficacite?: number;
+  evenement?: string;
 }
 
 export type CauseAbandon = 'mecanique' | 'incident';
@@ -815,6 +882,8 @@ export interface Finances {
   chocApport?: { annee: number; semaine: number; facteur: number; annonce?: boolean };
   /** Audit 5.12 : fait d'entrée dans la dernière crise (cause des suites). */
   evenementCrise?: string;
+  /** Phase 12a : dépenses des projets de conception et de fabrication (année en cours, et reste à payer à la prochaine écriture). */
+  depensesTechniques?: { annee: number; projetsMEUR: number; aPayerMEUR: number };
   verification: string;
 }
 

@@ -41,6 +41,7 @@ export * from './probabilites';
 export * from './variantes';
 export * from './crises';
 import { nombreGrandsPrix, regleVotee } from '../politique/acces';
+import { partRecherche } from '../technique/acces';
 import { CONFERENCES } from '../../balance/medias';
 import { patienceImage } from '../medias/acces';
 export * from './infrastructures';
@@ -294,10 +295,14 @@ function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
   };
   const depenses = {
     personnelPlafonne: fixes.personnelPlafonne / n, departements: fixes.departements / n, operations: fixes.operations / n,
-    entretien: fixes.entretien / n, developpement: fi.budget.developpementMEUR / n, salairesHorsPlafond: fixes.salairesHorsPlafond / n, marketing: fixes.marketing / n,
+    // Phase 12a : le développement payé = la part des programmes de recherche (au fil de l'année) + les projets de conception et de
+    // fabrication réellement engagés depuis la dernière écriture (coûts de F1 Manager 2024) ; le budget n'est plus qu'un plafond de dépense.
+    entretien: fixes.entretien / n, developpement: fi.budget.developpementMEUR * partRecherche(monde, e.id) / n + (fi.depensesTechniques?.aPayerMEUR ?? 0),
+    salairesHorsPlafond: fixes.salairesHorsPlafond / n, marketing: fixes.marketing / n,
     // Phase 6b-2 : financement des affiliés de l'académie (hors plafond).
     academie: coutAnnuelAcademie(monde, e.id) / n,
   };
+  if (fi.depensesTechniques) fi.depensesTechniques.aPayerMEUR = 0;
   for (const [k, v] of Object.entries(recettes)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;
   for (const [k, v] of Object.entries(depenses)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;
   fi.tresorerieMEUR += Object.values(recettes).reduce((a, b) => a + b, 0) - Object.values(depenses).reduce((a, b) => a + b, 0);

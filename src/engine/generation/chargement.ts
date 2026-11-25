@@ -8,7 +8,8 @@ import { AGE_MIN_HISTOIRE, PASSE } from '../balance/histoire';
 import { TYPES_MEDIAS, type Media } from '../model/medias';
 import { ARCHETYPES } from '../balance/carriere';
 import { COMPETENCES_PILOTE } from '../balance/personnages';
-import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, TypeProprietaire, Voiture } from '../model/types';
+import type { Carriere, Circuit, Clauses, Contrat, Ecurie, Motoriste, Palmares, Poste, TypeProprietaire, VoitureDonnees } from '../model/types';
+import { PARAMETRES_SENSIBILITE } from '../balance/monoplaces';
 import { CHAMPS_EXIGENCES, type ExigencesCircuit } from '../model/types';
 import { ErreurDonnees, Lecteur, lireCsv } from './csv';
 import { ETIQUETTES } from '../balance/memoire';
@@ -16,7 +17,7 @@ import { ETIQUETTES } from '../balance/memoire';
 /** Texte des fichiers, indexé par nom de fichier. */
 export type FichiersDonnees = Record<string, string>;
 
-export const FICHIERS_GRILLE = ['histoires.csv', 'finances.csv', 'voitures.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
+export const FICHIERS_GRILLE = ['histoires.csv', 'finances.csv', 'voitures.csv', 'sensibilites-circuits.csv', 'ecuries.csv', 'motoristes.csv', 'personnes.csv', 'contrats.csv', 'carrieres.csv', 'palmares.csv', 'circuits.csv'] as const;
 export const FICHIERS_COMMUNS = ['nationalites.csv', 'noms.csv', 'secteurs.csv', 'entreprises.csv', 'ecuries-juniors.csv', 'medias.csv'] as const;
 
 const POSTES_DONNEES: readonly Poste[] = [
@@ -73,7 +74,7 @@ export interface DonneesInitiales {
   /** Phase 9 (D-143) : histoires et rivalités réelles, publiquement connues (faits publics, intensités estimées). */
   histoires: HistoireDonnees[];
   circuits: Circuit[];
-  voitures: Voiture[];
+  voitures: VoitureDonnees[];
   finances: { ecurie: string; tresorerieMEUR: number; typeProprietaire: TypeProprietaire; apportAnnuelMEUR: number; revenusCommerciauxMEUR: number; verification: string }[];
   nationalites: Nationalite[];
   /** Prénoms et noms par code de nationalité. */
@@ -372,17 +373,37 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
       if (dejaVus.has(mois)) problemes.push(`climat-circuits.csv ligne ${l.numero} : mois ${mois} en double pour ${c.id}`);
       dejaVus.add(mois); vus.set(c.id, dejaVus);
       (c.pluieMensuelle ??= new Array<number>(12).fill(Number.NaN))[mois - 1] = rcl.decimal(l, 'pluieCourse', 0, 1);
+      // Phase 12a : température de l'air pendant la course (besoin de refroidissement), si la colonne est renseignée.
+      if ((l.valeurs['airCourseC'] ?? '') !== '') (c.temperatureMensuelle ??= new Array<number>(12).fill(Number.NaN))[mois - 1] = rcl.decimal(l, 'airCourseC', -20, 60);
     }
+    for (const c of circuits) if (c.temperatureMensuelle && c.temperatureMensuelle.some((x) => !Number.isFinite(x))) problemes.push(`climat-circuits.csv : ${c.id} n'a pas ses 12 températures`);
     // Audit (1.4) : un mois absent n'est jamais remplacé par 0 en silence.
     for (const c of circuits) if (c.pluieMensuelle && c.pluieMensuelle.some((x) => !Number.isFinite(x))) problemes.push(`climat-circuits.csv : ${c.id} n'a pas ses 12 mois`);
     problemes.push(...rcl.problemes);
   }
   verifierIdsUniques('circuits.csv', lcir.map((l, i) => ({ id: circuits[i]!.id, numero: l.numero })), problemes);
+  // Phase 12a : sensibilités du temps au tour (tools/circuits/sensibilites-voiture.mts) ; obligatoires pour chaque circuit.
+  {
+    const lse = lireCsv('sensibilites-circuits.csv', fichier(f, 'sensibilites-circuits.csv'), ['id', 'tempsS', 'niveauAileron', ...PARAMETRES_SENSIBILITE.flatMap((k) => [`d1_${k}`, `d2_${k}`])]);
+    const rse = new Lecteur('sensibilites-circuits.csv');
+    const parId = new Map(circuits.map((c) => [c.id, c]));
+    for (const l of lse) {
+      const c = parId.get(rse.texte(l, 'id'));
+      if (!c) { problemes.push(`sensibilites-circuits.csv ligne ${l.numero} : circuit inconnu`); continue; }
+      c.sensibilites = {
+        tempsS: rse.decimal(l, 'tempsS', 30, 200), niveauAileron: rse.decimal(l, 'niveauAileron', -2, 3),
+        d1: Object.fromEntries(PARAMETRES_SENSIBILITE.map((k) => [k, rse.decimal(l, `d1_${k}`, -5, 5)])),
+        d2: Object.fromEntries(PARAMETRES_SENSIBILITE.map((k) => [k, rse.decimal(l, `d2_${k}`, -5, 5)])),
+      };
+    }
+    for (const c of circuits) if (!c.sensibilites) problemes.push(`sensibilites-circuits.csv : aucune sensibilité pour ${c.id} (relancer tools/circuits/sensibilites-voiture.mts)`);
+    problemes.push(...rse.problemes);
+  }
 
   // Voitures (D-056).
   const lvoi = lireCsv('voitures.csv', fichier(f, 'voitures.csv'), ['ecurie', 'viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero', 'fiabilite', 'gestionPneus']);
   const rv = new Lecteur('voitures.csv');
-  const voitures: Voiture[] = lvoi.map((l) => {
+  const voitures: VoitureDonnees[] = lvoi.map((l) => {
     const ecurie = rv.reference(l, 'ecurie', idsEq);
     return {
       id: `voi_${ecurie.replace(/^eq_/, '')}`,

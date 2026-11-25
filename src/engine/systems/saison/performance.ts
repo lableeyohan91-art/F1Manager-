@@ -1,7 +1,9 @@
 /** Calculs de performance partagés par les systèmes de la saison (phase 3). */
 
 import { ALTITUDE_REFERENCE_M, CARACTERISTIQUES_VITESSE, POIDS_VOITURE_PAR_EXIGENCE } from '../../balance/circuits';
-import { PART_PLUIE_DANS_RYTHME, POIDS_PILOTE } from '../../balance/course';
+import { ECART_VOITURE_PAR_POINT, PART_PLUIE_DANS_RYTHME, POIDS_PILOTE } from '../../balance/course';
+import { COURSE_PHYSIQUE, INDICE_PHYSIQUE } from '../../balance/monoplaces';
+import { ecartTempsPct, enCache, parametresVoiture } from '../monoplaces/physique';
 import { COMPETENCES_RYTHME } from '../../balance/personnages';
 import { idsTries, table, type Monde } from '../../core/monde';
 import { TABLES, type Circuit, type Ecurie, type ExigencesCircuit, type Motoriste, type Personne, type Voiture } from '../../model/types';
@@ -25,10 +27,6 @@ export function motorisation(monde: Monde, ecurie: Ecurie): number {
   return (table(monde, TABLES.motoristes)[ecurie.motoriste] as unknown as Motoriste | undefined)?.niveau ?? 10;
 }
 
-/** Valeur d'une caractéristique de vitesse (la motorisation vient du motoriste). */
-export function caracteristique(monde: Monde, ecurie: Ecurie, v: Voiture, c: (typeof CARACTERISTIQUES_VITESSE)[number]): number {
-  return c === 'motorisation' ? motorisation(monde, ecurie) : v[c];
-}
 
 /** Poids des caractéristiques de la voiture sur un circuit (D-107), normalisés à 1. */
 export function poidsVoiture(circuit: Pick<Circuit, 'exigences' | 'altitudeM' | 'poidsProfil'>): Record<(typeof CARACTERISTIQUES_VITESSE)[number], number> {
@@ -47,21 +45,31 @@ export function poidsVoiture(circuit: Pick<Circuit, 'exigences' | 'altitudeM' | 
   return brut;
 }
 
-/** Indice de performance d'une voiture sur un circuit (moyenne pondérée des caractéristiques selon ses exigences). */
-export function indiceSurCircuit(monde: Monde, ecurie: Ecurie, circuit: Pick<Circuit, 'exigences' | 'altitudeM' | 'poidsProfil'>): number {
+/**
+ * Indice de performance d'une voiture sur un circuit, en « points équivalents » (phase 12a, D-170 §4.4) :
+ * INDICE_PHYSIQUE.base − écart physique de temps au tour (%, pièces et motoriste sur les sensibilités du circuit) / écart par point,
+ * plus la gestion des pneus (note provisoire, hors profil de vitesse, pondérée selon le circuit, D-107) jusqu'à la phase 13.
+ * Un point d'indice vaut toujours ECART_VOITURE_PAR_POINT % de temps au tour : la simulation de course et les indicateurs gardent leur unité.
+ * `mois` (1 à 12) : climat du mois pour le refroidissement ; sans mois, moyenne de l'année.
+ */
+export function indiceSurCircuit(monde: Monde, ecurie: Ecurie, circuit: Circuit, mois?: number): number {
   const v = voitureDe(monde, ecurie.id);
-  const poids = poidsVoiture(circuit);
-  let s = 0;
-  for (const c of CARACTERISTIQUES_VITESSE) s += poids[c] * caracteristique(monde, ecurie, v, c);
-  return s;
+  const ecart = ecartTempsPct(parametresVoiture(monde, ecurie), circuit, mois) * COURSE_PHYSIQUE.echelle;
+  return INDICE_PHYSIQUE.base - ecart / ECART_VOITURE_PAR_POINT + poidsVoiture(circuit).gestionPneus * (v.gestionPneus - INDICE_PHYSIQUE.notePneusReference);
 }
 
-/** Indice moyen (toutes caractéristiques de vitesse à poids égal) : sert aux statistiques. */
+/** Indice moyen sur les circuits du vivier (ou tous ceux qui ont des sensibilités) : sert aux statistiques et aux estimations. */
 export function indiceMoyen(monde: Monde, ecurie: Ecurie): number {
+  return enCache(monde, `indiceMoyen|${ecurie.id}`, () => calculerIndiceMoyen(monde, ecurie));
+}
+function calculerIndiceMoyen(monde: Monde, ecurie: Ecurie): number {
+  const circuits = (Object.values(table(monde, TABLES.circuits)) as unknown as Circuit[]).filter((c) => (c.vivier || !Object.values(table(monde, TABLES.circuits)).some((x) => (x as unknown as Circuit).vivier)));
+  if (!circuits.length) return INDICE_PHYSIQUE.base;
   const v = voitureDe(monde, ecurie.id);
+  const p = parametresVoiture(monde, ecurie);
   let s = 0;
-  for (const c of CARACTERISTIQUES_VITESSE) s += caracteristique(monde, ecurie, v, c);
-  return s / CARACTERISTIQUES_VITESSE.length;
+  for (const c of circuits) s += INDICE_PHYSIQUE.base - (ecartTempsPct(p, c) * COURSE_PHYSIQUE.echelle) / ECART_VOITURE_PAR_POINT + poidsVoiture(c).gestionPneus * (v.gestionPneus - INDICE_PHYSIQUE.notePneusReference);
+  return s / circuits.length;
 }
 
 /**

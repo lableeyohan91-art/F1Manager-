@@ -315,22 +315,22 @@ export function capaciteDeveloppement(monde: Monde, e: Ecurie): number {
   return (POIDS_CAPACITE.competences * competences + POIDS_CAPACITE.installations * installations + POIDS_CAPACITE.budget * budget) * (1 - USURE_SUCCES.effetDeveloppement * usure);
 }
 
-const CARACS_VOITURE = ['viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero', 'fiabilite', 'gestionPneus'] as const;
-/** Caractéristiques soumises aux restrictions aérodynamiques (soufflerie/CFD) selon le classement (phase 5a). */
-const CARACS_AERO = new Set<string>(['viragesLents', 'viragesRapides', 'efficaciteAero']);
+/**
+ * Phase 12a : la vitesse vient des pièces (systems/monoplaces) ; seules la fiabilité et la gestion des pneus, que le profil de vitesse ne
+ * couvre pas encore, gardent ce développement abstrait (jusqu'aux phases 12c et 13).
+ */
+const CARACS_VOITURE = ['fiabilite', 'gestionPneus'] as const;
 
 function developper(monde: Monde, e: Ecurie, mois: number, alea: number, cle: string): void {
   const v = voitureDe(monde, e.id);
   const cap = capaciteDeveloppement(monde, e);
-  const fi = financesDe(monde, e.id);
-  const aero = fi ? restrictionAero(monde, e.id) * (1 - fi.sanctionAero) : 1;
   // Phase 8b : la part des moyens consacrée aux programmes de recherche est retirée du développement de la voiture ;
   // en échange, le savoir accumulé rend ce développement plus efficace (effet PROVISOIRE, systems/technique/conception.ts).
   const partDeveloppement = 1 - partRecherche(monde, e.id);
   for (const c of CARACS_VOITURE) {
     const f = tirageLocal(monde, 'developpement', e.id, cle, c);
     const gain = TAUX_DEVELOPPEMENT_MENSUEL * mois * cap * partDeveloppement * bonusSavoirDeveloppement(monde, e.id, c)
-      * (CARACS_AERO.has(c) ? aero : 1) * Math.max(0, 1 - v[c] / PLAFOND_TECHNIQUE);
+      * Math.max(0, 1 - v[c] / PLAFOND_TECHNIQUE);
     v[c] = borner(v[c] + gain + f.normale(0, alea), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
   }
 }

@@ -16,7 +16,9 @@ import { tirerCarriere } from '../systems/carriere/profil';
 import { EXIGENCES_PAR_TYPE } from '../balance/circuits';
 import { EXPERIENCE_HISTORIQUE } from '../balance/carriere';
 import { COMPETENCES_RYTHME } from '../balance/personnages';
-import type { Personne } from '../model/types';
+import type { Personne, VoitureDonnees } from '../model/types';
+import { FRONTIERE, PIECES, type TypePiece } from '../balance/monoplaces';
+import { piecesDepart } from '../systems/monoplaces/pieces';
 
 export const SIGNATURE = 'f1manager-sauvegarde';
 
@@ -310,6 +312,33 @@ const MIGRATIONS: Record<number, Migration> = {
       if (b?.choixTP) delete b.choixTP.le; // D-166 : plus de délai entre deux modifications du budget
     }
     return { ...m, versionFormat: 30 };
+  },
+  // v30 → v31 (phase 12a, D-170) : la voiture devient six pièces (conversion des notes actuelles de la voiture, comme à la création),
+  // avec le savoir de départ cohérent (gardé s'il est déjà plus grand) ; plus de notes de vitesse abstraites. Les circuits d'une partie
+  // antérieure n'ont pas de sensibilités propres : ils utilisent les sensibilités moyennes des 30 circuits (balance/monoplaces.ts).
+  30: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, Record<string, unknown>>>;
+    tables['pieces'] ??= {};
+    tables['projetsConception'] ??= {};
+    tables['savoirs'] ??= {};
+    for (const v of Object.values(tables['voitures'] ?? {})) {
+      const d = v as unknown as VoitureDonnees;
+      if (d.viragesLents === undefined) continue;
+      const parDomaine = new Map<string, number[]>();
+      for (const p of piecesDepart(d)) {
+        const id = `pce_${d.ecurie.replace(/^eq_/, '')}_${p.type}_${p.version}`;
+        tables['pieces'][id] = { id, ...p };
+        const part = Math.min(FRONTIERE.partMaxDepart, Math.max(0, (p.efficacite + FRONTIERE.margeDepart - FRONTIERE.min) / FRONTIERE.etendue));
+        for (const dom of PIECES[p.type as TypePiece].domaines) parDomaine.set(dom, [...(parDomaine.get(dom) ?? []), -FRONTIERE.echelleSavoir * Math.log(1 - part)]);
+      }
+      for (const [dom, l] of parDomaine) {
+        const id = `${d.ecurie}|${dom}`;
+        const s = (tables['savoirs'][id] ??= { id, ecurie: d.ecurie, domaine: dom, fondamental: 0, parReglement: {}, pourSaisonSuivante: 0 }) as { fondamental: number };
+        s.fondamental = Math.max(s.fondamental, Math.round((l.reduce((a, b) => a + b, 0) / l.length) * 100) / 100);
+      }
+      for (const k of ['viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero']) delete (v as Record<string, unknown>)[k];
+    }
+    return { ...m, versionFormat: 31 };
   },
 };
 

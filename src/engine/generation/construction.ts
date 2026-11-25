@@ -42,6 +42,7 @@ import { PASSE } from '../balance/histoire';
 import { DATE_DEPART } from '../balance/monde';
 import { initialiserExperienceDonnees } from '../systems/carriere/performance';
 import { initialiserPasseJunior, saisonPasseJunior } from '../systems/juniors';
+import { creerVoitureEtPieces } from '../systems/monoplaces/pieces';
 
 export { DATE_DEPART } from '../balance/monde';
 
@@ -359,7 +360,8 @@ export function construireMonde(graine: number, donnees: DonneesInitiales, scena
   const ecuries = new Map<string, Ecurie>();
   for (const e of d.ecuries) ecuries.set(e.id, ajouter(monde, TABLES.ecuries, { ...e }));
   d.circuits.forEach((c, i) => ajouter(monde, TABLES.circuits, { ...c, ordre: i + 1 }));
-  for (const v of d.voitures) ajouter(monde, TABLES.voitures, { ...v });
+  // Phase 12a : la voiture est faite de six pièces, converties des notes de voitures.csv (conversion unique).
+  for (const v of d.voitures) creerVoitureEtPieces(monde, v);
   // Finances et propriétaires (phase 5a).
   for (const fi of d.finances) {
     if (!ecuries.has(fi.ecurie)) continue; // audit n°4 : pas de finances orphelines pour une écurie absente des données

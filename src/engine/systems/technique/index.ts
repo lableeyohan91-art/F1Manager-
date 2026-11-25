@@ -35,7 +35,8 @@ import { capaciteDeveloppement } from '../saison';
 import { niveauEffectif } from '../economie/infrastructures';
 import { forceEcurie, teamPrincipal } from '../humain/decision';
 import { avantProjets, intensitePercue, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
-import { appliquerPreparation, reconcevoirGrille } from './conception';
+import { fixerArchitectures, intersaison, reconcevoir } from '../monoplaces/conception';
+import { DATE_DEPART } from '../../balance/monde';
 import { domainePoste, iaDecide } from '../joueur/acces';
 
 const r3 = (x: number) => Math.round(x * 1000) / 1000;
@@ -247,7 +248,9 @@ export function entreeEnVigueur(monde: Monde): boolean {
     s.pourSaisonSuivante = r3(s.pourSaisonSuivante * (1 - i));
     delete s.parReglement[ancien.id];
   }
-  reconcevoirGrille(monde, ecuriesActives(monde), nouveau.intensites, nouveau.id, `reglement-${nouveau.id}`);
+  // Phase 12a : pari de concept (architecture choisie, sinon recommandée par le DT), puis reconception absolue des pièces.
+  fixerArchitectures(monde, ecuriesActives(monde), nouveau);
+  reconcevoir(monde, ecuriesActives(monde), nouveau.intensites, nouveau, `reglement-${nouveau.id}`);
   for (const p of programmes(monde)) if (p.horizon === nouveau.id) p.horizon = 'actuelle';
   ajouterEvenement(monde, {
     type: 'reglement.entree_en_vigueur', acteurs: [], importance: 4, visibilite: 'public', causes: causesConnues(monde, nouveau.causes?.annonce), contexte: { reglement: nouveau.id, orientation: nouveau.orientation, pneus: nouveau.pneus },
@@ -291,7 +294,7 @@ export function appliquerEvolutionMineure(monde: Monde): void {
     s.parReglement[actuel.id] = r3((s.parReglement[actuel.id] ?? 0) - perte);
     noterObsolescence(monde, s, perte);
   }
-  reconcevoirGrille(monde, ecuriesActives(monde), ev.intensites, actuel.id, `mineure-${ev.id}`);
+  reconcevoir(monde, ecuriesActives(monde), ev.intensites, actuel, `mineure-${ev.id}`);
 }
 
 /* ===================================================================== 8b — Recherche */
@@ -581,6 +584,8 @@ export const systemeTechnique: Systeme = {
       // Entrée en vigueur d'une réforme, sinon évolution mineure ; puis savoir destiné à cette saison.
       if (!entreeEnVigueur(monde)) appliquerEvolutionMineure(monde);
       for (const e of ecuriesActives(monde)) appliquerSaisonSuivante(monde, e);
+      // Phase 12a : voiture de l'année (chaque pièce se rapproche de sa frontière, savoir de la saison suivante compris).
+      if (date.annee > DATE_DEPART.annee) intersaison(monde, ecuriesActives(monde));
     }
     if (date.semaine === 2) {
       vieillirSavoir(monde);
@@ -614,7 +619,8 @@ function appliquerSaisonSuivante(monde: Monde, e: Ecurie): void {
     if (actuel) s.parReglement[actuel.id] = r3((s.parReglement[actuel.id] ?? 0) + s.pourSaisonSuivante);
     s.pourSaisonSuivante = 0;
   }
-  if (Object.keys(parDomaine).length) appliquerPreparation(monde, e, parDomaine);
+  // Phase 12a : ce savoir élargit la frontière du règlement en vigueur ; la voiture de l'année en profite à l'intersaison.
+  if (Object.keys(parDomaine).length) ajouterEvenement(monde, { type: 'technique.preparation', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 1, visibilite: 'prive', contexte: { savoirParDomaine: parDomaine } });
 }
 
 
