@@ -579,3 +579,19 @@ Aucun code à ce stade.
 - Format de sauvegarde 30 (migration testée).
 - Rapport `docs/rapports/d166-d168/rapport.md` ; outil `tools/retraites-pilotes.mts` ; laboratoire de démographie enrichi.
 
+## [Phase 12 — conception détaillée soumise] — 25/11/2026
+
+### Ajouté (documentation seulement, aucun code)
+- `docs/systemes/phase-12-conception-detaillee.md` :
+  - audit de l'existant ;
+  - articulation avec la recherche de la phase 8 ;
+  - pièces et valeurs de F1 Manager 2024 ;
+  - soufflerie et CFD ;
+  - fabrication ;
+  - renouvellement des hiérarchies ;
+  - découpage 12a–12d ;
+  - laboratoire ;
+  - 13 questions.
+- `docs/systemes/phase-12-fatigue-evenements.md` : fatigue, stress, alertes, événements de conception et de recherche, découvertes, exploitations et parades.
+- D-169 (projet de reformulation de D-081) et D-170, toutes deux à discuter.
+
