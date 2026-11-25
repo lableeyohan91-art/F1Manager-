@@ -639,9 +639,9 @@ Aucun code à ce stade.
 - Les heures de soufflerie pèsent encore trop peu : voir `docs/rapports/phase-12b/rapport.md`, D-172.
 
 
-## [Phase 12b bis — en cours] — 25/11/2026
+## [Phase 12b bis] — 25/11/2026
 
-### Modifié (réglage provisoire, **pas encore mesuré** : campagne et rapport à venir)
+### Modifié (réglage provisoire, mesuré : `docs/rapports/phase-12b-bis/rapport.md`, D-173)
 - Variante V5 adoptée (frontière : échelle de savoir 12, part fondamentale aux réformes 0,3 ; pénalités d'architecture 0,2 à 0,5).
 - Soufflerie renforcée : 4 jours de projet par heure, recherche aéro multipliée de 0,3 à 1,8 selon les heures.
 - ADUO (rattrapage des motoristes) : +1 évolution au-delà de 2 % de retard de puissance, +2 (et +2 la saison suivante) au-delà de 4 %.
@@ -649,3 +649,9 @@ Aucun code à ce stade.
 - Correction : l'IA gardait trop peu d'argent pour ses programmes de recherche en début d'année et pouvait dépasser le plafond ; une
   vérification demandée sans argent devient un ralentissement ; l'enveloppe des projets est aussi bornée par la place réelle sous le plafond.
 - Outils : stratégie « ponctuel » du laboratoire de conception ; `tools/tendances-voitures.mts` (indice moyen par saison, effet des réformes).
+
+### Ajouté (25/11/2026, suite)
+- Conversion de départ : chacune des six pièces reçoit un concept tiré du profil des notes de la voiture.
+- `tools/banc-grille.mts` : les 11 voitures classées sur les 30 circuits (sans hasard), pièces et caractéristiques physiques ;
+  rapport `docs/rapports/phase-12-profils/` (proposition de notes du porteur, non appliquée).
+- Mesures de la 12b bis : 30 saisons (α=1, α=2, sans ADUO), laboratoire Williams et Haas, tendances de vitesse et réformes.
