@@ -78,5 +78,5 @@ describe('Cohérence des promesses d’académie (rapport 6b-2)', () => {
       }
     }
     expect(tenues).toBeGreaterThan(2 * rompues);
-  }, 120_000);
+  }, 300_000); // plusieurs saisons simulées : ≈ 100 s sur une machine d’intégration chargée (CI n°188)
 });

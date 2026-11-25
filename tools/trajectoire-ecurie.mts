@@ -2,21 +2,28 @@
  * Phase 12c — trajectoire d'une écurie sur plusieurs saisons (demande du porteur : « si je prends Cadillac, puis-je progresser ? »).
  * L'écurie est dirigée par l'IA (référence : ce que fait une direction « moyenne ») ; mêmes graines que les campagnes.
  * Par saison : place au championnat constructeurs, points, meilleur résultat en course, rang de l'indice de la voiture, budget de
- * développement. Usage : npx tsx tools/trajectoire-ecurie.mts [écurie=eq_cadillac] [graines=8] [saisons=10]
+ * développement. Usage : npx tsx tools/trajectoire-ecurie.mts [écurie=eq_cadillac] [graines=8] [saisons=10] [stratégie=ia]
+ * Stratégies « de joueur » (laboratoire : imposées chaque semaine à l'écurie, le reste reste à l'IA) :
+ *   ia (aucune), voiture (soufflerie 100 % sur la voiture), prepa (voiture, mais 60 % pour la recherche dès qu'un règlement est annoncé).
  */
 import { resolve } from 'node:path';
 const racine = resolve('.');
 const eng = await import(`${racine}/src/engine/index.ts`);
 const { lireDonneesGrille2026 } = await import(`${racine}/src/platform/node/donnees.ts`);
 const sc = eng.creerScenarioGrille2026(lireDonneesGrille2026(racine));
-const ID = process.argv[2] ?? 'eq_cadillac', N = Number(process.argv[3] ?? 8), S = Number(process.argv[4] ?? 10);
+const ID = process.argv[2] ?? 'eq_cadillac', N = Number(process.argv[3] ?? 8), S = Number(process.argv[4] ?? 10), ST = process.argv[5] ?? 'ia';
 type Ligne = { place: number; points: number; meilleur: number; rangVoiture: number; dev: number };
 const parSaison: Ligne[][] = [];
 for (let g = 1; g <= N; g++) {
   const m = sc.creerMonde(g), mo = sc.creerMoteur();
   for (let s = 0; s < S; s++) {
     const annee = m.date.annee;
-    mo.avancer(m, 52);
+    if (ST === 'ia') mo.avancer(m, 52);
+    else for (let w = 0; w < 52; w++) {
+      const e = m.tables['ecuries'][ID] as { souffleriePartRecherche?: number };
+      e.souffleriePartRecherche = ST === 'prepa' && eng.reglementAnnonce(m) ? 0.6 : 0;
+      mo.avancer(m, 1);
+    }
     const sa = m.tables['saisons'][`ssn_${annee}`] as { constructeurs: { ecurie: string; points: number }[]; calendrier: string[] } | undefined;
     if (!sa) continue;
     const place = sa.constructeurs.findIndex((c) => c.ecurie === ID) + 1;
@@ -32,7 +39,7 @@ for (let g = 1; g <= N; g++) {
   }
 }
 const moy = (v: number[]) => v.reduce((a, b) => a + b, 0) / Math.max(1, v.length);
-console.log(`${ID} dirigée par l'IA — ${N} graines × ${S} saisons\n`);
+console.log(`${ID}, stratégie ${ST} — ${N} graines × ${S} saisons\n`);
 console.log('| Saison | Place constructeurs (moy. ; min–max) | Points (moy.) | Meilleur résultat (médiane) | Saisons avec des points | Rang de la voiture | Développement payé (M€) |');
 console.log('| --- | --- | --- | --- | --- | --- | --- |');
 parSaison.forEach((l, i) => {
