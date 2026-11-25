@@ -22,7 +22,7 @@ type Commander = (c: { type: string; auteur: string; parametres: Record<string, 
 import {
   TABLES, type Circuit, type Departement, type Ecurie, type Finances, type GrandPrix, type Installation, type PieceVoiture, type Personne, type ProjetConception, type Reglement,
 } from '../../model/types';
-import { programmes, reglementAnnonce, reglementEnVigueur, savoirApplicable } from '../technique/acces';
+import { programmes, reglementAnnonce, reglementEnVigueur, savoirApplicable, savoirExistant } from '../technique/acces';
 import { restrictionAero } from '../economie';
 import { usureSucces } from '../humain/decision';
 import { ecartTempsPct, effetPiece, invaliderVoitures, parametresVoiture, piecesInstallees, type ParametresVoiture } from './physique';
@@ -66,12 +66,15 @@ function directeurTechnique(monde: Monde, idEcurie: string): Personne | undefine
 
 /**
  * Pénalités PERÇUES par une écurie (même information pour le joueur et l'IA) : vérité + bruit propre à l'écurie, qui se resserre avec
- * le savoir préparé pour ce règlement et la vision technique du directeur technique. Le tirage de l'erreur est fixe : seule son ampleur
+ * le savoir propre à ce règlement (recherche orientée vers lui, phase 8) et la vision technique du directeur technique. Le tirage de l'erreur est fixe : seule son ampleur
  * diminue quand on apprend (pas de relance possible).
  */
 export function paysagePercu(monde: Monde, idEcurie: string, r: Reglement): Record<string, number> {
   const { familles, penalites } = paysage(monde, r);
-  const savoirPrepare = TYPES_PIECES.filter((t) => pieceTouchee(r, t)).reduce((a, t, _, l) => a + savoirPiece(monde, idEcurie, t, r.id) / l.length, 0);
+  // Seule la recherche menée SUR ce règlement (savoir propre au règlement, phase 8) éclaire le pari : le savoir fondamental, partagé par
+  // toutes les grandes écuries, ne dit rien de l'architecture qui conviendra aux nouvelles règles (sinon tout le monde devine juste).
+  const touchees = TYPES_PIECES.filter((t) => pieceTouchee(r, t));
+  const savoirPrepare = touchees.reduce((a, t) => a + PIECES[t].domaines.reduce((b, d) => b + (savoirExistant(monde, idEcurie, d)?.parReglement[r.id] ?? 0), 0) / PIECES[t].domaines.length, 0) / Math.max(1, touchees.length);
   const vision = directeurTechnique(monde, idEcurie)?.competences['visionTechnique'] ?? 10;
   const sigma = PAYSAGE.bruitBase * Math.exp(-savoirPrepare / PAYSAGE.echelleSavoirIndice) * Math.max(0.2, PAYSAGE.visionBase - vision / 20);
   const res: Record<string, number> = {};

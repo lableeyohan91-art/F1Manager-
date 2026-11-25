@@ -163,7 +163,7 @@ export const RECONCEPTION = { qualiteBase: 0.35, qualiteSavoir: 0.45 };
  * `bruitBase` × exp(−savoir préparé / `echelleSavoirIndice`) × (`visionBase` − vision technique du DT / 20).
  * Une pièce est touchée si l'intensité de la réforme dans l'un de ses domaines atteint `intensiteTouchee`.
  */
-export const PAYSAGE = { famillesMin: 2, famillesMax: 3, penaliteMin: 0.08, penaliteMax: 0.35, bruitBase: 0.25, echelleSavoirIndice: 25, visionBase: 1.4, intensiteTouchee: 0.3 };
+export const PAYSAGE = { famillesMin: 2, famillesMax: 3, penaliteMin: 0.08, penaliteMax: 0.35, bruitBase: 0.5, echelleSavoirIndice: 40, visionBase: 1.4, intensiteTouchee: 0.3 };
 
 /** Noms des familles d'architecture proposées par orientation de réforme (textes du jeu). */
 export const FAMILLES_ARCHITECTURE: Record<string, readonly string[]> = {
