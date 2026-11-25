@@ -622,3 +622,19 @@ Aucun code à ce stade.
 ### À signaler
 - La hiérarchie se fige sur 30 saisons : voir `docs/rapports/phase-12a/rapport.md`, variantes mesurées, décision D-171 à prendre.
 
+## [Phase 12b — soufflerie, rythmes, fatigue, alertes, événements] — 25/11/2026
+
+### Ajouté
+- Barème réel 2026 de soufflerie et de CFD, avec ses trois usages.
+- Recherche aéro dopée par les heures.
+- Rythmes de travail et fatigue des pôles.
+- Incidents, défauts cachés, pièces fragiles.
+- Alertes des responsables et événements de conception.
+- Dilemmes bloquants pour le joueur non délégué.
+- Écran Technique enrichi.
+- Laboratoire `tools/labo-conception.mts`.
+- Format 32.
+
+### À signaler
+- Les heures de soufflerie pèsent encore trop peu : voir `docs/rapports/phase-12b/rapport.md`, D-172.
+
