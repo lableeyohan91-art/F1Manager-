@@ -276,11 +276,12 @@ function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void
 const LIB_DECISION: Record<DecisionEnAttente['type'], string> = {
   contre_offre: 'Négociation', augmentation: 'Augmentation', depart: 'Départ', fin_contrat: 'Contrat',
   poste_vacant: 'Recrutement', offre_marche: 'Marché', vote_reglement: 'Règlement', election: 'Fédération', vote_federation: 'Fédération', conference: 'Presse',
-  offre_sponsor: 'Sponsor', operation_sponsor: 'Sponsor',
+  offre_sponsor: 'Sponsor', operation_sponsor: 'Sponsor', dilemme_technique: 'Technique',
 };
 
 function cibleDecision(d: DecisionEnAttente, nav: Navigation) {
   if (d.type === 'offre_sponsor' || d.type === 'operation_sponsor') return () => nav.aller('finances');
+  if (d.type === 'dilemme_technique') return () => nav.aller('technique');
   if (d.personne && d.type !== 'offre_marche' && d.type !== 'conference') return () => nav.ouvrirPersonne(d.personne!);
   if (d.type === 'poste_vacant' || d.type === 'offre_marche') return () => nav.aller('marche');
   if (d.type === 'conference') return () => nav.aller('actualites');

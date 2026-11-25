@@ -217,3 +217,73 @@ export const SOUFFLERIE = {
 };
 /** Domaines de la phase 8 dont la recherche passe par la soufflerie et la CFD. */
 export const DOMAINES_SOUFFLERIE = ['aero_avant', 'aero_arriere', 'fond_plat', 'refroidissement'] as const;
+
+/**
+ * Phase 12b — rythmes de travail et fatigue des pôles (fiche compagnon §1, D-170 Q2, Q3, Q11) :
+ * - vitesse : avancement selon le rythme ; charge : ce qu'il coûte au pôle (l'intensif fatigue plus qu'il n'accélère) ;
+ * - charge d'un pôle = Σ (charge du rythme des projets en conception) / équipes du pôle ; fatigue d'équilibre F* = `equilibreNormal` × c
+ *   (c ≤ 1) ou `equilibreNormal` + `pente` × (c − 1) ; chaque semaine la fatigue va vers F* de `montee` (si elle monte), `descente`
+ *   (si elle baisse), `descenteAllegee` sous une charge de `seuilAllege` : une équipe épuisée remise au normal redevient fraîche ;
+ * - effets : productivité × (1 − max(0, F − `productiviteSeuil`) / 100) ; incident par semaine et par projet
+ *   `incidentBase` + `incidentCoef` × max(0, F − `incidentSeuil`)² (difficultés normales comprises) ; efficacité des heures × (1 − F / 200) ;
+ *   erreur d'estimation × (1 + F / 100) ;
+ * - incident détecté (équipe : `detectionBase` + `detectionRigueur` × rigueur / 20, × (1 − F / 200) ; soufflerie : 1 − exp(−H / 15))
+ *   → retard de `retardMinJours` à `retardMaxJours` ; non détecté → défaut caché : performance (gain réduit de `defautMin` à `defautMax`)
+ *   ou pièce fragile (fiabilité de la voiture − `fragiliteFiabilite` tant qu'elle est montée) ; un second défaut au-delà de `echecFatigue`
+ *   de fatigue → projet inutilisable ;
+ * - surcoût de l'intensif (Q11, variable) : `surcout` × coût du projet × part du projet faite cette semaine × (1 + F / 100) ;
+ * - stress (existant, humain/etat.ts) du responsable du pôle : + `stressIncident` par incident, + `stressIntensif` par semaine d'intensif.
+ */
+export const RYTHMES = {
+  vitesse: { allege: 0.7, normal: 1, intensif: 1.3 },
+  charge: { allege: 0.7, normal: 1, intensif: 1.35 },
+};
+export type Rythme = keyof typeof RYTHMES.vitesse;
+export const FATIGUE = {
+  equilibreNormal: 15, pente: 110, montee: 0.15, descente: 0.12, descenteAllegee: 0.2, seuilAllege: 0.7,
+  productiviteSeuil: 40, incidentBase: 0.004, incidentCoef: 0.00004, incidentSeuil: 30,
+  detectionBase: 0.45, detectionRigueur: 0.4, retardMinJours: 7, retardMaxJours: 14,
+  defautMin: 0.2, defautMax: 0.6, partFragile: 0.35, fragiliteFiabilite: 1, echecFatigue: 70,
+  surcout: 0.1, stressIncident: 3, stressIntensif: 0.5,
+};
+
+/**
+ * Alertes des responsables (fiche compagnon §3) : risque réel = 0,6 si un défaut caché existe, sinon probabilité d'incident sur les
+ * semaines restantes (au plus 0,6) ; perçu = réel × exp(bruit), écart type `bruitBase` − `bruitCompetence` × (corrélation + rigueur) / 40
+ * + fatigue / 200 + stress / 300 ; alerte au-delà de `seuil` ; une par projet toutes les `delaiProjetSemaines`, une par pôle toutes les
+ * `delaiPoleSemaines`. Vérification : `verificationMEUR` et `verificationJours`, chance de trouver un défaut `detectionVerification`
+ * (+ soufflerie). Échéance d'un dilemme : `echeanceSemaines` ; sans réponse, la recommandation du responsable s'applique.
+ */
+export const ALERTES = {
+  seuil: 0.15, bruitBase: 0.8, bruitCompetence: 0.5, delaiProjetSemaines: 6, delaiPoleSemaines: 4,
+  verificationMEUR: 0.2, verificationJours: 7, detectionVerification: 0.6, echeanceSemaines: 2, stressMaintien: 5,
+};
+
+/** IA (et DT délégué) : rythme selon la fatigue du pôle et l'enjeu (mêmes règles que le joueur). */
+export const IA_RYTHME = { fatigueRepos: 55, fatigueIntensif: 30, forcePretendant: 0.75, risqueAudacieux: 14 };
+
+/**
+ * Phase 12b — événements de conception (fiche compagnon §4 ; cible du porteur : 5 à 10 % des projets) :
+ * - tirage unique au lancement : probabilité `base` × (0,7 + 0,6 × innovation / 20) × (0,8 + 0,4 × nouveauté du concept), bornée
+ *   [`min` ; `max`] ; moment de l'événement entre `momentMin` et `momentMax` de l'avancement ; une même famille au plus une fois
+ *   toutes les `delaiFamilleSemaines` par écurie (sinon l'événement est perdu, pas reporté) ;
+ * - poids des familles : piste prometteuse, contradiction CFD/soufflerie (pièces aéro), matériau expérimental (pièces mécaniques et
+ *   carrosserie), réorientation du concept ;
+ * - piste : vérité tirée (rien, mineure, majeure) ; majeure = `majeureBase` × (innovation / 14)², au plus `majeureMax` ; gains en
+ *   points d'efficacité ; explorer coûte `exploreJours` et `exploreMEUR`, capture `captureSimple` de la valeur (avec des heures en plus :
+ *   toute la valeur) ; une piste sans valeur apprend quand même `savoirRien` points de savoir ; une majeure ajoute `savoirMajeure` points ;
+ * - contradiction : la CFD a raison avec la probabilité 0,4 + 0,4 × corrélation / 20 ; vérifier coûte `verifierJours` et `verifierMEUR`
+ *   et révèle la vérité avec 0,6 + 0,3 × corrélation / 20 ; la prudence garde `facteurPrudence` du gain ; poursuivre sur une CFD fausse
+ *   ne garde qu'une part tirée entre 0 et `facteurErreurMax` ;
+ * - matériau : fragile avec la probabilité 0,45 − 0,2 × rigueur / 20 ; gain `gainMateriau` points ; essais `essaisMEUR`, `essaisJours` ;
+ * - réorientation : concept décalé de `decalageConcept` vers ce qui paie sur les circuits à venir, `reorienterJours`.
+ */
+export const EVENEMENTS_CONCEPTION = {
+  base: 0.07, min: 0.04, max: 0.12, momentMin: 0.3, momentMax: 0.7, delaiFamilleSemaines: 10,
+  poids: { piste: 30, contradiction: 25, materiau: 20, reorientation: 25 },
+  partRien: 0.5, majeureBase: 0.04, majeureMax: 0.08, mineureMin: 0.6, mineureMax: 1.2, majeure: 2.5,
+  exploreJours: 14, exploreMEUR: 0.45, captureSimple: 0.7, savoirRien: 0.3, savoirMajeure: 6,
+  verifierJours: 7, verifierMEUR: 0.15, facteurPrudence: 0.7, facteurErreurMax: 0.5,
+  gainMateriau: 0.8, essaisMEUR: 0.4, essaisJours: 7,
+  decalageConcept: 0.4, reorienterJours: 7, gainReorientationMin: 0.02,
+};

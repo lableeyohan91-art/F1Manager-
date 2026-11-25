@@ -58,6 +58,7 @@ export const TABLES = {
   // Phase 12a : pièces des voitures (versions) et projets de conception.
   pieces: 'pieces',
   projetsConception: 'projetsConception',
+  dilemmesTechniques: 'dilemmesTechniques',
   saisons: 'saisons',
   grandsPrix: 'grandsprix',
 } as const;
@@ -471,6 +472,9 @@ export interface Departement {
   niveauMoyen: Note;
   cohesion: Note;
   responsable: string;
+  /** Phase 12b : fatigue du pôle (0 à 100 ; seuls les pôles aéro et conception) et semaine (rang) de sa dernière alerte. */
+  fatigue?: number;
+  derniereAlerte?: number;
 }
 
 export type TypeInstallation =
@@ -544,6 +548,27 @@ export interface PieceVoiture {
   /** Saison de conception. */
   saison: number;
   installee: boolean;
+  /** Phase 12b : défaut caché de durabilité (révélé en course) : la fiabilité de la voiture baisse tant qu'elle est montée. */
+  fragile?: boolean;
+}
+
+/**
+ * Phase 12b : dilemme technique présenté à une écurie (alerte d'un responsable ou événement de conception). La vérité est fixée à la
+ * création ; les options changent les moyens engagés et ce qu'on capture de cette vérité, jamais la vérité elle-même.
+ */
+export interface DilemmeTechnique {
+  id: string;
+  ecurie: string;
+  projet: string;
+  /** 'alerte' (fatigue, défaut), ou famille d'événement de conception : 'piste', 'contradiction', 'materiau', 'reorientation'. */
+  famille: string;
+  options: string[];
+  recommandation: string;
+  /** Message du responsable (texte du jeu) et estimation qu'il donne (fourchette). */
+  texte: string;
+  verite: Record<string, number | string | boolean>;
+  cree: DateJeu;
+  echeance: DateJeu;
 }
 
 /** Phase 12a : projet de conception d'une nouvelle version de pièce (conception simplifiée : rythme normal, sans événement). */
@@ -566,6 +591,20 @@ export interface ProjetConception {
   /** Phase 12b : heures effectives de soufflerie et unités effectives de CFD consacrées au projet. */
   heures?: number;
   cfd?: number;
+  /** Phase 12b : rythme de travail (normal par défaut). */
+  rythme?: 'allege' | 'normal' | 'intensif';
+  /** Phase 12b : incidents survenus ; défaut caché (inconnu de l'écurie tant qu'il n'est pas découvert) ; projet devenu inutilisable. */
+  incidents?: number;
+  defaut?: { type: 'performance' | 'fragile'; ampleur: number };
+  echec?: boolean;
+  /** Phase 12b : semaine (rang) de la dernière alerte du responsable sur ce projet. */
+  derniereAlerte?: number;
+  /** Phase 12b : événement de conception tiré au lancement (famille, moment en part de l'avancement), déjà présenté ou non. */
+  evenementPrevu?: { famille: string; a: number; presente?: boolean };
+  /** Phase 12b : effets des choix faits pendant le projet (part de valeur capturée, bonus ou malus d'efficacité, gain de masse). */
+  bonusEfficacite?: number;
+  /** Phase 12b : part du gain prévu réellement obtenue (prudence, erreur non détectée). */
+  facteurGain?: number;
   evenement?: string;
 }
 

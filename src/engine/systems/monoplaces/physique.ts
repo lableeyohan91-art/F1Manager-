@@ -7,7 +7,7 @@
  * vitesse sur son tracé réel (tools/circuits/sensibilites-voiture.mts). Module pur de lecture : aucune écriture, aucun hasard.
  */
 
-import { EFFICACITE_REFERENCE, MOTORISTE_PUISSANCE, PARAMETRES_SENSIBILITE, PIECES, REFROIDISSEMENT, SENSIBILITES_MOYENNES, type ParametreVoiture, type TypePiece } from '../../balance/monoplaces';
+import { EFFICACITE_REFERENCE, FATIGUE, MOTORISTE_PUISSANCE, PARAMETRES_SENSIBILITE, PIECES, REFROIDISSEMENT, SENSIBILITES_MOYENNES, type ParametreVoiture, type TypePiece } from '../../balance/monoplaces';
 import { table, type Monde } from '../../core/monde';
 import { TABLES, type Circuit, type Ecurie, type Motoriste, type PieceVoiture } from '../../model/types';
 
@@ -99,4 +99,9 @@ export function ecartTempsPct(p: ParametresVoiture, circuit: Pick<Circuit, 'sens
 /** Écart de temps au tour (%) de la voiture d'une écurie sur un circuit. */
 export function ecartTempsEcurie(monde: Monde, e: Ecurie, circuit: Circuit, mois?: number): number {
   return ecartTempsPct(parametresVoiture(monde, e), circuit, mois);
+}
+
+/** Phase 12b : fiabilité de la voiture, moins la fragilité des pièces montées dont le défaut caché n'a pas été corrigé. */
+export function fiabiliteVoiture(monde: Monde, e: Ecurie, fiabiliteNote: number): number {
+  return fiabiliteNote - FATIGUE.fragiliteFiabilite * piecesInstallees(monde, e.id).filter((p) => p.fragile).length;
 }

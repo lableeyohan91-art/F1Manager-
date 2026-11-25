@@ -32,6 +32,7 @@ import { teamPrincipal, valeurMarche } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
 import { financesDe, offresSponsors, operationsSponsors, plafond } from '../economie';
 import { equipeStands } from '../stands';
+import { dilemmes } from '../monoplaces/dilemmes';
 import { propositions } from '../technique';
 import { federation } from '../politique';
 import { POSTES_INDIVIDUALISES } from '../../balance/monde';
@@ -257,9 +258,11 @@ export const commandeIgnorerDemande: DefinitionCommande = {
 /* ------------------------------------------------------------------ Décisions en attente (consultation) */
 
 export interface DecisionEnAttente {
-  type: 'contre_offre' | 'augmentation' | 'depart' | 'fin_contrat' | 'poste_vacant' | 'offre_marche' | 'vote_reglement' | 'election' | 'vote_federation' | 'conference' | 'offre_sponsor' | 'operation_sponsor';
+  type: 'contre_offre' | 'augmentation' | 'depart' | 'fin_contrat' | 'poste_vacant' | 'offre_marche' | 'vote_reglement' | 'election' | 'vote_federation' | 'conference' | 'offre_sponsor' | 'operation_sponsor' | 'dilemme_technique';
   /** Phase 11c : offre de contrat ou opération exceptionnelle d'un sponsor. */
   offreSponsor?: string;
+  /** Phase 12b : dilemme technique (alerte d'un responsable, événement de conception). */
+  dilemme?: string;
   operation?: string;
   /** Phase 11 : question de la presse en attente (identifiant de la conférence). */
   conference?: string;
@@ -368,6 +371,11 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
       const p = op.pilote ? personneDe(monde, op.pilote) : undefined;
       res.push({ type: 'operation_sponsor', titre: `${s?.nom ?? 'Un sponsor'} propose une opération publicitaire`, detail: `${op.exploit === 'victoire' ? 'Première victoire' : op.exploit === 'podium' ? 'Premier podium' : 'Premier top 5'} depuis longtemps : ${p ? `avec ${nomDe(p)}` : 'pilote au choix'}, de ${Math.min(...op.formats.map((f) => f.montantMEUR))} à ${Math.max(...op.formats.map((f) => f.montantMEUR))} M€.`, consequence: 'Sans réponse avant le prochain Grand Prix, l’équipe décide.', echeance: op.echeance, urgente: urgente(op.echeance), bloquante: false, operation: op.id, ...(p ? { personne: p.id } : {}) });
     }
+  }
+  // Phase 12b : dilemmes techniques ; bloquants (D-170 Q10, interprétation « bloquant » à confirmer) quand la recherche n'est pas
+  // déléguée (sinon le directeur technique les a déjà tranchés et ils n'apparaissent pas).
+  for (const d of dilemmes(monde, idEcurie)) {
+    res.push({ type: 'dilemme_technique', titre: d.famille === 'alerte' ? 'Alerte de votre responsable technique' : 'Décision technique', detail: d.texte, consequence: 'Sans réponse, la recommandation du responsable s’applique.', echeance: d.echeance, urgente: urgente(d.echeance), bloquante: true, dilemme: d.id });
   }
   return res.sort((a, b) => Number(b.bloquante) - Number(a.bloquante) || Number(b.urgente) - Number(a.urgente) || (a.echeance ? rang(a.echeance) : 1e9) - (b.echeance ? rang(b.echeance) : 1e9));
 }

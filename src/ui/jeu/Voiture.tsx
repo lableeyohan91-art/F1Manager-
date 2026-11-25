@@ -5,12 +5,21 @@
  */
 import { useState } from 'preact/hooks';
 import {
-  architectureRecommandee, circuitsAVenir, coutTotal, ecuriesActives, efficaciteAttendue, enveloppeRestante, estDelegue, indiceSurCircuit, meilleurProjet, paysage, paysagePercu,
+  allocationPeriode, architectureRecommandee, circuitsAVenir, coutTotal, dilemmes, fatiguePole, ecuriesActives, efficaciteAttendue, enveloppeRestante, estDelegue, indiceSurCircuit, meilleurProjet, paysage, paysagePercu,
   piecesInstallees, projets, reglementAnnonce, type Circuit, type Ecurie, type Monde,
 } from '../../engine';
-import { PIECES, TYPES_PIECES, type TypePiece } from '../../engine/balance/monoplaces';
+import { PIECES, SOUFFLERIE, TYPES_PIECES, type TypePiece } from '../../engine/balance/monoplaces';
 import { commander, ecurieJoueur, meur, type Partie } from './partie';
 import type { Navigation } from './Jeu';
+
+const LIB_OPTION: Record<string, string> = {
+  ralentir: 'Ralentir le rythme', verifier: 'Financer une vérification', maintenir: 'Maintenir le calendrier',
+  refuser: 'Refuser', explorer: 'Explorer (2 semaines, 0,45 M€)', explorer_soufflerie: 'Explorer avec la soufflerie (2 semaines, 0,45 M€)',
+  prudence: 'Jouer la prudence', poursuivre: 'Poursuivre', tenter: 'Tenter', essais: 'Essais de résistance (0,4 M€, 1 semaine)', conserver: 'Garder la solution éprouvée',
+  reorienter: 'Réorienter (1 semaine)',
+};
+const LIB_RYTHME: Record<string, string> = { allege: 'allégé', normal: 'normal', intensif: 'intensif' };
+const couleurFatigue = (f: number) => (f < 30 ? 'var(--green)' : f < 55 ? 'var(--yellow)' : 'var(--accent)');
 
 const libConcept = (t: TypePiece, c: number) => (c > 0.15 ? PIECES[t].conceptPlus : c < -0.15 ? PIECES[t].conceptMoins : 'équilibré');
 
@@ -43,9 +52,35 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
     setMsg(r.ok ? ok : `Impossible : ${(r as { motif: string }).motif}`);
     nav.rafraichir();
   };
+  const enAttente = dilemmes(m, e.id);
+  const souff = allocationPeriode(m, e.id);
+  const partRech = e.souffleriePartRecherche ?? SOUFFLERIE.partRechercheDefaut;
   return (
     <>
       {msg && <div class="carte retour" role="status">{msg}</div>}
+      {enAttente.map((d) => (
+        <div key={d.id} class="carte attention">
+          <h3>❗ {d.famille === 'alerte' ? 'Alerte de votre responsable' : 'Décision technique'}</h3>
+          <p>« {d.texte} »</p>
+          <div class="actions">{d.options.map((o) => <button key={o} class={`btn ${o === d.recommandation ? 'principal' : ''}`} onClick={() => agir('conception.dilemme', { dilemme: d.id, option: o }, 'Décision prise.')}>{LIB_OPTION[o] ?? o}</button>)}</div>
+          <p class="muted petit">Le bouton en rouge est la recommandation de votre responsable : ses conseils sont plus fiables quand il est compétent et reposé, jamais certains.</p>
+        </div>
+      ))}
+      <div class="carte">
+        <h3>Équipes techniques</h3>
+        {(['aero', 'conception'] as const).map((pole) => {
+          const f = fatiguePole(m, e.id, pole);
+          return <p key={pole}>{pole === 'aero' ? 'Pôle aérodynamique' : 'Pôle conception'} : fatigue <strong style={{ color: couleurFatigue(f) }}>{Math.round(f)}</strong>/100
+            <span class="muted petit"> · {f < 30 ? 'équipe fraîche' : f < 55 ? 'équipe fatiguée : erreurs plus probables' : 'équipe épuisée : ralentissez'}</span></p>;
+        })}
+        <p>Soufflerie : <strong>{Math.round(souff.heures)} h</strong> et {Math.round(souff.cfd)} simulations CFD par période ({Math.round(souff.bareme * 100)} % du barème, selon votre classement).</p>
+        {!delegue ? (
+          <label class="champ">Part de la soufflerie pour la recherche et la préparation de l’avenir
+            <select value={String(partRech)} onChange={(v) => agir('conception.soufflerie', { ecurie: e.id, partRecherche: Number((v.target as HTMLSelectElement).value) }, 'Répartition modifiée.')}>
+              {[0, 0.15, 0.3, 0.45, 0.6, 0.8, 1].map((x) => <option key={x} value={String(x)}>{Math.round(x * 100)} %</option>)}
+            </select></label>
+        ) : <p class="muted petit">Part de la recherche : {Math.round(partRech * 100)} % (décidée par votre directeur technique).</p>}
+      </div>
       <div class="carte">
         <h3>Votre voiture, circuit par circuit</h3>
         <p class="muted petit">Rang de votre voiture parmi les {ecuriesActives(m).length} sur les circuits à venir (temps au tour calculé sur le tracé réel).</p>
@@ -84,7 +119,8 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
           {enCours.map((p) => {
             const t = p.type as TypePiece;
             const etat = p.fabricationJoursRestants !== undefined ? `fabrication, ${Math.max(0, Math.ceil(p.fabricationJoursRestants))} j` : `conception ${Math.round(100 * (1 - p.joursRestants / p.joursTotal))} %`;
-            return <li key={p.id}><strong>{PIECES[t].libelle}</strong> ({libConcept(t, p.concept)}) : {etat}
+            return <li key={p.id}><strong>{PIECES[t].libelle}</strong> ({libConcept(t, p.concept)}) : {etat}{p.fabricationJoursRestants === undefined ? `, rythme ${LIB_RYTHME[p.rythme ?? 'normal']}` : ''}
+              {!delegue && p.fabricationJoursRestants === undefined && <> <select value={p.rythme ?? 'normal'} onChange={(v) => agir('conception.rythme', { projet: p.id, rythme: (v.target as HTMLSelectElement).value }, 'Rythme modifié.')}>{Object.entries(LIB_RYTHME).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></>}
               {!delegue && p.fabricationJoursRestants === undefined && <> <button class="btn" onClick={() => agir('conception.annuler', { projet: p.id }, 'Projet abandonné (coût de conception non remboursé).')}>Abandonner</button></>}</li>;
           })}
         </ul>

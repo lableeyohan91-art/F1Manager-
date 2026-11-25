@@ -37,6 +37,7 @@ import { nombreGrandsPrix } from '../politique/acces';
 import { avecVivier, circuitsDeLaSaison, moisDeSemaine } from './calendrier';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
+import { fiabiliteVoiture } from '../monoplaces/physique';
 
 /** Durée de conservation des explications détaillées des résultats, en saisons. */
 const CONSERVATION_EXPLICATIONS_SAISONS = 2;
@@ -141,7 +142,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       + USURE_SUCCES.effetCourse * borner((p.etat.motivation - USURE_SUCCES.motivationReference) / USURE_SUCCES.motivationReference, -1, 0);
     const alea = f.normale(0, sigma);
     // Audit (1.5) : la fiabilité peut dépasser 20 (bornes du développement) ; la probabilité ne descend pas sous le plancher.
-    const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - voitureDe(monde, e.id).fiabilite) * ABANDON_MECANIQUE.parPoint);
+    const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - fiabiliteVoiture(monde, e, voitureDe(monde, e.id).fiabilite)) * ABANDON_MECANIQUE.parPoint);
     const pInc = (INCIDENT.base + (20 - (p.competences['regularite'] ?? 10)) * INCIDENT.parPoint)
       * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.exigences.risqueAccident / INCIDENT.risqueReference);
     const abandon = f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : null;

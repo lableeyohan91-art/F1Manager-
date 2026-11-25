@@ -10,7 +10,7 @@
  */
 
 import {
-  DOMAINES_SOUFFLERIE, EFFICACITE_REFERENCE, FAMILLES_ARCHITECTURE, FRONTIERE, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, SOUFFLERIE, TYPES_PIECES, type TypePiece,
+  DOMAINES_SOUFFLERIE, EFFICACITE_REFERENCE, EVENEMENTS_CONCEPTION, FAMILLES_ARCHITECTURE, FATIGUE, FRONTIERE, IA_RYTHME, RYTHMES, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, SOUFFLERIE, TYPES_PIECES, type TypePiece,
 } from '../../balance/monoplaces';
 import { USURE_SUCCES } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
@@ -20,12 +20,18 @@ import { tirageLocal } from '../../core/moteur';
 
 type Commander = (c: { type: string; auteur: string; parametres: Record<string, unknown> }) => unknown;
 import {
-  TABLES, type Circuit, type Departement, type Ecurie, type Finances, type GrandPrix, type Installation, type PieceVoiture, type Personne, type ProjetConception, type Reglement,
+  TABLES, type Circuit, type Departement, type DilemmeTechnique, type Ecurie, type Finances, type GrandPrix, type Installation, type PieceVoiture, type Personne, type ProjetConception, type Reglement,
 } from '../../model/types';
 import { programmes, reglementAnnonce, reglementEnVigueur, savoir, savoirApplicable, savoirExistant } from '../technique/acces';
 import { repartirSoufflerie } from './soufflerie';
+import { depenser, enveloppeRestante } from './depenses';
+import { chargePole, departementPole, evoluerFatigue, facteurProductivite, fatiguePole, fraicheur, probaIncident, rythmeDe, type Pole } from './fatigue';
+import { alertesResponsables, creerDilemme, dilemmes, echeancesDilemmes, resoudre, responsable, stresser } from './dilemmes';
+import { presenterEvenement, tirerEvenement } from './evenements';
+import { rangSemaine } from '../../core/calendrier';
+export { depenser, enveloppeRestante } from './depenses';
 import { SAVOIR } from '../../balance/technique';
-import { usureSucces } from '../humain/decision';
+import { forceEcurie, usureSucces } from '../humain/decision';
 import { ecartTempsPct, effetPiece, invaliderVoitures, parametresVoiture, piecesInstallees, type ParametresVoiture } from './physique';
 import { ajouterPiece, installer, versions } from './pieces';
 
@@ -105,7 +111,6 @@ export function frontiere(monde: Monde, e: Ecurie, type: TypePiece, r: Reglement
 
 /* ===================================================================== Capacité et qualité */
 
-type Pole = 'aero' | 'conception';
 const INSTALLATIONS_POLE: Record<Pole, string[]> = { aero: ['soufflerie', 'cfd'], conception: ['bureau_etudes', 'simulateur'] };
 const COMPETENCE_POLE: Record<Pole, { poste: string; competence: string }> = { aero: { poste: 'responsable_aero', competence: 'aerodynamique' }, conception: { poste: 'responsable_conception', competence: 'conception' } };
 
@@ -191,29 +196,6 @@ export function efficaciteAttendue(monde: Monde, e: Ecurie, type: TypePiece, con
 export const projets = (monde: Monde, idEcurie?: string) => idsTries(table(monde, TABLES.projetsConception))
   .map((id) => table(monde, TABLES.projetsConception)[id] as unknown as ProjetConception).filter((p) => !idEcurie || p.ecurie === idEcurie);
 
-/** Dépenses techniques de l'année (créées au besoin). */
-function depenses(fi: Finances, annee: number): NonNullable<Finances['depensesTechniques']> {
-  if (!fi.depensesTechniques || fi.depensesTechniques.annee !== annee) fi.depensesTechniques = { annee, projetsMEUR: 0, aPayerMEUR: fi.depensesTechniques?.aPayerMEUR ?? 0 };
-  return fi.depensesTechniques;
-}
-
-/** Enveloppe encore disponible pour les projets cette année (budget de développement hors part de la recherche, moins le déjà dépensé). */
-export function enveloppeRestante(monde: Monde, idEcurie: string): number {
-  const fi = financesDe(monde, idEcurie);
-  if (!fi) return Infinity;
-  const recherche = programmes(monde, idEcurie).filter((p) => p.statut === 'actif').reduce((a, p) => a + p.part, 0);
-  return fi.budget.developpementMEUR * (1 - recherche) - depenses(fi, monde.date.annee).projetsMEUR;
-}
-
-/** Engage une dépense technique (comptée à la prochaine écriture comptable, sous le plafond). */
-export function depenser(monde: Monde, idEcurie: string, montant: number): void {
-  const fi = financesDe(monde, idEcurie);
-  if (!fi) return;
-  const d = depenses(fi, monde.date.annee);
-  d.projetsMEUR = r2(d.projetsMEUR + montant);
-  d.aPayerMEUR = r2(d.aPayerMEUR + montant);
-}
-
 /** Coût total d'un projet (conception + exemplaires fabriqués). */
 export const coutTotal = (type: TypePiece) => PIECES[type].coutProjetMEUR + PROJETS.exemplaires * PIECES[type].coutUnitaireMEUR;
 
@@ -252,6 +234,9 @@ export function lancerProjet(monde: Monde, auteur: string, prm: Record<string, u
     texte: `Lancement d'un nouveau projet : ${def.libelle.toLowerCase()} (${p.concept > 0.05 ? def.conceptPlus : p.concept < -0.05 ? def.conceptMoins : 'concept équilibré'}).`,
   });
   p.evenement = evt.id;
+  p.rythme = 'normal';
+  // Phase 12b : un éventuel événement de conception est tiré une seule fois, au lancement (pas de relance possible).
+  tirerEvenement(monde, p);
   table(monde, TABLES.projetsConception)[id] = p as unknown as Entite;
   return p;
 }
@@ -359,10 +344,21 @@ function terminerConception(monde: Monde, p: ProjetConception): void {
     if (pi > predite) { predite = pi; q = qi; }
   }
   q = Math.max(PROJETS.progressionMin, q);
-  p.efficacite = r2(base + q * Math.max(0, frontiere(monde, e, type) - base) - PROJETS.penaliteConcept * Math.abs(p.concept - (actuelle?.concept ?? 0)));
+  // Phase 12b : choix faits pendant le projet (part du gain obtenue, bonus d'une piste ou d'un matériau) et défaut caché de performance.
+  const gain = q * Math.max(0, frontiere(monde, e, type) - base) * (p.facteurGain ?? 1) * (p.defaut?.type === 'performance' ? 1 - p.defaut.ampleur : 1);
+  p.efficacite = r2(base + gain + (p.bonusEfficacite ?? 0) - PROJETS.penaliteConcept * Math.abs(p.concept - (actuelle?.concept ?? 0)));
   // Phase 12b, expertise : la conception et les essais font gagner du savoir propre au règlement dans les domaines de la pièce.
   apprendre(monde, e.id, type, r?.id, p.joursTotal + SOUFFLERIE.joursParHeure * (p.heures ?? 0) + SOUFFLERIE.joursParUniteCfd * (p.cfd ?? 0));
   p.fabricationJoursRestants = PIECES[type].fabricationJours;
+  if (p.echec) {
+    // Phase 12b : projet devenu inutilisable (erreurs en cascade d'une équipe épuisée) ; l'expertise reste, l'argent est perdu.
+    delete table(monde, TABLES.projetsConception)[p.id];
+    ajouterEvenement(monde, {
+      type: 'conception.echec', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'prive', causes: p.evenement ? [p.evenement] : [],
+      contexte: { projet: p.id, piece: type, incidents: p.incidents ?? 0 }, texte: `Le projet « ${PIECES[type].libelle.toLowerCase()} » est inutilisable : trop d'erreurs accumulées.`,
+    });
+    return;
+  }
   depenser(monde, e.id, PROJETS.exemplaires * PIECES[type].coutUnitaireMEUR);
 }
 
@@ -376,10 +372,11 @@ function terminerFabrication(monde: Monde, p: ProjetConception): void {
   const piece = ajouterPiece(monde, {
     ecurie: e.id, type, version: (liste.at(-1)?.version ?? 0) + 1, efficacite: p.efficacite ?? EFFICACITE_REFERENCE, concept: p.concept,
     reglement: reglementEnVigueur(monde)?.id ?? '', saison: monde.date.annee, installee: false,
+    ...(p.defaut?.type === 'fragile' ? { fragile: true } : {}),
   });
   const pole = PIECES[type].pole as Pole;
   // Phase 12b, validation (soufflerie) : chaque heure de vent resserre l'estimation (rendement décroissant).
-  const sigma = (PROJETS.ecartEstimation * (1.5 - correlation(monde, e.id, pole) / 20)) / Math.sqrt(1 + (p.heures ?? 0) / SOUFFLERIE.heuresValidation);
+  const sigma = (PROJETS.ecartEstimation * (1.5 - correlation(monde, e.id, pole) / 20) * (1 + fatiguePole(monde, e.id, pole) / 100)) / Math.sqrt(1 + (p.heures ?? 0) / SOUFFLERIE.heuresValidation);
   const estimee = piece.efficacite + tirageLocal(monde, 'monoplaces.estimation', p.id).normale(0, sigma);
   const circuits = circuitsAVenir(monde);
   const avec = ecartMoyen(avecPiece(monde, e, type, estimee, piece.concept), circuits);
@@ -397,25 +394,115 @@ function terminerFabrication(monde: Monde, p: ProjetConception): void {
 
 /** Avancement hebdomadaire des projets (conception, puis fabrication). */
 export function avancerProjetsConception(monde: Monde): void {
-  // Phase 12b : heures de soufflerie et de CFD de la semaine, réparties avant le travail.
   const parEcurie = new Map<string, ProjetConception[]>();
   for (const p of projets(monde)) parEcurie.set(p.ecurie, [...(parEcurie.get(p.ecurie) ?? []), p]);
   for (const id of idsTries(table(monde, TABLES.ecuries))) {
     const e = ecurieDe(monde, id)!;
-    if (e.statut === 'active') repartirSoufflerie(monde, e, parEcurie.get(id) ?? []);
-  }
-  for (const p of projets(monde)) {
-    const e = ecurieDe(monde, p.ecurie);
-    if (!e || e.statut !== 'active') { delete table(monde, TABLES.projetsConception)[p.id]; continue; }
-    if (p.fabricationJoursRestants === undefined) {
-      p.joursRestants = r2(p.joursRestants - 7 * productivite(monde, p.ecurie, PIECES[p.type as TypePiece].pole as Pole));
-      if (p.joursRestants <= 0) terminerConception(monde, p);
-    } else {
-      p.fabricationJoursRestants = r2(p.fabricationJoursRestants - 7);
-      if (p.fabricationJoursRestants <= 0) terminerFabrication(monde, p);
+    const liste = parEcurie.get(id) ?? [];
+    if (e.statut !== 'active') { for (const p of liste) delete table(monde, TABLES.projetsConception)[p.id]; continue; }
+    // Phase 12b : fatigue des pôles selon la charge de la semaine, puis heures de soufflerie (moins utiles à une équipe fatiguée).
+    for (const pole of ['aero', 'conception'] as Pole[]) {
+      const d = departementPole(monde, id, pole);
+      if (d) evoluerFatigue(d, chargePole(liste, pole, emplacements(monde, id, pole)));
     }
+    repartirSoufflerie(monde, e, liste, fraicheur(fatiguePole(monde, id, 'aero')));
+    for (const p of liste) avancerProjet(monde, p);
   }
+  echeancesDilemmes(monde);
 }
+
+/** Une semaine de travail sur un projet : avancement (rythme, fatigue), surcoût de l'intensif, incidents, alertes, événement prévu. */
+function avancerProjet(monde: Monde, p: ProjetConception): void {
+  if (p.fabricationJoursRestants !== undefined) {
+    p.fabricationJoursRestants = r2(p.fabricationJoursRestants - 7);
+    if (p.fabricationJoursRestants <= 0) terminerFabrication(monde, p);
+    return;
+  }
+  const type = p.type as TypePiece;
+  const pole = PIECES[type].pole as Pole;
+  const f = fatiguePole(monde, p.ecurie, pole);
+  const rythme = rythmeDe(p);
+  const jours = 7 * productivite(monde, p.ecurie, pole) * RYTHMES.vitesse[rythme] * facteurProductivite(f);
+  if (rythme === 'intensif') {
+    // Surcoût variable (D-170 Q11) : heures supplémentaires, plus chères quand l'équipe est fatiguée ; stress du responsable.
+    depenser(monde, p.ecurie, FATIGUE.surcout * p.coutMEUR * Math.min(1, jours / p.joursTotal) * (1 + f / 100));
+    stresser(monde, p.ecurie, pole, FATIGUE.stressIntensif);
+  }
+  p.joursRestants = r2(p.joursRestants - jours);
+  incidents(monde, p, pole, f);
+  presenterEvenement(monde, p, (d) => creerDilemme(monde, d), (x) => conceptAlternatif(monde, x));
+  alertesResponsables(monde, p);
+  if (p.joursRestants <= 0 && table(monde, TABLES.projetsConception)[p.id] && !dilemmes(monde).some((d) => d.projet === p.id)) terminerConception(monde, p);
+}
+
+/** Incidents d'exécution (difficultés normales et erreurs dues à la fatigue) : détectés (retard) ou non (défaut caché). */
+function incidents(monde: Monde, p: ProjetConception, pole: Pole, f: number): void {
+  const t = tirageLocal(monde, 'monoplaces.incident', p.id, rangSemaine(monde.date));
+  if (!t.chance(probaIncident(f))) return;
+  p.incidents = (p.incidents ?? 0) + 1;
+  stresser(monde, p.ecurie, pole, FATIGUE.stressIncident);
+  const rigueur = responsable(monde, p.ecurie, pole)?.competences['rigueur'] ?? 10;
+  const equipe = (FATIGUE.detectionBase + (FATIGUE.detectionRigueur * rigueur) / 20) * fraicheur(f);
+  const detecte = t.chance(1 - (1 - equipe) * Math.exp(-(p.heures ?? 0) / SOUFFLERIE.heuresDetection));
+  if (detecte) {
+    const retard = t.entier(FATIGUE.retardMinJours, FATIGUE.retardMaxJours);
+    p.joursRestants = r2(p.joursRestants + retard);
+    ajouterEvenement(monde, {
+      type: 'conception.incident', acteurs: [{ id: p.ecurie, role: 'ecurie' }], importance: 1, visibilite: 'prive', causes: p.evenement ? [p.evenement] : [],
+      contexte: { projet: p.id, piece: p.type, retardJours: retard, fatigue: f }, texte: `Erreur détectée sur le projet « ${PIECES[p.type as TypePiece].libelle.toLowerCase()} » : ${retard} jours d'essais supplémentaires.`,
+    });
+    return;
+  }
+  // Non détecté : défaut caché ; un second au-delà d'une fatigue extrême rend le projet inutilisable.
+  if (p.defaut && f >= FATIGUE.echecFatigue) { p.echec = true; return; }
+  p.defaut ??= t.chance(FATIGUE.partFragile) ? { type: 'fragile', ampleur: 1 } : { type: 'performance', ampleur: r2(FATIGUE.defautMin + t.suivant() * (FATIGUE.defautMax - FATIGUE.defautMin)) };
+}
+
+/** Concept alternatif le plus prometteur pour un projet (réorientation), d'après les circuits à venir. */
+function conceptAlternatif(monde: Monde, p: ProjetConception): { concept: number; gain: number } {
+  const e = ecurieDe(monde, p.ecurie)!;
+  const type = p.type as TypePiece;
+  const circuits = circuitsAVenir(monde);
+  const base = parametresVoiture(monde, e);
+  const eff = efficaciteAttendue(monde, e, type, p.concept);
+  const actuel = ecartMoyen(avecPiece(monde, e, type, eff, p.concept, base), circuits);
+  let best = { concept: p.concept, gain: 0 };
+  for (const c of [p.concept - EVENEMENTS_CONCEPTION.decalageConcept, p.concept + EVENEMENTS_CONCEPTION.decalageConcept].map((x) => r2(borner(x, -1, 1)))) {
+    if (c === p.concept) continue;
+    const gain = actuel - ecartMoyen(avecPiece(monde, e, type, eff, c, base), circuits);
+    if (gain > best.gain || best.concept === p.concept) best = { concept: c, gain };
+  }
+  return best;
+}
+
+/** Rythme d'un projet : même commande pour le joueur et l'IA. */
+export const commandeRythme: DefinitionCommande = {
+  type: 'conception.rythme',
+  valider(monde, c) {
+    const p = table(monde, TABLES.projetsConception)[String(c.parametres['projet'] ?? '')] as unknown as ProjetConception | undefined;
+    if (!p || !auteurAutorise(monde, c.auteur, p.ecurie)) return 'Projet inconnu ou auteur non autorisé.';
+    return ['allege', 'normal', 'intensif'].includes(String(c.parametres['rythme'])) ? null : 'Rythme : allégé, normal ou intensif.';
+  },
+  appliquer({ monde }, c) {
+    const p = table(monde, TABLES.projetsConception)[String(c.parametres['projet'])] as unknown as ProjetConception;
+    p.rythme = String(c.parametres['rythme']) as ProjetConception['rythme'];
+    ajouterEvenement(monde, { type: 'conception.rythme', acteurs: [{ id: c.auteur, role: 'auteur' }, { id: p.ecurie, role: 'ecurie' }], importance: 1, visibilite: 'prive', contexte: { projet: p.id, rythme: p.rythme } });
+  },
+};
+
+/** Réponse à un dilemme technique : même commande pour le joueur et l'IA. */
+export const commandeDilemme: DefinitionCommande = {
+  type: 'conception.dilemme',
+  valider(monde, c) {
+    const d = table(monde, TABLES.dilemmesTechniques)[String(c.parametres['dilemme'] ?? '')] as unknown as DilemmeTechnique | undefined;
+    if (!d || !auteurAutorise(monde, c.auteur, d.ecurie)) return 'Dilemme inconnu ou auteur non autorisé.';
+    return d.options.includes(String(c.parametres['option'])) ? null : 'Option inconnue.';
+  },
+  appliquer({ monde }, c) {
+    const d = table(monde, TABLES.dilemmesTechniques)[String(c.parametres['dilemme'])] as unknown as DilemmeTechnique;
+    resoudre(monde, d, String(c.parametres['option']), c.auteur);
+  },
+};
 
 /* ===================================================================== Intersaison et réformes */
 
@@ -513,6 +600,16 @@ export function decisionsConception(monde: Monde, commander: Commander): void {
     if (e.statut !== 'active' || (e.pilotee && !e.delegationRecherche)) continue;
     const auteur = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === e.id && (p.poste === 'directeur_technique' || p.poste === 'team_principal'));
     if (!auteur) continue;
+    // Phase 12b : rythme des projets selon la fatigue du pôle et l'enjeu (repos d'une équipe épuisée, intensif pour une écurie qui
+    // joue le titre ou un directeur technique audacieux, si l'équipe est fraîche).
+    const dt = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((x) => x.statut === 'actif' && x.ecurie === e.id && x.poste === 'directeur_technique');
+    const enjeu = forceEcurie(monde, e.id) >= IA_RYTHME.forcePretendant || (dt?.traits['risque'] ?? 10) >= IA_RYTHME.risqueAudacieux;
+    for (const p of projets(monde, e.id)) {
+      if (p.fabricationJoursRestants !== undefined) continue;
+      const f = fatiguePole(monde, e.id, PIECES[p.type as TypePiece].pole as Pole);
+      const voulu = f >= IA_RYTHME.fatigueRepos ? 'allege' : f < IA_RYTHME.fatigueIntensif && enjeu ? 'intensif' : 'normal';
+      if (rythmeDe(p) !== voulu) commander({ type: 'conception.rythme', auteur: auteur.id, parametres: { projet: p.id, rythme: voulu } });
+    }
     const voulue = partSouffleriePolitique(monde, e);
     if ((e.souffleriePartRecherche ?? SOUFFLERIE.partRechercheDefaut) !== voulue) commander({ type: 'conception.soufflerie', auteur: auteur.id, parametres: { ecurie: e.id, partRecherche: voulue } });
     const enCoursListe = projets(monde, e.id);

@@ -340,6 +340,13 @@ const MIGRATIONS: Record<number, Migration> = {
     }
     return { ...m, versionFormat: 31 };
   },
+  // v31 → v32 (phase 12b) : soufflerie et CFD, rythmes, fatigue des pôles, dilemmes techniques. Champs facultatifs (fatigue 0, rythme
+  // normal, aucune heure accumulée) ; seule la table des dilemmes est créée.
+  31: (m) => {
+    const tables = (m['tables'] ??= {}) as Record<string, Record<string, unknown>>;
+    tables['dilemmesTechniques'] ??= {};
+    return { ...m, versionFormat: 32 };
+  },
 };
 
 export function serialiser(monde: Monde): string {
