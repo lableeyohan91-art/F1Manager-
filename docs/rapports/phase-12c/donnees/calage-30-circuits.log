@@ -1,0 +1,11 @@
+départ   total 21.01 | calage 15.57 km/h, 1.59 % | validation 21.07 km/h, 4.07 % | bornes 0/30 | ordre violé 0
+  muMotricite → 0.8106 : total 18.53 | calage 15.06 km/h, 1.15 % | validation 20.58 km/h, 4.24 % | bornes 1/30 | ordre violé 0
+  muFreinage → 1.479 : total 17.96 | calage 15.07 km/h, 1.39 % | validation 20.50 km/h, 4.38 % | bornes 1/30 | ordre violé 0
+  reductionAppuiLigne → 0.7657 : total 17.94 | calage 15.05 km/h, 1.39 % | validation 20.44 km/h, 4.38 % | bornes 1/30 | ordre violé 0
+  partTraineeAileron → 0.3047 : total 17.89 | calage 15.09 km/h, 1.30 % | validation 20.44 km/h, 4.37 % | bornes 1/30 | ordre violé 0
+  reductionAppuiLigne → 0.6432 : total 17.88 | calage 15.09 km/h, 1.30 % | validation 20.32 km/h, 4.36 % | bornes 1/30 | ordre violé 0
+  muMotricite → 0.8754 : total 16.63 | calage 15.39 km/h, 1.17 % | validation 20.61 km/h, 4.24 % | bornes 0/30 | ordre violé 0
+  partTraineeAileron → 0.2804 : total 16.62 | calage 15.36 km/h, 1.19 % | validation 20.63 km/h, 4.25 % | bornes 0/30 | ordre violé 0
+résultat {"cla":5.065,"cda":0.8798,"muMeca":1.473,"muAero":1.516,"muMotricite":0.8754,"muFreinage":1.479,"energieElectriqueTourJ":6411000,"reductionTraineeLigne":0.9226,"reductionAppuiLigne":0.6432,"finesseIncrementale":2.014,"partAppuiAileron":0.4405,"partTraineeAileron":0.2804}
+final    total 16.62 | calage 15.36 km/h, 1.19 % | validation 20.63 km/h, 4.25 % | bornes 0/30 | ordre violé 0
+niveaux albert -0.10 · jeddah -0.10 · interlagos -0.05 · lasvegas -0.05 · miami -0.05 · silverstone -0.05 · mexico 0.00 · monza 0.00 · bakou 0.00 · montreal 0.00 · spielberg 0.00 · sakhir 0.05 · imola 0.10 · shanghai 0.15 · spa 0.15 · suzuka 0.20 · istanbul 0.25 · paulricard 0.25 · austin 0.45 · yasmarina 0.45 · singapour 0.50 · sepang 0.65 · portimao 0.65 · barcelone 0.75 · kyalami 0.75 · hungaroring 0.95 · lusail 0.95 · zandvoort 1.05 · madrid 1.15 · monaco 1.35

@@ -658,3 +658,16 @@ Aucun code à ce stade.
 - Fiabilité retirée de l'efficacité du châssis (D-174) ; refroidissement lu selon le mois du Grand Prix ; paramètres de banc d'essai
   (`course.meteoForcee`, `course.abandons`, `course.pression`) et leur test.
 - Analyse approfondie : `docs/systemes/phase-12c-analyse-approfondie.md`.
+
+## [Phase 12c] — 26/11/2026
+
+### Modifié
+- Voiture de référence recalée sur les 30 circuits (réglage d'ailerons optimal à l'intérieur de la plage partout, ordre public d'appui),
+  sensibilités robustes (Silverstone), concepts neutres, note facultative de motricité, coupe aux grandes réformes (D-175).
+- Corrections de bugs de la relecture (D-176) : réforme et pièces en fabrication, effort budgétaire lissé, départage du « titre ouvert »,
+  rang du barème de soufflerie, défauts cachés.
+- Outil de tendance corrigé (mesure après la semaine 1) ; rapport de la 12b bis rectifié sur les réformes.
+
+### Ajouté
+- Rapport `docs/rapports/phase-12c/` ; étude de nuit `docs/etudes/2026-11-26-etude-de-nuit.md` ; outils `calage-30-circuits`,
+  `saison-victoires`, `trajectoire-ecurie`.

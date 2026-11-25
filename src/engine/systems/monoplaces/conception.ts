@@ -553,6 +553,12 @@ export function reconcevoir(monde: Monde, ecuries: Ecurie[], intensites: Record<
       p.reglement = r.id;
       variations[type] = r2(p.efficacite - avant);
     }
+    // Relecture du 26/11/2026 : une pièce déjà conçue (en fabrication) sous l'ancien règlement subit la même variation que la pièce montée ;
+    // sinon elle arrivait après la réforme avec une efficacité d'avant la réforme (ni perte d'intensité ni coupe).
+    for (const q of projets(monde, e.id)) {
+      const dv = variations[q.type];
+      if (q.fabricationJoursRestants !== undefined && q.efficacite !== undefined && dv !== undefined) q.efficacite = r2(Math.max(FRONTIERE.min, q.efficacite + dv));
+    }
     invaliderVoitures(monde);
     ajouterEvenement(monde, {
       type: 'technique.reconception', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 1, visibilite: 'prive',

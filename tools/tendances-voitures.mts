@@ -18,7 +18,10 @@ for (let g = 1; g <= N; g++) {
   let avant = NaN;
   let precedents = new Map<string, number>();
   for (let s = 0; s < S; s++) {
-    mo.avancer(m, 52);
+    mo.avancer(m, s === 0 ? 52 : 51);
+    // La semaine 1 (intersaison, entrée en vigueur d'un règlement, reconception) n'est exécutée qu'au pas suivant : on l'exécute avant de
+    // mesurer, sinon l'effet d'une réforme est attribué à l'année d'après (erreur corrigée le 26/11/2026).
+    mo.avancer(m, 1);
     const moy = eng.ecuriesActives(m).reduce((a: number, e: unknown) => a + eng.indiceMoyen(m, e), 0) / eng.ecuriesActives(m).length;
     (parAnnee[s] ??= []).push(moy);
     // Année d'une grande réforme : un règlement (hors règlement de départ) commence cette saison.

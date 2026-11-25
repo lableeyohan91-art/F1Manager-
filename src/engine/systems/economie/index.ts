@@ -91,7 +91,8 @@ export function restrictionAero(monde: Monde, idEcurie: string): number {
 function rangAero(monde: Monde, idEcurie: string): { rang: number; n: number } {
   if (monde.date.semaine >= SOUFFLERIE.semaineMiSaison) {
     const s = (table(monde, TABLES.saisons)[`ssn_${monde.date.annee}`] as unknown as Saison | undefined);
-    const cl = s ? [...s.constructeurs].sort((a, b) => b.points - a.points || (a.ecurie < b.ecurie ? -1 : 1)) : [];
+    // Relecture du 26/11/2026 : l'ordre officiel (départage par victoires puis places, trié après chaque Grand Prix), pas les seuls points.
+    const cl = s ? s.constructeurs : [];
     const i = cl.findIndex((c) => c.ecurie === idEcurie);
     if (i >= 0 && cl.some((c) => c.points > 0)) return { rang: i + 1, n: cl.length };
   }
@@ -320,8 +321,11 @@ function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
   for (const [k, v] of Object.entries(recettes)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;
   for (const [k, v] of Object.entries(depenses)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;
   fi.tresorerieMEUR += Object.values(recettes).reduce((a, b) => a + b, 0) - Object.values(depenses).reduce((a, b) => a + b, 0);
-  // D-166 : argent plafonné réellement payé sur cette période, ramené à l'année (lu par la progression des voitures).
-  fi.depensePeriode = { annee, plafonneesAnnuelMEUR: n * (depenses.personnelPlafonne + depenses.departements + depenses.operations + depenses.entretien + depenses.developpement) };
+  // D-166 : argent plafonné réellement payé, ramené à l'année (lu par la progression des voitures). Relecture du 26/11/2026 : depuis la
+  // phase 12a, les projets se paient d'un bloc ; on lisse donc sur les périodes écoulées de l'année (cumul payé / périodes × n), au
+  // lieu d'extrapoler la seule dernière période (qui faisait sauter le facteur de 0,3 à 1,3 au gré des lancements).
+  const periodesEcoulees = Math.max(1, Math.round((monde.date.semaine / 52) * n));
+  fi.depensePeriode = { annee, plafonneesAnnuelMEUR: (n * totalPlafonne(c)) / periodesEcoulees };
 
   // Projection de fin d'année : si la trésorerie finirait négative, on coupe le développement restant.
   const periodesRestantes = Math.max(0, n - Math.round((monde.date.semaine / 52) * n));

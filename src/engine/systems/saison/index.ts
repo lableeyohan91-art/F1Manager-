@@ -260,17 +260,18 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
 /**
  * Un rival peut-il encore être champion à la dernière manche ? Cas le plus favorable au rival :
  * il gagne (points du vainqueur, +1 victoire, +1 podium) et le leader ne marque rien.
- * Départage comme le classement : points, puis victoires, puis podiums ; égalité parfaite = encore ouvert.
+ * Départage comme le classement : points, puis victoires, puis 2es places, 3es places… ; égalité parfaite = encore ouvert.
  */
 export function titreEncoreOuvert(s: Saison): boolean {
   const [leader, ...rivaux] = s.pilotes;
   if (!leader) return false;
   const maxPoints = s.bareme[0] ?? 0;
   return rivaux.some((r) => {
-    const pts = r.points + maxPoints, v = r.victoires + 1, pod = r.podiums + 1;
+    const pts = r.points + maxPoints, v = r.victoires + 1;
     if (pts !== leader.points) return pts > leader.points;
     if (v !== leader.victoires) return v > leader.victoires;
-    return pod >= leader.podiums;
+    // Relecture du 26/11/2026 : même départage que le classement (2es places, puis 3es…) ; égalité parfaite = encore ouvert.
+    return comparerPlaces(leader.places, r.places) >= 0;
   });
 }
 

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { deserialiser, titreEncoreOuvert, VERSION_FORMAT, type LigneClassementPilote, type Saison } from '../src/engine';
 
-const ligne = (pilote: string, points: number, victoires: number, podiums: number): LigneClassementPilote =>
-  ({ pilote, ecurie: 'eq', points, victoires, podiums, abandons: 0, meilleurResultat: 1 });
+/** `deuxiemes` : nombre de 2es places (départage officiel après les victoires, D-165). */
+const ligne = (pilote: string, points: number, victoires: number, podiums: number, deuxiemes = 0): LigneClassementPilote =>
+  ({ pilote, ecurie: 'eq', points, victoires, podiums, abandons: 0, meilleurResultat: 1, places: [victoires, deuxiemes] });
 const saison = (pilotes: LigneClassementPilote[]): Saison => ({
   id: 'ssn', annee: 2027, calendrier: [], bareme: [25, 18, 15, 12, 10, 8, 6, 4, 2, 1], pilotes, constructeurs: [],
   leaders: [], ecartsTete: [], indiceDebut: {}, indiceFin: {}, termine: false, chronique: [],
@@ -18,12 +19,12 @@ describe('Titre ouvert avant la dernière manche — définition exacte', () => 
   it('écart de 25 points : égalité possible, départagée par les victoires', () => {
     // b gagne la dernière : 300 – 300, victoires 6 contre 8 → a reste champion : titre joué.
     expect(titreEncoreOuvert(saison([ligne('a', 300, 8, 15), ligne('b', 275, 5, 12)]))).toBe(false);
-    // b à 7 victoires : 8 contre 8 → départage aux podiums : b 13 contre a 15 → joué.
-    expect(titreEncoreOuvert(saison([ligne('a', 300, 8, 15), ligne('b', 275, 7, 12)]))).toBe(false);
+    // b à 7 victoires : 8 contre 8 → départage aux 2es places (comme le classement) : b 3 contre a 5 → joué.
+    expect(titreEncoreOuvert(saison([ligne('a', 300, 8, 15, 5), ligne('b', 275, 7, 12, 3)]))).toBe(false);
     // b à 8 victoires : 9 contre 8 → b peut être champion : ouvert.
     expect(titreEncoreOuvert(saison([ligne('a', 300, 8, 15), ligne('b', 275, 8, 12)]))).toBe(true);
-    // égalité parfaite possible (victoires et podiums) : ouvert.
-    expect(titreEncoreOuvert(saison([ligne('a', 300, 8, 15), ligne('b', 275, 7, 14)]))).toBe(true);
+    // égalité possible aux victoires et b a plus de 2es places : ouvert.
+    expect(titreEncoreOuvert(saison([ligne('a', 300, 8, 15, 4), ligne('b', 275, 7, 14, 6)]))).toBe(true);
   });
   it('un rival au 3e rang peut aussi garder le titre ouvert', () => {
     expect(titreEncoreOuvert(saison([ligne('a', 300, 8, 15), ligne('b', 270, 1, 5), ligne('c', 280, 3, 9)]))).toBe(true);

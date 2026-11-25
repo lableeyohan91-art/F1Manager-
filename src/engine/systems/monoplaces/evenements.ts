@@ -177,7 +177,7 @@ export function appliquerChoixEvenement(monde: Monde, d: DilemmeTechnique, p: Pr
         return 'matériau validé';
       }
       p.bonusEfficacite = r2((p.bonusEfficacite ?? 0) + EV.gainMateriau);
-      if (v['fragile']) p.defaut = { type: 'fragile', ampleur: 1 };
+      if (v['fragile']) p.defaut ??= { type: 'fragile', ampleur: 1 }; // un défaut déjà présent n'est pas effacé
       return v['fragile'] ? 'matériau fragile (non détecté)' : 'pari gagné';
     }
     case 'reorientation': {

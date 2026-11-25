@@ -72,6 +72,11 @@ Ce qui ne marche pas (**objectifs non atteints**) :
 
 ## 4. Vitesse des voitures et réformes (4 graines × 30 saisons)
 
+> **Rectificatif du 26/11/2026** : la conclusion « les réformes ne font pas reculer » est **fausse**. L'outil mesurait avant l'exécution
+> de la semaine 1, et comptait l'effet d'une réforme l'année suivante. Mesure corrigée (`donnees/tendances-voitures-corrige.md`) : l'année
+> d'une grande réforme, la grille recule de 0,97 point en moyenne (+0,59 une année normale) et 67 % des écuries reculent (8 % une année
+> normale). Voir `docs/rapports/phase-12c/rapport.md` §4. Le texte d'origine est conservé ci-dessous.
+
 Indice moyen de la grille (1 point ≈ 0,28 % ≈ 0,25 s) : 15,7 (2028) → 21,9 (2035) → 23,6 (2040) → 25,2 (2050) → 24,5 (2057).
 - **Pas de course à l'infini** : la frontière plafonne la progression ; environ +9 points (≈ 2,4 s) en 20 ans, puis un plateau.
 - **Les réformes ne font pas reculer les voitures** (**objectif non atteint**) : la grille progresse de +0,46 point les années de
