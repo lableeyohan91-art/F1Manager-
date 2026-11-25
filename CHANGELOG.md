@@ -638,3 +638,14 @@ Aucun code à ce stade.
 ### À signaler
 - Les heures de soufflerie pèsent encore trop peu : voir `docs/rapports/phase-12b/rapport.md`, D-172.
 
+
+## [Phase 12b bis — en cours] — 25/11/2026
+
+### Modifié (réglage provisoire, **pas encore mesuré** : campagne et rapport à venir)
+- Variante V5 adoptée (frontière : échelle de savoir 12, part fondamentale aux réformes 0,3 ; pénalités d'architecture 0,2 à 0,5).
+- Soufflerie renforcée : 4 jours de projet par heure, recherche aéro multipliée de 0,3 à 1,8 selon les heures.
+- ADUO (rattrapage des motoristes) : +1 évolution au-delà de 2 % de retard de puissance, +2 (et +2 la saison suivante) au-delà de 4 %.
+- IA : rythme intensif ponctuel sur les 14 derniers jours d'un projet, si l'équipe n'est pas fatiguée.
+- Correction : l'IA gardait trop peu d'argent pour ses programmes de recherche en début d'année et pouvait dépasser le plafond ; une
+  vérification demandée sans argent devient un ralentissement ; l'enveloppe des projets est aussi bornée par la place réelle sous le plafond.
+- Outils : stratégie « ponctuel » du laboratoire de conception ; `tools/tendances-voitures.mts` (indice moyen par saison, effet des réformes).

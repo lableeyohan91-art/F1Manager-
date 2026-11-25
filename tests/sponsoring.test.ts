@@ -325,7 +325,8 @@ describe('Phase 11c — opérations exceptionnelles', () => {
     };
     const eqs = ecuriesActives(m);
     const habituee = eqs.find((e) => meilleure(e.id) <= 3)!; // a déjà fait un podium ces 3 dernières années
-    const disette = eqs.find((e) => meilleure(e.id) > 3); // aucun podium depuis 3 ans
+    // aucun podium depuis 3 ans, et pas encore d'opération cette saison (un premier top 5 a pu en déclencher une : non cumulable)
+    const disette = eqs.find((e) => meilleure(e.id) > 3 && operationsSponsors(m, e.id).every((o) => o.proposeeLe.annee !== 2030));
     gp.resultats.find((r) => r.ecurie === habituee.id)!.position = 2;
     expect(exploit(m, habituee, gp)).toBeUndefined();
     expect(disette).toBeDefined();

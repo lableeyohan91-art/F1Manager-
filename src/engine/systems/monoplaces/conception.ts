@@ -22,7 +22,7 @@ type Commander = (c: { type: string; auteur: string; parametres: Record<string, 
 import {
   TABLES, type Circuit, type Departement, type DilemmeTechnique, type Ecurie, type Finances, type GrandPrix, type Installation, type PieceVoiture, type Personne, type ProjetConception, type Reglement,
 } from '../../model/types';
-import { programmes, reglementAnnonce, reglementEnVigueur, savoir, savoirApplicable, savoirExistant } from '../technique/acces';
+import { partRecherche, programmes, reglementAnnonce, reglementEnVigueur, savoir, savoirApplicable, savoirExistant } from '../technique/acces';
 import { repartirSoufflerie } from './soufflerie';
 import { depenser, enveloppeRestante } from './depenses';
 import { chargePole, departementPole, evoluerFatigue, facteurProductivite, fatiguePole, fraicheur, probaIncident, rythmeDe, type Pole } from './fatigue';
@@ -30,7 +30,7 @@ import { alertesResponsables, creerDilemme, dilemmes, echeancesDilemmes, resoudr
 import { presenterEvenement, tirerEvenement } from './evenements';
 import { rangSemaine } from '../../core/calendrier';
 export { depenser, enveloppeRestante } from './depenses';
-import { SAVOIR } from '../../balance/technique';
+import { IA_RECHERCHE, SAVOIR } from '../../balance/technique';
 import { forceEcurie, usureSucces } from '../humain/decision';
 import { ecartTempsPct, effetPiece, invaliderVoitures, parametresVoiture, piecesInstallees, type ParametresVoiture } from './physique';
 import { ajouterPiece, installer, versions } from './pieces';
@@ -607,20 +607,27 @@ export function decisionsConception(monde: Monde, commander: Commander): void {
     for (const p of projets(monde, e.id)) {
       if (p.fabricationJoursRestants !== undefined) continue;
       const f = fatiguePole(monde, e.id, PIECES[p.type as TypePiece].pole as Pole);
-      const voulu = f >= IA_RYTHME.fatigueRepos ? 'allege' : f < IA_RYTHME.fatigueIntensif && enjeu ? 'intensif' : 'normal';
+      // Coup de collier pour finir une pièce (les dernières semaines), si l'équipe n'est pas déjà fatiguée ; repos d'une équipe épuisée.
+      const finProche = p.joursRestants <= IA_RYTHME.joursFinProjet;
+      const voulu = f >= IA_RYTHME.fatigueRepos ? 'allege' : (finProche && f < IA_RYTHME.fatigueFinProjet) || (f < IA_RYTHME.fatigueIntensif && enjeu) ? 'intensif' : 'normal';
       if (rythmeDe(p) !== voulu) commander({ type: 'conception.rythme', auteur: auteur.id, parametres: { projet: p.id, rythme: voulu } });
     }
     const voulue = partSouffleriePolitique(monde, e);
     if ((e.souffleriePartRecherche ?? SOUFFLERIE.partRechercheDefaut) !== voulue) commander({ type: 'conception.soufflerie', auteur: auteur.id, parametres: { ecurie: e.id, partRecherche: voulue } });
     const enCoursListe = projets(monde, e.id);
     const libres = (['aero', 'conception'] as Pole[]).filter((pole) => enCoursListe.filter((p) => PIECES[p.type as TypePiece].pole === pole && p.fabricationJoursRestants === undefined).length < emplacements(monde, e.id, pole));
-    if (!libres.length || enveloppeRestante(monde, e.id) < Math.min(...TYPES_PIECES.map(coutTotal))) continue;
+    // L'IA garde de quoi payer ses programmes de recherche quand ils ne sont pas encore lancés (début de partie) : sinon les projets
+    // du début d'année consomment l'argent de la recherche et le plafond est dépassé.
+    const fiIA = (Object.values(table(monde, TABLES.finances)) as unknown as Finances[]).find((x) => x.ecurie === e.id);
+    const reserve = Math.max(0, 2 * (IA_RECHERCHE.partDefaut + IA_RECHERCHE.partAudace / 2) - partRecherche(monde, e.id)) * (fiIA?.budget.developpementMEUR ?? 0);
+    const disponible = () => enveloppeRestante(monde, e.id) - reserve;
+    if (!libres.length || disponible() < Math.min(...TYPES_PIECES.map(coutTotal))) continue;
     const enCours = new Set(enCoursListe.map((p) => p.type));
     const f = tirageLocal(monde, 'monoplaces.ia', e.id, monde.date.annee, monde.date.semaine);
     const candidats = TYPES_PIECES.filter((t) => !enCours.has(t) && libres.includes(PIECES[t].pole as Pole)).map((t) => ({ t, ...meilleurProjet(monde, e, t, circuits) }))
       .map((x) => ({ ...x, score: (x.gain + f.normale(0, IA_CONCEPTION.alea)) / coutTotal(x.t) })).sort((a, b) => b.score - a.score);
     for (const x of candidats) {
-      if (x.gain < IA_CONCEPTION.gainMin) continue;
+      if (x.gain < IA_CONCEPTION.gainMin || disponible() < coutTotal(x.t)) continue;
       const prm = { ecurie: e.id, type: x.t, concept: x.concept };
       if (motifRefusProjet(monde, auteur.id, prm)) continue;
       commander({ type: 'conception.lancer', auteur: auteur.id, parametres: prm });

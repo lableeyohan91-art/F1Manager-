@@ -1,7 +1,10 @@
 /** Phase 12a — dépenses techniques (projets, fabrication, vérifications), sous le plafond, payées à la prochaine écriture comptable. */
 
 import { table, type Monde } from '../../core/monde';
-import { TABLES, type Finances } from '../../model/types';
+import { TABLES, type Ecurie, type Finances } from '../../model/types';
+import { totalPlafonne } from '../../model/finances';
+import { MARGE_SECURITE_PLAFOND, PERIODES_PAR_AN } from '../../balance/finances';
+import { depensesFixes } from '../economie/index';
 import { programmes } from '../technique/acces';
 
 const r2 = (x: number) => Math.round(x * 100) / 100;
@@ -18,7 +21,18 @@ export function enveloppeRestante(monde: Monde, idEcurie: string): number {
   const fi = financesDe(monde, idEcurie);
   if (!fi) return Infinity;
   const recherche = programmes(monde, idEcurie).filter((p) => p.statut === 'actif').reduce((a, p) => a + p.part, 0);
-  return fi.budget.developpementMEUR * (1 - recherche) - depenses(fi, monde.date.annee).projetsMEUR;
+  const budget = fi.budget.developpementMEUR * (1 - recherche) - depenses(fi, monde.date.annee).projetsMEUR;
+  // Place réellement restante sous le plafond visé : déjà payé cette année + frais plafonnés des périodes restantes (au niveau actuel,
+  // embauches de l'année comprises) + recherche + dépenses engagées non encore payées. Sans cette borne, une écurie qui consomme toute son
+  // enveloppe dépasse le plafond quand ses frais fixes ont augmenté depuis le budget (test « aucun dépassement involontaire »).
+  const e = table(monde, TABLES.ecuries)[idEcurie] as unknown as Ecurie | undefined;
+  if (!e || fi.comptes.annee !== monde.date.annee) return budget;
+  const n = PERIODES_PAR_AN;
+  const restantes = Math.max(0, n - Math.round((monde.date.semaine / 52) * n));
+  const f = depensesFixes(monde, e);
+  const aVenir = restantes * ((f.personnelPlafonne + f.departements + f.operations + f.entretien) / n + (fi.budget.developpementMEUR * recherche) / n);
+  const place = fi.budget.plafondVise * (1 - MARGE_SECURITE_PLAFOND) - totalPlafonne(fi.comptes) - aVenir - (fi.depensesTechniques?.aPayerMEUR ?? 0);
+  return Math.min(budget, place);
 }
 
 /** Engage une dépense technique (comptée à la prochaine écriture comptable, sous le plafond). */

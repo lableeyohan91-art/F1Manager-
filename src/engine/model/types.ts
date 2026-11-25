@@ -87,6 +87,8 @@ export interface Motoriste {
   nationalite: string;
   niveau: Note;
   verification: string;
+  /** Phase 12b : évolutions ADUO encore dues la saison suivante (motoriste très en retard). */
+  aduoReport?: number;
 }
 
 export interface Ecurie {

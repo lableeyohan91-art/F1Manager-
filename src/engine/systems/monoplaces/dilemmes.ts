@@ -14,7 +14,7 @@ import { tirageLocal } from '../../core/moteur';
 import { TABLES, type DilemmeTechnique, type Ecurie, type Personne, type ProjetConception } from '../../model/types';
 import { fatiguePole, fraicheur, probaIncident, type Pole } from './fatigue';
 import { appliquerChoixEvenement, choixEvenementIA } from './evenements';
-import { depenser } from './depenses';
+import { depenser, enveloppeRestante } from './depenses';
 
 const ecurieDe = (m: Monde, id: string) => table(m, TABLES.ecuries)[id] as unknown as Ecurie | undefined;
 const projetDe = (m: Monde, id: string) => table(m, TABLES.projetsConception)[id] as unknown as ProjetConception | undefined;
@@ -52,7 +52,9 @@ export function creerDilemme(monde: Monde, d: Omit<DilemmeTechnique, 'id' | 'cre
 }
 
 function choixIA(monde: Monde, d: DilemmeTechnique): string {
-  return d.famille === 'alerte' ? d.recommandation : choixEvenementIA(monde, d);
+  if (d.famille !== 'alerte') return choixEvenementIA(monde, d);
+  // Une vérification se paie sur l'enveloppe de l'année : sans argent, on ralentit (aucun dépassement involontaire du plafond).
+  return d.recommandation === 'verifier' && enveloppeRestante(monde, d.ecurie) < ALERTES.verificationMEUR ? 'ralentir' : d.recommandation;
 }
 
 /** Applique un choix et clôt le dilemme. */

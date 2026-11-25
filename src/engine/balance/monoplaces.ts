@@ -123,9 +123,10 @@ export const INDICE_PHYSIQUE = { base: 15, notePneusReference: 14 };
  */
 /**
  * `partFondamentalReforme` : sous une grande réforme, part du savoir FONDAMENTAL comptée pour les pièces qu'elle touche (le reste vient
- * de la recherche menée sur ce règlement). 1 = tout le savoir de fond compte (12a d'origine, D-171) ; valeur testée en variante V4.
+ * de la recherche menée sur ce règlement). 1 = tout le savoir de fond compte (12a d'origine) ; 0,3 adopté avec V5 (porteur, 25/11/2026).
+ * `echelleSavoir` 30 → 12 (V1, adopté avec V5) : le savoir sature plus vite, l'avance des écuries qui en ont beaucoup se tasse.
  */
-export const FRONTIERE = { min: 5, etendue: 14, echelleSavoir: 30, margeDepart: 1, partMaxDepart: 0.95, partFondamentalReforme: 1 };
+export const FRONTIERE = { min: 5, etendue: 14, echelleSavoir: 12, margeDepart: 1, partMaxDepart: 0.95, partFondamentalReforme: 0.3 };
 
 /**
  * Projets de conception (fiche §6, conception simplifiée de la 12a : rythme normal, sans événement) :
@@ -167,7 +168,7 @@ export const RECONCEPTION = { qualiteBase: 0.35, qualiteSavoir: 0.45 };
  * `bruitBase` × exp(−savoir préparé / `echelleSavoirIndice`) × (`visionBase` − vision technique du DT / 20).
  * Une pièce est touchée si l'intensité de la réforme dans l'un de ses domaines atteint `intensiteTouchee`.
  */
-export const PAYSAGE = { famillesMin: 2, famillesMax: 3, penaliteMin: 0.08, penaliteMax: 0.35, bruitBase: 0.5, echelleSavoirIndice: 40, visionBase: 1.4, intensiteTouchee: 0.3 };
+export const PAYSAGE = { famillesMin: 2, famillesMax: 3, penaliteMin: 0.2, penaliteMax: 0.5, bruitBase: 0.5, echelleSavoirIndice: 40, visionBase: 1.4, intensiteTouchee: 0.3 };
 
 /** Noms des familles d'architecture proposées par orientation de réforme (textes du jeu). */
 export const FAMILLES_ARCHITECTURE: Record<string, readonly string[]> = {
@@ -200,7 +201,9 @@ export const SENSIBILITES_MOYENNES = { tempsS: 86.707, niveauAileron: 0, d1: {cl
  * - part de la recherche : `partRechercheDefaut`, `partRecherchePreparation` pour une écurie qui prépare l'avenir (IA ; le joueur choisit) ;
  * - trois usages, chacun à rendement décroissant (sans double comptage) :
  *   1) expertise : savoir gagné en fin de projet = `expertiseParJour` × (jours + `joursParHeure` × H + `joursParUniteCfd` × C) / (1 + S / 40)
- *      (« une heure ≈ une journée d'expertise », F1 Manager 2024) ;
+ *      (F1 Manager 2024 : une unité de soufflerie ≈ une journée d'expertise ; une heure de vent ≈ 4 passages, 320 passages pour 80 h :
+ *      une heure ≈ 4 jours ; 2 000 simulations CFD pour 320 passages : une simulation ≈ 0,16 jour). Renforcé le 25/11/2026 (porteur :
+ *      la soufflerie doit compter ; avant : 1 jour par heure, effet mesuré nul, rapport 12b) ;
  *   2) variantes (CFD) : 1 + C / `cfdParVariante` variantes (au plus `variantesMax`), la meilleure EN APPARENCE est retenue (erreur de
  *      prédiction `ecartPredictionCfd` × (1,5 − corrélation / 20)) ;
  *   3) validation (soufflerie) : erreur d'estimation ÷ √(1 + H / `heuresValidation`) ; détection des défauts (12b, fatigue) 1 − exp(−H / `heuresDetection`) ;
@@ -210,10 +213,10 @@ export const SOUFFLERIE = {
   heuresParPeriode: 80, cfdParPeriode: 2000, periodesParAn: 6, semaineMiSaison: 27, amplification: 1,
   qualiteBase: 0.6, qualiteParNiveau: 0.04, competenceBase: 0.6, competenceAmplitude: 0.4,
   partRechercheDefaut: 0.3, partRecherchePreparation: 0.6,
-  expertiseParJour: 0.012, joursParHeure: 1, joursParUniteCfd: 0.04,
+  expertiseParJour: 0.012, joursParHeure: 4, joursParUniteCfd: 0.16,
   cfdParVariante: 150, variantesMax: 8, ecartPredictionCfd: 0.08,
   heuresValidation: 10, heuresDetection: 15,
-  rechercheMin: 0.5, rechercheAmplitude: 1, rechercheReference: 10,
+  rechercheMin: 0.3, rechercheAmplitude: 1.5, rechercheReference: 15,
 };
 /** Domaines de la phase 8 dont la recherche passe par la soufflerie et la CFD. */
 export const DOMAINES_SOUFFLERIE = ['aero_avant', 'aero_arriere', 'fond_plat', 'refroidissement'] as const;
@@ -259,8 +262,11 @@ export const ALERTES = {
   verificationMEUR: 0.2, verificationJours: 7, detectionVerification: 0.6, echeanceSemaines: 2, stressMaintien: 5,
 };
 
-/** IA (et DT délégué) : rythme selon la fatigue du pôle et l'enjeu (mêmes règles que le joueur). */
-export const IA_RYTHME = { fatigueRepos: 55, fatigueIntensif: 30, forcePretendant: 0.75, risqueAudacieux: 14 };
+/**
+ * IA (et DT délégué) : rythme selon la fatigue du pôle et l'enjeu (mêmes règles que le joueur) ; coup de collier en intensif sur les
+ * `joursFinProjet` derniers jours d'un projet si la fatigue est sous `fatigueFinProjet` (l'intensif ponctuel, D-170 et porteur 25/11/2026).
+ */
+export const IA_RYTHME = { fatigueRepos: 55, fatigueIntensif: 30, forcePretendant: 0.75, risqueAudacieux: 14, joursFinProjet: 14, fatigueFinProjet: 40 };
 
 /**
  * Phase 12b — événements de conception (fiche compagnon §4 ; cible du porteur : 5 à 10 % des projets) :
@@ -287,3 +293,13 @@ export const EVENEMENTS_CONCEPTION = {
   gainMateriau: 0.8, essaisMEUR: 0.4, essaisJours: 7,
   decalageConcept: 0.4, reorienterJours: 7, gainReorientationMin: 0.02,
 };
+
+/**
+ * ADUO (Additional Development and Upgrade Opportunities, règlement moteur 2026, vérifié) : un motoriste dont la puissance est en
+ * retard sur le meilleur de `seuil1Pct` % ou plus reçoit une évolution supplémentaire dans la saison ; de `seuil2Pct` % ou plus, deux, et
+ * encore deux la saison suivante. Évaluation à l'intersaison (puissance = niveau × MOTORISTE_PUISSANCE.pourcentParPoint). Équilibrage
+ * déclaré (D-169) : il donne des moyens de développement à un motoriste en retard, jamais de la vitesse décidée d'avance.
+ * `gainParEvolution` : points de niveau par évolution, avec le même rendement décroissant que la progression normale.
+ */
+export const ADUO = { actif: true, seuil1Pct: 2, seuil2Pct: 4, evolutions1: 1, evolutions2: 2, saisonsSuivantes2: 1, gainParEvolution: 0.6 };
+

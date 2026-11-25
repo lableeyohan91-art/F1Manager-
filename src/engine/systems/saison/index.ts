@@ -38,6 +38,7 @@ import { avecVivier, circuitsDeLaSaison, moisDeSemaine } from './calendrier';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 import { fiabiliteVoiture } from '../monoplaces/physique';
+import { ADUO, MOTORISTE_PUISSANCE } from '../../balance/monoplaces';
 
 /** Durée de conservation des explications détaillées des résultats, en saisons. */
 const CONSERVATION_EXPLICATIONS_SAISONS = 2;
@@ -402,10 +403,22 @@ export const systemeIntersaison: Systeme = {
     const premiere = Object.keys(table(monde, TABLES.saisons)).length === 0;
     if (!premiere) {
       for (const e of ecuriesActives(monde)) developper(monde, e, MOIS_EQUIVALENTS_INTERSAISON, ALEA_INTERSAISON, `intersaison-${date.annee}`);
-      for (const id of idsTries(table(monde, TABLES.motoristes))) {
-        const m = table(monde, TABLES.motoristes)[id] as unknown as Motoriste;
-        const f = tirageLocal(monde, 'motoriste', id, date.annee);
-        m.niveau = borner(m.niveau + MOTORISTE_PROGRESSION_ANNUELLE * Math.max(0, 1 - m.niveau / PLAFOND_TECHNIQUE) + f.normale(0, MOTORISTE_ALEA_ANNUEL), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
+      // ADUO (phase 12b, règle moteur 2026) : le retard de puissance est mesuré avant l'évolution de l'année.
+      const motoristes = idsTries(table(monde, TABLES.motoristes)).map((id) => table(monde, TABLES.motoristes)[id] as unknown as Motoriste);
+      const meilleur = Math.max(...motoristes.map((x) => x.niveau));
+      for (const m of motoristes) {
+        const f = tirageLocal(monde, 'motoriste', m.id, date.annee);
+        const retardPct = (meilleur - m.niveau) * MOTORISTE_PUISSANCE.pourcentParPoint;
+        let evolutions = m.aduoReport ?? 0;
+        delete m.aduoReport;
+        if (ADUO.actif && retardPct >= ADUO.seuil2Pct) { evolutions += ADUO.evolutions2; m.aduoReport = ADUO.evolutions2 * ADUO.saisonsSuivantes2; }
+        else if (ADUO.actif && retardPct >= ADUO.seuil1Pct) evolutions += ADUO.evolutions1;
+        const rendement = Math.max(0, 1 - m.niveau / PLAFOND_TECHNIQUE);
+        m.niveau = borner(m.niveau + (MOTORISTE_PROGRESSION_ANNUELLE + evolutions * ADUO.gainParEvolution) * rendement + f.normale(0, MOTORISTE_ALEA_ANNUEL), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
+        if (evolutions > 0) ajouterEvenement(monde, {
+          type: 'motoriste.aduo', acteurs: [{ id: m.id, role: 'motoriste' }], importance: 2, visibilite: 'public', contexte: { retardPct: Math.round(retardPct * 10) / 10, evolutions },
+          texte: `${m.nom}, en retard de ${(Math.round(retardPct * 10) / 10).toLocaleString('fr-FR')} % de puissance, obtient ${evolutions} évolution${evolutions > 1 ? 's' : ''} supplémentaire${evolutions > 1 ? 's' : ''} de son moteur (ADUO).`,
+        });
       }
     }
     creerSaison(monde, date.annee);

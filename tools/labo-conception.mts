@@ -2,7 +2,8 @@
  * Phase 12b — laboratoire du département technique (fiche §14, demande du porteur) : la même écurie, sur les mêmes graines, avec des
  * stratégies différentes ; et l'effet isolé du barème de soufflerie (réel contre plat).
  * Stratégies (rythme des projets et part de soufflerie pour la recherche, imposés chaque semaine à l'écurie étudiée) :
- *   ia (alternance de l'IA), normal (toujours normal), intensif (toujours intensif), voiture (soufflerie 0 % recherche), avenir (100 %).
+ *   ia (politique de l'IA), normal (toujours normal), intensif (toujours intensif), ponctuel (intensif sur les 14 derniers jours de chaque
+ *   projet), voiture (soufflerie 0 % recherche), avenir (100 %), plat (barème de soufflerie à 100 % pour toutes les écuries).
  * Mesures : place moyenne au championnat constructeurs, gain d'indice sur la période (points équivalents), fatigue moyenne et maximale des
  * pôles, incidents, échecs, défauts cachés, dilemmes, dépenses techniques.
  * Usage : npx tsx tools/labo-conception.mts [graines=8] [saisons=4] [écurie=eq_williams]
@@ -14,8 +15,8 @@ const { lireDonneesGrille2026 } = await import(`${racine}/src/platform/node/donn
 const sc = eng.creerScenarioGrille2026(lireDonneesGrille2026(racine));
 const N = Number(process.argv[2] ?? 8), S = Number(process.argv[3] ?? 4), ID = process.argv[4] ?? 'eq_williams';
 
-type Strategie = 'ia' | 'normal' | 'intensif' | 'voiture' | 'avenir' | 'plat';
-const STRATEGIES: Strategie[] = ['ia', 'normal', 'intensif', 'voiture', 'avenir', 'plat'];
+type Strategie = 'ia' | 'normal' | 'intensif' | 'ponctuel' | 'voiture' | 'avenir' | 'plat';
+const STRATEGIES: Strategie[] = (process.argv[5]?.split(',') as Strategie[] | undefined) ?? ['ia', 'normal', 'intensif', 'ponctuel', 'voiture', 'avenir', 'plat'];
 
 function jouer(graine: number, st: Strategie) {
   const m = sc.creerMonde(graine), mo = sc.creerMoteur();
@@ -28,7 +29,7 @@ function jouer(graine: number, st: Strategie) {
   let depense = 0;
   for (let w = 0; w < 52 * S; w++) {
     if (st !== 'ia' && st !== 'plat') {
-      for (const p of eng.projets(m, ID)) if (p.fabricationJoursRestants === undefined && (st === 'normal' || st === 'intensif')) p.rythme = st === 'intensif' ? 'intensif' : 'normal';
+      for (const p of eng.projets(m, ID)) if (p.fabricationJoursRestants === undefined && (st === 'normal' || st === 'intensif' || st === 'ponctuel')) p.rythme = st === 'intensif' || (st === 'ponctuel' && p.joursRestants <= 14) ? 'intensif' : 'normal';
       if (st === 'voiture') e.souffleriePartRecherche = 0;
       if (st === 'avenir') e.souffleriePartRecherche = 1;
     }
