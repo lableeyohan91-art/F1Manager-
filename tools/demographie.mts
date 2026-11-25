@@ -15,6 +15,7 @@ const compteurs: Record<string, number> = {};
 const debutants: number[] = [];
 const niveauGrille: number[][] = [];
 const ageGrille: number[][] = [];
+const agesTitulaires: number[] = [];
 const ageRetraite: number[] = [];
 const carriereF1: number[] = [];
 const ageRetraitePersonnel: number[] = [];
@@ -86,6 +87,7 @@ for (let g = 1; g <= N; g++) {
     debutants.push(nouveaux);
     (niveauGrille[s] ??= []).push(moy(tit.map((p) => eng.niveauPilote(p, false))));
     (ageGrille[s] ??= []).push(moy(tit.map((p) => m.date.annee - p.anneeNaissance)));
+    for (const p of tit) agesTitulaires.push(m.date.annee - p.anneeNaissance);
     for (const p of Object.values(m.tables['personnes']) as any[]) if (p.junior && p.junior.annee >= m.date.annee - 1) { baquetsJuniors++; if (p.junior.subventionne) baquetsSubventionnes++; if (typeof p.junior.prixMEUR === 'number') prixPayes.push(p.junior.prixMEUR); }
     const sal = (Object.values(m.tables['contrats']) as any[]).filter((c) => c.statut === 'actif' && c.type === 'emploi' && c.poste === 'pilote_titulaire').map((c) => c.salaireMEUR).sort((a, b) => b - a);
     (salaireTop5[s] ??= []).push(moy(sal.slice(0, 5)));
@@ -153,6 +155,9 @@ console.log(`${N} graines × ${S} saisons`);
 console.log(`Débutants en F1 par saison : ${moy(debutants).toFixed(2)} (cible D-072 : 2 à 4)`);
 console.log(`Carrière en F1 à la retraite (saisons) : moyenne ${moy(carriereF1).toFixed(1)}, 10 % ${q(carriereF1, 0.1)}, 90 % ${q(carriereF1, 0.9)}, max ${q(carriereF1, 1)} (cible : 6 à 10)`);
 console.log(`Âge de retraite des pilotes de F1 : moyenne ${moy(ageRetraite).toFixed(1)}, 10 % ${q(ageRetraite, 0.1)}, 90 % ${q(ageRetraite, 0.9)}`);
+const tranches = [[0, 31], [32, 34], [35, 37], [38, 40], [41, 99]] as const;
+console.log('Âge de retraite des pilotes de F1, répartition : ' + tranches.map(([a, b]) => `${b === 99 ? `${a}+` : a === 0 ? `≤${b}` : `${a}-${b}`} ${Math.round((100 * ageRetraite.filter((x) => x >= a && x <= b).length) / Math.max(1, ageRetraite.length))} %`).join(' · '));
+console.log(`Titulaires de 36 ans ou plus : ${Math.round((100 * agesTitulaires.filter((a) => a >= 36).length) / Math.max(1, agesTitulaires.length))} % ; de 40 ans ou plus : ${Math.round((100 * agesTitulaires.filter((a) => a >= 40).length) / Math.max(1, agesTitulaires.length))} % ; le plus âgé : ${q(agesTitulaires, 1)} ans`);
 console.log(`Âge de retraite du personnel : moyenne ${moy(ageRetraitePersonnel).toFixed(1)}, 10 % ${q(ageRetraitePersonnel, 0.1)}, 90 % ${q(ageRetraitePersonnel, 0.9)}`);
 console.log(`Âge des champions (titres simulés) : moyenne ${moy(ageTitre).toFixed(1)}, 10 % ${q(ageTitre, 0.1)}, 90 % ${q(ageTitre, 0.9)}`);
 const points = [0, ...Array.from({ length: Math.floor(S / 5) }, (_, i) => 5 * (i + 1) - 1)].filter((s) => s < S);
