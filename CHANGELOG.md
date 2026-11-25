@@ -655,3 +655,6 @@ Aucun code à ce stade.
 - `tools/banc-grille.mts` : les 11 voitures classées sur les 30 circuits (sans hasard), pièces et caractéristiques physiques ;
   rapport `docs/rapports/phase-12-profils/` (proposition de notes du porteur, non appliquée).
 - Mesures de la 12b bis : 30 saisons (α=1, α=2, sans ADUO), laboratoire Williams et Haas, tendances de vitesse et réformes.
+- Fiabilité retirée de l'efficacité du châssis (D-174) ; refroidissement lu selon le mois du Grand Prix ; paramètres de banc d'essai
+  (`course.meteoForcee`, `course.abandons`, `course.pression`) et leur test.
+- Analyse approfondie : `docs/systemes/phase-12c-analyse-approfondie.md`.

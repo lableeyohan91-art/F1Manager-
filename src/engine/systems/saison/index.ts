@@ -117,9 +117,14 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   // Phase 11b : climat réel du mois où le Grand Prix a lieu (un Grand Prix déplacé change de climat) ; sinon, ancienne classe de pluie.
   const pluie = circuit.pluieMensuelle ? circuit.pluieMensuelle[moisDeSemaine(gp.semaine) - 1]! : (PROBABILITE_PLUIE[circuit.climatPluie] ?? 0.1);
   gp.pluie = tirageLocal(monde, 'meteo', gp.id).chance(pluie);
+  // Banc d'essai (audit APEX, point 10) : météo imposée par paramètre d'expérience (−1 = tirage normal, 0 = sec, 1 = pluie).
+  const meteoForcee = parametre(monde, 'course.meteoForcee', -1);
+  if (meteoForcee >= 0) gp.pluie = meteoForcee >= 1;
+  // Phase 12 (point 9 de l'audit) : refroidissement selon la chaleur du MOIS du Grand Prix, et non la moyenne de l'année.
+  const mois = moisDeSemaine(gp.semaine);
 
   // Rang des voitures sur ce circuit (1 = la plus rapide).
-  const indices = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, circuit)]));
+  const indices = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, circuit, mois)]));
   const rangs = new Map([...indices.entries()].sort((a, b) => b[1] - a[1]).map(([id], i) => [id, i + 1]));
   const meilleurIndice = Math.max(...indices.values());
   const retard = (id: string) => Math.round((meilleurIndice - (indices.get(id) as number)) * ECART_VOITURE_PAR_POINT * 1000) / 1000;
@@ -137,7 +142,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const ecartPilote = parametre(monde, 'course.ecartPiloteParPoint', ECART_PILOTE_PAR_POINT) * (DIFFICULTE_CIRCUIT.min + DIFFICULTE_CIRCUIT.parPoint * circuit.exigences.difficulte);
     const mod = modificateurNiveau(monde, p, circuit);
     const pilote = (niveauPilote(p, gp.pluie, circuit.exigences) + mod.affinite + mod.nouveaute) * ecartPilote;
-    const pression = erreurPression(monde, p, saison, gp.manche, gp.id);
+    // Banc d'essai : `course.pression` = 0 neutralise l'erreur sous pression (1 par défaut).
+    const pression = erreurPression(monde, p, saison, gp.manche, gp.id) * parametre(monde, 'course.pression', 1);
     // D-140 : un pilote démotivé (usure du succès) perd un peu de rythme ; une motivation élevée n'apporte rien de plus.
     const forme = EFFET_FORME_MAX * borner((p.etat.confiance - CONFIANCE_REFERENCE) / (100 - CONFIANCE_REFERENCE), -1, 1)
       + USURE_SUCCES.effetCourse * borner((p.etat.motivation - USURE_SUCCES.motivationReference) / USURE_SUCCES.motivationReference, -1, 0);
@@ -146,7 +152,9 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - fiabiliteVoiture(monde, e, voitureDe(monde, e.id).fiabilite)) * ABANDON_MECANIQUE.parPoint);
     const pInc = (INCIDENT.base + (20 - (p.competences['regularite'] ?? 10)) * INCIDENT.parPoint)
       * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.exigences.risqueAccident / INCIDENT.risqueReference);
-    const abandon = f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : null;
+    // Banc d'essai : `course.abandons` = 0 neutralise pannes et incidents (les tirages de rythme restent identiques).
+    const abandonsActifs = parametre(monde, 'course.abandons', 1) > 0;
+    const abandon = !abandonsActifs ? null : f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : null;
     return {
       p, e, temps: -(voiture + pilote + forme) + alea + pression, abandon,
       explication: { voiture, pilote, forme, alea, affinite: mod.affinite * ecartPilote, nouveaute: mod.nouveaute * ecartPilote, pression },

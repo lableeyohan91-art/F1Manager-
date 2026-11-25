@@ -84,6 +84,8 @@ export const REFROIDISSEMENT = { margeReference: 6, temperatureNeutreC: 22, parD
  * Conversion de départ (une seule fois, à la création du monde) des notes de `voitures.csv` (1 à 20, phase 3) en pièces :
  * efficacité = référence + `parPoint` × (note − `noteReference`) (notes `notes` de la pièce, moyennées) ;
  * concept = `conceptParPoint` × (moyenne des notes `conceptPlus` − moyenne des notes `conceptMoins`), borné à ± `conceptMax`.
+ * La fiabilité n'entre dans aucune efficacité (décision du porteur, 25/11/2026 : une voiture fragile n'est pas plus lente) ;
+ * elle fixe la fiabilité de la voiture et oriente le concept des pontons.
  * Le profil de la voiture se lit ainsi sur ses six pièces (demande du porteur, 25/11/2026 : « personne ne gagne partout ») :
  *   ailerons : fort appui si virages rapides > vitesse de pointe, faible traînée sinon ;
  *   châssis : agilité mécanique si virages lents > virages rapides, plateforme aérodynamique sinon ;
@@ -94,7 +96,7 @@ export const REFROIDISSEMENT = { margeReference: 6, temperatureNeutreC: 22, parD
 export const CONVERSION_DEPART = {
   noteReference: 14, parPoint: 0.7, conceptParPoint: 0.25, conceptMax: 0.6,
   notes: {
-    chassis: ['viragesLents', 'fiabilite'], aileron_avant: ['viragesRapides', 'efficaciteAero'], aileron_arriere: ['efficaciteAero', 'vitessePointe'],
+    chassis: ['viragesLents', 'viragesRapides'], aileron_avant: ['viragesRapides', 'efficaciteAero'], aileron_arriere: ['efficaciteAero', 'vitessePointe'],
     pontons: ['vitessePointe', 'efficaciteAero'], fond_plat: ['viragesRapides', 'viragesLents'], suspensions: ['viragesLents', 'gestionPneus'],
   } as Record<TypePiece, readonly string[]>,
   conceptPlus: {
