@@ -9,7 +9,8 @@ const { chromium, devices } = createRequire(import.meta.url)('playwright');
 const URL_SITE = process.env.URL_SITE ?? 'http://localhost:4173/F1Manager-/';
 const dossier = process.argv[2] ?? 'sorties/parcours-android';
 mkdirSync(dossier, { recursive: true });
-const APPAREILS = ['Galaxy S9+', 'Galaxy S8', 'Pixel 7', 'Pixel 7 landscape', 'Galaxy S8 landscape'];
+// D-177 : jeu exclusivement en paysage ; les appareils sont tenus en paysage (le portrait affiche une invitation à tourner l'appareil).
+const APPAREILS = ['Galaxy S9+ landscape', 'Galaxy S8 landscape', 'Pixel 7 landscape', 'Pixel 5 landscape', 'Galaxy Tab S4 landscape'];
 const ECRANS = [['Actualités', 'À la une'], ['Équipe', 'Effectif de'], ['Marché', 'Cibles possibles'], ['Technique', 'Savoir technique'], ['Finances', 'Budget de développement'], ['Championnat', 'Constructeurs'], ['Archives', 'Records'], ['Direction', 'Délégations'], ['Réglages', 'Mesure des performances']];
 const navigateur = await chromium.launch();
 const erreurs = [];

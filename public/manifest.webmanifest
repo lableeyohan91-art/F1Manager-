@@ -1,0 +1,10 @@
+{
+  "name": "APEX Manager",
+  "short_name": "APEX",
+  "lang": "fr",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0d0f12",
+  "theme_color": "#0d0f12"
+}

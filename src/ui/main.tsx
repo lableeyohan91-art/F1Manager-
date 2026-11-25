@@ -12,7 +12,17 @@ function Racine() {
     addEventListener('hashchange', f);
     return () => removeEventListener('hashchange', f);
   }, []);
-  return hash.startsWith('#diagnostic') ? <App /> : <Jeu />;
+  // D-177 : le jeu se joue exclusivement en paysage ; en portrait, une invitation à tourner l'appareil couvre l'écran (CSS).
+  return (
+    <>
+      <div class="tourner" role="alert">
+        <span class="tourner-icone" aria-hidden="true">⟲</span>
+        <strong>Tournez votre appareil</strong>
+        <span class="muted">Le jeu se joue en mode paysage.</span>
+      </div>
+      {hash.startsWith('#diagnostic') ? <App /> : <Jeu />}
+    </>
+  );
 }
 
 render(<Racine />, document.getElementById('app') as HTMLElement);

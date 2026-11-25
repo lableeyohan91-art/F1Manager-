@@ -101,3 +101,53 @@ details.carte > summary h3 { display: inline; }
 details.carte > summary::-webkit-details-marker { display: none; }
 button.lien { background: none; border: 0; padding: 0; color: var(--text); cursor: pointer; text-align: left; font: inherit; }
 button.lien:hover { text-decoration: underline; }
+
+/*
+ * D-177 (26/11/2026) : jeu EXCLUSIVEMENT en paysage, sur ordinateur comme sur téléphone. Remplace le modèle « mobile portrait » de la
+ * phase 10 (barre du bas + « Plus ») : barre latérale permanente (icônes seules sur téléphone, libellés sur grand écran), contenu en
+ * colonnes de cartes ; les cartes qui contiennent un tableau prennent toute la largeur.
+ */
+:root { --rail: 76px; --entete: 52px; }
+.jeu { padding-bottom: 0; padding-left: calc(var(--rail) + env(safe-area-inset-left)); }
+.jeu-entete { min-height: var(--entete); box-sizing: border-box; }
+.jeu-bandeau { top: var(--entete); }
+.jeu-nav { top: 0; bottom: 0; left: 0; right: auto; width: calc(var(--rail) + env(safe-area-inset-left)); box-sizing: border-box; flex-direction: column; flex-wrap: nowrap;
+  overflow-x: hidden; overflow-y: auto; border-top: 0; border-right: 1px solid var(--line); padding: 4px 0 env(safe-area-inset-bottom) env(safe-area-inset-left); }
+.jeu-nav button { flex: 0 0 auto; min-height: 46px; padding: 4px 2px; }
+.jeu-nav button.secondaire { display: flex; }
+.jeu-nav.ouvert button.secondaire { order: 0; border-bottom: 0; }
+.jeu-nav button.plus { display: none; }
+.jeu-nav button.actif { box-shadow: inset 3px 0 0 var(--accent); }
+.jeu-page { max-width: 1600px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 0 12px; align-items: start; }
+.jeu-page > :not(.carte), .jeu-page > .carte:has(table), .jeu-page > .carte.retour, .jeu-page > .carte.attention, .jeu-page > .carte.pleine { grid-column: 1 / -1; }
+.actions.collant { bottom: 0; }
+.carte.retour[role="status"] { top: calc(var(--entete) + 8px); }
+/* Grand écran : barre latérale avec libellés. */
+@media (min-width: 1100px) and (min-height: 560px) {
+  :root { --rail: 170px; }
+  .jeu-nav button { flex-direction: row; justify-content: flex-start; gap: 10px; padding: 10px 16px; min-height: 0; }
+  .jeu-nav button .lib { font-size: .9rem; }
+}
+/* Téléphone en paysage (faible hauteur) : en-tête et barre resserrés. */
+@media (max-height: 500px) {
+  :root { --entete: 44px; }
+  .jeu-entete { padding: 4px 10px; }
+  .jeu-nav button { min-height: 36px; padding: 2px; }
+  .jeu-nav button .ic { font-size: 1rem; }
+  .jeu-nav button .lib { font-size: .6rem; }
+  .carte-circuit { max-height: 62vh; }
+  .jeu-page { padding: 6px 10px 10px; }
+  /* Les 11 écrans ne tiennent pas en hauteur : 4 principaux + « Plus », qui déplie la barre sur deux colonnes, par-dessus le contenu. */
+  .jeu-nav button { min-height: 44px; }
+  .jeu-nav button.secondaire { display: none; }
+  .jeu-nav button.plus { display: flex; }
+  .jeu-nav.ouvert { display: grid; grid-template-columns: repeat(2, var(--rail)); grid-auto-rows: 44px; align-content: start; width: calc(2 * var(--rail) + env(safe-area-inset-left)); box-shadow: 6px 0 16px rgba(0,0,0,.5); }
+  .jeu-nav.ouvert button.secondaire { display: flex; }
+}
+/* Portrait : invitation à tourner l'appareil (téléphones et tablettes). */
+.tourner { display: none; }
+@media (orientation: portrait) and (max-width: 1099px) {
+  .tourner { display: flex; position: fixed; inset: 0; z-index: 1000; background: var(--bg); color: var(--text); flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 24px; }
+  .tourner-icone { font-size: 3rem; line-height: 1; }
+}

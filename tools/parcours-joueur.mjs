@@ -189,7 +189,8 @@ async function parcours(nomAppareil, contexteOptions) {
 }
 
 try {
-  await parcours('telephone', { ...devices['iPhone 13'] });
+  // D-177 : jeu exclusivement en paysage (téléphone tenu en paysage).
+  await parcours('telephone', { ...devices['iPhone 13 landscape'] });
   await parcours('ordinateur', { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
 } catch (e) {
   erreurs.push(String(e));

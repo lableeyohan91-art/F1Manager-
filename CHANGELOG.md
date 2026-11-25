@@ -671,3 +671,7 @@ Aucun code à ce stade.
 ### Ajouté
 - Rapport `docs/rapports/phase-12c/` ; étude de nuit `docs/etudes/2026-11-26-etude-de-nuit.md` ; outils `calage-30-circuits`,
   `saison-victoires`, `trajectoire-ecurie`.
+
+### Modifié (interface, D-177)
+- Jeu exclusivement en paysage : barre latérale permanente, cartes en colonnes, invitation à tourner l'appareil en portrait,
+  manifeste `public/manifest.webmanifest` (orientation paysage) ; outils de parcours passés en paysage.
