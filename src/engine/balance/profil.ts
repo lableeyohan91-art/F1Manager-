@@ -29,31 +29,35 @@ export const VOITURE_REFERENCE = {
   // Recalés le même jour après la correction de la comptabilité électrique (l'électrique utilisé en sortie de virage, limité par la
   // motricité, est désormais compté), avec la contrainte publique « moins d'appui à Monza qu'à Monaco » (tools/calage-profil.mts).
   // Valeurs précédentes et comparaison : docs/rapports/phase-11b/audit-apex-lab.md.
-  cla: 4.043,
+  // Recalés le 25/11/2026 (phase 12c, D-175, tools/calage-30-circuits.mts) : même critère sur les 5 tracés détaillés, plus deux
+  // contraintes sur les 30 circuits : réglage d'ailerons optimal à l'intérieur de la plage partout, ordre public d'appui respecté.
+  // Avant : cla 4,043 ; muMeca 1,27 ; muAero 1,805 ; muMotricite 0,8319 ; muFreinage 1,498 ; énergie 8,413 MJ ; appui en ligne 0,6775 ;
+  // finesse 3,231 ; part d'appui des ailerons 0,336 ; part de traînée 0,406. Comparaison : docs/rapports/phase-12c/.
+  cla: 5.065,
   cda: 0.8798,
-  muMeca: 1.27,
-  muAero: 1.805,
-  muMotricite: 0.8319,
-  muFreinage: 1.498,
+  muMeca: 1.473,
+  muAero: 1.516,
+  muMotricite: 0.8754,
+  muFreinage: 1.479,
   vitesseMaxMs: 110,
   /** Énergie électrique déployable par tour (J) : au-delà, l'écurie coupe le déploiement au-dessus d'une vitesse de coupure (H, ordre de grandeur du règlement 2026). */
-  energieElectriqueTourJ: 8_413_000,
+  energieElectriqueTourJ: 6_411_000,
   /**
    * Aérodynamique active (règlement 2026) : sur les portions presque droites, les ailerons s'ouvrent. Traînée × (1 − reductionTraineeLigne),
    * appui × (1 − reductionAppuiLigne). En virage et au freinage, configuration normale (H, approximation géométrique des zones).
    */
   reductionTraineeLigne: 0.9226,
-  reductionAppuiLigne: 0.6775,
+  reductionAppuiLigne: 0.6432,
   /**
    * Phase 12a (refonte D-163) : part de l'appui et de la traînée de la voiture (au réglage médian) due aux ailerons (H : effet de sol
    * ≈ 60 % de l'appui ; ailerons ≈ 35 % de la traînée). Le réglage d'ailerons et l'aérodynamique active n'agissent que sur cette part.
    */
-  partAppuiAileron: 0.336,
-  partTraineeAileron: 0.406,
+  partAppuiAileron: 0.4405,
+  partTraineeAileron: 0.2804,
   /** Niveau d'ailerons du week-end (réglage, 0 = médian) : fixé par `avecAilerons`. */
   niveauAileron: 0,
   /** Finesse incrémentale des ailerons : appui ajouté / traînée ajoutée quand on charge l'aileron (H, plage plausible 2,5 à 6 ; calée). */
-  finesseIncrementale: 3.231,
+  finesseIncrementale: 2.014,
 };
 
 /** Aérodynamique active : portion « ligne droite » si le rayon dépasse ce seuil (m) ; zones réelles désignées par la FIA, ici approchées par la géométrie (H). */

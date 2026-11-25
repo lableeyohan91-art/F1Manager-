@@ -515,6 +515,8 @@ export interface VoitureDonnees {
   efficaciteAero: number;
   fiabilite: number;
   gestionPneus: number;
+  /** Phase 12c (D-175) : motricité en sortie de virage (1 à 20) ; lue par la conversion de départ (suspensions). Absente des anciennes données : virages lents. */
+  motricite?: number;
   verification: string;
 }
 

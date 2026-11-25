@@ -15,7 +15,7 @@ import {
 import { USURE_SUCCES } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
-import { idsTries, table, type Entite, type Monde } from '../../core/monde';
+import { idsTries, parametre, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal } from '../../core/moteur';
 
 type Commander = (c: { type: string; auteur: string; parametres: Record<string, unknown> }) => unknown;
@@ -536,7 +536,8 @@ export function intersaison(monde: Monde, ecuries: Ecurie[]): void {
  * son avance et repart d'une qualité propre à l'écurie (savoir préparé, exécution), vers SA frontière sous ce règlement (architecture
  * comprise). Absolu : rien ne ramène une écurie vers la moyenne de la grille (fiche §10.4).
  */
-export function reconcevoir(monde: Monde, ecuries: Ecurie[], intensites: Record<string, number>, r: Reglement, cle: string): void {
+export function reconcevoir(monde: Monde, ecuries: Ecurie[], intensites: Record<string, number>, r: Reglement, cle: string, grandeReforme = false): void {
+  const coupe = grandeReforme ? parametre(monde, 'reglement.coupeReforme', RECONCEPTION.coupeReforme) : 0;
   for (const e of ecuries) {
     const variations: Record<string, number> = {};
     for (const p of piecesInstallees(monde, e.id)) {
@@ -548,7 +549,7 @@ export function reconcevoir(monde: Monde, ecuries: Ecurie[], intensites: Record<
       const s = savoirPiece(monde, e.id, type, r);
       const qualite = borner(RECONCEPTION.qualiteBase + RECONCEPTION.qualiteSavoir * (1 - Math.exp(-s / FRONTIERE.echelleSavoir)) + aleaExecution(monde, `${e.id}|${type}|${cle}`, s), 0, 1);
       const avant = p.efficacite;
-      p.efficacite = r2(FRONTIERE.min + (1 - I) * (p.efficacite - FRONTIERE.min) + I * qualite * (frontiere(monde, e, type, r) - FRONTIERE.min));
+      p.efficacite = r2(Math.max(FRONTIERE.min, FRONTIERE.min + (1 - I) * (p.efficacite - FRONTIERE.min) + I * qualite * (frontiere(monde, e, type, r) - FRONTIERE.min) - I * coupe));
       p.reglement = r.id;
       variations[type] = r2(p.efficacite - avant);
     }

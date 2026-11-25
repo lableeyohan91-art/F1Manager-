@@ -35,17 +35,17 @@ export const PIECES = {
   chassis: {
     libelle: 'Châssis', conceptionJours: 33, coutProjetMEUR: 1.0, fabricationJours: 10, coutUnitaireMEUR: 0.55, pole: 'conception',
     domaines: ['chassis', 'masse', 'fiabilite'], conceptMoins: 'plateforme aérodynamique', conceptPlus: 'agilité mécanique',
-    gain: { masseKg: -0.1, muMeca: 0.12 }, compromis: { muMeca: 1.2, cla: -1.5 },
+    gain: { masseKg: -0.1, muMeca: 0.12 }, compromis: { muMeca: 1.2, cla: -1.77 },
   },
   aileron_avant: {
     libelle: 'Aileron avant', conceptionJours: 44, coutProjetMEUR: 1.8, fabricationJours: 3, coutUnitaireMEUR: 0.225, pole: 'aero',
     domaines: ['aero_avant'], conceptMoins: 'faible traînée', conceptPlus: 'fort appui',
-    gain: { cla: 0.3, cda: -0.05 }, compromis: { cla: 1.5, cda: 4.9 },
+    gain: { cla: 0.3, cda: -0.05 }, compromis: { cla: 1.5, cda: 4.15 },
   },
   aileron_arriere: {
     libelle: 'Aileron arrière', conceptionJours: 44, coutProjetMEUR: 1.8, fabricationJours: 3, coutUnitaireMEUR: 0.275, pole: 'aero',
     domaines: ['aero_arriere'], conceptMoins: 'faible traînée', conceptPlus: 'fort appui',
-    gain: { cla: 0.25, cda: -0.12 }, compromis: { cla: 2.5, cda: 8.2 },
+    gain: { cla: 0.25, cda: -0.12 }, compromis: { cla: 2.5, cda: 6.91 },
   },
   pontons: {
     libelle: 'Pontons', conceptionJours: 33, coutProjetMEUR: 1.0, fabricationJours: 8, coutUnitaireMEUR: 0.45, pole: 'aero',
@@ -55,12 +55,12 @@ export const PIECES = {
   fond_plat: {
     libelle: 'Fond plat', conceptionJours: 33, coutProjetMEUR: 1.0, fabricationJours: 8, coutUnitaireMEUR: 0.4, pole: 'aero',
     domaines: ['fond_plat'], conceptMoins: 'plateforme tolérante', conceptPlus: 'effet de sol maximal',
-    gain: { cla: 0.4, cda: -0.03 }, compromis: { cla: 1.2, cda: 0.3, muMeca: -1.0 },
+    gain: { cla: 0.4, cda: -0.03 }, compromis: { cla: 1.2, cda: 0.3, muMeca: -0.74 },
   },
   suspensions: {
     libelle: 'Suspensions', conceptionJours: 33, coutProjetMEUR: 1.0, fabricationJours: 8, coutUnitaireMEUR: 0.3, pole: 'conception',
     domaines: ['suspensions', 'interface_pneus'], conceptMoins: 'plateforme raide', conceptPlus: 'souplesse et motricité',
-    gain: { muMeca: 0.12, muMotricite: 0.2, muFreinage: 0.1 }, compromis: { muMotricite: 1.0, muFreinage: 0.4, cla: -0.35 },
+    gain: { muMeca: 0.12, muMotricite: 0.2, muFreinage: 0.1 }, compromis: { muMotricite: 1.0, muFreinage: 0.4, cla: -0.34 },
   },
 } as const satisfies Record<TypePiece, {
   libelle: string; conceptionJours: number; coutProjetMEUR: number; fabricationJours: number; coutUnitaireMEUR: number; pole: 'aero' | 'conception';
@@ -90,18 +90,18 @@ export const REFROIDISSEMENT = { margeReference: 6, temperatureNeutreC: 22, parD
  *   ailerons : fort appui si virages rapides > vitesse de pointe, faible traînée sinon ;
  *   châssis : agilité mécanique si virages lents > virages rapides, plateforme aérodynamique sinon ;
  *   fond plat : effet de sol maximal si virages rapides > virages lents ;
- *   suspensions : souplesse et motricité si virages lents et pneus > virages rapides ;
+ *   suspensions : souplesse et motricité si motricité et pneus > virages rapides (note `motricite`, D-175 ; à défaut, virages lents) ;
  *   pontons : refroidissement généreux si fiabilité > vitesse de pointe, carrosserie serrée sinon.
  */
 export const CONVERSION_DEPART = {
   noteReference: 14, parPoint: 0.7, conceptParPoint: 0.25, conceptMax: 0.6,
   notes: {
     chassis: ['viragesLents', 'viragesRapides'], aileron_avant: ['viragesRapides', 'efficaciteAero'], aileron_arriere: ['efficaciteAero', 'vitessePointe'],
-    pontons: ['vitessePointe', 'efficaciteAero'], fond_plat: ['viragesRapides', 'viragesLents'], suspensions: ['viragesLents', 'gestionPneus'],
+    pontons: ['vitessePointe', 'efficaciteAero'], fond_plat: ['viragesRapides', 'viragesLents'], suspensions: ['motricite', 'gestionPneus'],
   } as Record<TypePiece, readonly string[]>,
   conceptPlus: {
     chassis: ['viragesLents'], aileron_avant: ['viragesRapides'], aileron_arriere: ['viragesRapides'], pontons: ['fiabilite'],
-    fond_plat: ['viragesRapides'], suspensions: ['viragesLents', 'gestionPneus'],
+    fond_plat: ['viragesRapides'], suspensions: ['motricite', 'gestionPneus'],
   } as Record<TypePiece, readonly string[]>,
   conceptMoins: {
     chassis: ['viragesRapides'], aileron_avant: ['vitessePointe'], aileron_arriere: ['vitessePointe'], pontons: ['vitessePointe'],
@@ -174,7 +174,13 @@ export const INTERSAISON = { progression: 0.15 };
  * efficacité = min + (1 − I) × (efficacité − min) + I × qualité × (frontière − min) (min : FRONTIERE.min),
  * qualité = `qualiteBase` + `qualiteSavoir` × (1 − exp(−S / FRONTIERE.echelleSavoir)) + exécution incertaine. Absolu, jamais relatif à la grille.
  */
-export const RECONCEPTION = { qualiteBase: 0.35, qualiteSavoir: 0.45 };
+export const RECONCEPTION = { qualiteBase: 0.35, qualiteSavoir: 0.45, coupeReforme: 3 };
+/*
+ * `coupeReforme` (points d'efficacité, D-175, chantier 3) : une GRANDE réforme retire en plus I × coupeReforme à chaque pièce touchée
+ * (l'équivalent d'une coupe d'appui ou d'une nouvelle motorisation imposée par le règlement) ; jamais sous FRONTIERE.min. La frontière, elle,
+ * ne bouge pas : l'écart à combler grandit, et les écuries qui ont préparé le règlement (savoir propre, bonne architecture) remontent plus
+ * vite. Les évolutions mineures n'ont pas de coupe. Réglable pour les expériences : paramètre `reglement.coupeReforme`.
+ */
 
 /**
  * Paris de concept (fiche §10.2, D-170 Q7) : chaque grande réforme cache 2 ou 3 familles d'architecture ; la meilleure n'a aucune
@@ -203,7 +209,7 @@ export const IA_CONCEPTION = { pasConcept: 0.25, gainMin: 0.005, alea: 0.01 };
  * Sensibilités moyennes des 30 circuits (moyenne de data/grille-2026/sensibilites-circuits.csv, vérifiée par un test) : utilisées pour
  * un circuit sans sensibilités propres, c'est-à-dire seulement dans une partie antérieure au format 31 (migrée sans les données).
  */
-export const SENSIBILITES_MOYENNES = { tempsS: 86.707, niveauAileron: 0, d1: {cla: -0.15521, cda: 0.04747, masseKg: 0.26084, muMeca: -0.19018, muMotricite: -0.04747, muFreinage: -0.02265, puissance: -0.11559}, d2: {cla: 0.008198, cda: 5.9e-05, masseKg: 0.003659, muMeca: 0.008279, muMotricite: 0.001675, muFreinage: 0.000657, puissance: 0.001722} };
+export const SENSIBILITES_MOYENNES = { tempsS: 86.09, niveauAileron: 0, d1: {cla: -0.13104, cda: 0.0474, masseKg: 0.23605, muMeca: -0.19341, muMotricite: -0.03448, muFreinage: -0.0239, puissance: -0.11763}, d2: {cla: 0.002682, cda: 0.000113, masseKg: -0.001116, muMeca: 0.003939, muMotricite: 0.001348, muFreinage: 0.000653, puissance: 0.002} };
 
 /**
  * Phase 12b — soufflerie et CFD (fiche principale §5, D-170 Q6 ; règlement réel 2026 vérifié) :

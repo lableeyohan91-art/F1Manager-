@@ -20,7 +20,9 @@ const r2 = (x: number) => Math.round(x * 100) / 100;
  * droite part d'ailerons « faible traînée »).
  */
 export function piecesDepart(d: VoitureDonnees): Omit<PieceVoiture, 'id'>[] {
-  const note = (k: string) => (d as unknown as Record<string, number>)[k] ?? CONVERSION_DEPART.noteReference;
+  const brut = d as unknown as Record<string, number>;
+  // D-175 : sans note de motricité (anciennes données, migration), la note des virages lents.
+  const note = (k: string) => brut[k] ?? (k === 'motricite' ? brut['viragesLents'] : undefined) ?? CONVERSION_DEPART.noteReference;
   const c = CONVERSION_DEPART;
   return TYPES_PIECES.map((type) => {
     const notes = c.notes[type];

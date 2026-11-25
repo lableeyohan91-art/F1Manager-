@@ -252,7 +252,7 @@ export function entreeEnVigueur(monde: Monde): boolean {
   }
   // Phase 12a : pari de concept (architecture choisie, sinon recommandée par le DT), puis reconception absolue des pièces.
   fixerArchitectures(monde, ecuriesActives(monde), nouveau);
-  reconcevoir(monde, ecuriesActives(monde), nouveau.intensites, nouveau, `reglement-${nouveau.id}`);
+  reconcevoir(monde, ecuriesActives(monde), nouveau.intensites, nouveau, `reglement-${nouveau.id}`, true);
   for (const p of programmes(monde)) if (p.horizon === nouveau.id) p.horizon = 'actuelle';
   ajouterEvenement(monde, {
     type: 'reglement.entree_en_vigueur', acteurs: [], importance: 4, visibilite: 'public', causes: causesConnues(monde, nouveau.causes?.annonce), contexte: { reglement: nouveau.id, orientation: nouveau.orientation, pneus: nouveau.pneus },

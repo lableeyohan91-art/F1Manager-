@@ -414,6 +414,8 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
       efficaciteAero: rv.entier(l, 'efficaciteAero', 1, 20),
       fiabilite: rv.entier(l, 'fiabilite', 1, 20),
       gestionPneus: rv.entier(l, 'gestionPneus', 1, 20),
+      // Phase 12c (D-175) : motricité en sortie de virage (colonne facultative ; sans elle, la note des virages lents).
+      motricite: l.valeurs['motricite'] ? rv.entier(l, 'motricite', 1, 20) : rv.entier(l, 'viragesLents', 1, 20),
       verification: l.valeurs['verification'] ?? '',
     };
   });

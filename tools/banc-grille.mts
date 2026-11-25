@@ -4,7 +4,7 @@
  * et classe les 11 voitures sur chacun des 30 circuits du jeu (temps au tour physique sur le tracé réel, moteurs compris), avant toute course.
  * Sorties : les 3 premières voitures par circuit, le nombre de circuits gagnés par voiture, le meilleur et le pire rang de chaque voiture,
  * l'écart moyen entre la 1re et la 2e, et les circuits où une voiture « moins bonne en moyenne » bat une voiture meilleure en moyenne.
- * Usage : npx tsx tools/banc-grille.mts [fichier de notes]
+ * Usage : npx tsx tools/banc-grille.mts [fichier de notes] [fichier de motoristes]
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -14,6 +14,8 @@ const { lireDonneesGrille2026 } = await import(`${racine}/src/platform/node/donn
 const fichiers = lireDonneesGrille2026(racine);
 const notes = process.argv[2];
 if (notes) fichiers['voitures.csv'] = readFileSync(notes, 'utf8');
+// Variante de moteurs (facultative) : 3e argument, un fichier au format de data/grille-2026/motoristes.csv.
+if (process.argv[3]) fichiers['motoristes.csv'] = readFileSync(process.argv[3], 'utf8');
 const m = eng.creerScenarioGrille2026(fichiers).creerMonde(1);
 const eq = eng.ecuriesActives(m) as { id: string }[];
 const nom = (id: string) => id.replace('eq_', '');

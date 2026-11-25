@@ -2,7 +2,7 @@
  * Phase 12a — sensibilités du temps au tour aux paramètres physiques de la voiture, sur les 30 circuits (D-170 §4.4).
  *
  * Pour chaque circuit : réglage d'ailerons optimal de la voiture de référence, temps au tour, puis dérivées première et seconde du
- * temps au tour pour une variation relative de chaque paramètre (différences centrées à ± PAS %). Au réglage optimal, la dérivée
+ * temps au tour pour une variation relative de chaque paramètre (ajustement par moindres carrés de −10 % à +10 %, phase 12c). Au réglage optimal, la dérivée
  * première tient déjà compte, au premier ordre, du nouveau réglage qu'une voiture différente choisirait (théorème de l'enveloppe).
  *
  * Le moteur du jeu lit data/grille-2026/sensibilites-circuits.csv (pas les tracés, trop lourds pour le téléphone) : l'écart de temps au tour d'une voiture est
@@ -14,8 +14,12 @@ import { appuiNaturel, avecAilerons, courbures, profilVitesse, type Trace, type 
 import { VOITURE_REFERENCE } from '../../src/engine/balance/profil';
 import { PARAMETRES_SENSIBILITE } from '../../src/engine/balance/monoplaces';
 
-/** Pas de la différence centrée (%) : assez grand pour dépasser le bruit de la discrétisation, assez petit pour rester local. */
-const PAS = 3;
+/**
+ * Phase 12c (D-175, chantier A2) : d1 et d2 sont AJUSTÉS par moindres carrés sur des écarts de −10 % à +10 % (la plage où vivent les
+ * voitures du jeu), et non plus pris par différence centrée à ± 3 % : un virage qui bascule « à fond » dans un petit intervalle faisait
+ * exploser la courbure (Silverstone : ≈ 10 fois les autres circuits).
+ */
+const ECARTS = [-10, -6, -3, 3, 6, 10];
 const dossiers = ['data/circuits', 'data/circuits/validation', 'data/circuits/reconstruits'];
 const traces = dossiers.flatMap((d) => readdirSync(d).filter((f) => f.startsWith('cir_') && f.endsWith('.json')).map((f) => JSON.parse(readFileSync(`${d}/${f}`, 'utf8')) as Trace & { altitudeM?: number }));
 
@@ -33,9 +37,16 @@ for (const t of traces.sort((a, b) => (a.circuit < b.circuit ? -1 : 1))) {
   const base = avecAilerons(VOITURE_REFERENCE, niveau);
   const d1: Record<string, number> = {}, d2: Record<string, number> = {};
   for (const cle of PARAMETRES_SENSIBILITE) {
-    const plus = profilVitesse(t, varier(base, cle, PAS), c, k).tempsS, moins = profilVitesse(t, varier(base, cle, -PAS), c, k).tempsS;
-    d1[cle] = +((plus - moins) / (2 * PAS)).toFixed(5);
-    d2[cle] = +((plus - 2 * profil.tempsS + moins) / (PAS * PAS)).toFixed(6);
+    // Δt(x) ≈ d1 x + ½ d2 x² : équations normales à deux inconnues (a = d1, b = ½ d2).
+    let sxx = 0, sx3 = 0, sx4 = 0, sxy = 0, sx2y = 0;
+    for (const x of ECARTS) {
+      const y = profilVitesse(t, varier(base, cle, x), c, k).tempsS - profil.tempsS;
+      sxx += x * x; sx3 += x ** 3; sx4 += x ** 4; sxy += x * y; sx2y += x * x * y;
+    }
+    const det = sxx * sx4 - sx3 * sx3;
+    const a = (sxy * sx4 - sx2y * sx3) / det, b = (sxx * sx2y - sx3 * sxy) / det;
+    d1[cle] = +a.toFixed(5);
+    d2[cle] = +(2 * b).toFixed(6);
   }
   res[t.circuit] = { tempsS: +profil.tempsS.toFixed(3), niveauAileron: niveau, d1, d2 };
   console.log(t.circuit.padEnd(16), 'aileron', niveau.toFixed(2), 'temps', profil.tempsS.toFixed(2), JSON.stringify(d1));
@@ -44,4 +55,4 @@ for (const t of traces.sort((a, b) => (a.circuit < b.circuit ? -1 : 1))) {
 const entete = ['id', 'tempsS', 'niveauAileron', ...PARAMETRES_SENSIBILITE.map((k) => `d1_${k}`), ...PARAMETRES_SENSIBILITE.map((k) => `d2_${k}`)];
 const lignes = Object.entries(res).map(([id, r]) => [id, r.tempsS, r.niveauAileron, ...PARAMETRES_SENSIBILITE.map((k) => r.d1[k]), ...PARAMETRES_SENSIBILITE.map((k) => r.d2[k])].join(';'));
 writeFileSync('data/grille-2026/sensibilites-circuits.csv', [entete.join(';'), ...lignes].join('\n') + '\n');
-console.log(`${lignes.length} circuits écrits dans data/grille-2026/sensibilites-circuits.csv (pas ${PAS} %)`);
+console.log(`${lignes.length} circuits écrits dans data/grille-2026/sensibilites-circuits.csv (ajustement sur ${ECARTS.join(', ')} %)`);
