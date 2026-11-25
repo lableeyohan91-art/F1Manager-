@@ -84,16 +84,19 @@ export function restrictionAero(monde: Monde, idEcurie: string): number {
 }
 
 /**
- * Facteur budget du développement : effort technique annuel prévu (dépenses plafonnées fixes + budget de développement
- * restant, coupes comprises) rapporté à la référence. Toutes les écuries au plafond sont à égalité ; seules celles qui
- * n'ont pas les moyens de l'atteindre sont en retrait (D-081 : l'argent compte, mais le plafond le borne).
+ * Facteur budget du développement : effort technique annuel rapporté à la référence. Toutes les écuries au plafond sont à
+ * égalité ; seules celles qui n'ont pas les moyens de l'atteindre sont en retrait (D-081 : l'argent compte, mais le plafond le borne).
+ * D-166 : l'effort est l'argent RÉELLEMENT payé à la dernière période comptable (ramené à l'année) ; avant la première période
+ * de l'année, l'effort prévu (dépenses plafonnées fixes + budget de développement). Changer le budget agit donc à partir de la
+ * période suivante, et l'on reçoit exactement ce que l'on paie (fin du contournement du constat 5.1, sans limiter les modifications).
  */
 export function facteurBudgetDeveloppement(monde: Monde, idEcurie: string): number {
   const fi = financesDe(monde, idEcurie);
   const e = table(monde, TABLES.ecuries)[idEcurie] as unknown as Ecurie | undefined;
   if (!fi || !e || fi.budget.annee === 0) return 1;
-  const f = depensesFixes(monde, e);
-  const effort = f.personnelPlafonne + f.departements + f.operations + f.entretien + fi.budget.developpementMEUR;
+  const paye = fi.depensePeriode?.annee === monde.date.annee ? fi.depensePeriode.plafonneesAnnuelMEUR : undefined;
+  const f = paye === undefined ? depensesFixes(monde, e) : undefined;
+  const effort = paye ?? (f!.personnelPlafonne + f!.departements + f!.operations + f!.entretien + fi.budget.developpementMEUR);
   return borner(effort / EFFORT_TECHNIQUE_REFERENCE, FACTEUR_BUDGET_DEV.min, FACTEUR_BUDGET_DEV.max);
 }
 
@@ -298,6 +301,8 @@ function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
   for (const [k, v] of Object.entries(recettes)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;
   for (const [k, v] of Object.entries(depenses)) (c as unknown as Record<string, number>)[k] = ((c as unknown as Record<string, number>)[k] ?? 0) + v;
   fi.tresorerieMEUR += Object.values(recettes).reduce((a, b) => a + b, 0) - Object.values(depenses).reduce((a, b) => a + b, 0);
+  // D-166 : argent plafonné réellement payé sur cette période, ramené à l'année (lu par la progression des voitures).
+  fi.depensePeriode = { annee, plafonneesAnnuelMEUR: n * (depenses.personnelPlafonne + depenses.departements + depenses.operations + depenses.entretien + depenses.developpement) };
 
   // Projection de fin d'année : si la trésorerie finirait négative, on coupe le développement restant.
   const periodesRestantes = Math.max(0, n - Math.round((monde.date.semaine / 52) * n));

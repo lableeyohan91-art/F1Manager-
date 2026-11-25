@@ -120,7 +120,8 @@ describe('Audit — phases 4 et 9', () => {
 });
 
 describe('Audit — économie (phase 5 et sponsoring)', () => {
-  it('5.1 et 10.2 : le budget de développement se modifie au plus une fois par trimestre, et le budget annuel garde ce choix', () => {
+  it('5.1, 10.2 et D-166 : la progression suit l’argent réellement payé ; budget modifiable à tout moment, gardé par le budget annuel', async () => {
+    const { facteurBudgetDeveloppement } = await import('../src/engine');
     const m = sc.creerMonde(12), moteur = sc.creerMoteur();
     executerCommandeJoueur(moteur, m, { type: 'joueur.prendre_ecurie', auteur: 'joueur', parametres: { ecurie: 'eq_haas', prenom: 'Camille', nom: 'Essai' } });
     const budget = (montant: number) => executerCommandeJoueur(moteur, m, { type: 'budget.developpement', auteur: m.joueur!.personne, parametres: { ecurie: 'eq_haas', montant } });
@@ -128,7 +129,14 @@ describe('Audit — économie (phase 5 et sponsoring)', () => {
     moteur.avancer(m, 2);
     const fi = (Object.values(table(m, TABLES.finances)) as unknown as { ecurie: string; budget: { developpementMEUR: number } }[]).find((f) => f.ecurie === 'eq_haas')!;
     expect(fi.budget.developpementMEUR).toBe(60); // non écrasé par le budget annuel de la semaine 1
-    expect(budget(200).ok).toBe(false); // deuxième modification dans le trimestre
+    while (m.date.semaine % 4 !== 1) moteur.avancer(m, 1); // juste après une écriture comptable
+    const avant = facteurBudgetDeveloppement(m, 'eq_haas');
+    expect(budget(200).ok).toBe(true); // D-166 : plus de délai entre deux modifications
+    expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBe(avant); // rien n'a encore été payé : aucun effet
+    moteur.avancer(m, 4); // l'écriture suivante paie le nouveau budget
+    expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBeGreaterThan(avant);
+    expect(budget(15).ok).toBe(true);
+    expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBeGreaterThan(avant); // l'effet reste celui de l'argent déjà payé
   });
 
   it('5.2 : chaque année est jugée avec le plafond en vigueur cette année-là', () => {
@@ -159,15 +167,22 @@ describe('Audit — phases 6 et 7', () => {
     expect(actuel.fin).toBe(finAvant);
   }, 60_000);
 
-  it('6.4 : passé l’âge de fin de protection, un pilote n’est plus retenu par son contrat dans sa décision de retraite', async () => {
-    const { probabiliteRetraite } = await import('../src/engine');
-    const { RETRAITE } = await import('../src/engine/balance/carriere');
-    const m = sc.creerMonde(22);
-    const pilote = (Object.values(table(m, TABLES.personnes)) as unknown as { id: string; poste: string; statut: string; anneeNaissance: number; carriere?: unknown }[])
+  it('6.4 et D-167 : un pilote n’est jamais protégé par son contrat ; sa retraite est annoncée avant le marché', async () => {
+    const { probabiliteRetraite, annoncerRetraites, proposerProlongation, contratEmploi } = await import('../src/engine');
+    const m = sc.creerMonde(22), moteur = sc.creerMoteur();
+    const pilote = (Object.values(table(m, TABLES.personnes)) as unknown as { id: string; poste: string; statut: string; anneeNaissance: number; carriere?: { finApogee: number }; retraiteAnnoncee?: number }[])
       .find((p) => p.poste === 'pilote_titulaire' && p.statut === 'actif' && p.carriere)!;
     const age = (a: number) => { pilote.anneeNaissance = m.date.annee - a; return probabiliteRetraite(m, pilote as never); };
-    const jeune = age(RETRAITE.ageFinProtectionPilote - 1), vieux = age(RETRAITE.ageFinProtectionPilote);
-    expect(vieux).toBeGreaterThan(jeune);
+    expect(age(36)).toBeGreaterThan(age(33));
+    // Annonce forcée (âge maximal) : le contrat prend fin avec la saison, plus aucune prolongation possible, retraite en fin de saison.
+    pilote.anneeNaissance = m.date.annee - 80;
+    annoncerRetraites(m);
+    expect(pilote.retraiteAnnoncee).toBe(m.date.annee);
+    const c = contratEmploi(m, pilote.id)!;
+    expect(c.fin).toBe(m.date.annee);
+    expect(proposerProlongation(m, c, 'per_x', 10, 2, [], 1).issue).toBe('refus');
+    while (m.date.semaine !== 50) moteur.avancer(m, 1);
+    expect(pilote.statut).toBe('retraite');
   });
 });
 

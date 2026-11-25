@@ -67,7 +67,7 @@ export function faitsVisibles(m: Monde, portee: 'ecurie' | 'paddock', limite = 8
   return res;
 }
 
-export type ArretAvance = 'decision' | 'urgence' | 'derniere_chance' | 'marche' | 'grand_prix' | 'fin_de_saison' | 'fin_de_partie' | 'limite' | 'semaine';
+export type ArretAvance = 'bloquante' | 'decision' | 'urgence' | 'derniere_chance' | 'marche' | 'grand_prix' | 'fin_de_saison' | 'fin_de_partie' | 'limite' | 'semaine';
 
 /**
  * Avance le temps semaine par semaine, en rendant la main à l'écran entre deux semaines (calcul par tranches, D-147).
@@ -78,6 +78,8 @@ export async function avancer(p: Partie, mode: 'semaine' | 'grand_prix' | 'decis
   // Audit 10.5 : la clé distingue aussi chaque conférence, offre et opération (deux décisions du même type ne se confondent plus).
   const cle = (d: DecisionEnAttente) => `${d.type}|${d.contrat ?? d.poste ?? ''}|${d.personne ?? ''}|${d.conference ?? d.offreSponsor ?? d.operation ?? ''}`;
   const depart = decisionsEnAttente(m);
+  // D-168 : une demande bloquante attend une réponse (accepter, refuser ou « ne pas répondre ») : le temps n'avance pas.
+  if (depart.some((d) => d.bloquante)) return { arret: 'bloquante', semaines: 0, msParSemaine: 0 };
   const avant = new Set(depart.map(cle));
   const urgentesAvant = new Set(depart.filter((d) => d.urgente).map(cle));
   // Audit de la phase 10 (arbitrage du porteur) : quel que soit le bouton, l'avance s'arrête la dernière semaine avant une échéance.
@@ -97,6 +99,7 @@ export async function avancer(p: Partie, mode: 'semaine' | 'grand_prix' | 'decis
     if (mode === 'semaine') return { arret: 'semaine', semaines: n, msParSemaine: total / n };
     if (m.date.annee !== annee || m.date.semaine === 50) return { arret: 'fin_de_saison', semaines: n, msParSemaine: total / n };
     const maintenant = decisionsEnAttente(m);
+    if (maintenant.some((d) => d.bloquante)) return { arret: 'bloquante', semaines: n, msParSemaine: total / n };
     if (maintenant.some((d) => derniereChance(d) && !derniereChanceAvant.has(cle(d)))) return { arret: 'derniere_chance', semaines: n, msParSemaine: total / n };
     if (maintenant.some((d) => !avant.has(cle(d)))) return { arret: 'decision', semaines: n, msParSemaine: total / n };
     if (mode === 'grand_prix' && m.date.annee === annee && grandsPrix(m).filter((g) => g.termine).length > gpAvant) return { arret: 'grand_prix', semaines: n, msParSemaine: total / n };

@@ -99,13 +99,22 @@ export const ESTIMATION = { demiLargeurJeune: 3, demiLargeurVeteran: 0.8, ageVet
  */
 export const RETRAITE = {
   base: 0.01, parAnneeApresPlateau: 0.07, declinRessenti: 2, parSaisonLibre: 0.25, ambition: 0.01, envieTitre: 0.08,
-  ageMinimalPilote: 30, ageMinimalPersonnel: 52, ageMaximal: 75, facteurSousContrat: 0.3,
+  ageMinimalPilote: 30, ageMinimalPersonnel: 52, ageMaximal: 75,
+  /** Personnel (hors pilotes) : on termine en général son contrat (probabilité multipliée). D-167 : ne s'applique plus aux pilotes. */
+  facteurSousContrat: 0.3,
   /**
-   * Audit 6.4 : au-delà de cet âge, un pilote n'est plus « protégé » par son contrat (facteur sous contrat, contrat signé pour la
-   * suite) : sinon, prolongé ou recruté chaque été, un pilote demandé ne terminait jamais son contrat (titulaire à 51 ans). (H)
+   * D-167 (décision du porteur : « 35 ans, c'est déjà une très belle carrière ; certains partent dès 32 ») : pour un pilote, envie
+   * d'arrêter qui croît avec l'âge, indépendamment de son apogée (probabilité ajoutée par an au-delà de `agePilote`, H).
    */
-  ageFinProtectionPilote: 41,
+  agePilote: 30, parAnneeAgePilote: 0.05,
 };
+
+/**
+ * D-167 : la retraite d'un pilote s'annonce avant le marché (comme dans la réalité), à la semaine `semaine` ; il termine sa saison
+ * mais ne signe plus rien. En fin de saison, un pilote sous contrat qui n'a rien annoncé peut encore arrêter par surprise :
+ * probabilité de l'année multipliée par `partSurprise` (rare, H).
+ */
+export const ANNONCE_RETRAITE = { semaine: 24, partSurprise: 0.1 };
 /** Retour après une retraite (D-072) : années maximales, ambition et niveau minimaux, probabilité annuelle. */
 export const RETOUR = { anneesMax: 2, ambitionMin: 14, niveauMin: 14, probabilite: 0.15 };
 /** Abandon des jeunes pilotes qui n'ont jamais eu de baquet en F1 (D-101) : probabilité annuelle par âge. */

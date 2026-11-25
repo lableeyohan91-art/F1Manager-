@@ -147,7 +147,7 @@ export function EcranFinances({ partie, nav }: { partie: Partie; nav: Navigation
           <input class="num" inputMode="decimal" value={montant} onInput={(v) => setMontant((v.target as HTMLInputElement).value)} />
         </label>
         <div class="actions"><button class="btn principal" onClick={() => { noter(commander(partie, 'budget.developpement', { ecurie: e.id, montant: Number(montant.replace(',', '.')) }), 'Budget modifié pour le reste de l’année.'); nav.rafraichir(); }}>Appliquer</button></div>
-        <p class="muted petit">Plus de développement = une voiture qui progresse plus vite, mais une trésorerie qui baisse. Si la trésorerie de fin d’année devient négative, la direction financière coupe le développement (même règle que pour l’IA). Dépasser le plafond expose aux sanctions. Le budget est reproposé chaque mois de janvier.</p>
+        <p class="muted petit">Plus de développement = une voiture qui progresse plus vite, mais une trésorerie qui baisse. La voiture progresse selon l’argent réellement payé : un changement agit dès l’écriture comptable suivante (toutes les 4 semaines), et vous pouvez le modifier à tout moment. Si la trésorerie de fin d’année devient négative, la direction financière coupe le développement (même règle que pour l’IA). Dépasser le plafond expose aux sanctions. Le budget est reproposé chaque mois de janvier.</p>
       </div>
       <div class="carte">
         <h3>Années précédentes</h3>

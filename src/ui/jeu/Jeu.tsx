@@ -59,7 +59,7 @@ export function Jeu() {
     const r = await avancer(p, mode, (n) => setCalcul(`Simulation… ${n} semaine(s)`));
     setCalcul(null);
     const textes: Record<ArretAvance, string> = {
-      decision: 'Arrêt : une décision vous attend.', urgence: 'Arrêt : l’échéance d’une décision approche.', derniere_chance: 'Arrêt : dernière semaine pour répondre à une décision.', marche: 'Le marché des transferts est ouvert.',
+      bloquante: '❗ Une demande attend votre réponse : répondez-y (ou choisissez « ne pas répondre ») pour continuer.', decision: 'Arrêt : une décision vous attend.', urgence: 'Arrêt : l’échéance d’une décision approche.', derniere_chance: 'Arrêt : dernière semaine pour répondre à une décision.', marche: 'Le marché des transferts est ouvert.',
       grand_prix: 'Grand Prix couru.', fin_de_saison: 'Fin de saison.',
       fin_de_partie: 'Le conseil vous a remplacé.', limite: 'Une saison s’est écoulée.', semaine: '',
     };
@@ -327,8 +327,8 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
         {decisions.length === 0 ? <p class="muted">Rien ne vous attend. Les domaines délégués sont gérés par votre équipe.</p> : (
           <ul class="liste-decisions">
             {decisions.map((d, i) => (
-              <li key={i} class={d.urgente ? 'urgente' : ''} onClick={cibleDecision(d, nav)}>
-                <span class="etiquette">{LIB_DECISION[d.type] ?? d.type}</span>
+              <li key={i} class={d.bloquante ? 'bloquante' : d.urgente ? 'urgente' : ''} onClick={cibleDecision(d, nav)}>
+                <span class="etiquette">{d.bloquante ? '❗ ' : ''}{LIB_DECISION[d.type] ?? d.type}</span>
                 <div>
                   <strong>{d.titre}</strong>
                   <div class="muted">{d.detail}</div>

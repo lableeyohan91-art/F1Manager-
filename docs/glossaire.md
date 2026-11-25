@@ -229,3 +229,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Circuit permanent** | Circuit du vivier présent à chaque saison (10 au départ). |
 | **Rotation (des circuits)** | Partage des places restantes du calendrier : contrats en cours, puis circuits absents depuis le plus longtemps, sans tirage. |
 | **Perte nette au stand** | Temps perdu par un arrêt par rapport à un tour sans arrêt : temps de passage dans la voie moins le temps de la même distance en piste. À ne pas confondre avec le temps de passage. |
+| **Retraite annoncée** | Décision d'un pilote, rendue publique en semaine 24 (avant le marché), d'arrêter à la fin de la saison : il ne signe plus rien et son contrat prend fin avec la saison (D-167). |
+| **Retraite surprise** | Retraite décidée en fin de saison par un pilote qui avait une suite (contrat en cours ou signé) sans l'avoir annoncée ; rare (D-167). |
+| **Demande bloquante** | Demande d'une personne d'un domaine non délégué (augmentation, départ, contre-proposition) qui arrête l'avance du temps tant que le joueur n'a pas répondu ou choisi « ne pas répondre » (D-168). |
+| **Argent réellement payé** | Dépenses plafonnées débitées à la dernière écriture comptable, ramenées à l'année ; c'est ce que lit la progression des voitures (D-166). |

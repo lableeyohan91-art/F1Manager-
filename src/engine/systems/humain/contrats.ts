@@ -86,7 +86,7 @@ export function proposerProlongation(monde: Monde, c: Contrat, auteur: string, s
   // Audit n°3 : garde commune à toutes les prolongations (joueur, IA, conseil, contre-attaque) — pas de dépassement d'effectif.
   // Phase 10 (correction) : des prolongations successives ne cumulent pas leurs durées au-delà de la durée maximale d'un contrat.
   // Audit 6.1 : une personne qui a déjà signé ailleurs pour la suite ne peut plus être prolongée (deux contrats sur la même saison).
-  const effectif = motifDejaSigne(monde, c) ?? motifRefusEffectif(monde, c.organisation, c.personne, c.poste, c.fin + 1, Math.max(c.fin, monde.date.annee) + duree)
+  const effectif = (p.retraiteAnnoncee !== undefined ? `${p.prenom} ${p.nom} a annoncé sa retraite en fin de saison.` : null) ?? motifDejaSigne(monde, c) ?? motifRefusEffectif(monde, c.organisation, c.personne, c.poste, c.fin + 1, Math.max(c.fin, monde.date.annee) + duree)
     ?? (Math.max(c.fin, monde.date.annee) + duree > monde.date.annee + BORNES_CONTRAT.dureeMax ? `Un contrat ne peut pas aller au-delà de ${monde.date.annee + BORNES_CONTRAT.dureeMax}.` : null);
   if (effectif) {
     const evt = ajouterEvenement(monde, {

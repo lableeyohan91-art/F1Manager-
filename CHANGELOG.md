@@ -561,3 +561,21 @@ Aucun code à ce stade.
 - Grands Prix à la semaine de leur date habituelle.
 - Budget de développement modifiable une fois par trimestre.
 - D-165 ; rapport `docs/rapports/audit-phases-1-11/rapport.md` ; 16 tests (`tests/audit-nuit.test.ts`).
+
+## [D-166 à D-168 — réponses du porteur sur l'audit] — 25/11/2026
+
+### Modifié
+- Budget (D-166) :
+  - la voiture progresse selon l'argent réellement payé (dernière écriture comptable) ;
+  - le budget de développement se modifie à tout moment (fin de la limite trimestrielle).
+- Retraites des pilotes (D-167) :
+  - annoncées en semaine 24, avant le marché ;
+  - plus aucune protection par le contrat ;
+  - retraite surprise rare en fin de saison ;
+  - carrières plus courtes : âge moyen de retraite volontaire des titulaires 37,4 → 34,5 ans, plus aucun titulaire de 40 ans ou plus.
+- Demandes bloquantes (D-168) :
+  - augmentation, départ et contre-proposition (domaine non délégué) arrêtent le temps, marquées « ❗ » ;
+  - nouveau choix « Ne pas répondre » (commande `demande.ignorer`).
+- Format de sauvegarde 30 (migration testée).
+- Rapport `docs/rapports/d166-d168/rapport.md` ; outil `tools/retraites-pilotes.mts` ; laboratoire de démographie enrichi.
+

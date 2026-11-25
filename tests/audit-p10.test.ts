@@ -164,15 +164,17 @@ describe('Audit P10 — arbitrages du porteur', () => {
     expect(decisionsEnAttente(m).some((d) => d.personne === p.id)).toBe(false);
   });
 
-  it('3. « Jusqu’au Grand Prix » s’arrête la dernière semaine avant une échéance, même si la décision était déjà connue', async () => {
+  it('3 et D-168. une demande de départ bloque l’avance : le temps ne dépasse jamais son échéance', async () => {
     const { avancer } = await import('../src/ui/jeu/partie');
     const { m } = partie();
     const moteur = sc.creerMoteur();
     moteur.avancer(m, 3);
     contratEmploi(m, autre(m).id)!.demandeDepart = { indemnite: 0.2, depuis: { ...m.date } };
     const echeance = decisionsEnAttente(m).find((d) => d.type === 'depart')!.echeance!;
+    const date = { ...m.date };
     const r = await avancer({ monde: m, moteur }, 'grand_prix', () => undefined, 30);
-    expect(['derniere_chance', 'urgence', 'decision', 'grand_prix']).toContain(r.arret);
+    expect(r).toMatchObject({ arret: 'bloquante', semaines: 0 }); // D-168 : demande bloquante, le temps n'avance pas
+    expect(m.date).toEqual(date);
     // Quoi qu'il arrive, on n'a pas dépassé l'échéance.
     expect(m.date.annee * 52 + m.date.semaine).toBeLessThanOrEqual(echeance.annee * 52 + echeance.semaine);
     for (let i = 0; i < 10 && m.date.semaine < echeance.semaine - 1; i++) await avancer({ monde: m, moteur }, 'grand_prix', () => undefined, 30);

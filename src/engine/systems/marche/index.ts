@@ -136,6 +136,7 @@ export function indexerContrats(monde: Monde): IndexContrats {
 
 export function disponibilite(monde: Monde, p: Personne, e: Ecurie, debut: number, idx?: IndexContrats, poste: Poste = POSTE_MARCHE): Disponibilite | string {
   if (p.statut === 'retraite') return 'Cette personne a pris sa retraite.';
+  if (p.retraiteAnnoncee !== undefined) return 'Cette personne a annoncé sa retraite en fin de saison.'; // D-167
   if (estPilote(poste)) {
     if (!p.poste.startsWith('pilote')) return 'Seul un pilote peut occuper un baquet de titulaire.';
     if (debut - p.anneeNaissance < AGE_MINIMAL_F1) return `Trop jeune pour la F1 à cette date (âge minimal ${AGE_MINIMAL_F1} ans).`;
@@ -441,7 +442,7 @@ interface Cible { p: Personne; score: number; salaire: number; duree: number; in
 /** Vivier commun du tour : présélection sur l'opinion du paddock (niveau et potentiel estimé publics), pour borner le calcul. */
 function vivier(monde: Monde): Personne[] {
   const notes = personnes(monde)
-    .filter((p) => p.statut !== 'retraite' && p.poste.startsWith('pilote') && monde.date.annee + 1 - p.anneeNaissance >= AGE_MINIMAL_F1)
+    .filter((p) => p.statut !== 'retraite' && p.retraiteAnnoncee === undefined && p.poste.startsWith('pilote') && monde.date.annee + 1 - p.anneeNaissance >= AGE_MINIMAL_F1)
     .map((p) => ({ p, v: niveauMetier(p) + 0.5 * Math.max(0, potentielEstime(monde, null, p).centre - niveauMetier(p)) }))
     .sort((a, b) => b.v - a.v || (a.p.id < b.p.id ? -1 : 1));
   const sportifs = notes.slice(0, PLAN_MARCHE.vivier).map((x) => x.p);

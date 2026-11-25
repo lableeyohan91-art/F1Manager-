@@ -10,7 +10,7 @@
 
 import {
   ABANDON_AGE_MIN, ABANDON_AGE_QUASI_CERTAIN, ABANDON_JEUNES, ABANDON_PROBABILITE_MAX, ALEA_PROGRESSION, ARCHETYPES, DECLIC, DECLIN, ENCADREMENT,
-  MENTOR, MOTIVATION_PROGRESSION, NATURE_COMPETENCE, NATURES, PROGRESSION_PLATEAU, RECONVERSION, RETOUR, RETRAITE, STAGNATION, TAUX_PROGRESSION,
+  ANNONCE_RETRAITE, MENTOR, MOTIVATION_PROGRESSION, NATURE_COMPETENCE, NATURES, PROGRESSION_PLATEAU, RECONVERSION, RETOUR, RETRAITE, STAGNATION, TAUX_PROGRESSION,
   TEMPS_DE_JEU, TRAVAIL, ARCHIVAGE,
 } from '../../balance/carriere';
 import { COMPETENCES_TRANSVERSALES } from '../../balance/personnages';
@@ -147,6 +147,34 @@ function tirerPhaseSpeciale(monde: Monde, p: Personne): void {
 
 /* ---------------------------------------------------------------- Fin de carrière (semaine 49) */
 
+function contratsSignes(monde: Monde, p: Personne): Contrat[] {
+  return (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).filter((c) => c.personne === p.id && c.statut === 'signe' && c.type === 'emploi');
+}
+
+/**
+ * D-167 : annonces de retraite des pilotes, avant l'ouverture du marché. Le pilote termine la saison ; son contrat prend fin avec
+ * elle et un éventuel contrat signé pour la suite est annulé : son écurie a tout le marché pour le remplacer.
+ */
+export function annoncerRetraites(monde: Monde): void {
+  const annee = monde.date.annee;
+  for (const p of personnes(monde)) {
+    if (!estPilote(p) || p.statut !== 'actif' || p.retraiteAnnoncee !== undefined || p.joueur) continue;
+    if (!tirageLocal(monde, 'carriere.annonce', p.id, annee).chance(probabiliteRetraite(monde, p))) continue;
+    p.retraiteAnnoncee = annee;
+    const t = titres(monde, p);
+    const evt = ajouterEvenement(monde, {
+      type: 'personne.retraite_annoncee', acteurs: [{ id: p.id, role: 'personne' }, ...(p.ecurie ? [{ id: p.ecurie, role: 'organisation' }] : [])],
+      importance: t > 0 ? 4 : (p.carriere?.saisonsF1 ?? 0) > 0 ? 3 : 2, visibilite: 'public',
+      contexte: { age: annee - p.anneeNaissance, titres: t, saisonsF1: p.carriere?.saisonsF1 ?? 0 },
+      texte: `${p.prenom} ${p.nom} annonce qu'il mettra fin à sa carrière à l'issue de la saison ${annee}.`,
+    });
+    const c = contratActif(monde, p);
+    if (c && c.fin > annee) c.fin = annee; // le contrat prend fin avec la saison (aucune indemnité : décision annoncée)
+    for (const s of contratsSignes(monde, p)) { s.statut = 'rompu'; s.motifFin = 'demission'; }
+    void evt;
+  }
+}
+
 function contratActif(monde: Monde, p: Personne): Contrat | undefined {
   return (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).find((c) => c.personne === p.id && c.statut === 'actif' && c.type === 'emploi');
 }
@@ -170,16 +198,21 @@ export function probabiliteRetraite(monde: Monde, p: Personne): number {
   const libre = p.statut === 'libre' && p.libreDepuis !== undefined ? monde.date.annee - p.libreDepuis : 0;
   const reveTitre = p.aspirations.some((a) => a.type === 'etre_champion') && titres(monde, p) === 0 && p.poste === 'pilote_titulaire' ? RETRAITE.envieTitre : 0;
   let pr = RETRAITE.base + RETRAITE.parAnneeApresPlateau * Math.max(0, age - k.finApogee) + RETRAITE.declinRessenti * declinRessenti
-    + RETRAITE.parSaisonLibre * libre - RETRAITE.ambition * ((p.traits['ambition'] ?? 10) - 10) - reveTitre;
+    + RETRAITE.parSaisonLibre * libre - RETRAITE.ambition * ((p.traits['ambition'] ?? 10) - 10) - reveTitre
+    + (estPilote(p) ? RETRAITE.parAnneeAgePilote * Math.max(0, age - RETRAITE.agePilote) : 0);
+  // Le personnel termine en général son contrat. D-167 : un pilote n'est jamais protégé par son contrat (il annonce sa retraite
+  // avant le marché, et le contrat prend fin avec la saison).
   const c = contratActif(monde, p);
-  // On termine en général son contrat ; plus au-delà d'un âge réaliste de fin de carrière (audit 6.4).
-  if (c && c.fin > monde.date.annee && !(estPilote(p) && age >= RETRAITE.ageFinProtectionPilote)) pr *= RETRAITE.facteurSousContrat;
+  if (!estPilote(p) && c && c.fin > monde.date.annee) pr *= RETRAITE.facteurSousContrat;
   return borner(pr, 0, 1);
 }
 
 function prendreRetraite(monde: Monde, p: Personne, motif: string): void {
   const c = contratActif(monde, p);
   if (c) liberer(monde, p, c, 'demission');
+  // D-167 : une retraite surprise annule un contrat signé pour la suite (l'écurie le sait tout de suite, pas à la saison suivante).
+  for (const s of contratsSignes(monde, p)) { s.statut = 'rompu'; s.motifFin = 'demission'; }
+  delete p.retraiteAnnoncee;
   p.statut = 'retraite';
   p.ecurie = '';
   p.retraiteDepuis = monde.date.annee;
@@ -234,8 +267,9 @@ export function bilanCarrieres(monde: Monde): void {
       continue;
     }
     tirerPhaseSpeciale(monde, p);
-    // Phase 7a : on ne quitte pas le métier juste après avoir signé un contrat qui commence bientôt.
-    const vientDeSigner = signes.has(p.id) && !(estPilote(p) && annee - p.anneeNaissance >= RETRAITE.ageFinProtectionPilote); // audit 6.4
+    // Phase 7a : on ne quitte pas le métier juste après avoir signé un contrat qui commence bientôt. D-167 : sauf un pilote (il
+    // annonce sa retraite avant le marché ; en fin de saison, il ne reste qu'une petite chance de surprise).
+    const vientDeSigner = signes.has(p.id) && !estPilote(p);
     if (p.statut === 'actif') {
       k.saisonsActives++;
       if (p.poste === 'pilote_titulaire') k.saisonsF1++;
@@ -251,8 +285,17 @@ export function bilanCarrieres(monde: Monde): void {
         continue;
       }
     }
-    if (!vientDeSigner && f.chance(probabiliteRetraite(monde, p))) {
-      prendreRetraite(monde, p, p.statut === 'libre' ? 'sans contrat' : 'choix personnel');
+    // D-167 : retraite annoncée avant le marché, effective en fin de saison.
+    if (p.retraiteAnnoncee !== undefined && p.retraiteAnnoncee <= annee) {
+      prendreRetraite(monde, p, 'retraite annoncée');
+      tenterReconversion(monde, p, f);
+      continue;
+    }
+    // Pilote sous contrat (ou déjà signé pour la suite) sans annonce : seulement une surprise rare (D-167).
+    const suite = contratActif(monde, p);
+    const surprise = estPilote(p) && ((!!suite && suite.fin > annee) || signes.has(p.id));
+    if (!vientDeSigner && f.chance(probabiliteRetraite(monde, p) * (surprise ? ANNONCE_RETRAITE.partSurprise : 1))) {
+      prendreRetraite(monde, p, p.statut === 'libre' ? 'sans contrat' : surprise ? 'retraite surprise' : 'choix personnel');
       tenterReconversion(monde, p, f);
     }
   }
@@ -269,6 +312,14 @@ export const systemeProgression: Systeme = {
     for (const p of tous) if (p.statut === 'actif' && p.ecurie) parEcurie.set(p.ecurie, [...(parEcurie.get(p.ecurie) ?? []), p]);
     const installations = indexInstallations(monde);
     for (const p of tous) faireProgresser(monde, p, p.statut === 'actif' ? (parEcurie.get(p.ecurie) ?? []) : [], installations);
+  },
+};
+
+/** D-167 : annonces de retraite des pilotes avant l'ouverture du marché. */
+export const systemeAnnoncesRetraite: Systeme = {
+  nom: 'carriere.annonces',
+  executer({ monde, date }) {
+    if (date.semaine === ANNONCE_RETRAITE.semaine) annoncerRetraites(monde);
   },
 };
 
@@ -329,5 +380,5 @@ export function archiverRetraites(monde: Monde): number {
 
 /** À installer après les systèmes humains (contrats) : la retraite libère les postes avant les fins de contrat. */
 export function installerCarriere(moteur: Moteur): Moteur {
-  return moteur.ajouterSysteme(systemeProgression).ajouterSysteme(systemeBilanCarrieres).ajouterSysteme(systemeCohorte);
+  return moteur.ajouterSysteme(systemeProgression).ajouterSysteme(systemeAnnoncesRetraite).ajouterSysteme(systemeBilanCarrieres).ajouterSysteme(systemeCohorte);
 }

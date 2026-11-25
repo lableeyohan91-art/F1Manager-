@@ -301,6 +301,16 @@ const MIGRATIONS: Record<number, Migration> = {
   // v28 → v29 (phase 11b) : vivier de circuits et climat mensuel. Une partie antérieure n'a pas de vivier (il vient des données) :
   // elle garde son calendrier (les N premiers circuits, 24 au départ) et ses classes de pluie. Aucune donnée n'est modifiée.
   28: (m) => ({ ...m, versionFormat: 29 }),
+  // v29 → v30 (D-166, D-167, D-168) : argent réellement payé (lu à partir de la prochaine écriture comptable ; avant, le budget
+  // prévu, comme jusqu'ici), annonces de retraite (aucune en cours dans une partie antérieure : les pilotes de la saison en cours
+  // peuvent encore arrêter en fin de saison, au taux de surprise), demandes bloquantes (calculées, rien à stocker).
+  29: (m) => {
+    for (const f of Object.values((m.tables as Record<string, Record<string, unknown>>)['finances'] ?? {})) {
+      const b = (f as { budget?: { choixTP?: { le?: unknown } } }).budget;
+      if (b?.choixTP) delete b.choixTP.le; // D-166 : plus de délai entre deux modifications du budget
+    }
+    return { ...m, versionFormat: 30 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

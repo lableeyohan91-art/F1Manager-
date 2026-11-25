@@ -146,6 +146,7 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
             <button class="btn principal" onClick={() => agir('contrat.repondre_augmentation', { accepter: true }, 'Augmentation accordée.')}>Accorder</button>
             <button class="btn" onClick={() => agir('contrat.repondre_augmentation', { accepter: false, justification: true }, 'Refusée, en expliquant pourquoi.')}>Refuser en expliquant</button>
             <button class="btn" onClick={() => agir('contrat.repondre_augmentation', { accepter: false }, 'Refusée.')}>Refuser</button>
+            <button class="btn" onClick={() => agir('demande.ignorer', { ecurie: c.organisation, demande: 'augmentation' }, 'Demande laissée sans réponse : elle la vit comme un refus.')}>Ne pas répondre</button>
           </div>
         </div>
       )}
@@ -155,6 +156,7 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
           <div class="actions">
             <button class="btn" onClick={() => agir('contrat.repondre_depart', { accepter: true }, 'Départ accepté.')}>Accepter</button>
             <button class="btn" onClick={() => agir('contrat.repondre_depart', { accepter: false }, 'Départ refusé.')}>Refuser</button>
+            <button class="btn" onClick={() => agir('demande.ignorer', { ecurie: c.organisation, demande: 'depart' }, 'Demande laissée sans réponse : elle la vit comme un refus.')}>Ne pas répondre</button>
           </div>
           <p class="muted petit">Un refus peut mener à une démission si l’envie de partir est forte.</p>
         </div>
@@ -163,7 +165,8 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
         <h3>Contrat</h3>
         {nego && (
           <p>Contre-proposition : <strong>{nego.salaireDemande} M€</strong> par an sur {nego.dureeAnnees} an(s).{' '}
-            <button class="btn principal" onClick={() => prolonger(nego.salaireDemande, nego.dureeAnnees, 1)}>Accepter sa demande</button></p>
+            <button class="btn principal" onClick={() => prolonger(nego.salaireDemande, nego.dureeAnnees, 1)}>Accepter sa demande</button>{' '}
+            <button class="btn" onClick={() => agir('demande.ignorer', { ecurie: c.organisation, demande: 'contre_offre' }, 'Contre-proposition laissée sans réponse : le contrat ne sera pas prolongé.')}>Ne pas répondre</button></p>
         )}
         <div class="ligne-champs">
           <label class="champ">Salaire (M€/an) <input class="num" inputMode="decimal" value={salaire} onInput={(v) => setSalaire((v.target as HTMLInputElement).value)} /></label>

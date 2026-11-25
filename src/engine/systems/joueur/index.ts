@@ -12,7 +12,7 @@
 import { BUDGET_JOUEUR, DELEGATION_RECHERCHE_DEFAUT, DELEGATION_STANDS_DEFAUT, DELEGATIONS_DEFAUT, MANAGER_JOUEUR, URGENCE_SEMAINES } from '../../balance/joueur';
 import { DEVELOPPEMENT_MINIMUM } from '../../balance/finances';
 import { COMPETENCES_PAR_POSTE, COMPETENCES_TRANSVERSALES } from '../../balance/personnages';
-import { SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS } from '../../balance/contrats';
+import { DEMANDE_AUGMENTATION, SEMAINE_FIN_CONTRATS, SEMAINE_NEGOCIATIONS } from '../../balance/contrats';
 import { DEMANDES_DEPART } from '../../balance/departs';
 import { CALENDRIER_REGLEMENT } from '../../balance/technique';
 import { AUTRES_VOTES, FEDERATION } from '../../balance/politique';
@@ -24,7 +24,9 @@ import { idsTries, table, type Monde } from '../../core/monde';
 import type { Moteur, Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Ecurie, type Personne, type Poste } from '../../model/types';
 import { genererPersonne } from '../../generation/construction';
-import { contratEmploi, creerContrat, deciderProlongation, liberer, pourvoirPostes, TABLE_NEGOCIATIONS, type NegociationEnCours } from '../humain/contrats';
+import { contratEmploi, creerContrat, deciderProlongation, liberer, nePasProlonger, pourvoirPostes, TABLE_NEGOCIATIONS, type NegociationEnCours } from '../humain/contrats';
+import { repondreAugmentation } from '../humain/interactions';
+import { repondreDepart } from '../humain/departs';
 import { reprendreProlongationsPilotes } from '../marche';
 import { teamPrincipal, valeurMarche } from '../humain/decision';
 import { placesLibres } from '../humain/effectifs';
@@ -193,10 +195,7 @@ export const commandeBudgetDeveloppement: DefinitionCommande = {
     if (typeof m !== 'number' || !Number.isFinite(m)) return 'Montant invalide.';
     if (m < DEVELOPPEMENT_MINIMUM) return `Le développement ne descend pas sous ${DEVELOPPEMENT_MINIMUM} M€ par an.`;
     if (m > budgetMaxJoueur(monde)) return `Au plus ${budgetMaxJoueur(monde)} M€ par an.`;
-    // Audit 5.1 : une modification par trimestre (sinon, budget haut juste avant chaque étape de développement et bas avant chaque
-    // écriture comptable : plafond contourné).
-    const choix = financesDe(monde, id)!.budget.choixTP;
-    if (choix && rangSemaine(monde.date) - rangSemaine(choix.le) < BUDGET_JOUEUR.delaiModificationSemaines) return `Le budget de développement se modifie au plus une fois toutes les ${BUDGET_JOUEUR.delaiModificationSemaines} semaines.`;
+    // D-166 : modifiable à tout moment ; la progression suit l'argent réellement payé (le contournement du constat 5.1 n'a plus d'intérêt).
     return null;
   },
   appliquer({ monde }, c) {
@@ -207,12 +206,51 @@ export const commandeBudgetDeveloppement: DefinitionCommande = {
     fi.budget.strategie = 'choix_du_team_principal';
     // Audit 10.2 : le choix vaut pour la saison en cours, ou pour la suivante si le budget annuel n'est pas encore bâti ; le budget
     // annuel le garde au lieu de l'écraser.
-    fi.budget.choixTP = { annee: monde.date.annee, montantMEUR: fi.budget.developpementMEUR, le: { ...monde.date } };
+    fi.budget.choixTP = { annee: monde.date.annee, montantMEUR: fi.budget.developpementMEUR };
     ajouterEvenement(monde, {
       type: 'finances.budget_modifie', acteurs: [{ id: c.auteur, role: 'auteur' }, { id, role: 'ecurie' }], importance: 1, visibilite: 'prive',
       contexte: { avant, apres: fi.budget.developpementMEUR },
       texte: `Budget de développement porté de ${avant} à ${fi.budget.developpementMEUR} M€ pour ${monde.date.annee}.`,
     });
+  },
+};
+
+/* ------------------------------------------------------------------ D-168 : « ne pas répondre » */
+
+/**
+ * Le team principal choisit de ne pas répondre à une demande (augmentation, départ, contre-proposition de fin de contrat).
+ * C'est une décision : la personne la vit comme un refus (mêmes conséquences que le silence au bout du délai), tout de suite.
+ */
+export const commandeIgnorerDemande: DefinitionCommande = {
+  type: 'demande.ignorer',
+  valider(monde, c) {
+    const id = String(c.parametres['ecurie'] ?? '');
+    const tp = teamPrincipal(monde, id);
+    if (!tp || tp.id !== c.auteur) return 'Seul le team principal répond aux demandes.';
+    const contrat = contratEmploi(monde, String(c.parametres['personne'] ?? ''));
+    if (!contrat || contrat.organisation !== id) return 'Cette personne ne travaille pas pour l’écurie.';
+    const demande = c.parametres['demande'];
+    if (demande === 'augmentation') return contrat.demandeAugmentation !== undefined ? null : 'Aucune demande d’augmentation en attente.';
+    if (demande === 'depart') return contrat.demandeDepart && !contrat.demandeDepart.refusee ? null : 'Aucune demande de départ en attente.';
+    if (demande === 'contre_offre') return (table(monde, TABLE_NEGOCIATIONS) as unknown as Record<string, NegociationEnCours>)[contrat.id] ? null : 'Aucune contre-proposition en attente.';
+    return 'Demande inconnue (augmentation, depart ou contre_offre).';
+  },
+  appliquer({ monde }, c) {
+    const id = String(c.parametres['ecurie']);
+    const tp = teamPrincipal(monde, id)!;
+    const contrat = contratEmploi(monde, String(c.parametres['personne']))!;
+    const p = table(monde, TABLES.personnes)[contrat.personne] as unknown as Personne;
+    const demande = String(c.parametres['demande']);
+    const evt = ajouterEvenement(monde, {
+      type: 'demande.sans_reponse', acteurs: [{ id: tp.id, role: 'auteur' }, { id: p.id, role: 'cible' }, { id, role: 'organisation' }], importance: 1, visibilite: 'prive',
+      contexte: { demande }, texte: `${tp.prenom} ${tp.nom} laisse sans réponse la demande de ${p.prenom} ${p.nom}.`,
+    });
+    if (demande === 'augmentation') repondreAugmentation(monde, tp, p, false, false);
+    else if (demande === 'depart') repondreDepart(monde, tp, p, false);
+    else {
+      delete (table(monde, TABLE_NEGOCIATIONS) as unknown as Record<string, NegociationEnCours>)[contrat.id];
+      nePasProlonger(monde, contrat, tp.id, 'contre-proposition laissée sans réponse', [evt.id]);
+    }
   },
 };
 
@@ -231,6 +269,11 @@ export interface DecisionEnAttente {
   consequence: string;
   echeance?: DateJeu;
   urgente: boolean;
+  /**
+   * D-168 : décision qui bloque l'avance du temps tant que le joueur n'a pas répondu (accepter, refuser ou « ne pas répondre »),
+   * comme dans Football Manager. Seules les demandes de personnes d'un domaine NON délégué bloquent.
+   */
+  bloquante: boolean;
   personne?: string;
   contrat?: string;
   poste?: Poste;
@@ -258,19 +301,19 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
     const n = negos[c.id];
     if (n) {
       const ech = { annee, semaine: SEMAINE_FIN_CONTRATS };
-      res.push({ type: 'contre_offre', titre: `${nomDe(p)} : contre-proposition`, detail: `Demande ${n.salaireDemande} M€ par an sur ${n.dureeAnnees} an(s).`, consequence: 'Sans nouvelle offre, le contrat se termine à son échéance.', echeance: ech, urgente: urgente(ech), personne: p.id, contrat: c.id, poste: c.poste });
+      res.push({ type: 'contre_offre', titre: `${nomDe(p)} : contre-proposition`, detail: `Demande ${n.salaireDemande} M€ par an sur ${n.dureeAnnees} an(s).`, consequence: 'Sans nouvelle offre, le contrat se termine à son échéance.', echeance: ech, urgente: urgente(ech), bloquante: !delegue, personne: p.id, contrat: c.id, poste: c.poste });
     }
     if (c.demandeAugmentation !== undefined && !delegue) {
-      res.push({ type: 'augmentation', titre: `${nomDe(p)} demande une augmentation`, detail: `Salaire actuel ${c.salaireMEUR} M€, demande ${c.demandeAugmentation} M€.`, consequence: 'La demande reste en attente ; la personne s’en souvient.', urgente: false, personne: p.id, contrat: c.id, poste: c.poste });
+      res.push({ type: 'augmentation', titre: `${nomDe(p)} demande une augmentation`, detail: `Salaire actuel ${c.salaireMEUR} M€, demande ${c.demandeAugmentation} M€.`, consequence: `Sans réponse en ${DEMANDE_AUGMENTATION.delaiReponseSemaines} semaines, la demande vaut refus.`, urgente: false, bloquante: true, personne: p.id, contrat: c.id, poste: c.poste });
     }
     if (c.demandeDepart && !c.demandeDepart.refusee && !delegue) {
       // Audit de la phase 10 : calendrier du moteur (avant : semaine 44 + 8 semaines donnait la semaine 52 de l'année suivante).
       const ech = ajouterSemaines(c.demandeDepart.depuis, DEMANDES_DEPART.delaiReponseSemaines);
-      res.push({ type: 'depart', titre: `${nomDe(p)} demande à partir`, detail: `Départ à l’amiable contre une indemnité de ${c.demandeDepart.indemnite} M€.`, consequence: `Sans réponse en ${DEMANDES_DEPART.delaiReponseSemaines} semaines, la demande vaut refus.`, echeance: ech, urgente: urgente(ech), personne: p.id, contrat: c.id, poste: c.poste });
+      res.push({ type: 'depart', titre: `${nomDe(p)} demande à partir`, detail: `Départ à l’amiable contre une indemnité de ${c.demandeDepart.indemnite} M€.`, consequence: `Sans réponse en ${DEMANDES_DEPART.delaiReponseSemaines} semaines, la demande vaut refus.`, echeance: ech, urgente: urgente(ech), bloquante: true, personne: p.id, contrat: c.id, poste: c.poste });
     }
     if (c.fin === annee && !c.nonProlonge && !n && !delegue && monde.date.semaine < SEMAINE_FIN_CONTRATS) {
       const ech = { annee, semaine: SEMAINE_FIN_CONTRATS };
-      res.push({ type: 'fin_contrat', titre: `Contrat de ${nomDe(p)} : fin ${annee}`, detail: `${c.poste.replace(/_/g, ' ')}, ${c.salaireMEUR} M€ par an.`, consequence: 'Sans prolongation, la personne part en fin de saison.', echeance: ech, urgente: urgente(ech), personne: p.id, contrat: c.id, poste: c.poste });
+      res.push({ type: 'fin_contrat', titre: `Contrat de ${nomDe(p)} : fin ${annee}`, detail: `${c.poste.replace(/_/g, ' ')}, ${c.salaireMEUR} M€ par an.`, consequence: 'Sans prolongation, la personne part en fin de saison.', echeance: ech, urgente: urgente(ech), bloquante: false, personne: p.id, contrat: c.id, poste: c.poste });
     }
   }
   // Postes encore à pourvoir pour la saison suivante (contrats et pré-accords comptés).
@@ -281,7 +324,7 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
     // Audit de la phase 10 : seulement tant que le marché permet d'agir (avant : affiché jusqu'en semaine 49, échéance dépassée).
     if (libres > 0 && monde.date.semaine <= FENETRE.fin) {
       const ech = { annee, semaine: FENETRE.fin };
-      res.push({ type: 'poste_vacant', titre: `${libres > 1 ? `${libres} places` : 'Une place'} à pourvoir en ${suivante} : ${String(poste).replace(/_/g, ' ')}`, detail: `Marché ouvert de la semaine ${FENETRE.debut} à la semaine ${FENETRE.fin}.`, consequence: 'Sans recrutement, un remplaçant est engagé d’office en fin de saison.', echeance: ech, urgente: urgente(ech), poste: poste as Poste });
+      res.push({ type: 'poste_vacant', titre: `${libres > 1 ? `${libres} places` : 'Une place'} à pourvoir en ${suivante} : ${String(poste).replace(/_/g, ' ')}`, detail: `Marché ouvert de la semaine ${FENETRE.debut} à la semaine ${FENETRE.fin}.`, consequence: 'Sans recrutement, un remplaçant est engagé d’office en fin de saison.', echeance: ech, urgente: urgente(ech), bloquante: false, poste: poste as Poste });
     }
   }
   // Offres du marché : contre-propositions reçues.
@@ -289,44 +332,44 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
     if (o.ecurie !== idEcurie || o.statut !== 'contre_offre') continue;
     const p = personneDe(monde, o.personne);
     if (!p) continue;
-    res.push({ type: 'offre_marche', titre: `${nomDe(p)} fait une contre-proposition`, detail: `Votre offre : ${o.salaireMEUR} M€ par an.`, consequence: 'Sans nouvelle offre, la négociation s’arrête à la clôture du marché.', urgente: false, personne: p.id });
+    res.push({ type: 'offre_marche', titre: `${nomDe(p)} fait une contre-proposition`, detail: `Votre offre : ${o.salaireMEUR} M€ par an.`, consequence: 'Sans nouvelle offre, la négociation s’arrête à la clôture du marché.', urgente: false, bloquante: false, personne: p.id });
   }
   // Votes (domaine politique non délégué).
   if (!iaDecide(e, 'politique')) {
     const props = propositions(monde);
     if (props.length && !props[0]!.votes?.[idEcurie] && monde.date.semaine <= CALENDRIER_REGLEMENT.semaineVote) {
       const ech = { annee, semaine: CALENDRIER_REGLEMENT.semaineVote };
-      res.push({ type: 'vote_reglement', titre: 'Vote sur le prochain règlement', detail: `${props.length} réforme(s) proposée(s), ou prolongation du règlement actuel.`, consequence: 'Sans vote, l’écurie s’abstient.', echeance: ech, urgente: urgente(ech) });
+      res.push({ type: 'vote_reglement', titre: 'Vote sur le prochain règlement', detail: `${props.length} réforme(s) proposée(s), ou prolongation du règlement actuel.`, consequence: 'Sans vote, l’écurie s’abstient.', echeance: ech, urgente: urgente(ech), bloquante: false });
     }
     const f = federation(monde);
     if (f && annee === f.finMandat && monde.date.semaine <= FEDERATION.semaineElection && !f.election?.votes[idEcurie]) {
       const ech = { annee, semaine: FEDERATION.semaineElection };
-      res.push({ type: 'election', titre: 'Élection à la présidence de la fédération', detail: 'Une voix par écurie.', consequence: 'Sans vote, l’écurie s’abstient.', echeance: ech, urgente: urgente(ech) });
+      res.push({ type: 'election', titre: 'Élection à la présidence de la fédération', detail: 'Une voix par écurie.', consequence: 'Sans vote, l’écurie s’abstient.', echeance: ech, urgente: urgente(ech), bloquante: false });
     }
     if (f?.vote && f.vote.annee === annee && monde.date.semaine <= AUTRES_VOTES.semaine && f.vote.votes[idEcurie] === undefined) {
       const ech = { annee, semaine: AUTRES_VOTES.semaine };
-      res.push({ type: 'vote_federation', titre: 'Vote de la fédération', detail: `Sujet : ${f.vote.sujet === 'plafondMEUR' ? 'plafond budgétaire' : f.vote.sujet === 'grandsPrix' ? 'nombre de Grands Prix' : 'restrictions aérodynamiques'}, valeur proposée ${f.vote.valeur}.`, consequence: 'Sans vote, l’écurie s’abstient.', echeance: ech, urgente: urgente(ech) });
+      res.push({ type: 'vote_federation', titre: 'Vote de la fédération', detail: `Sujet : ${f.vote.sujet === 'plafondMEUR' ? 'plafond budgétaire' : f.vote.sujet === 'grandsPrix' ? 'nombre de Grands Prix' : 'restrictions aérodynamiques'}, valeur proposée ${f.vote.valeur}.`, consequence: 'Sans vote, l’écurie s’abstient.', echeance: ech, urgente: urgente(ech), bloquante: false });
     }
   }
   // Phase 11 : questions de la presse (communication non déléguée).
   for (const c of Object.values(table(monde, TABLES.conferences)) as unknown as Conference[]) {
     if (c.ecurie !== idEcurie) continue;
-    res.push({ type: 'conference', titre: 'La presse vous interroge', detail: LIBELLES_QUESTIONS[c.question], consequence: 'Sans réponse, le service de communication esquive la question.', echeance: c.echeance, urgente: urgente(c.echeance), conference: c.id, ...(c.sujet && personneDe(monde, c.sujet) ? { personne: c.sujet } : {}) });
+    res.push({ type: 'conference', titre: 'La presse vous interroge', detail: LIBELLES_QUESTIONS[c.question], consequence: 'Sans réponse, le service de communication esquive la question.', echeance: c.echeance, urgente: urgente(c.echeance), bloquante: false, conference: c.id, ...(c.sujet && personneDe(monde, c.sujet) ? { personne: c.sujet } : {}) });
   }
   // Phase 11c : offres de contrat et opérations exceptionnelles des sponsors (domaine commercial non délégué).
   if (!iaDecide(e, 'commercial')) {
     for (const o of offresSponsors(monde, idEcurie)) {
       const s = table(monde, TABLES.sponsors)[o.sponsor] as unknown as { nom: string } | undefined;
-      res.push({ type: 'offre_sponsor', titre: `${s?.nom ?? 'Un sponsor'} : offre de sponsor ${o.rang === 'titre' ? 'titre' : 'principal'}`, detail: `${o.variantes.length} variante${o.variantes.length > 1 ? 's' : ''}, de ${Math.min(...o.variantes.map((v) => v.fixeMEUR))} à ${Math.max(...o.variantes.map((v) => v.fixeMEUR))} M€ de fixe par an.`, consequence: 'Sans réponse, votre directeur commercial choisit à l’échéance.', echeance: o.echeance, urgente: urgente(o.echeance), offreSponsor: o.id });
+      res.push({ type: 'offre_sponsor', titre: `${s?.nom ?? 'Un sponsor'} : offre de sponsor ${o.rang === 'titre' ? 'titre' : 'principal'}`, detail: `${o.variantes.length} variante${o.variantes.length > 1 ? 's' : ''}, de ${Math.min(...o.variantes.map((v) => v.fixeMEUR))} à ${Math.max(...o.variantes.map((v) => v.fixeMEUR))} M€ de fixe par an.`, consequence: 'Sans réponse, votre directeur commercial choisit à l’échéance.', echeance: o.echeance, urgente: urgente(o.echeance), bloquante: false, offreSponsor: o.id });
     }
     for (const op of operationsSponsors(monde, idEcurie)) {
       if (op.statut !== 'proposee') continue;
       const s = table(monde, TABLES.sponsors)[op.sponsor] as unknown as { nom: string } | undefined;
       const p = op.pilote ? personneDe(monde, op.pilote) : undefined;
-      res.push({ type: 'operation_sponsor', titre: `${s?.nom ?? 'Un sponsor'} propose une opération publicitaire`, detail: `${op.exploit === 'victoire' ? 'Première victoire' : op.exploit === 'podium' ? 'Premier podium' : 'Premier top 5'} depuis longtemps : ${p ? `avec ${nomDe(p)}` : 'pilote au choix'}, de ${Math.min(...op.formats.map((f) => f.montantMEUR))} à ${Math.max(...op.formats.map((f) => f.montantMEUR))} M€.`, consequence: 'Sans réponse avant le prochain Grand Prix, l’équipe décide.', echeance: op.echeance, urgente: urgente(op.echeance), operation: op.id, ...(p ? { personne: p.id } : {}) });
+      res.push({ type: 'operation_sponsor', titre: `${s?.nom ?? 'Un sponsor'} propose une opération publicitaire`, detail: `${op.exploit === 'victoire' ? 'Première victoire' : op.exploit === 'podium' ? 'Premier podium' : 'Premier top 5'} depuis longtemps : ${p ? `avec ${nomDe(p)}` : 'pilote au choix'}, de ${Math.min(...op.formats.map((f) => f.montantMEUR))} à ${Math.max(...op.formats.map((f) => f.montantMEUR))} M€.`, consequence: 'Sans réponse avant le prochain Grand Prix, l’équipe décide.', echeance: op.echeance, urgente: urgente(op.echeance), bloquante: false, operation: op.id, ...(p ? { personne: p.id } : {}) });
     }
   }
-  return res.sort((a, b) => Number(b.urgente) - Number(a.urgente) || (a.echeance ? rang(a.echeance) : 1e9) - (b.echeance ? rang(b.echeance) : 1e9));
+  return res.sort((a, b) => Number(b.bloquante) - Number(a.bloquante) || Number(b.urgente) - Number(a.urgente) || (a.echeance ? rang(a.echeance) : 1e9) - (b.echeance ? rang(b.echeance) : 1e9));
 }
 
 /* ------------------------------------------------------------------ Suivi : fin de partie */
@@ -385,6 +428,6 @@ export function executerCommandeJoueur(moteur: Moteur, monde: Monde, commande: O
 
 export function installerJoueur(moteur: Moteur): Moteur {
   moteur.ajouterSysteme(systemeSuiviJoueur);
-  moteur.commandes.enregistrer(commandePrendreEcurie).enregistrer(commandeDeleguerJoueur).enregistrer(commandeBudgetDeveloppement);
+  moteur.commandes.enregistrer(commandePrendreEcurie).enregistrer(commandeDeleguerJoueur).enregistrer(commandeBudgetDeveloppement).enregistrer(commandeIgnorerDemande);
   return moteur;
 }

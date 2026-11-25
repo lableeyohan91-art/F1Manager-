@@ -140,6 +140,12 @@ Ces choix ont été nécessaires pour corriger. Tu peux revenir sur chacun d'eux
 6. **Part pluvieuse 0,43** (vérifiée sur l'historique réel).
 7. **Grands Prix placés à la semaine de leur date habituelle.**
 
+> **Réponses du porteur (25/11/2026)** :
+> - validés : débauchage dans les deux sens, offre de sponsor tranchée 2 semaines avant, académie confiée à l'équipe ;
+> - budget une fois par trimestre → remplacé par **D-166** : la progression suit l'argent réellement payé, et le budget se modifie à tout moment ;
+> - protection de retraite jusqu'à 41 ans → remplacée par **D-167** : plus aucune protection, retraite annoncée avant le marché, carrières plus courtes ;
+> - silence = refus → complété par **D-168** : demandes bloquantes et option « ne pas répondre ».
+
 ## 6. Ce qui n'est pas corrigé, et pourquoi
 
 | Sujet | Raison | Quand |

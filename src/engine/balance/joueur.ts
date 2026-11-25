@@ -26,8 +26,7 @@ export const DELEGATION_STANDS_DEFAUT = true;
 export const MANAGER_JOUEUR = { trait: 10, valeur: 10, competence: 12, age: 45, dureeContratAnnees: 3 };
 
 /** Budget de développement fixé par le joueur (commande `budget.developpement`) : borne haute en multiple du plafond budgétaire. */
-/** delaiModificationSemaines (audit 5.1) : le budget de développement se modifie au plus une fois par trimestre (H). */
-export const BUDGET_JOUEUR = { maxEnPartDuPlafond: 1, delaiModificationSemaines: 13 };
+export const BUDGET_JOUEUR = { maxEnPartDuPlafond: 1 };
 
 /** Décisions en attente : nombre de semaines avant l'échéance au-delà duquel une décision n'est pas encore signalée comme urgente. */
 export const URGENCE_SEMAINES = 4;

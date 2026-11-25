@@ -196,6 +196,8 @@ export interface Personne {
   carriere?: CarrierePersonne;
   /** Année de retraite (retours possibles, D-072). */
   retraiteDepuis?: number;
+  /** D-167 : saison à la fin de laquelle le pilote a annoncé qu'il arrête (annonce faite avant le marché). */
+  retraiteAnnoncee?: number;
   /** Phase 6b : baquet junior de la saison en cours (la personne reste « libre » au sens de la F1, donc recrutable). */
   junior?: { categorie: 'apex3' | 'apex2'; ecurie: string; annee: number; prixMEUR?: number; subventionne?: boolean };
   /** Phase 6b : réputation sportive (0–100) — classements karting et Apex 4, résultats Apex 3 et Apex 2. */
@@ -790,9 +792,14 @@ export interface Finances {
   /** Budget de l'année en cours. */
   budget: {
     annee: number; developpementMEUR: number; plafondVise: number; strategie: string;
-    /** Audit 5.1 et 10.2 : choix du team principal (montant, saison visée, date) — gardé par le budget annuel, une modification par trimestre. */
-    choixTP?: { annee: number; montantMEUR: number; le: DateJeu };
+    /** Audit 5.1 et 10.2 : choix du team principal (montant, saison visée, date) — gardé par le budget annuel, modifiable à tout moment (D-166). */
+    choixTP?: { annee: number; montantMEUR: number };
   };
+  /**
+   * D-166 : dépenses plafonnées réellement payées à la dernière période comptable, ramenées à l'année (M€/an). La progression
+   * de la voiture lit cet argent dépensé, pas le budget prévu : on reçoit ce que l'on paie.
+   */
+  depensePeriode?: { annee: number; plafonneesAnnuelMEUR: number };
   /** Comptes de l'année en cours (cumulés période par période). */
   comptes: ComptesAnnee;
   /** Bilans des années passées. */
