@@ -107,6 +107,35 @@
 
 Je recommande de **ne pas recalibrer davantage maintenant** (méthode D-095), mais d'adopter V1 tout de suite si tu es d'accord, puis de mesurer après la 12b.
 
+## 4 bis. Changements d'ère : effet sur les petites écuries (question du porteur, 25/11/2026)
+
+**Mesure** : 4 parties de 25 saisons, 17 réformes, avec le réglage de la 12a.
+- Meilleure remontée d'une petite écurie à une réforme : environ 2 places, contre 2,3 places une année normale.
+- Le top 4 d'avant reste presque toujours dans le top 5.
+- **Les réformes ne rebattaient rien.**
+
+**Cause** : à la reconception, le savoir de fond accumulé (2 à 3 fois plus grand chez les grandes écuries) comptait en entier.
+
+**Variantes testées** (10 graines × 30 saisons, mêmes graines) :
+- V4 : sous une grande réforme, pour les pièces touchées, le savoir de fond ne compte qu'à 30 % (`partFondamentalReforme`), et les paris d'architecture coûtent plus cher (pénalités de 0,2 à 0,5) ;
+- V5 : V4 + V1.
+
+| Indicateur (30 saisons) | Avant 12a | 12a | V1 | V4 | V5 |
+| --- | --- | --- | --- | --- | --- |
+| Champions constructeurs différents | 6,3 | 3,7 | 4,8 | 4,0 | 4,6 |
+| Plus longue série de titres | 6,2 | 8,1 | 7,2 | 7,9 | 7,8 |
+| Remontées (+3 places) | 38,9 | 9,4 | 17,0 | 12,7 | 17,1 |
+| Écuries changeant d'étage par saison | 3,8 | 2,1 | 2,5 | 2,4 | 2,6 |
+| Vainqueurs différents par saison | 7,4 | 5,9 | 6,5 | 6,3 | 6,7 |
+| Séries avec 5 titres consécutifs ou plus | 70 % | 90 % | 80 % | 90 % | 80 % |
+| Dernière écurie avec au moins 1 point | 80 % | 36 % | 49 % | 42 % | 40 % |
+| Écart 1re–dernière voiture | 0,98 % | 1,58 % | 1,39 % | 1,50 % | 1,49 % |
+
+**Lecture**
+- V4 fait apparaître de vrais renversements à certaines réformes : remontée de 5 à 6 places, écurie du top 4 qui tombe 8e. Mais l'effet moyen reste faible.
+- Les grandes écuries préparent aussi le nouveau règlement, avec plus de moyens.
+- Le levier qui manque est celui qui donne **plus de moyens de préparation aux écuries mal classées** : le barème des heures de soufflerie et de CFD (12b).
+
 ## 5. Autres effets à signaler
 
 - **Finances** : les écuries de tête, près de leur frontière, dépensent moins que leur budget de développement (exemple : 29 M€ sur 73 M€). Leur trésorerie gonfle (Mercédes vers 480 M€ en 2031). À surveiller.
