@@ -1,0 +1,20 @@
+départ 62.06
+  cla → 4.043 : 60.66 km/h
+  cda → 1.027 : 45.35 km/h
+  partAppuiAileron → 0.3360 : 45.20 km/h
+  partTraineeAileron → 0.4060 : 44.64 km/h
+  cda → 0.8625 : 44.60 km/h
+  reductionTraineeLigne → 0.7953 : 44.45 km/h
+  finesseIncrementale → 3.231 : 44.38 km/h
+  reductionTraineeLigne → 0.9226 : 44.20 km/h
+  muFreinage → 1.571 : 44.06 km/h
+  cda → 0.8798 : 44.00 km/h
+  piste cir_singapour → 0.934 : 43.95 km/h
+pistes {
+  cir_mexico: 1.014,
+  cir_monaco: 0.947,
+  cir_monza: 0.951,
+  cir_singapour: 0.98,
+  cir_suzuka: 1.108
+}
+résultat {"cla":4.043,"cda":0.8798,"muMeca":1.27,"muAero":1.805,"muMotricite":0.8319,"muFreinage":1.498,"energieElectriqueTourJ":8413000,"reductionTraineeLigne":0.9226,"reductionAppuiLigne":0.6775,"finesseIncrementale":3.231,"partAppuiAileron":0.336,"partTraineeAileron":0.406} écart moyen 43.95 km/h

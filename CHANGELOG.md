@@ -604,3 +604,21 @@ Aucun code à ce stade.
   - surcoût de l'intensif variable ;
   - dilemmes techniques bloquants, à confirmer.
 
+## [Phase 12a — architecture et physique des monoplaces] — 25/11/2026
+
+### Ajouté
+- Voitures en six pièces : efficacité et concept, valeurs de F1 Manager 2024.
+- Temps au tour physique sur les 30 circuits, branché sur les courses.
+- Refroidissement selon la chaleur du mois et l'altitude.
+- Frontière de compromis, projets de conception, paris d'architecture.
+- Écran Technique (voiture circuit par circuit, pièces, projets, architecture).
+- Format 31.
+
+### Modifié
+- Aérodynamique du profil de vitesse refondue (D-163, partielle).
+- Reconception aux réformes désormais absolue.
+- Développement abstrait limité à la fiabilité et aux pneus.
+
+### À signaler
+- La hiérarchie se fige sur 30 saisons : voir `docs/rapports/phase-12a/rapport.md`, variantes mesurées, décision D-171 à prendre.
+
