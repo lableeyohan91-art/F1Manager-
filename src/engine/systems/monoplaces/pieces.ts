@@ -25,7 +25,8 @@ export function piecesDepart(d: VoitureDonnees): Omit<PieceVoiture, 'id'>[] {
   return TYPES_PIECES.map((type) => {
     const notes = c.notes[type];
     const moyenne = notes.reduce((a, k) => a + note(k), 0) / notes.length;
-    const concept = type === 'aileron_avant' || type === 'aileron_arriere' ? borner(c.conceptParPoint * (note('viragesRapides') - note('vitessePointe')), -c.conceptMax, c.conceptMax) : 0;
+    const moy = (ks: readonly string[]) => ks.reduce((a, k) => a + note(k), 0) / ks.length;
+    const concept = borner(c.conceptParPoint * (moy(c.conceptPlus[type]) - moy(c.conceptMoins[type])), -c.conceptMax, c.conceptMax);
     return { ecurie: d.ecurie, type, version: 1, efficacite: r2(EFFICACITE_REFERENCE + c.parPoint * (moyenne - c.noteReference)), concept: r2(concept), reglement: '', saison: 0, installee: true };
   });
 }
