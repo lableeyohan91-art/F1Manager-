@@ -121,7 +121,11 @@ export const INDICE_PHYSIQUE = { base: 15, notePneusReference: 14 };
  * son efficacité de départ (les grandes écuries ont des décennies de savoir-faire, une nouvelle écurie beaucoup moins). Versé au savoir
  * FONDAMENTAL (il survit aux réformes, D-128).
  */
-export const FRONTIERE = { min: 5, etendue: 14, echelleSavoir: 30, margeDepart: 1, partMaxDepart: 0.95 };
+/**
+ * `partFondamentalReforme` : sous une grande réforme, part du savoir FONDAMENTAL comptée pour les pièces qu'elle touche (le reste vient
+ * de la recherche menée sur ce règlement). 1 = tout le savoir de fond compte (12a d'origine, D-171) ; valeur testée en variante V4.
+ */
+export const FRONTIERE = { min: 5, etendue: 14, echelleSavoir: 30, margeDepart: 1, partMaxDepart: 0.95, partFondamentalReforme: 1 };
 
 /**
  * Projets de conception (fiche §6, conception simplifiée de la 12a : rythme normal, sans événement) :

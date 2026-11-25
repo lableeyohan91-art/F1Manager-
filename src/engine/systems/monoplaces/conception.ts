@@ -37,9 +37,16 @@ const financesDe = (m: Monde, id: string) => (Object.values(table(m, TABLES.fina
 /* ===================================================================== Savoir, architecture, frontière */
 
 /** Savoir applicable moyen des domaines d'une pièce, sous un règlement. */
-export function savoirPiece(monde: Monde, idEcurie: string, type: TypePiece, idReglement: string | undefined): number {
+export function savoirPiece(monde: Monde, idEcurie: string, type: TypePiece, r: Reglement | undefined): number {
   const d = PIECES[type].domaines;
-  return d.reduce((a, x) => a + savoirApplicable(monde, idEcurie, x, idReglement), 0) / d.length;
+  // Changement d'ère : sous une grande réforme, pour les pièces qu'elle touche, le savoir de fond ne compte qu'en partie ; c'est la
+  // recherche menée SUR ce règlement qui fait la différence (D-128 : obsolescence partielle ; fiche §10.2).
+  const reforme = !!r && r.orientation !== 'initial' && pieceTouchee(r, type);
+  return d.reduce((a, x) => {
+    if (!reforme) return a + savoirApplicable(monde, idEcurie, x, r?.id);
+    const s = savoirExistant(monde, idEcurie, x);
+    return a + (s?.parReglement[r!.id] ?? 0) + FRONTIERE.partFondamentalReforme * (s?.fondamental ?? 0);
+  }, 0) / d.length;
 }
 
 /** Paysage caché d'une grande réforme : familles d'architecture et pénalité de chacune (la meilleure : 0). Déterministe (graine). */
@@ -91,7 +98,7 @@ export function penaliteArchitecture(monde: Monde, e: Ecurie, type: TypePiece, r
 
 /** Frontière (efficacité maximale atteignable) d'une écurie pour une pièce, sous le règlement donné (par défaut, celui en vigueur). */
 export function frontiere(monde: Monde, e: Ecurie, type: TypePiece, r: Reglement | undefined = reglementEnVigueur(monde)): number {
-  const s = savoirPiece(monde, e.id, type, r?.id);
+  const s = savoirPiece(monde, e.id, type, r);
   return FRONTIERE.min + FRONTIERE.etendue * (1 - Math.exp(-s / FRONTIERE.echelleSavoir)) * (1 - penaliteArchitecture(monde, e, type, r));
 }
 
@@ -303,7 +310,7 @@ function terminerConception(monde: Monde, p: ProjetConception): void {
   const actuelle = piecesInstallees(monde, e.id).find((x) => x.type === type);
   const base = actuelle?.efficacite ?? EFFICACITE_REFERENCE;
   const r = reglementEnVigueur(monde);
-  const s = savoirPiece(monde, e.id, type, r?.id);
+  const s = savoirPiece(monde, e.id, type, r);
   const f = tirageLocal(monde, 'monoplaces.conception', p.id);
   const q = Math.max(PROJETS.progressionMin, progressionAttendue(monde, e, type) + f.normale(0, PROJETS.ecartExecution * Math.exp(-s / PROJETS.echelleSavoirExecution)));
   p.efficacite = r2(base + q * Math.max(0, frontiere(monde, e, type) - base) - PROJETS.penaliteConcept * Math.abs(p.concept - (actuelle?.concept ?? 0)));
@@ -369,7 +376,7 @@ export function intersaison(monde: Monde, ecuries: Ecurie[]): void {
     for (const p of piecesInstallees(monde, e.id)) {
       const type = p.type as TypePiece;
       if (!(type in PIECES)) continue;
-      const s = savoirPiece(monde, e.id, type, r?.id);
+      const s = savoirPiece(monde, e.id, type, r);
       const q = Math.max(PROJETS.progressionMin, INTERSAISON.progression + aleaExecution(monde, `${e.id}|${type}|${monde.date.annee}|inter`, s));
       const avant = p.efficacite;
       p.efficacite = r2(p.efficacite + q * Math.max(0, frontiere(monde, e, type, r) - p.efficacite));
@@ -395,7 +402,7 @@ export function reconcevoir(monde: Monde, ecuries: Ecurie[], intensites: Record<
       const d = PIECES[type].domaines;
       const I = Math.max(...d.map((x) => intensites[x] ?? 0));
       if (I <= 0) continue;
-      const s = savoirPiece(monde, e.id, type, r.id);
+      const s = savoirPiece(monde, e.id, type, r);
       const qualite = borner(RECONCEPTION.qualiteBase + RECONCEPTION.qualiteSavoir * (1 - Math.exp(-s / FRONTIERE.echelleSavoir)) + aleaExecution(monde, `${e.id}|${type}|${cle}`, s), 0, 1);
       const avant = p.efficacite;
       p.efficacite = r2(FRONTIERE.min + (1 - I) * (p.efficacite - FRONTIERE.min) + I * qualite * (frontiere(monde, e, type, r) - FRONTIERE.min));
