@@ -10,7 +10,7 @@
  */
 
 import {
-  EFFICACITE_REFERENCE, FAMILLES_ARCHITECTURE, FRONTIERE, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, TYPES_PIECES, type TypePiece,
+  DOMAINES_SOUFFLERIE, EFFICACITE_REFERENCE, FAMILLES_ARCHITECTURE, FRONTIERE, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, SOUFFLERIE, TYPES_PIECES, type TypePiece,
 } from '../../balance/monoplaces';
 import { USURE_SUCCES } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
@@ -22,8 +22,9 @@ type Commander = (c: { type: string; auteur: string; parametres: Record<string, 
 import {
   TABLES, type Circuit, type Departement, type Ecurie, type Finances, type GrandPrix, type Installation, type PieceVoiture, type Personne, type ProjetConception, type Reglement,
 } from '../../model/types';
-import { programmes, reglementAnnonce, reglementEnVigueur, savoirApplicable, savoirExistant } from '../technique/acces';
-import { restrictionAero } from '../economie';
+import { programmes, reglementAnnonce, reglementEnVigueur, savoir, savoirApplicable, savoirExistant } from '../technique/acces';
+import { repartirSoufflerie } from './soufflerie';
+import { SAVOIR } from '../../balance/technique';
 import { usureSucces } from '../humain/decision';
 import { ecartTempsPct, effetPiece, invaliderVoitures, parametresVoiture, piecesInstallees, type ParametresVoiture } from './physique';
 import { ajouterPiece, installer, versions } from './pieces';
@@ -144,11 +145,9 @@ function correlation(monde: Monde, idEcurie: string, pole: Pole): number {
 /** Part attendue de l'écart à la frontière comblée par un projet (sans l'aléa d'exécution). */
 export function progressionAttendue(monde: Monde, e: Ecurie, type: TypePiece): number {
   const pole = PIECES[type].pole as Pole;
-  // Restriction aérodynamique selon le classement (phase 5a) et sanction d'un dépassement du plafond (réduction aéro de la saison).
-  const sanction = financesDe(monde, e.id)?.sanctionAero ?? 0;
-  const aero = pole === 'aero' ? restrictionAero(monde, e.id) * (1 - sanction) : 1;
-  // Restriction aérodynamique (phase 5a, barème selon le classement) sur les pièces aéro, jusqu'aux heures de soufflerie (12b).
-  return PROJETS.progressionBase * Math.sqrt(competence(monde, e.id, pole) / PROJETS.competenceReference) * aero;
+  // Phase 12b : le barème selon le classement et la sanction d'un dépassement du plafond passent par les HEURES de soufflerie et de CFD
+  // (soufflerie.ts), plus par un coefficient de vitesse.
+  return PROJETS.progressionBase * Math.sqrt(competence(monde, e.id, pole) / PROJETS.competenceReference);
 }
 
 /* ===================================================================== Estimation par circuit */
@@ -302,6 +301,41 @@ export const commandeArchitecture: DefinitionCommande = {
   },
 };
 
+/** Savoir gagné par un projet (« jours d'expertise ») : propre au règlement, une part au fondamental, rendement décroissant (phase 8). */
+function apprendre(monde: Monde, idEcurie: string, type: TypePiece, idReglement: string | undefined, jours: number): void {
+  const doms = PIECES[type].domaines;
+  for (const d of doms) {
+    const s = savoir(monde, idEcurie, d);
+    const gain = (SOUFFLERIE.expertiseParJour * jours) / doms.length / (1 + savoirApplicable(monde, idEcurie, d, idReglement) / SAVOIR.rendementK);
+    s.fondamental = r3(s.fondamental + gain * SAVOIR.partFondamental);
+    if (idReglement) s.parReglement[idReglement] = r3((s.parReglement[idReglement] ?? 0) + gain * (1 - SAVOIR.partFondamental));
+    else s.fondamental = r3(s.fondamental + gain * (1 - SAVOIR.partFondamental));
+  }
+}
+
+/** Part des heures de soufflerie réservée à la recherche (préparation de l'avenir) : même commande pour le joueur et l'IA. */
+export const commandeSoufflerie: DefinitionCommande = {
+  type: 'conception.soufflerie',
+  valider(monde, c) {
+    const e = ecurieDe(monde, String(c.parametres['ecurie'] ?? ''));
+    if (!e || !auteurAutorise(monde, c.auteur, e.id)) return 'Seuls le team principal et le directeur technique répartissent la soufflerie.';
+    const x = c.parametres['partRecherche'];
+    return typeof x === 'number' && Number.isFinite(x) && x >= 0 && x <= 1 ? null : 'Part de la recherche entre 0 et 1.';
+  },
+  appliquer({ monde }, c) {
+    const e = ecurieDe(monde, String(c.parametres['ecurie']))!;
+    e.souffleriePartRecherche = r2(Number(c.parametres['partRecherche']));
+    ajouterEvenement(monde, { type: 'conception.soufflerie', acteurs: [{ id: c.auteur, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 1, visibilite: 'prive', contexte: { partRecherche: e.souffleriePartRecherche } });
+  },
+};
+
+/** Part de soufflerie visée par l'IA : la préparation de l'avenir si un programme aéro vise un règlement futur. */
+function partSouffleriePolitique(monde: Monde, e: Ecurie): number {
+  const actuel = reglementEnVigueur(monde)?.id;
+  const prepare = programmes(monde, e.id).some((p) => p.statut === 'actif' && (DOMAINES_SOUFFLERIE as readonly string[]).includes(p.domaine) && p.horizon !== 'actuelle' && p.horizon !== 'suivante' && p.horizon !== actuel);
+  return prepare ? SOUFFLERIE.partRecherchePreparation : SOUFFLERIE.partRechercheDefaut;
+}
+
 /** Fin de conception : qualité réelle tirée (fixée une fois pour toutes), fabrication lancée et payée. */
 function terminerConception(monde: Monde, p: ProjetConception): void {
   const e = ecurieDe(monde, p.ecurie);
@@ -312,8 +346,22 @@ function terminerConception(monde: Monde, p: ProjetConception): void {
   const r = reglementEnVigueur(monde);
   const s = savoirPiece(monde, e.id, type, r);
   const f = tirageLocal(monde, 'monoplaces.conception', p.id);
-  const q = Math.max(PROJETS.progressionMin, progressionAttendue(monde, e, type) + f.normale(0, PROJETS.ecartExecution * Math.exp(-s / PROJETS.echelleSavoirExecution)));
+  // Phase 12b, variantes (CFD) : plusieurs exécutions possibles ; l'équipe garde celle qui PARAÎT la meilleure (prédiction imparfaite,
+  // selon la corrélation) : plus de CFD donne en moyenne une meilleure pièce, avec un rendement décroissant.
+  const pole = PIECES[type].pole as Pole;
+  const n = Math.min(SOUFFLERIE.variantesMax, 1 + Math.floor((p.cfd ?? 0) / SOUFFLERIE.cfdParVariante));
+  const sigmaExec = PROJETS.ecartExecution * Math.exp(-s / PROJETS.echelleSavoirExecution);
+  const sigmaPred = SOUFFLERIE.ecartPredictionCfd * (1.5 - correlation(monde, e.id, pole) / 20);
+  let q = -Infinity, predite = -Infinity;
+  for (let i = 0; i < n; i++) {
+    const qi = progressionAttendue(monde, e, type) + f.normale(0, sigmaExec);
+    const pi = qi + f.normale(0, sigmaPred);
+    if (pi > predite) { predite = pi; q = qi; }
+  }
+  q = Math.max(PROJETS.progressionMin, q);
   p.efficacite = r2(base + q * Math.max(0, frontiere(monde, e, type) - base) - PROJETS.penaliteConcept * Math.abs(p.concept - (actuelle?.concept ?? 0)));
+  // Phase 12b, expertise : la conception et les essais font gagner du savoir propre au règlement dans les domaines de la pièce.
+  apprendre(monde, e.id, type, r?.id, p.joursTotal + SOUFFLERIE.joursParHeure * (p.heures ?? 0) + SOUFFLERIE.joursParUniteCfd * (p.cfd ?? 0));
   p.fabricationJoursRestants = PIECES[type].fabricationJours;
   depenser(monde, e.id, PROJETS.exemplaires * PIECES[type].coutUnitaireMEUR);
 }
@@ -330,7 +378,8 @@ function terminerFabrication(monde: Monde, p: ProjetConception): void {
     reglement: reglementEnVigueur(monde)?.id ?? '', saison: monde.date.annee, installee: false,
   });
   const pole = PIECES[type].pole as Pole;
-  const sigma = PROJETS.ecartEstimation * (1.5 - correlation(monde, e.id, pole) / 20);
+  // Phase 12b, validation (soufflerie) : chaque heure de vent resserre l'estimation (rendement décroissant).
+  const sigma = (PROJETS.ecartEstimation * (1.5 - correlation(monde, e.id, pole) / 20)) / Math.sqrt(1 + (p.heures ?? 0) / SOUFFLERIE.heuresValidation);
   const estimee = piece.efficacite + tirageLocal(monde, 'monoplaces.estimation', p.id).normale(0, sigma);
   const circuits = circuitsAVenir(monde);
   const avec = ecartMoyen(avecPiece(monde, e, type, estimee, piece.concept), circuits);
@@ -348,6 +397,13 @@ function terminerFabrication(monde: Monde, p: ProjetConception): void {
 
 /** Avancement hebdomadaire des projets (conception, puis fabrication). */
 export function avancerProjetsConception(monde: Monde): void {
+  // Phase 12b : heures de soufflerie et de CFD de la semaine, réparties avant le travail.
+  const parEcurie = new Map<string, ProjetConception[]>();
+  for (const p of projets(monde)) parEcurie.set(p.ecurie, [...(parEcurie.get(p.ecurie) ?? []), p]);
+  for (const id of idsTries(table(monde, TABLES.ecuries))) {
+    const e = ecurieDe(monde, id)!;
+    if (e.statut === 'active') repartirSoufflerie(monde, e, parEcurie.get(id) ?? []);
+  }
   for (const p of projets(monde)) {
     const e = ecurieDe(monde, p.ecurie);
     if (!e || e.statut !== 'active') { delete table(monde, TABLES.projetsConception)[p.id]; continue; }
@@ -457,6 +513,8 @@ export function decisionsConception(monde: Monde, commander: Commander): void {
     if (e.statut !== 'active' || (e.pilotee && !e.delegationRecherche)) continue;
     const auteur = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === e.id && (p.poste === 'directeur_technique' || p.poste === 'team_principal'));
     if (!auteur) continue;
+    const voulue = partSouffleriePolitique(monde, e);
+    if ((e.souffleriePartRecherche ?? SOUFFLERIE.partRechercheDefaut) !== voulue) commander({ type: 'conception.soufflerie', auteur: auteur.id, parametres: { ecurie: e.id, partRecherche: voulue } });
     const enCoursListe = projets(monde, e.id);
     const libres = (['aero', 'conception'] as Pole[]).filter((pole) => enCoursListe.filter((p) => PIECES[p.type as TypePiece].pole === pole && p.fabricationJoursRestants === undefined).length < emplacements(monde, e.id, pole));
     if (!libres.length || enveloppeRestante(monde, e.id) < Math.min(...TYPES_PIECES.map(coutTotal))) continue;

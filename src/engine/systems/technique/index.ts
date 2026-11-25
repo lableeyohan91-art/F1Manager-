@@ -36,6 +36,8 @@ import { niveauEffectif } from '../economie/infrastructures';
 import { forceEcurie, teamPrincipal } from '../humain/decision';
 import { avantProjets, intensitePercue, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
 import { fixerArchitectures, intersaison, reconcevoir } from '../monoplaces/conception';
+import { facteurRechercheSoufflerie } from '../monoplaces/soufflerie';
+import { DOMAINES_SOUFFLERIE } from '../../balance/monoplaces';
 import { DATE_DEPART } from '../../balance/monde';
 import { domainePoste, iaDecide } from '../joueur/acces';
 
@@ -333,6 +335,11 @@ export function avancerRecherche(monde: Monde): void {
   const actuel = reglementEnVigueur(monde);
   for (const e of ecuriesActives(monde)) {
     const cap = capaciteDeveloppement(monde, e);
+    // Phase 12b : les heures de soufflerie réservées à la recherche (barème selon le classement) dopent les programmes aéro.
+    const aeroActifs = programmes(monde, e.id).filter((p) => p.statut === 'actif' && (DOMAINES_SOUFFLERIE as readonly string[]).includes(p.domaine));
+    const partAero = aeroActifs.reduce((a, p) => a + p.part, 0);
+    const heures = e.heuresRecherche ?? 0;
+    e.heuresRecherche = 0;
     for (const p of programmes(monde, e.id)) {
       if (p.statut !== 'actif') continue;
       const d = p.domaine as Domaine;
@@ -341,8 +348,9 @@ export function avancerRecherche(monde: Monde): void {
       const deja = s.fondamental + (cibleReglement ? s.parReglement[cibleReglement] ?? 0 : s.pourSaisonSuivante);
       const efficacite = p.remiseEnRoute > 0 ? SAVOIR.efficaciteRemiseEnRoute : 1;
       p.remiseEnRoute = Math.max(0, p.remiseEnRoute - PROGRAMMES.periodeSemaines);
+      const soufflerie = (DOMAINES_SOUFFLERIE as readonly string[]).includes(d) ? facteurRechercheSoufflerie(partAero > 0 ? (heures * p.part) / partAero : 0) : 1;
       const gain = SAVOIR.gainBase * (p.part / IA_RECHERCHE.partDefaut) * cap * facteurCompetence(monde, e.id, d) * facteurInstallations(monde, e.id, d)
-        * efficacite / (1 + deja / SAVOIR.rendementK);
+        * efficacite * soufflerie / (1 + deja / SAVOIR.rendementK);
       s.fondamental = r3(s.fondamental + gain * SAVOIR.partFondamental);
       const specifique = gain * (1 - SAVOIR.partFondamental);
       if (p.horizon === 'suivante') s.pourSaisonSuivante = r3(s.pourSaisonSuivante + specifique);

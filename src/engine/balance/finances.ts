@@ -53,10 +53,11 @@ export const SEUIL_DEPASSEMENT_MINEUR = 0.05;
 export const SANCTION_PLAFOND = { amendeFacteur: 2, reductionAeroMineur: 0.1, reductionAeroMajeur: 0.25 };
 
 /**
- * Restrictions aérodynamiques selon le classement constructeurs de la saison précédente (règle connue et
- * identique pour tous, D-081) : efficacité du développement aérodynamique, du premier au dernier.
+ * Restrictions aérodynamiques (règle connue et identique pour tous, D-081) : part des heures de soufflerie et de CFD selon le classement
+ * constructeurs. Phase 12b : barème réel 2026 (vérifié) : `premier` pour le champion, + `pasParPlace` par place, plafonné à `dernier`
+ * (les 10e et 11e ont 115 %). Avant la 12b : interpolation linéaire de 0,75 à 1,15. Bornes votables (phase 8d).
  */
-export const RESTRICTIONS_AERO = { premier: 0.75, dernier: 1.15 };
+export const RESTRICTIONS_AERO = { premier: 0.7, dernier: 1.15, pasParPlace: 0.05 };
 
 /* ---------------------------------------------------------------- Budget de développement */
 

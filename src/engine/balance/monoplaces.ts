@@ -188,3 +188,32 @@ export const IA_CONCEPTION = { pasConcept: 0.25, gainMin: 0.005, alea: 0.01 };
  * un circuit sans sensibilités propres, c'est-à-dire seulement dans une partie antérieure au format 31 (migrée sans les données).
  */
 export const SENSIBILITES_MOYENNES = { tempsS: 86.707, niveauAileron: 0, d1: {cla: -0.15521, cda: 0.04747, masseKg: 0.26084, muMeca: -0.19018, muMotricite: -0.04747, muFreinage: -0.02265, puissance: -0.11559}, d2: {cla: 0.008198, cda: 5.9e-05, masseKg: 0.003659, muMeca: 0.008279, muMotricite: 0.001675, muFreinage: 0.000657, puissance: 0.001722} };
+
+/**
+ * Phase 12b — soufflerie et CFD (fiche principale §5, D-170 Q6 ; règlement réel 2026 vérifié) :
+ * - allocation par période (6 par an) : `heuresParPeriode` heures de vent et `cfdParPeriode` unités de CFD pour 100 % ; barème selon le
+ *   classement constructeurs (balance/finances.ts, RESTRICTIONS_AERO : 70 % au champion, +5 % par place, 115 % au plus), recalculé à
+ *   la semaine `semaineMiSaison` sur le classement du moment ; `amplification` α (D-169, équilibrage déclaré) : 100 % + α × (barème − 100 %).
+ *   Les heures sont réparties chaque semaine et perdues si elles ne servent pas (aucun report, aucun transfert) ;
+ * - efficacité d'une heure : (`qualiteBase` + `qualiteParNiveau` × niveau de l'installation) × (`competenceBase` + `competenceAmplitude`
+ *   × (aérodynamique + corrélation du responsable aéro) / 40) × fraîcheur du pôle ;
+ * - part de la recherche : `partRechercheDefaut`, `partRecherchePreparation` pour une écurie qui prépare l'avenir (IA ; le joueur choisit) ;
+ * - trois usages, chacun à rendement décroissant (sans double comptage) :
+ *   1) expertise : savoir gagné en fin de projet = `expertiseParJour` × (jours + `joursParHeure` × H + `joursParUniteCfd` × C) / (1 + S / 40)
+ *      (« une heure ≈ une journée d'expertise », F1 Manager 2024) ;
+ *   2) variantes (CFD) : 1 + C / `cfdParVariante` variantes (au plus `variantesMax`), la meilleure EN APPARENCE est retenue (erreur de
+ *      prédiction `ecartPredictionCfd` × (1,5 − corrélation / 20)) ;
+ *   3) validation (soufflerie) : erreur d'estimation ÷ √(1 + H / `heuresValidation`) ; détection des défauts (12b, fatigue) 1 − exp(−H / `heuresDetection`) ;
+ * - recherche aéro (phase 8) : gain × (`rechercheMin` + `rechercheAmplitude` × (1 − exp(−H / `rechercheReference`))), H par période de 4 semaines.
+ */
+export const SOUFFLERIE = {
+  heuresParPeriode: 80, cfdParPeriode: 2000, periodesParAn: 6, semaineMiSaison: 27, amplification: 1,
+  qualiteBase: 0.6, qualiteParNiveau: 0.04, competenceBase: 0.6, competenceAmplitude: 0.4,
+  partRechercheDefaut: 0.3, partRecherchePreparation: 0.6,
+  expertiseParJour: 0.012, joursParHeure: 1, joursParUniteCfd: 0.04,
+  cfdParVariante: 150, variantesMax: 8, ecartPredictionCfd: 0.08,
+  heuresValidation: 10, heuresDetection: 15,
+  rechercheMin: 0.5, rechercheAmplitude: 1, rechercheReference: 10,
+};
+/** Domaines de la phase 8 dont la recherche passe par la soufflerie et la CFD. */
+export const DOMAINES_SOUFFLERIE = ['aero_avant', 'aero_arriere', 'fond_plat', 'refroidissement'] as const;

@@ -19,6 +19,7 @@ import {
   PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
 } from '../../balance/finances';
 import { ENVELOPPE_PRIMES_MEUR, PARTS_PRIMES, PLAFOND_BUDGETAIRE_MEUR } from '../../balance/reglement';
+import { SOUFFLERIE } from '../../balance/monoplaces';
 import { SEMAINE_NEGOCIATIONS } from '../../balance/contrats';
 import { ajouterEvenement } from '../../core/evenements';
 import { idsTries, parametre, table, type Monde } from '../../core/monde';
@@ -75,13 +76,26 @@ export function rangPrecedent(monde: Monde, idEcurie: string): { rang: number; n
   return { rang: Math.max(1, classement.findIndex(([id]) => id === idEcurie) + 1), n: classement.length };
 }
 
-/** Restriction aérodynamique (règle connue de tous) : efficacité du développement aéro selon le dernier classement. */
+/**
+ * Restriction aérodynamique (règle connue de tous) : part des heures de soufflerie et de CFD selon le classement (phase 12b, barème réel
+ * 2026 : premier + 5 % par place, plafonné). Classement de la saison précédente, puis, à partir de la mi-saison, celui du moment.
+ */
 export function restrictionAero(monde: Monde, idEcurie: string): number {
-  const { rang, n } = rangPrecedent(monde, idEcurie);
-  const t = n > 1 ? (rang - 1) / (n - 1) : 0.5;
+  const { rang } = rangAero(monde, idEcurie);
   const premier = parametre(monde, 'reglement.restrictionAeroPremier', regleVotee(monde, 'restrictionAeroPremier', RESTRICTIONS_AERO.premier));
   const dernier = parametre(monde, 'reglement.restrictionAeroDernier', regleVotee(monde, 'restrictionAeroDernier', RESTRICTIONS_AERO.dernier));
-  return premier + t * (dernier - premier);
+  return Math.min(dernier, premier + RESTRICTIONS_AERO.pasParPlace * (rang - 1));
+}
+
+/** Rang retenu pour le barème : classement en cours à partir de la mi-saison (règle réelle), sinon celui de la saison précédente. */
+function rangAero(monde: Monde, idEcurie: string): { rang: number; n: number } {
+  if (monde.date.semaine >= SOUFFLERIE.semaineMiSaison) {
+    const s = (table(monde, TABLES.saisons)[`ssn_${monde.date.annee}`] as unknown as Saison | undefined);
+    const cl = s ? [...s.constructeurs].sort((a, b) => b.points - a.points || (a.ecurie < b.ecurie ? -1 : 1)) : [];
+    const i = cl.findIndex((c) => c.ecurie === idEcurie);
+    if (i >= 0 && cl.some((c) => c.points > 0)) return { rang: i + 1, n: cl.length };
+  }
+  return rangPrecedent(monde, idEcurie);
 }
 
 /**

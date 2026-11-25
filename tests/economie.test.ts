@@ -59,7 +59,7 @@ describe('Phase 5a — économie', () => {
     const s = table(m, TABLES.saisons)['ssn_2027'] as unknown as { constructeurs: { ecurie: string }[] };
     const premier = s.constructeurs[0]!.ecurie;
     const dernier = s.constructeurs.at(-1)!.ecurie;
-    expect(restrictionAero(m, premier)).toBeCloseTo(0.75);
+    expect(restrictionAero(m, premier)).toBeCloseTo(0.7); // barème réel 2026 (phase 12b)
     expect(restrictionAero(m, dernier)).toBeCloseTo(1.15);
   });
 

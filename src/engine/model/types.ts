@@ -126,6 +126,10 @@ export interface Ecurie {
   objectifAnnonce?: { annee: number; niveau: 'titre' | 'prudent' };
   /** Phase 12a : famille d'architecture choisie pour chaque règlement (pari de concept, D-170 Q7). */
   architectures?: Record<string, string>;
+  /** Phase 12b : part des heures de soufflerie et de CFD réservée à la recherche (le reste va aux projets de pièces). */
+  souffleriePartRecherche?: number;
+  /** Phase 12b : heures effectives de soufflerie consacrées à la recherche depuis le dernier avancement des programmes. */
+  heuresRecherche?: number;
 }
 
 /** Couche 1 — personnalité : traits cachés (liste provisoire, D-025). */
@@ -559,6 +563,9 @@ export interface ProjetConception {
   fabricationJoursRestants?: number;
   /** Efficacité obtenue (fixée à la fin de la conception). */
   efficacite?: number;
+  /** Phase 12b : heures effectives de soufflerie et unités effectives de CFD consacrées au projet. */
+  heures?: number;
+  cfd?: number;
   evenement?: string;
 }
 
