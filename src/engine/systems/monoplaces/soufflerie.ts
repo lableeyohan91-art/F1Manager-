@@ -4,7 +4,7 @@
  */
 
 import { PIECES, SOUFFLERIE, type TypePiece } from '../../balance/monoplaces';
-import { table, type Monde } from '../../core/monde';
+import { parametre, table, type Monde } from '../../core/monde';
 import { TABLES, type Ecurie, type Finances, type Installation, type Personne, type ProjetConception } from '../../model/types';
 import { restrictionAero } from '../economie';
 
@@ -12,7 +12,7 @@ const financesDe = (m: Monde, id: string) => (Object.values(table(m, TABLES.fina
 
 /** Part du barème (1 = 100 %) d'une écurie cette semaine : classement, amplification déclarée (D-169), sanction d'un dépassement du plafond. */
 export function bareme(monde: Monde, idEcurie: string): number {
-  const b = 1 + SOUFFLERIE.amplification * (restrictionAero(monde, idEcurie) - 1);
+  const b = 1 + parametre(monde, 'soufflerie.amplification', SOUFFLERIE.amplification) * (restrictionAero(monde, idEcurie) - 1);
   return Math.max(0, b) * (1 - (financesDe(monde, idEcurie)?.sanctionAero ?? 0));
 }
 

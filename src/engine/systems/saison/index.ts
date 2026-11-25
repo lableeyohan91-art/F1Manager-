@@ -406,13 +406,14 @@ export const systemeIntersaison: Systeme = {
       // ADUO (phase 12b, règle moteur 2026) : le retard de puissance est mesuré avant l'évolution de l'année.
       const motoristes = idsTries(table(monde, TABLES.motoristes)).map((id) => table(monde, TABLES.motoristes)[id] as unknown as Motoriste);
       const meilleur = Math.max(...motoristes.map((x) => x.niveau));
+      const aduoActif = parametre(monde, 'motoriste.aduo', ADUO.actif ? 1 : 0) > 0; // 0 : expérience sans ADUO
       for (const m of motoristes) {
         const f = tirageLocal(monde, 'motoriste', m.id, date.annee);
         const retardPct = (meilleur - m.niveau) * MOTORISTE_PUISSANCE.pourcentParPoint;
         let evolutions = m.aduoReport ?? 0;
         delete m.aduoReport;
-        if (ADUO.actif && retardPct >= ADUO.seuil2Pct) { evolutions += ADUO.evolutions2; m.aduoReport = ADUO.evolutions2 * ADUO.saisonsSuivantes2; }
-        else if (ADUO.actif && retardPct >= ADUO.seuil1Pct) evolutions += ADUO.evolutions1;
+        if (aduoActif && retardPct >= ADUO.seuil2Pct) { evolutions += ADUO.evolutions2; m.aduoReport = ADUO.evolutions2 * ADUO.saisonsSuivantes2; }
+        else if (aduoActif && retardPct >= ADUO.seuil1Pct) evolutions += ADUO.evolutions1;
         const rendement = Math.max(0, 1 - m.niveau / PLAFOND_TECHNIQUE);
         m.niveau = borner(m.niveau + (MOTORISTE_PROGRESSION_ANNUELLE + evolutions * ADUO.gainParEvolution) * rendement + f.normale(0, MOTORISTE_ALEA_ANNUEL), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
         if (evolutions > 0) ajouterEvenement(monde, {
