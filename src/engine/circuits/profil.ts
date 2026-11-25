@@ -124,13 +124,20 @@ function passeUnique(tr: Trace, v0: VoiturePhysique, c: Conditions, kap: number[
   const n = kap.length, pas = tr.pasM, m = v.masseKg;
   const rho = densiteAir(c), rhoRel = rho / AIR.densiteMer;
   // Aérodynamique active : configuration « ligne droite » sur les portions presque droites.
-  const ligne = kap.map((kk) => kk < 1 / AERO_ACTIVE.rayonMinLigneM);
-  const appui = (vv: number, i: number) => 0.5 * rho * v.cla * (ligne[i] ? 1 - v.reductionAppuiLigne : 1) * vv * vv;
-  const trainee = (vv: number, i: number) => 0.5 * rho * v.cda * (ligne[i] ? 1 - v.reductionTraineeLigne : 1) * vv * vv;
+  const ligne = zonesAeroActive(kap, pas);
+  // Phase 12a (D-163) : les ailerons (part de l'appui et de la traînée, selon leur réglage) sont seuls touchés par l'aéro active.
+  // L'ouverture du volet est fixée par le règlement : elle retire une QUANTITÉ fixe (part de l'aileron au réglage médian), pas une
+  // proportion. Un aileron plus chargé garde donc son surplus de traînée en ligne droite : c'est le coût de l'appui (D-163).
+  const { claCorps, claAileron, cdaCorps, cdaAileron, claAileron0, cdaAileron0 } = aero(v);
+  const claLigne = claCorps + Math.max(0, claAileron - v.reductionAppuiLigne * claAileron0);
+  const cdaLigne = cdaCorps + Math.max(0.1 * cdaAileron0, cdaAileron - v.reductionTraineeLigne * cdaAileron0);
+  const appui = (vv: number, i: number) => 0.5 * rho * (ligne[i] ? claLigne : claCorps + claAileron) * vv * vv;
+  const trainee = (vv: number, i: number) => 0.5 * rho * (ligne[i] ? cdaLigne : cdaCorps + cdaAileron) * vv * vv;
+  const claVirage = claCorps + claAileron;
   // 1. Vitesse maximale en virage : m v² κ = muMeca m g + muAero × appui(v)  →  v² = muMeca m g / (m κ − muAero ½ ρ CLA)
   const vmax: number[] = [];
   for (const kk of kap) {
-    const den = m * kk - v.muAero * 0.5 * rho * v.cla;
+    const den = m * kk - v.muAero * 0.5 * rho * claVirage;
     vmax.push(den > 0 ? Math.min(v.vitesseMaxMs, Math.sqrt((v.muMeca * m * G) / den)) : v.vitesseMaxMs);
   }
   const vit = vmax.slice();
@@ -166,9 +173,41 @@ function passeUnique(tr: Trace, v0: VoiturePhysique, c: Conditions, kap: number[
   return { tempsS: t, vitesses: vit, limites: lim, courbures: kap, coupureKmh: Number.isFinite(coupure) ? Math.round(coupure * 3.6) : null, energieElectriqueJ: e };
 }
 
+/** Zones d'aéro active : portions presque droites (rayon > seuil) d'au moins `AERO_ACTIVE.longueurMinM` (le tracé boucle). */
+function zonesAeroActive(kap: number[], pas: number): boolean[] {
+  const n = kap.length, droit = kap.map((kk) => kk < 1 / AERO_ACTIVE.rayonMinLigneM), res = new Array<boolean>(n).fill(false);
+  const minPts = Math.ceil(AERO_ACTIVE.longueurMinM / pas);
+  if (droit.every(Boolean)) return res.fill(true);
+  const depart = droit.findIndex((x) => !x); // on commence hors zone pour ne pas couper une zone qui chevauche la ligne d'arrivée
+  let debut = -1;
+  for (let o = 1; o <= n; o++) {
+    const i = (depart + o) % n;
+    if (droit[i] && debut < 0) debut = o;
+    if ((!droit[i] || o === n) && debut >= 0) {
+      const fin = droit[i] ? o + 1 : o;
+      if (fin - debut >= minPts) for (let q = debut; q < fin; q++) res[(depart + q) % n] = true;
+      debut = -1;
+    }
+  }
+  return res;
+}
+
 /** Voiture avec un niveau d'ailerons a (réglage du week-end). */
 export function avecAilerons(v: VoiturePhysique, a: number): VoiturePhysique {
-  return { ...v, cla: v.cla * (1 + a), cda: v.cda * (1 + NIVEAUX_AILERONS.trainee * a) };
+  return { ...v, niveauAileron: a };
+}
+
+/**
+ * Décomposition aérodynamique (phase 12a, D-163) : corps (fond plat, carrosserie) et ailerons. `cla` et `cda` sont les totaux au
+ * réglage médian ; le niveau d'ailerons a multiplie l'appui des ailerons par (1 + a) et ajoute la traînée correspondante.
+ */
+export function aero(v: VoiturePhysique): { claCorps: number; claAileron: number; cdaCorps: number; cdaAileron: number; claAileron0: number; cdaAileron0: number } {
+  const claA0 = v.cla * v.partAppuiAileron, cdaA0 = v.cda * v.partTraineeAileron, a = v.niveauAileron;
+  return {
+    claAileron0: claA0, cdaAileron0: cdaA0,
+    claCorps: v.cla - claA0, claAileron: claA0 * (1 + a),
+    cdaCorps: v.cda - cdaA0, cdaAileron: Math.max(0.05 * cdaA0, cdaA0 + (claA0 * a) / v.finesseIncrementale),
+  };
 }
 
 /**

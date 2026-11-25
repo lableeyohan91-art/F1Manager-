@@ -29,34 +29,44 @@ export const VOITURE_REFERENCE = {
   // Recalés le même jour après la correction de la comptabilité électrique (l'électrique utilisé en sortie de virage, limité par la
   // motricité, est désormais compté), avec la contrainte publique « moins d'appui à Monza qu'à Monaco » (tools/calage-profil.mts).
   // Valeurs précédentes et comparaison : docs/rapports/phase-11b/audit-apex-lab.md.
-  cla: 2.59,
-  cda: 0.7338,
-  muMeca: 1.264,
-  muAero: 2.043,
-  muMotricite: 0.9607,
-  muFreinage: 1.647,
+  cla: 4.043,
+  cda: 0.8798,
+  muMeca: 1.27,
+  muAero: 1.805,
+  muMotricite: 0.8319,
+  muFreinage: 1.498,
   vitesseMaxMs: 110,
   /** Énergie électrique déployable par tour (J) : au-delà, l'écurie coupe le déploiement au-dessus d'une vitesse de coupure (H, ordre de grandeur du règlement 2026). */
-  energieElectriqueTourJ: 8_860_000,
+  energieElectriqueTourJ: 8_413_000,
   /**
    * Aérodynamique active (règlement 2026) : sur les portions presque droites, les ailerons s'ouvrent. Traînée × (1 − reductionTraineeLigne),
    * appui × (1 − reductionAppuiLigne). En virage et au freinage, configuration normale (H, approximation géométrique des zones).
    */
-  reductionTraineeLigne: 0.54,
-  reductionAppuiLigne: 0.6953,
+  reductionTraineeLigne: 0.9226,
+  reductionAppuiLigne: 0.6775,
+  /**
+   * Phase 12a (refonte D-163) : part de l'appui et de la traînée de la voiture (au réglage médian) due aux ailerons (H : effet de sol
+   * ≈ 60 % de l'appui ; ailerons ≈ 35 % de la traînée). Le réglage d'ailerons et l'aérodynamique active n'agissent que sur cette part.
+   */
+  partAppuiAileron: 0.336,
+  partTraineeAileron: 0.406,
+  /** Niveau d'ailerons du week-end (réglage, 0 = médian) : fixé par `avecAilerons`. */
+  niveauAileron: 0,
+  /** Finesse incrémentale des ailerons : appui ajouté / traînée ajoutée quand on charge l'aileron (H, plage plausible 2,5 à 6 ; calée). */
+  finesseIncrementale: 3.231,
 };
 
 /** Aérodynamique active : portion « ligne droite » si le rayon dépasse ce seuil (m) ; zones réelles désignées par la FIA, ici approchées par la géométrie (H). */
-export const AERO_ACTIVE = { rayonMinLigneM: 1000 };
+/** Phase 12a : une zone d'aéro active doit être une vraie ligne droite, longue d'au moins `longueurMinM` (zones désignées par la FIA, H). */
+export const AERO_ACTIVE = { rayonMinLigneM: 1000, longueurMinM: 300 };
 
 /**
- * Réglage d'ailerons du week-end (D-160) : niveau a de −`min` à +`max`, appui × (1 + a) et traînée × (1 + `trainee` × a).
- * Le profil de vitesse choisit le niveau qui donne le meilleur tour : c'est le « niveau d'appui naturel » du circuit (H).
- * `trainee` : un aileron ajoute environ 4 fois plus d'appui que de traînée, la voiture entière environ 5,4 fois plus (CLA / CDA) ;
- * en relatif, ΔCDA / CDA ≈ (CLA / CDA) / 4 × ΔCLA / CLA ≈ 1,35 × a (ordre de grandeur, H). Avec 0,7 (premier essai), l'aileron
- * maximal gagnait partout, même à Monza : physiquement faux.
+ * Réglage d'ailerons du week-end (D-160), refondu en phase 12a (D-163) : niveau a de `min` à `max`, centré sur le réglage médian.
+ * Seule la part « ailerons » change : appui des ailerons × (1 + a) ; leur traînée augmente de l'appui ajouté divisé par la
+ * finesse incrémentale de la voiture (`VOITURE_REFERENCE.finesseIncrementale`).
+ * Le profil de vitesse choisit le niveau qui donne le meilleur tour : c'est le « niveau d'appui naturel » du circuit.
  */
-export const NIVEAUX_AILERONS = { min: -0.5, max: 1.0, pas: 0.05, trainee: 1.35 };
+export const NIVEAUX_AILERONS = { min: -0.6, max: 1.4, pas: 0.05 };
 
 /**
  * Moteur turbo en altitude : la puissance thermique baisse moins vite que la densité de l'air (le turbo compense en partie).
