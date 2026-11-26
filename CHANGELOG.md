@@ -676,3 +676,12 @@ Aucun code à ce stade.
 - Jeu exclusivement en paysage : barre latérale permanente, cartes en colonnes, invitation à tourner l'appareil en portrait,
   manifeste `public/manifest.webmanifest` (orientation paysage) ; outils de parcours passés en paysage.
 - Bilan préparatoire de la phase 13 : `docs/systemes/phase-13-bilan-preparatoire.md` ; trajectoires Haas et Audi, laboratoire Cadillac.
+
+## [Phase 12d] — 26/11/2026
+
+### Ajouté
+- Diagnostic des hiérarchies (`tools/diagnostic-hierarchies.mts`, `tools/analyse-diagnostic-hierarchies.py`), rapport `docs/rapports/phase-12d/`.
+
+### Modifié
+- Une vraie nouvelle ère à chaque grande réforme (D-178) : usure du savoir de fond touché (50 % × intensité), transfert de l'ancienne ère
+  réduit ((1 − I)²). Dynasties divisées par deux, championnats plus ouverts ; la dernière écurie marque un peu moins souvent (chantier 2 à venir).

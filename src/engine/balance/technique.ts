@@ -65,6 +65,14 @@ export const EVOLUTIONS_MINEURES = { probabilite: 0.6, semaine: 44, domainesMin:
  * - vieillissementAnnuel : érosion très lente, hors réforme (D-132, question 6) ;
  * - remiseEnRouteSemaines : semaines à efficacité réduite (efficaciteRemiseEnRoute) après une réorientation (D-132, question 7 : coût en temps seulement).
  */
+/**
+ * Phase 12d (D-178) — une vraie nouvelle ère à chaque grande réforme (porteur, 26/11/2026). Pour un domaine touché à l'intensité I :
+ * - `usureFondamentale` : le savoir FONDAMENTAL est multiplié par (1 − usureFondamentale × I) (méthodes et outils d'une ère qui vieillissent) ;
+ * - `transfertExposant` : le savoir propre à l'ancien règlement passe au nouveau dans la proportion (1 − I)^transfertExposant (avant : 1).
+ * Mesuré : pièces touchées à 55 % du plafond juste après une réforme (73 % avant ; 54 % au début du jeu) ; dynasties 60 % → 30 % des séries.
+ */
+export const REFORME = { usureFondamentale: 0.5, transfertExposant: 2 };
+
 export const SAVOIR = { gainBase: 2.2, rendementK: 40, partVoisins: 0.15, partFondamental: 0.3, partFondamentalRejet: 0.3, vieillissementAnnuel: 0.01, remiseEnRouteSemaines: 6, efficaciteRemiseEnRoute: 0.5 };
 
 /** Programmes de recherche : deux emplacements (D-128) ; part des moyens de développement par programme, part totale maximale ; avancement toutes les `periodeSemaines` semaines. */

@@ -42,18 +42,21 @@ describe('Phase 8a — règlements', () => {
     expect(reglements(m).some((r) => r.generation > 1 && (r.statut === 'en_vigueur' || r.statut === 'termine'))).toBe(true);
   }, 120_000);
 
-  it('obsolescence à l’entrée en vigueur : le savoir propre à l’ancien règlement est gardé à hauteur de (1 − intensité)', () => {
+  it('D-178, nouvelle ère : l’ancienne ère est transférée à hauteur de (1 − I)², le savoir de fond touché s’use de 50 % × I, un domaine non touché ne perd rien', () => {
     const { m } = mondeJoueur();
     const ancien = reglementEnVigueur(m)!;
     const s = savoir(m, 'eq_mercedes', 'aero_avant');
     s.parReglement[ancien.id] = 40;
     s.fondamental = 10;
+    const autre = savoir(m, 'eq_mercedes', 'chassis');
+    autre.fondamental = 10;
     const nouveau: Reglement = { id: 'reg_test', generation: 2, orientation: 'aero', debut: m.date.annee, fin: m.date.annee + 4, statut: 'annonce', intensites: Object.fromEntries(LISTE_DOMAINES.map((d) => [d, d === 'aero_avant' ? 0.75 : 0])), pneus: 1 };
     table(m, TABLES.reglements)[nouveau.id] = nouveau as never;
     expect(entreeEnVigueur(m)).toBe(true);
-    expect(s.parReglement['reg_test']).toBeCloseTo(40 * 0.25, 3);
+    expect(s.parReglement['reg_test']).toBeCloseTo(40 * 0.25 * 0.25, 3); // (1 − 0,75)² de l'ancienne ère
     expect(s.parReglement[ancien.id]).toBeUndefined();
-    expect(s.fondamental).toBe(10); // le fondamental n'est jamais perdu
+    expect(s.fondamental).toBeCloseTo(10 * (1 - 0.5 * 0.75), 3); // le savoir de fond s'use avec l'intensité
+    expect(autre.fondamental).toBeCloseTo(10, 3); // domaine non touché : rien n'est perdu
     expect(reglementEnVigueur(m)!.id).toBe('reg_test');
   });
 

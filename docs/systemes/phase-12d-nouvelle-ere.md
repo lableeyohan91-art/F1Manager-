@@ -2,7 +2,7 @@
 
 > Demande du porteur (26/11/2026) : « à chaque nouvelle ère, le savoir doit revenir un peu comme au début du jeu… le savoir doit vraiment
 > redescendre ». Chantier 1 de l'ordre convenu (chantier 2 : piège de la pauvreté, ensuite).
-> Statut : **conception soumise au porteur** ; variantes mesurées dans des copies du dépôt, **rien n'est changé dans le jeu**.
+> Statut : **validée et mise en œuvre (D-178, 26/11/2026)**. Les mesures ci-dessous ont été faites avec exactement ce mécanisme.
 > Diagnostic de départ : `docs/rapports/phase-12d/diagnostic.md`.
 
 ## 1. Le problème (mesuré)

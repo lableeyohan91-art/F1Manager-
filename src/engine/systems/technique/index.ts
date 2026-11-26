@@ -17,7 +17,7 @@
 
 import { causesConnues } from '../humain/causes';
 import {
-  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, SAVOIR, VOTE_IA,
+  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, REFORME, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
@@ -243,10 +243,14 @@ export function entreeEnVigueur(monde: Monde): boolean {
   nouveau.statut = 'en_vigueur';
   for (const s of Object.values(table(monde, TABLES.savoirs)) as unknown as Savoir[]) {
     const i = nouveau.intensites[s.domaine] ?? 0;
-    const garde = (s.parReglement[ancien.id] ?? 0) * (1 - i);
+    // D-178 : nouvelle ère. Le savoir de fond s'use avec l'intensité de la réforme ; l'ancienne ère n'est presque plus transférée.
+    const usure = s.fondamental * REFORME.usureFondamentale * i;
+    s.fondamental = r3(s.fondamental - usure);
+    noterObsolescence(monde, s, usure);
+    const garde = (s.parReglement[ancien.id] ?? 0) * Math.pow(1 - i, REFORME.transfertExposant);
     s.parReglement[nouveau.id] = r3((s.parReglement[nouveau.id] ?? 0) + garde);
     // Le savoir préparé « pour la saison suivante » visait l'ancien règlement : même obsolescence.
-    noterObsolescence(monde, s, ((s.parReglement[ancien.id] ?? 0) + s.pourSaisonSuivante) * i);
+    noterObsolescence(monde, s, (s.parReglement[ancien.id] ?? 0) - garde + s.pourSaisonSuivante * i);
     s.pourSaisonSuivante = r3(s.pourSaisonSuivante * (1 - i));
     delete s.parReglement[ancien.id];
   }
@@ -255,8 +259,8 @@ export function entreeEnVigueur(monde: Monde): boolean {
   reconcevoir(monde, ecuriesActives(monde), nouveau.intensites, nouveau, `reglement-${nouveau.id}`, true);
   for (const p of programmes(monde)) if (p.horizon === nouveau.id) p.horizon = 'actuelle';
   ajouterEvenement(monde, {
-    type: 'reglement.entree_en_vigueur', acteurs: [], importance: 4, visibilite: 'public', causes: causesConnues(monde, nouveau.causes?.annonce), contexte: { reglement: nouveau.id, orientation: nouveau.orientation, pneus: nouveau.pneus },
-    texte: `Le nouveau règlement (${ORIENTATIONS[nouveau.orientation as Orientation]?.libelle ?? nouveau.orientation}) entre en vigueur : les voitures sont reconçues.`,
+    type: 'reglement.entree_en_vigueur', acteurs: [], importance: 4, visibilite: 'public', causes: causesConnues(monde, nouveau.causes?.annonce), contexte: { reglement: nouveau.id, orientation: nouveau.orientation, pneus: nouveau.pneus, usureFondamentale: REFORME.usureFondamentale },
+    texte: `Le nouveau règlement (${ORIENTATIONS[nouveau.orientation as Orientation]?.libelle ?? nouveau.orientation}) entre en vigueur : une nouvelle ère commence, une grande partie du savoir accumulé ne sert plus et les voitures sont reconçues.`,
   });
   return true;
 }
