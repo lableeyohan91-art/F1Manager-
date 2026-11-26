@@ -174,6 +174,7 @@ export const INTERSAISON = { progression: 0.15 };
  * frontière comblée par un projet × facteur, bornée à `progressionMax`. Le total de l'année reste du même ordre ; chaque pièce se sent.
  */
 export const PAQUETS = { facteur: 1, progressionMax: 0.6 };
+/** Prototype de mesure (paramètre `conception.progression`, 1 par défaut) : multiplie la part de l'écart à la frontière comblée par un projet, sans changer leur durée ni leur coût. */
 
 /**
  * Reconception à l'entrée d'un nouveau règlement ou d'une évolution mineure (remplace la conversion provisoire de la phase 8, qui

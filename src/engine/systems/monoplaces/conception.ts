@@ -180,7 +180,7 @@ export function progressionAttendue(monde: Monde, e: Ecurie, type: TypePiece): n
   // Phase 12b : le barème selon le classement et la sanction d'un dépassement du plafond passent par les HEURES de soufflerie et de CFD
   // (soufflerie.ts), plus par un coefficient de vitesse.
   // Variante R2 (prototype) : un « paquet » comble une plus grande part de l'écart.
-  return Math.min(PAQUETS.progressionMax, PROJETS.progressionBase * facteurPaquet(monde) * Math.sqrt(competence(monde, e.id, pole) / PROJETS.competenceReference));
+  return Math.min(PAQUETS.progressionMax, PROJETS.progressionBase * parametre(monde, 'conception.progression', 1) * facteurPaquet(monde) * Math.sqrt(competence(monde, e.id, pole) / PROJETS.competenceReference));
 }
 
 /* ===================================================================== Estimation par circuit */

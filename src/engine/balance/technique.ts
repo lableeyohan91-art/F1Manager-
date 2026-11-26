@@ -102,7 +102,12 @@ export const DECOUVERTES = { base: 0.004, ampleur: 15, diffusionParSaison: 0.5, 
  * rapporté à `referenceMEUR`, à la puissance `exposant` (rendement décroissant), au lieu de la seule part du budget.
  * Référence : part par défaut (0,15) × budget de développement moyen de la grille (≈ 100 M€).
  */
-export const RECHERCHE_MONTANT = { actif: 0, referenceMEUR: 15, exposant: 0.5 };
+export const RECHERCHE_MONTANT = { actif: 0, referenceMEUR: 15, exposant: 0.5, partPersonnel: 0 };
+/**
+ * R1 corrigé (prototype) : le programme dispose aussi de sa part du temps du personnel technique (pôles aéro et conception, déjà payé sous
+ * le plafond), compté `partPersonnel` fois son coût annuel (paramètre `recherche.partPersonnel` ; référence : `recherche.reference`).
+ * Vitesse du savoir (prototype, paramètre `recherche.vitesse`, 1 par défaut) : multiplie le gain de savoir de toute la grille.
+ */
 
 export const IA_RECHERCHE = { forcePretendant: 0.75, forceDistancee: 0.4, partDefaut: 0.15, partAudace: 0.15, alea: 0.15 };
 

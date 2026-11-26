@@ -26,6 +26,7 @@ import { allies, poidsOrientation } from '../politique/acces';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
 import { idsTries, parametre, table, type Entite, type Monde } from '../../core/monde';
+import { COUT_EMPLOYE } from '../../balance/finances';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import {
   TABLES, type Decouverte, type Ecurie, type EvolutionMineure, type HistoriqueRecherche, type Installation, type Personne, type ProgrammeRecherche, type Reglement, type Savoir,
@@ -341,8 +342,13 @@ function facteurInstallations(monde: Monde, idEcurie: string, domaine: Domaine):
 function facteurMoyens(monde: Monde, idEcurie: string, part: number): number {
   if (parametre(monde, 'recherche.montant', RECHERCHE_MONTANT.actif) <= 0) return part / IA_RECHERCHE.partDefaut;
   const fi = (Object.values(table(monde, TABLES.finances)) as unknown as { ecurie: string; budget: { developpementMEUR: number } }[]).find((f) => f.ecurie === idEcurie);
-  const montant = (fi?.budget.developpementMEUR ?? 0) * part;
-  return (Math.max(0, montant) / RECHERCHE_MONTANT.referenceMEUR) ** RECHERCHE_MONTANT.exposant;
+  // R1 corrigé : part du coût annuel du personnel technique (pôles aéro et conception), déjà payé sous le plafond.
+  const alpha = parametre(monde, 'recherche.partPersonnel', RECHERCHE_MONTANT.partPersonnel);
+  const personnel = alpha > 0 ? (Object.values(table(monde, TABLES.departements)) as unknown as { ecurie: string; type: string; effectif: number; niveauMoyen: number }[])
+    .filter((d) => d.ecurie === idEcurie && (d.type === 'aero' || d.type === 'conception'))
+    .reduce((a, d) => a + d.effectif * (COUT_EMPLOYE.base + COUT_EMPLOYE.parPointNiveau * d.niveauMoyen), 0) : 0;
+  const montant = ((fi?.budget.developpementMEUR ?? 0) + alpha * personnel) * part;
+  return (Math.max(0, montant) / parametre(monde, 'recherche.reference', RECHERCHE_MONTANT.referenceMEUR)) ** RECHERCHE_MONTANT.exposant;
 }
 
 /** Progression des programmes (toutes les 4 semaines) : savoir gagné, voisinages, historique, découvertes. */
@@ -364,7 +370,7 @@ export function avancerRecherche(monde: Monde): void {
       const efficacite = p.remiseEnRoute > 0 ? SAVOIR.efficaciteRemiseEnRoute : 1;
       p.remiseEnRoute = Math.max(0, p.remiseEnRoute - PROGRAMMES.periodeSemaines);
       const soufflerie = (DOMAINES_SOUFFLERIE as readonly string[]).includes(d) ? facteurRechercheSoufflerie(partAero > 0 ? (heures * p.part) / partAero : 0) : 1;
-      const gain = SAVOIR.gainBase * facteurMoyens(monde, e.id, p.part) * cap * facteurCompetence(monde, e.id, d) * facteurInstallations(monde, e.id, d)
+      const gain = SAVOIR.gainBase * parametre(monde, 'recherche.vitesse', 1) * facteurMoyens(monde, e.id, p.part) * cap * facteurCompetence(monde, e.id, d) * facteurInstallations(monde, e.id, d)
         * efficacite * soufflerie / (1 + deja / SAVOIR.rendementK);
       s.fondamental = r3(s.fondamental + gain * SAVOIR.partFondamental);
       const specifique = gain * (1 - SAVOIR.partFondamental);
