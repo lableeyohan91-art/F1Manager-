@@ -685,3 +685,9 @@ Aucun code à ce stade.
 ### Modifié
 - Une vraie nouvelle ère à chaque grande réforme (D-178) : usure du savoir de fond touché (50 % × intensité), transfert de l'ancienne ère
   réduit ((1 − I)²). Dynasties divisées par deux, championnats plus ouverts ; la dernière écurie marque un peu moins souvent (chantier 2 à venir).
+
+## [Phase 12e] — 26/11/2026
+
+### Ajouté
+- Diagnostic financier (`tools/diagnostic-finances.mts`, `tools/analyse-diagnostic-finances.py`).
+- Piège de la pauvreté (D-179) : investisseur d'opportunité, objectifs du propriétaire (affichés dans Finances) ; format 33.
