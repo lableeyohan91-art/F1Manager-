@@ -240,3 +240,5 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Architecture (pari de concept)** | Famille de conception choisie pour un nouveau règlement ; le règlement en cache une meilleure que les autres, que la recherche aide à deviner (D-170 Q7). |
 | **Sensibilités (d'un circuit)** | Effet sur le temps au tour d'un petit changement de chaque paramètre physique de la voiture, calculé par le profil de vitesse sur le tracé réel (phase 12a). |
 | **Projet de conception** | Travail d'un pôle technique pour créer une nouvelle version de pièce : durée et coût de F1 Manager 2024, puis fabrication et installation si le responsable l'estime meilleure. |
+| **Prévisions (financières)** | Projection, par le moteur et sans rien modifier, des comptes d'une écurie jusqu'à la fin de l'année au niveau actuel des recettes et des dépenses (trésorerie, plafond, développement, dividendes, saison suivante), hors imprévus (D-180). |
+| **Dépense non dépensable** | Part du budget de développement qu'une écurie ne pourra pas payer d'ici la fin de l'année au rythme actuel de ses projets (faute d'équipes ou de projets utiles). |

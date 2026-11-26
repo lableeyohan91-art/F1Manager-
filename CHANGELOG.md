@@ -698,3 +698,10 @@ Aucun code à ce stade.
 - Audit de l'économie, sans modification (`docs/etudes/2026-11-26-audit-economie.md`).
 - Fiche de conception des leviers A (capacités achetables) et B (tableau de bord prévisionnel) : `docs/systemes/economie-capacites-et-previsions.md` (D-180, à discuter).
 - Sauvegarde de la version d'avant ce chantier : branche `sauvegarde-2026-11-26-avant-economie`.
+
+## [Économie, levier B] — 26/11/2026
+
+### Ajouté
+- Tableau de bord prévisionnel (D-181) : `previsionFinances` (moteur, fonction pure), carte « Prévisions » dans l'écran Finances, seuils dans `balance/previsions.ts`.
+- Mesure de précision (`tools/precision-previsions.mts`), tests (`tests/previsions.test.ts`), rapport court `docs/rapports/economie-b/rapport.md`.
+- Fiche économie : version 2 du levier A selon les réponses du porteur (§E) ; glossaire : « prévisions », « dépense non dépensable ».

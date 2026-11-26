@@ -1,7 +1,7 @@
 /** Phase 10 — écrans Technique, Finances, Championnat, Direction et Réglages. */
 import { useState } from 'preact/hooks';
 import {
-  budgetMaxJoueur, candidatsPresidence, copierMonde, ecuriesActives, profilTechnique, DOMAINES_DELEGATION, equipeStands, estDelegue, federation, financesDe, plafond, programmes,
+  budgetMaxJoueur, candidatsPresidence, previsionFinances, copierMonde, ecuriesActives, profilTechnique, DOMAINES_DELEGATION, equipeStands, estDelegue, federation, financesDe, plafond, programmes,
   propositions, reglementEnVigueur, serialiser, table, TABLES, type DomaineJoueur, type Monde, type Saison,
 } from '../../engine';
 import { DOMAINES, LISTE_DOMAINES, ORIENTATIONS, PROGRAMMES } from '../../engine/balance/technique';
@@ -122,6 +122,35 @@ export function EcranTechnique({ partie, nav }: { partie: Partie; nav: Navigatio
 
 /* ------------------------------------------------------------------ Finances */
 
+/** D-180, levier B : tableau de bord prévisionnel (fonction pure du moteur ; imprévus non compris). */
+const NOMS_PROPRIETAIRES: Record<string, string> = { constructeur: 'le constructeur', milliardaire: 'le milliardaire', fonds: "le fonds d'investissement", famille: 'la famille propriétaire', consortium: 'le consortium' };
+function Previsions({ m, ecurie }: { m: Monde; ecurie: string }) {
+  const p = previsionFinances(m, ecurie);
+  if (!p || p.periodesRestantes === 0) return <div class="carte"><h3>Prévisions</h3><p class="muted">Les prévisions s’affichent dès que le budget de l’année est établi (après la première semaine).</p></div>;
+  const t = p.tresorerie, s = p.saisonSuivante;
+  return (
+    <div class={`carte pleine ${p.alertes.length ? 'attention' : ''}`}>
+      <h3>Prévisions {p.annee}</h3>
+      {p.alertes.length > 0 && <ul>{p.alertes.map((a) => <li key={a}>{a}</li>)}</ul>}
+      <div class="defile"><table class="compact">
+        <thead><tr><th>Trésorerie</th><th>Maintenant</th><th>Dans 4 semaines</th><th>Fin de saison</th><th>Après dividendes</th></tr></thead>
+        <tbody><tr><td /><td class="num">{meur(t.maintenant)}</td><td class="num">{meur(t.dansQuatreSemaines)}</td><td class="num">{meur(t.finAvantDividendes)}</td><td class="num">{meur(t.finApresDividendes)}</td></tr></tbody>
+      </table></div>
+      <p><strong>Recettes restantes</strong> {meur(p.recettes.garanties)} garanties (primes {meur(p.recettes.primes)}, droits {meur(p.recettes.droits)}, sponsors {meur(p.recettes.sponsors)}, propriétaire {meur(p.recettes.apport)})
+        {' '}+ {meur(p.recettes.primesSponsorsProbables)} de primes de sponsors probables<span class="muted"> (jusqu'à {meur(p.recettes.conditionnelles)} de plus si tout réussit)</span></p>
+      <p><strong>Dépenses restantes</strong> {meur(p.depenses.total)} : sous le plafond {meur(p.depenses.plafonneesFixes)} de frais fixes et {meur(p.depenses.developpement)} de développement ; hors plafond {meur(p.depenses.horsPlafond)}{p.depenses.chantiers > 0 ? `, chantiers ${meur(p.depenses.chantiers)}` : ''}{p.depenses.interets > 0 ? `, intérêts ${meur(p.depenses.interets)}` : ''}</p>
+      <p><strong>Plafond</strong> {meur(p.plafond.montant)} : déjà dépensé {meur(p.plafond.depense)}, à venir {meur(p.plafond.aVenir)}, <strong>marge {meur(p.plafond.marge)}</strong></p>
+      <p><strong>Développement</strong> budget {meur(p.developpement.budget)}, dépense prévue sur l'année {meur(p.developpement.payePrevu)}
+        {p.developpement.fiable && p.developpement.nonDepensable > 0 ? <span> · <strong>{meur(p.developpement.nonDepensable)} non dépensés</strong> au rythme actuel des projets</span> : null}</p>
+      {p.dividendes.montant > 0 && <p><strong>Dividendes</strong> au bilan, {NOMS_PROPRIETAIRES[p.dividendes.typeProprietaire] ?? 'le propriétaire'} prélèvera environ {meur(p.dividendes.montant)} ({Math.round(100 * p.dividendes.part)} % de ce qui dépasse {meur(p.dividendes.seuil)})</p>}
+      <p><strong>Saison suivante</strong> primes du championnat à la {s.placeActuelle}e place : {meur(s.primesALaPlace)}{s.gainUnePlace > 0 ? ` (une place de mieux : + ${meur(s.gainUnePlace)})` : ''}
+        {s.sponsorsQuiFinissent > 0 ? ` · ${s.sponsorsQuiFinissent} contrat${s.sponsorsQuiFinissent > 1 ? 's' : ''} de sponsor se termine${s.sponsorsQuiFinissent > 1 ? 'nt' : ''} (${meur(s.sponsorsMontantPerdu)} par an)` : ''}
+        {s.contratsQuiFinissent > 0 ? ` · ${s.contratsQuiFinissent} contrat${s.contratsQuiFinissent > 1 ? 's' : ''} de personnel à renouveler (${meur(s.salairesLiberes)} de salaires)` : ''}</p>
+      <p class="muted petit">Au niveau actuel des recettes et des dépenses, selon les règles du jeu. Non compris : un retrait du propriétaire non annoncé, un emprunt, les imprévus de course et de chantier.</p>
+    </div>
+  );
+}
+
 export function EcranFinances({ partie, nav }: { partie: Partie; nav: Navigation }) {
   const m = partie.monde;
   const e = ecurieJoueur(m)!;
@@ -147,6 +176,7 @@ export function EcranFinances({ partie, nav }: { partie: Partie; nav: Navigation
         )}
         {fi.bonusApport?.annee === m.date.annee && <p class="retour">Objectif de l'an dernier atteint : apport du propriétaire majoré de {Math.round(100 * (fi.bonusApport.facteur - 1))} % cette saison.</p>}
       </div>
+      <Previsions m={m} ecurie={e.id} />
       <Sponsors partie={partie} nav={nav} />
       <div class="carte">
         <h3>Budget de développement {m.date.annee}</h3>

@@ -46,6 +46,7 @@ import { partRecherche } from '../technique/acces';
 import { CONFERENCES } from '../../balance/medias';
 import { patienceImage } from '../medias/acces';
 export * from './infrastructures';
+export * from './previsions';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -118,7 +119,7 @@ export function facteurBudgetDeveloppement(monde: Monde, idEcurie: string): numb
 
 /* ---------------------------------------------------------------- Estimations annuelles */
 
-function primesAttendues(monde: Monde, idEcurie: string): number {
+export function primesAttendues(monde: Monde, idEcurie: string): number {
   const saisons = (Object.values(table(monde, TABLES.saisons)) as unknown as Saison[]).filter((s) => s.termine).sort((a, b) => b.annee - a.annee);
   const versee = saisons[0]?.constructeurs.find((c) => c.ecurie === idEcurie)?.primesMEUR;
   if (versee !== undefined) return versee;
@@ -129,7 +130,7 @@ function primesAttendues(monde: Monde, idEcurie: string): number {
 }
 
 /** Droits commerciaux (télévision, organisateur) : la part du commercial qui ne dépend pas des sponsors (phase 5b). */
-function commercialAnnuel(monde: Monde, e: Ecurie, fi: Finances): number {
+export function commercialAnnuel(monde: Monde, e: Ecurie, fi: Finances): number {
   return PART_DROITS_COMMERCIAUX * fi.revenusCommerciauxBaseMEUR * (COMMERCIAL.popMin + COMMERCIAL.popParPoint * e.popularite) * (COMMERCIAL.resultatsMin + COMMERCIAL.resultatsAmplitude * forceEcurie(monde, e.id));
 }
 
@@ -161,7 +162,7 @@ function tirerRetrait(monde: Monde, e: Ecurie, fi: Finances, annee: number): voi
   };
 }
 
-function apportAnnuel(monde: Monde, e: Ecurie, fi: Finances, annee: number): number {
+export function apportAnnuel(monde: Monde, e: Ecurie, fi: Finances, annee: number): number {
   const p = proprietaireDe(monde, e.id);
   if (!p) return 0;
   const profil = PROPRIETAIRES[p.type] ?? PROPRIETAIRES['consortium']!;

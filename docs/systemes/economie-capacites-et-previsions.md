@@ -1,7 +1,7 @@
 # Économie — capacités achetables (A) et tableau de bord prévisionnel (B) (fiche de conception, 26/11/2026)
 
 > Demande du porteur : « Audit et amélioration de l'économie — inspiration F1 Manager 2024 », puis « on fait A et B et on fait un point
-> après ». Base : `docs/etudes/2026-11-26-audit-economie.md`. Statut : **conception soumise au porteur, aucun code** (D-180, À DISCUTER).
+> après ». Base : `docs/etudes/2026-11-26-audit-economie.md`. Statut : **B validé et mis en œuvre** (« ok pour B d'abord », 26/11/2026) ; **A révisé** après les réponses du porteur (§E), soumis à nouveau.
 > Version sauvegardée avant ce chantier : branche `sauvegarde-2026-11-26-avant-economie`.
 
 ## 0. Le problème en une phrase
@@ -140,3 +140,76 @@ Format : trois colonnes en paysage (D-177), chiffres arrondis, alertes en tête.
    voiture). D'accord ?
 7. **B** : le contenu te convient (notamment l'affichage des dividendes à venir) ?
 8. **Ordre** : B puis A ?
+
+---
+
+## E. Réponses du porteur (26/11/2026) et version 2 de A
+
+Réponses : « le but n'est pas de faire 50 projets en même temps » ; « sur F1 Manager, mettre beaucoup d'ingénieurs sur un même projet augmente
+son efficacité ; on pourrait aussi mettre plus d'argent » ; fatigue : « pas le nombre d'ingénieurs mais la façon dont on les fait
+travailler » ; installations : oui, « mais il faut un cap, sinon l'écurie qui a la meilleure installation ne se rattrape jamais, ou alors le coût
+d'entretien pour équilibrer » ; autres départements : « des leviers pour quoi ? on peut en parler dès maintenant » ; « on va tout surveiller
+puisque ça va creuser les écarts, mais on a vraiment besoin que l'argent serve à quelque chose » ; « B d'abord puis mesures ».
+
+Précision honnête : je ne peux pas vérifier le détail de F1 Manager 2024 ; je m'appuie sur ta description.
+
+### E1. Les ingénieurs font avancer les projets plus vite (remplace A1 sur les places)
+
+| Règle | Proposition |
+| --- | --- |
+| Projets en même temps | **3 au plus par pôle, pour toutes les écuries** (fin du lien « effectif ÷ 45 ») |
+| Répartition | Les ingénieurs du pôle se répartissent entre ses projets en conception : à parts égales par défaut ; le joueur peut marquer un projet **prioritaire** (il reçoit deux parts) |
+| Vitesse d'un projet | × (ingénieurs affectés ÷ 45)^0,6, bornée entre 0,5 et 1,8 : rendement **décroissant** (doubler l'équipe ne double pas la vitesse) |
+| Exemples | Haas en aéro (75 personnes) : un projet seul × 1,36 ; deux projets × 0,90 chacun ; trois × 0,70. Mercédès (150) : trois projets × 1,07 chacun ; un seul × 1,8 |
+| Le dilemme | Concentrer = une pièce vite (pour un Grand Prix précis) ; répartir = plus de pièces au total, chacune plus lente |
+| Recruter, réduire | Comme dans la version 1 (A1) : commande commune, 8 semaines de délai, coûts sous le plafond, cohésion d'intégration, indemnité de licenciement |
+
+### E2. Mettre plus d'argent sur un projet
+
+Option par projet : **essais renforcés** (coût de conception × 1,5, sous le plafond) : l'aléa d'exécution est divisé par deux et l'estimation
+de la pièce est plus juste (moins de mauvaises surprises, moins de pièces montées qui reculent). L'argent achète de la **certitude**, les
+ingénieurs de la **vitesse** ; ni l'un ni l'autre ne dépasse la frontière du savoir (le plafond technique reste le savoir).
+
+### E3. La fatigue dépend de la façon de travailler
+
+La charge d'un pôle devient la moyenne des rythmes (allégé, normal, intensif) de ses ingénieurs occupés, les ingénieurs sans projet se
+reposant. Trois projets au rythme normal = charge normale, quel que soit l'effectif. C'est le rythme qui fatigue, pas le nombre.
+
+### E4. Installations : un plafond de rattrapage
+
+Aujourd'hui : niveau 1 à 10, enveloppe de 25 M€ par an hors plafond (même règle pour tous), vieillissement de 1,2 % par an, entretien de
+0,25 M€ par niveau (**sous le plafond**) : Mercédès paie 25 M€ d'entretien, Haas 17.
+Proposition (mesurée avant adoption) :
+1. **Entretien progressif** : 0,05 M€ × niveau² par installation (niveau 5 : 1,25 M€, inchangé ; niveau 10 : 5 M€ au lieu de 2,5). Une
+   écurie aux installations maximales paie environ 15 à 20 M€ de plus **sous le plafond** : moins d'argent pour les pièces. Rester au
+   sommet coûte ; rattraper coûte moins cher. C'est ton idée, et c'est la plus « réelle ».
+2. **Rendement décroissant** de l'effet des installations au-dessus du niveau 8 (le dernier niveau rapporte moins que le premier).
+3. L'enveloppe annuelle commune de 25 M€ reste le vrai plafond d'investissement (règle réelle) ; un seul chantier à la fois.
+
+### E5. Les autres départements : des leviers pour quoi ?
+
+| Département (effectif de base) | Levier proposé | Lu par | Priorité |
+| --- | --- | --- | --- |
+| **Production** (250) | Vitesse de fabrication des pièces (jours de fabrication) et pièces de rechange après un accident | Projets de conception, course | **Haute** |
+| **Fiabilité** (40) | Fiabilité de la voiture (abandons mécaniques) et détection des défauts des pièces avant leur montage | Course, conception (incidents) | **Haute** |
+| **Simulation** (45) | Avec le simulateur : préparation des pilotes au circuit, et justesse des estimations des pièces (corrélation) | Course, conception | Moyenne |
+| **Stratégie** (15) | Décisions en course (arrêts, pluie, voiture de sécurité) | Course (quand la stratégie existera, phase 13) | Plus tard |
+| **Logistique** (35) | Coût des déplacements par Grand Prix et fatigue des enchaînements de courses | Comptabilité | Faible : sinon, frais de structure |
+| Marketing, recrutement, stands | Déjà des leviers | Sponsors, repérage, arrêts aux stands | — |
+
+Chacun deviendrait réglable avec la même commande de recrutement que l'aéro et la conception (coût sous le plafond) : c'est là que l'argent
+« sert à quelque chose » partout, et le plafond oblige à choisir.
+
+### E6. Surveillance
+
+Comme demandé, la campagne mesurera tout (20 graines × 30 saisons, mêmes graines que la référence D-179) avec en plus : écart de
+vitesse entre la 1re et la 11e voiture, argent non dépensé, corrélation argent ↔ performance, dividendes, effectifs, niveaux
+d'installations par écurie.
+
+### E7. Questions au porteur (version 2)
+
+1. **E1** : 3 projets au plus par pôle pour tous, vitesse selon les ingénieurs affectés (rendement décroissant), projet prioritaire : d'accord ?
+2. **E2** : les essais renforcés (l'argent achète de la certitude, pas de la vitesse) : d'accord ?
+3. **E4** : entretien progressif **et** rendement décroissant, ou seulement l'un des deux ?
+4. **E5** : je commence par **production** et **fiabilité** (les plus utiles en course), puis la simulation ; logistique en frais de
+   structure. D'accord ?
