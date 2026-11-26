@@ -167,6 +167,18 @@ export const INVESTISSEUR = { fenetreSaisons: 4, saisonsBasMin: 3, placesBas: 3,
  * garder la première place ne donne pas de bonus, et seules les écuries parties de la `placeMinBonus`e place ou au-delà en reçoivent un
  * (les grandes sont au plafond ; mesuré : un bonus pour les écuries de tête rendait les championnats moins disputés, titre ouvert 38 % → 27 %).
  */
+/**
+ * Chantier 2, levier B (fiche phase-12e-levier-b-pilote-soutenu.md) — offre du pilote soutenu. PROTOTYPE DE MESURE : désactivé par défaut
+ * (`actif` 0 ; paramètre d'expérience `pilotesSoutenus`), en attente de la validation du porteur.
+ * Éligibilité (ouverture du marché) : baquet libre la saison suivante, seconde moitié du classement, et pas de sponsor titre ni principal
+ * la saison suivante ou trésorerie sous `tresorerieMois` mois de dépenses. Au plus une offre par saison sur la grille (l'écurie la plus pauvre),
+ * avec la chance `chance` ; pas de nouvelle offre pendant un contrat en cours ni `delaiApresRefus` saisons après un refus.
+ * Pilote : sans baquet, niveau entre (référence de l'écurie − `ecartMax`) et (référence − `ecartMin`), au moins `niveauMin` ; le plus vendeur.
+ * Chèque `chequeMin`–`chequeMax` M€ ; sponsor principal `sponsorMin`–`sponsorMax` M€/an pendant `dureeSponsor` ans ; titulaire `dureeGarantie` saisons, n°1.
+ * IA : accepte si l'écart de niveau est au plus `ecartAccepteIA`, ou si la trésorerie est sous le seuil.
+ */
+export const PILOTE_SOUTENU = { actif: 0, chance: 0.25, delaiApresRefus: 3, tresorerieMois: 3, ecartMin: 1, ecartMax: 4, niveauMin: 10, ecartAccepteIA: 3,
+  chequeMin: 10, chequeMax: 25, sponsorMin: 20, sponsorMax: 35, dureeSponsor: 5, dureeGarantie: 3, salaireParValeur: 0.6 };
 export const OBJECTIF_PROPRIETAIRE = { progressionPlaces: 1, bonusApport: 0.15, placeMinBonus: 5 };
 /** Rachat : types de repreneurs (poids), apport annuel de base (M€, fourchette), part de la dette effacée, chance de changer de team principal. */
 export const REPRENEURS: Record<string, { poids: number; apportMin: number; apportMax: number }> = {

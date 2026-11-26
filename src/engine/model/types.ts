@@ -934,6 +934,8 @@ export interface Finances {
   objectifProprietaire?: { annee: number; place: number; depart?: number };
   /** D-179 : objectif atteint → apport de la saison `annee` multiplié par `facteur`. */
   bonusApport?: { annee: number; facteur: number };
+  /** Levier B (prototype) : dernière offre de pilote soutenu (contrat jusqu'à `jusqua`, ou refus l'année `refus`). */
+  piloteSoutenu?: { jusqua?: number; refus?: number; pilote?: string };
   /** Audit 5.12 : fait d'entrée dans la dernière crise (cause des suites). */
   evenementCrise?: string;
   /** Phase 12a : dépenses des projets de conception et de fabrication (année en cours, et reste à payer à la prochaine écriture). */

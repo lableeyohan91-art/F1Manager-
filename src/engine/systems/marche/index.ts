@@ -33,6 +33,7 @@ import {
 import { dureeMaxEffectif, lireConditions, motifRefusConseil, nombrePlaces, occupantsPour } from '../humain/effectifs';
 import { candidatPour, contratEmploi, deciderProlongation, dureeContrat, liberer, nePasProlonger, proposerProlongation } from '../humain/contrats';
 import { candidaturesSpontanees, commandeCandidature, planPersonnel } from './personnel';
+import { offrePiloteSoutenu } from './pilote-soutenu';
 import { apportCommercialPour, bonusPilotePayant, systemeCommercial, transfererSponsors } from './commercial';
 import { PILOTES_PAYANTS } from '../../balance/commercial';
 import { domainePoste, iaDecide } from '../joueur/acces';
@@ -246,6 +247,17 @@ function enregistrerOffre(monde: Monde, auteur: string, prm: Record<string, unkn
     contexte: { offre: o.id, salaire: o.salaireMEUR, duree: o.dureeAnnees, debut, indemnite: o.indemniteMEUR, tour: o.tour },
   }).id;
   return o;
+}
+
+/**
+ * Levier B (prototype, D-179) : engagement direct d'un pilote soutenu — la personne et son groupe proposent, l'écurie accepte ; mêmes règles
+ * d'engagement que le marché (effectif, disponibilité, conseil). Retourne le motif de refus, ou l'événement de signature.
+ */
+export function engagerPiloteSoutenu(monde: Monde, e: Ecurie, p: Personne, auteur: string, salaire: number, duree: number, debut: number): Evenement | string {
+  const refus = motifRefusEngagement(monde, e, p, salaire, duree, debut);
+  if (refus) return refus;
+  const o = enregistrerOffre(monde, auteur, { ecurie: e.id, personne: p.id, salaire, duree, debut, statutN1: true });
+  return signer(monde, o, p, ['pilote soutenu par un grand groupe de son pays'], 1);
 }
 
 export const commandeOffre: DefinitionCommande = {
@@ -681,6 +693,7 @@ export const systemeMarche: Systeme = {
     if (date.semaine < FENETRE.debut || date.semaine > FENETRE.fin || (date.semaine - FENETRE.debut) % FENETRE.pas !== 0) return;
     const liste = vivier(monde);
     if (date.semaine === FENETRE.debut) prolongationsTitulaires(monde, liste);
+    if (date.semaine === FENETRE.debut) offrePiloteSoutenu(monde); // levier B (prototype, désactivé par défaut)
     repondreAuxOffres(monde);
     if (date.semaine === CANDIDATURES.semaine) candidaturesSpontanees(monde, (c) => commanderIA(c));
     planIA(monde, liste, (c) => commanderIA(c));

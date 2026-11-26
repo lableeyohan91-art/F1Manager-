@@ -166,7 +166,7 @@ function entreprisesLieesActives(monde: Monde): number {
 }
 
 /** Entreprise liée à un pilote (familiale ou nationale) ; null si le plafond du monde est atteint. */
-function entrepriseLiee(monde: Monde, p: Personne, genre: 'fam' | 'nat', montant: number): Sponsor | null {
+export function entrepriseLiee(monde: Monde, p: Personne, genre: 'fam' | 'nat', montant: number): Sponsor | null {
   const id = `spo_${genre}_${p.id.replace(/^per_/, '')}`;
   const t = table(monde, TABLES.sponsors);
   const existant = t[id] as unknown as Sponsor | undefined;
