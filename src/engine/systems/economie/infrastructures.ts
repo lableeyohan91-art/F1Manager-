@@ -7,7 +7,7 @@
  * - Enveloppe réglementaire d'investissement par an, hors plafond : l'argent compte, mais dans une limite connue de tous.
  */
 
-import { INSTALLATIONS_COUT } from '../../balance/capacites';
+import { IA_INSTALLATIONS, INSTALLATIONS_COUT } from '../../balance/capacites';
 import type { DefinitionCommande } from '../../core/commandes';
 import {
   COUT_INFRASTRUCTURE, DUREE_INFRASTRUCTURE, INSTALLATIONS_TECHNIQUES, INVESTISSEMENT_ANNUEL_MAX, MARGE_LANCEMENT_PROJET, PERIODES_PAR_AN,
@@ -131,7 +131,8 @@ export function deciderProjet(monde: Monde, e: Ecurie, fi: Finances, reserveVise
   let meilleur: { i: Installation; nature: ProjetInfrastructure['nature']; cout: number; ratio: number } | undefined;
   for (const i of installationsDe(monde, e.id).filter((x) => (INSTALLATIONS_TECHNIQUES as readonly string[]).includes(x.type))) {
     const actuel = niveauEffectif(i);
-    if (i.niveau < 10) {
+    // S6 : pas d'agrandissement si le budget de développement est déjà trop faible (l'entretien en plus se paie sous le plafond).
+    if (i.niveau < 10 && fi.budget.developpementMEUR >= IA_INSTALLATIONS.devMinAgrandissementMEUR) {
       const cout = coutChantier(i, 'amelioration');
       const ratio = (niveauUtile(i.niveau + 1) - actuel) / cout;
       if (!meilleur || ratio > meilleur.ratio) meilleur = { i, nature: 'amelioration', cout, ratio };

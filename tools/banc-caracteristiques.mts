@@ -11,6 +11,11 @@ const racine = resolve('.');
 const eng = await import(`${racine}/src/engine/index.ts`);
 const { lireDonneesGrille2026 } = await import(`${racine}/src/platform/node/donnees.ts`);
 const base = lireDonneesGrille2026(racine);
+// NEUTRE=1 : la voiture testée reçoit 14 partout (concepts neutres) : on juge les circuits, pas le profil de départ de la voiture.
+if (process.env.NEUTRE) {
+  const [h, ...l] = base['voitures.csv']!.trim().split('\n'); const H = h!.split(';');
+  base['voitures.csv'] = [h, ...l.map((x) => { const v = x.split(';'); if (v[0] === (process.argv[2] ?? 'eq_haas')) for (const c of ['viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero', 'gestionPneus', 'motricite']) { const i = H.indexOf(c); if (i >= 0) v[i] = '14'; } return v.join(';'); })].join('\n') + '\n';
+}
 const ID = process.argv[2] ?? 'eq_haas';
 const CARACS = ['viragesLents', 'viragesRapides', 'vitessePointe', 'efficaciteAero', 'motricite', 'gestionPneus'];
 const LIB: Record<string, string> = { viragesLents: 'Virages lents', viragesRapides: 'Virages rapides', vitessePointe: 'Vitesse de pointe', efficaciteAero: 'Efficacité aéro', motricite: 'Motricité', gestionPneus: 'Gestion des pneus' };

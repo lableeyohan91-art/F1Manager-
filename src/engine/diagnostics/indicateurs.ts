@@ -35,6 +35,10 @@ export interface IndicateursSaison {
   /** Écart de performance moyen entre la meilleure et la moins bonne voiture au début de la saison, en % du temps au tour. */
   ecartPerfPct: number;
   ecartP1P2: number;
+  /** Porteur (27/11) : « une saison serrée entre deux pilotes d'une écurie n'est pas une saison serrée » : écart entre le champion et le
+   *  meilleur pilote d'une AUTRE écurie, et écart entre les deux premiers constructeurs. */
+  ecartInterEcuries: number;
+  ecartConstructeurs: number;
   changementsLeader: number;
   doublesTotal: number;
   /** Écart moyen entre coéquipiers à l'arrivée (courses où les deux finissent), en % du temps au tour. */
@@ -244,6 +248,8 @@ export function indicateursSaison(monde: Monde, s: Saison): IndicateursSaison {
     derniereEcurieMarque: (s.constructeurs.at(-1)?.points ?? 0) > 0,
     ecartPerfPct: idx.length ? (Math.max(...idx) - Math.min(...idx)) * ECART_VOITURE_PAR_POINT : 0,
     ecartP1P2: (s.pilotes[0]?.points ?? 0) - (s.pilotes[1]?.points ?? 0),
+    ecartInterEcuries: (s.pilotes[0]?.points ?? 0) - (s.pilotes.find((x) => x.ecurie !== s.pilotes[0]?.ecurie)?.points ?? 0),
+    ecartConstructeurs: (s.constructeurs[0]?.points ?? 0) - (s.constructeurs[1]?.points ?? 0),
     changementsLeader: s.leaders.filter((l, i) => i > 0 && l !== s.leaders[i - 1]).length,
     doublesTotal: s.constructeurs.reduce((a, c) => a + c.doubles, 0),
     ecartCoequipiersPct: ecarts.length ? ecarts.reduce((a, b) => a + b, 0) / ecarts.length : 0,

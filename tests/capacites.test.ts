@@ -102,7 +102,7 @@ describe('D-181 — essais renforcés, installations', () => {
     const m = sc.creerMonde(1);
     const e = table(m, TABLES.ecuries)['eq_mercedes'] as unknown as Ecurie;
     const inst = (Object.values(table(m, TABLES.installations)) as unknown as Installation[]).filter((i) => i.ecurie === e.id);
-    const attendu = inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + i.ageAnnees / 30), 0);
+    const attendu = inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30), 0);
     expect(depensesFixes(m, e).entretien).toBeCloseTo(attendu, 5);
   });
 

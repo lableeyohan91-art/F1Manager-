@@ -59,4 +59,10 @@ export const IA_EFFECTIFS = { cibleParProjet: 45, anneesMarge: 1, partReductionC
  * 1,25 M€, comme l'ancien barème linéaire ; niveau 10 : 5 M€) ; rendement décroissant au-dessus de `seuilRendement` : chaque niveau en plus
  * ne compte que pour `rendementAuDela`.
  */
-export const INSTALLATIONS_COUT = { entretienParNiveauCarre: 0.05, seuilRendement: 8, rendementAuDela: 0.5 };
+export const INSTALLATIONS_COUT = { entretienParNiveauCarre: 0.05, seuilRendement: 8, rendementAuDela: 0.5, ageMaxEntretien: 15 };
+/**
+ * Rapport de nuit du 27/11 (S6) : l'entretien croît avec l'âge jusqu'à `INSTALLATIONS_COUT.ageMaxEntretien` ans seulement (sinon les
+ * installations jamais rénovées coûtaient de plus en plus cher sous le plafond, sans limite) ; l'IA n'agrandit plus une installation
+ * quand son budget de développement est déjà sous `devMinAgrandissementMEUR` (l'entretien en plus serait pris sur les pièces).
+ */
+export const IA_INSTALLATIONS = { devMinAgrandissementMEUR: 60 };

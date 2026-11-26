@@ -134,8 +134,14 @@ function lignes(c: Campagne): { saison: Ligne[]; serie: Ligne[]; proportions: Li
       { cle: 'duo', nom: 'Champion et vice-champion coéquipiers', valeurs: oui('duoCoequipiers'), format: pct },
       { cle: 'lutteCoequipiers', nom: 'Lutte jusqu’à la dernière manche entre coéquipiers', valeurs: oui('lutteCoequipiers'), format: pct },
       { cle: 'lutteInter', nom: 'Lutte jusqu’à la dernière manche entre écuries différentes', valeurs: oui('lutteInterEcuries'), format: pct },
-      { cle: 'serrees', nom: 'Saisons très serrées (≤ 10 points d’écart)', valeurs: c.saisons.map((s) => (s.ecartP1P2 <= 10 ? 1 : 0)), format: pct },
-      { cle: 'dominations', nom: 'Dominations (≥ 120 points d’écart)', valeurs: c.saisons.map((s) => (s.ecartP1P2 >= 120 ? 1 : 0)), format: pct },
+      // Porteur (27/11) : une lutte entre coéquipiers n'est pas une saison serrée ; on mesure l'écart au meilleur pilote d'une autre écurie.
+      { cle: 'serrees', nom: 'Saisons très serrées entre écuries différentes (≤ 10 points entre le champion et le meilleur pilote d’une autre écurie)', valeurs: c.saisons.map((s) => (s.ecartInterEcuries <= 10 ? 1 : 0)), format: pct },
+      { cle: 'dominations', nom: 'Dominations (≥ 120 points d’avance sur le meilleur pilote d’une autre écurie)', valeurs: c.saisons.map((s) => (s.ecartInterEcuries >= 120 ? 1 : 0)), format: pct },
+      { cle: 'ecartInter', nom: 'Écart moyen entre le champion et le meilleur pilote d’une autre écurie (points)', valeurs: c.saisons.map((s) => s.ecartInterEcuries), format: (x) => f(x, 0) },
+      { cle: 'serreesC', nom: 'Championnat constructeurs serré (≤ 25 points entre les deux premiers)', valeurs: c.saisons.map((s) => (s.ecartConstructeurs <= 25 ? 1 : 0)), format: pct },
+      { cle: 'dominationsC', nom: 'Domination constructeurs (≥ 150 points entre les deux premiers)', valeurs: c.saisons.map((s) => (s.ecartConstructeurs >= 150 ? 1 : 0)), format: pct },
+      { cle: 'serreesCoeq', nom: 'Saisons très serrées, coéquipiers compris (≤ 10 points entre les deux premiers pilotes ; ancienne mesure)', valeurs: c.saisons.map((s) => (s.ecartP1P2 <= 10 ? 1 : 0)), format: pct },
+      { cle: 'dominationsCoeq', nom: 'Dominations, coéquipiers compris (≥ 120 points entre les deux premiers pilotes ; ancienne mesure)', valeurs: c.saisons.map((s) => (s.ecartP1P2 >= 120 ? 1 : 0)), format: pct },
       // Coéquipiers (décomposition).
       { cle: 'coeqTotal', nom: 'Coéquipiers : écart moyen à l’arrivée (% temps au tour)', valeurs: co('moyAbsTotal'), format: (x) => f(x, 2) },
       { cle: 'coeqComp', nom: 'Coéquipiers : écart moyen dû aux compétences', valeurs: co('moyAbsCompetences'), format: (x) => f(x, 2) },

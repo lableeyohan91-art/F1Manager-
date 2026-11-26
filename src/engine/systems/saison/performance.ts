@@ -55,7 +55,7 @@ export function poidsVoiture(circuit: Pick<Circuit, 'exigences' | 'altitudeM' | 
 export function indiceSurCircuit(monde: Monde, ecurie: Ecurie, circuit: Circuit, mois?: number): number {
   const v = voitureDe(monde, ecurie.id);
   const ecart = ecartTempsPct(parametresVoiture(monde, ecurie), circuit, mois) * COURSE_PHYSIQUE.echelle;
-  return INDICE_PHYSIQUE.base - ecart / ECART_VOITURE_PAR_POINT + poidsVoiture(circuit).gestionPneus * (v.gestionPneus - INDICE_PHYSIQUE.notePneusReference);
+  return INDICE_PHYSIQUE.base - ecart / ECART_VOITURE_PAR_POINT + INDICE_PHYSIQUE.poidsPneusDirect * poidsVoiture(circuit).gestionPneus * (v.gestionPneus - INDICE_PHYSIQUE.notePneusReference);
 }
 
 /** Indice moyen sur les circuits du vivier (ou tous ceux qui ont des sensibilités) : sert aux statistiques et aux estimations. */
@@ -68,7 +68,7 @@ function calculerIndiceMoyen(monde: Monde, ecurie: Ecurie): number {
   const v = voitureDe(monde, ecurie.id);
   const p = parametresVoiture(monde, ecurie);
   let s = 0;
-  for (const c of circuits) s += INDICE_PHYSIQUE.base - (ecartTempsPct(p, c) * COURSE_PHYSIQUE.echelle) / ECART_VOITURE_PAR_POINT + poidsVoiture(c).gestionPneus * (v.gestionPneus - INDICE_PHYSIQUE.notePneusReference);
+  for (const c of circuits) s += INDICE_PHYSIQUE.base - (ecartTempsPct(p, c) * COURSE_PHYSIQUE.echelle) / ECART_VOITURE_PAR_POINT + INDICE_PHYSIQUE.poidsPneusDirect * poidsVoiture(c).gestionPneus * (v.gestionPneus - INDICE_PHYSIQUE.notePneusReference);
   return s / circuits.length;
 }
 

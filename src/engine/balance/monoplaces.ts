@@ -60,7 +60,7 @@ export const PIECES = {
   suspensions: {
     libelle: 'Suspensions', conceptionJours: 33, coutProjetMEUR: 1.0, fabricationJours: 8, coutUnitaireMEUR: 0.3, pole: 'conception',
     domaines: ['suspensions', 'interface_pneus'], conceptMoins: 'plateforme raide', conceptPlus: 'souplesse et motricité',
-    gain: { muMeca: 0.12, muMotricite: 0.2, muFreinage: 0.1 }, compromis: { muMotricite: 1.0, muFreinage: 0.4, cla: -0.34 },
+    gain: { muMeca: 0.12, muMotricite: 0.35, muFreinage: 0.1 }, compromis: { muMotricite: 1.8, muFreinage: 0.4, cla: -0.34 },
   },
 } as const satisfies Record<TypePiece, {
   libelle: string; conceptionJours: number; coutProjetMEUR: number; fabricationJours: number; coutUnitaireMEUR: number; pole: 'aero' | 'conception';
@@ -94,10 +94,12 @@ export const REFROIDISSEMENT = { margeReference: 6, temperatureNeutreC: 22, parD
  *   pontons : refroidissement généreux si fiabilité > vitesse de pointe, carrosserie serrée sinon.
  */
 export const CONVERSION_DEPART = {
-  noteReference: 14, parPoint: 0.7, conceptParPoint: 0.25, conceptMax: 0.6,
+  // S1 (rapport de nuit du 27/11, porteur : « met-le en œuvre ») : concepts plus marqués (0,25 → 0,4 par point ; plafond 0,6 → 1).
+  noteReference: 14, parPoint: 0.7, conceptParPoint: 0.3, conceptMax: 1,
   notes: {
-    chassis: ['viragesLents', 'viragesRapides'], aileron_avant: ['viragesRapides', 'efficaciteAero'], aileron_arriere: ['efficaciteAero', 'vitessePointe'],
-    pontons: ['vitessePointe', 'efficaciteAero'], fond_plat: ['viragesRapides', 'viragesLents'], suspensions: ['motricite', 'gestionPneus'],
+    // S3 : chaque caractéristique alimente deux pièces (avant : virages rapides et efficacité aéro trois, motricité une demie).
+    chassis: ['viragesLents', 'motricite'], aileron_avant: ['viragesRapides', 'efficaciteAero'], aileron_arriere: ['efficaciteAero', 'vitessePointe'],
+    pontons: ['vitessePointe'], fond_plat: ['viragesRapides', 'viragesLents'], suspensions: ['motricite', 'gestionPneus'],
   } as Record<TypePiece, readonly string[]>,
   conceptPlus: {
     chassis: ['viragesLents'], aileron_avant: ['viragesRapides'], aileron_arriere: ['viragesRapides'], pontons: ['fiabilite'],
@@ -125,7 +127,8 @@ export const COURSE_PHYSIQUE = { echelle: 1 };
  * Indice de performance en « points équivalents » (continuité avec les phases 3 à 11) : base de l'échelle (H, la voiture de référence
  * vaut 15) et note de gestion des pneus qui ne change rien (H).
  */
-export const INDICE_PHYSIQUE = { base: 15, notePneusReference: 14 };
+/** S3 : `poidsPneusDirect` réduit l'effet direct de la note de pneus (elle agit déjà par les suspensions) ; 1 avant le 27/11. */
+export const INDICE_PHYSIQUE = { base: 15, notePneusReference: 14, poidsPneusDirect: 0.45 };
 
 
 /**

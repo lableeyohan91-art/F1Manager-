@@ -195,7 +195,7 @@ export function depensesFixes(monde: Monde, e: Ecurie): { personnelPlafonne: num
     departements: deps.reduce((a, d) => a + d.effectif * (COUT_EMPLOYE.base + COUT_EMPLOYE.parPointNiveau * d.niveauMoyen), 0),
     operations: OPERATIONS_PAR_GP * nombreGrandsPrix(monde),
     // D-181 : entretien progressif (niveau²) : rester au sommet coûte, rattraper coûte moins cher.
-    entretien: inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + i.ageAnnees / 30), 0),
+    entretien: inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30), 0),
     salairesHorsPlafond: horsPlafond.reduce((a, c) => a + c.salaireMEUR, 0),
     marketing: fi ? PART_MARKETING * (commercialAnnuel(monde, e, fi) + revenusSponsors(monde, e.id, monde.date.annee)) : 0,
   };
