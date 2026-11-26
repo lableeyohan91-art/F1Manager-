@@ -691,3 +691,10 @@ Aucun code à ce stade.
 ### Ajouté
 - Diagnostic financier (`tools/diagnostic-finances.mts`, `tools/analyse-diagnostic-finances.py`).
 - Piège de la pauvreté (D-179) : investisseur d'opportunité, objectifs du propriétaire (affichés dans Finances) ; format 33.
+
+## [Économie, audit] — 26/11/2026
+
+### Ajouté
+- Audit de l'économie, sans modification (`docs/etudes/2026-11-26-audit-economie.md`).
+- Fiche de conception des leviers A (capacités achetables) et B (tableau de bord prévisionnel) : `docs/systemes/economie-capacites-et-previsions.md` (D-180, à discuter).
+- Sauvegarde de la version d'avant ce chantier : branche `sauvegarde-2026-11-26-avant-economie`.
