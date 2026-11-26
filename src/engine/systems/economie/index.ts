@@ -15,11 +15,12 @@
 
 import {
   ALEA_APPORT, BUDGET_IA, OBJECTIF_PROPRIETAIRE, DIVIDENDES, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
-  DEVELOPPEMENT_MINIMUM, EFFORT_TECHNIQUE_REFERENCE, MARGE_SECURITE_PLAFOND, ENTRETIEN_PAR_NIVEAU, FACTEUR_BUDGET_DEV, OPERATIONS_PAR_GP, PART_MARKETING,
+  DEVELOPPEMENT_MINIMUM, EFFORT_TECHNIQUE_REFERENCE, MARGE_SECURITE_PLAFOND, FACTEUR_BUDGET_DEV, OPERATIONS_PAR_GP, PART_MARKETING,
   PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
 } from '../../balance/finances';
 import { ENVELOPPE_PRIMES_MEUR, PARTS_PRIMES, PLAFOND_BUDGETAIRE_MEUR } from '../../balance/reglement';
 import { SOUFFLERIE } from '../../balance/monoplaces';
+import { INSTALLATIONS_COUT } from '../../balance/capacites';
 import { SEMAINE_NEGOCIATIONS } from '../../balance/contrats';
 import { ajouterEvenement } from '../../core/evenements';
 import { idsTries, parametre, table, type Monde } from '../../core/monde';
@@ -33,7 +34,8 @@ import { liberer, nePasProlonger, pourvoirPostes, proposerProlongation } from '.
 import { forceEcurie, teamPrincipal, valeurMarche } from '../humain/decision';
 import { evaluerSponsors, initialiserSponsors, marcheSponsors, revenusSponsors } from './sponsors';
 import { capaciteEmprunt, gererTresorerie, proprietaireActif, tauxDette, verifierInvestisseur, verifierLassitude } from './crises';
-import { avancerProjets, deciderProjet, negligerEntretien, vieillirInstallations } from './infrastructures';
+import { avancerProjets, commandeChantier, deciderProjet, negligerEntretien, vieillirInstallations } from './infrastructures';
+import { commandeEffectif, systemeCapacites } from './capacites';
 import { coutAnnuelAcademie } from '../juniors/academies';
 
 export * from './sponsors';
@@ -47,6 +49,7 @@ import { CONFERENCES } from '../../balance/medias';
 import { patienceImage } from '../medias/acces';
 export * from './infrastructures';
 export * from './previsions';
+export * from './capacites';
 
 const borner = (x: number, min: number, max: number) => Math.min(max, Math.max(min, x));
 const arrondi = (x: number) => Math.round(x * 10) / 10;
@@ -191,7 +194,8 @@ export function depensesFixes(monde: Monde, e: Ecurie): { personnelPlafonne: num
     personnelPlafonne: plafonnes.reduce((a, c) => a + c.salaireMEUR, 0),
     departements: deps.reduce((a, d) => a + d.effectif * (COUT_EMPLOYE.base + COUT_EMPLOYE.parPointNiveau * d.niveauMoyen), 0),
     operations: OPERATIONS_PAR_GP * nombreGrandsPrix(monde),
-    entretien: inst.reduce((a, i) => a + i.niveau * ENTRETIEN_PAR_NIVEAU * (1 + i.ageAnnees / 30), 0),
+    // D-181 : entretien progressif (niveau²) : rester au sommet coûte, rattraper coûte moins cher.
+    entretien: inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + i.ageAnnees / 30), 0),
     salairesHorsPlafond: horsPlafond.reduce((a, c) => a + c.salaireMEUR, 0),
     marketing: fi ? PART_MARKETING * (commercialAnnuel(monde, e, fi) + revenusSponsors(monde, e.id, monde.date.annee)) : 0,
   };
@@ -452,7 +456,7 @@ function prolongationTeamPrincipal(monde: Monde, e: Ecurie): void {
 
 export const systemeEconomieAnnuelle: Systeme = {
   nom: 'economie.annuelle',
-  executer({ monde, date }) {
+  executer({ monde, date, commanderIA }) {
     if (date.semaine !== 1) return;
     initialiserSponsors(monde);
     // Primes et satisfaction des sponsors de l'année écoulée (inscrites avant la clôture).
@@ -476,7 +480,7 @@ export const systemeEconomieAnnuelle: Systeme = {
       const fi = financesDe(monde, e.id);
       if (!fi || fi.budget.annee === date.annee) continue;
       const reserve = deciderBudget(monde, e, fi);
-      deciderProjet(monde, e, fi, reserve);
+      deciderProjet(monde, e, fi, reserve, commanderIA);
     }
   },
 };
@@ -503,7 +507,8 @@ export const systemeConseil: Systeme = {
 
 /** À installer AVANT les systèmes de la saison (le budget doit exister avant le développement d'intersaison). */
 export function installerEconomie(moteur: Moteur): Moteur {
-  return moteur.ajouterSysteme(systemeEconomieAnnuelle).ajouterSysteme(systemeComptabilite).ajouterSysteme(systemeConseil);
+  moteur.commandes.enregistrer(commandeEffectif).enregistrer(commandeChantier);
+  return moteur.ajouterSysteme(systemeEconomieAnnuelle).ajouterSysteme(systemeComptabilite).ajouterSysteme(systemeConseil).ajouterSysteme(systemeCapacites);
 }
 
 

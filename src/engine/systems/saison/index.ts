@@ -30,7 +30,7 @@ import {
 } from '../../model/types';
 import { genererChronique } from './chronique';
 import { apresGrandPrix, erreurPression, modificateurNiveau, noterLuttesTitre, titreSurCircuit } from '../carriere/performance';
-import { facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero } from '../economie';
+import { facteurAbandon, facteurBudgetDeveloppement, financesDe, niveauEffectif, restrictionAero } from '../economie';
 import { bonusSavoirDeveloppement } from '../technique/conception';
 import { usureSucces } from '../humain/decision';
 import { nombreGrandsPrix } from '../politique/acces';
@@ -149,7 +149,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       + USURE_SUCCES.effetCourse * borner((p.etat.motivation - USURE_SUCCES.motivationReference) / USURE_SUCCES.motivationReference, -1, 0);
     const alea = f.normale(0, sigma);
     // Audit (1.5) : la fiabilité peut dépasser 20 (bornes du développement) ; la probabilité ne descend pas sous le plancher.
-    const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - fiabiliteVoiture(monde, e, voitureDe(monde, e.id).fiabilite)) * ABANDON_MECANIQUE.parPoint);
+    // D-181 : le département fiabilité réduit (ou augmente) les pannes.
+    const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - fiabiliteVoiture(monde, e, voitureDe(monde, e.id).fiabilite)) * ABANDON_MECANIQUE.parPoint) * facteurAbandon(monde, e.id);
     const pInc = (INCIDENT.base + (20 - (p.competences['regularite'] ?? 10)) * INCIDENT.parPoint)
       * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.exigences.risqueAccident / INCIDENT.risqueReference);
     // Banc d'essai : `course.abandons` = 0 neutralise pannes et incidents (les tirages de rythme restent identiques).

@@ -1,7 +1,7 @@
 /** Phase 12a — monoplaces : physique, pièces, conception (D-170). */
 
 import type { Moteur, Systeme } from '../../core/moteur';
-import { avancerProjetsConception, commandeAnnulerProjet, commandeArchitecture, commandeDilemme, commandeLancerProjet, commandeRythme, commandeSoufflerie, decisionsConception } from './conception';
+import { avancerProjetsConception, commandeAnnulerProjet, commandeArchitecture, commandeDilemme, commandeLancerProjet, commandePriorite, commandeRythme, commandeSoufflerie, decisionsConception } from './conception';
 
 export * from './physique';
 export * from './pieces';
@@ -23,6 +23,6 @@ export const systemeMonoplaces: Systeme = {
 
 export function installerMonoplaces(moteur: Moteur): Moteur {
   moteur.ajouterSysteme(systemeMonoplaces);
-  moteur.commandes.enregistrer(commandeLancerProjet).enregistrer(commandeAnnulerProjet).enregistrer(commandeArchitecture).enregistrer(commandeSoufflerie).enregistrer(commandeRythme).enregistrer(commandeDilemme);
+  moteur.commandes.enregistrer(commandeLancerProjet).enregistrer(commandeAnnulerProjet).enregistrer(commandeArchitecture).enregistrer(commandeSoufflerie).enregistrer(commandeRythme).enregistrer(commandeDilemme).enregistrer(commandePriorite);
   return moteur;
 }

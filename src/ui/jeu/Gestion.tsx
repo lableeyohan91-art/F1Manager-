@@ -1,12 +1,13 @@
 /** Phase 10 — écrans Technique, Finances, Championnat, Direction et Réglages. */
 import { useState } from 'preact/hooks';
 import {
-  budgetMaxJoueur, candidatsPresidence, previsionFinances, copierMonde, ecuriesActives, profilTechnique, DOMAINES_DELEGATION, equipeStands, estDelegue, federation, financesDe, plafond, programmes,
+  budgetMaxJoueur, candidatsPresidence, previsionFinances, coutChantier, coutImmediat, coutParPersonne, departementDe, DEPARTEMENTS_REGLABLES, niveauRecrues, type Installation, copierMonde, ecuriesActives, profilTechnique, DOMAINES_DELEGATION, equipeStands, estDelegue, federation, financesDe, plafond, programmes,
   propositions, reglementEnVigueur, serialiser, table, TABLES, type DomaineJoueur, type Monde, type Saison,
 } from '../../engine';
 import { DOMAINES, LISTE_DOMAINES, ORIENTATIONS, PROGRAMMES } from '../../engine/balance/technique';
 import { ORIENTATIONS_STANDS } from '../../engine/balance/stands';
-import { DEVELOPPEMENT_MINIMUM, OBJECTIF_PROPRIETAIRE } from '../../engine/balance/finances';
+import { COUT_INFRASTRUCTURE, DEVELOPPEMENT_MINIMUM, INVESTISSEMENT_ANNUEL_MAX, OBJECTIF_PROPRIETAIRE } from '../../engine/balance/finances';
+import { INSTALLATIONS_COUT, RECRUTEMENT_DEPARTEMENT } from '../../engine/balance/capacites';
 import { enregistrer, exporter, importer } from '../../platform/navigateur/stockage';
 import { commander, ecurieJoueur, mesurerAppareil, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, saisonCourante, type Partie } from './partie';
 import type { Navigation } from './Jeu';
@@ -45,6 +46,69 @@ function Delegation({ partie, domaine, nav }: { partie: Partie; domaine: Domaine
 
 /* ------------------------------------------------------------------ Technique */
 
+/** D-181, levier A : effectifs des départements réglables et chantiers d'installations (commandes communes au joueur et à l'IA). */
+const LIB_DEP: Record<string, string> = { aero: 'Aérodynamique', conception: 'Conception', production: 'Production', fiabilite: 'Fiabilité' };
+const ROLE_DEP: Record<string, string> = { aero: 'vitesse des projets aéro', conception: 'vitesse des projets châssis et suspensions', production: 'vitesse de fabrication des pièces', fiabilite: 'pannes en course, erreurs détectées' };
+const LIB_INST: Record<string, string> = { soufflerie: 'Soufflerie', cfd: 'Centre de calcul (CFD)', simulateur: 'Simulateur', bureau_etudes: 'Bureau d’études' };
+function CarteCapacites({ partie, nav }: { partie: Partie; nav: Navigation }) {
+  const m = partie.monde;
+  const e = ecurieJoueur(m)!;
+  const [msg, noter] = useRetour();
+  const [dep, setDep] = useState('aero');
+  const [nombre, setNombre] = useState('10');
+  const [profil, setProfil] = useState('standard');
+  const personnelDelegue = estDelegue(m, e, 'personnel');
+  const rechercheDeleguee = estDelegue(m, e, 'recherche');
+  const fi = financesDe(m, e.id);
+  const insts = (Object.values(table(m, TABLES.installations)) as unknown as Installation[]).filter((i) => i.ecurie === e.id && i.type in LIB_INST);
+  const chantier = fi?.projets[0];
+  const agir = (t: string, prm: Record<string, unknown>, ok: string) => { noter(commander(partie, t, prm), ok); nav.rafraichir(); };
+  const d = departementDe(m, e.id, dep);
+  const n = Math.trunc(Number(nombre));
+  return (
+    <div class="carte pleine">
+      <h3>Effectifs et installations</h3>
+      {msg && <p class="retour">{msg}</p>}
+      <div class="defile"><table class="compact">
+        <thead><tr><th>Département</th><th>Effectif</th><th>Niveau</th><th>Cohésion</th><th>Agit sur</th><th>En cours</th></tr></thead>
+        <tbody>{DEPARTEMENTS_REGLABLES.map((t) => {
+          const x = departementDe(m, e.id, t);
+          if (!x) return null;
+          return <tr key={t}><td>{LIB_DEP[t]}</td><td class="num">{x.effectif}</td><td class="num">{x.niveauMoyen}</td>
+            <td class="num">{x.cohesion}{x.cohesionHabituelle !== undefined && x.cohesion < x.cohesionHabituelle ? ` (habituelle ${x.cohesionHabituelle})` : ''}</td>
+            <td class="muted petit">{ROLE_DEP[t]}</td>
+            <td class="petit">{x.mouvement ? `${x.mouvement.nombre > 0 ? '+' : ''}${x.mouvement.nombre} en semaine ${x.mouvement.effet.semaine}` : '—'}</td></tr>;
+        })}</tbody>
+      </table></div>
+      <Delegation partie={partie} domaine="personnel" nav={nav} />
+      {!personnelDelegue && d && (
+        <>
+          <div class="ligne-champs">
+            <label class="champ">Département <select value={dep} onChange={(v) => setDep((v.target as HTMLSelectElement).value)}>{DEPARTEMENTS_REGLABLES.map((t) => <option key={t} value={t}>{LIB_DEP[t]}</option>)}</select></label>
+            <label class="champ">Personnes (négatif pour réduire) <input class="num" inputMode="numeric" value={nombre} onInput={(v) => setNombre((v.target as HTMLInputElement).value)} /></label>
+            <label class="champ">Profils <select value={profil} onChange={(v) => setProfil((v.target as HTMLSelectElement).value)}><option value="standard">standard</option><option value="confirmes">confirmés (frais × {RECRUTEMENT_DEPARTEMENT.fraisConfirmes}, meilleur niveau)</option></select></label>
+          </div>
+          {Number.isFinite(n) && n !== 0 && <p class="muted petit">{n > 0
+            ? `Arrivée dans ${RECRUTEMENT_DEPARTEMENT.delaiArriveeSemaines} semaines, niveau ${niveauRecrues(m, d, profil === 'confirmes')} ; frais ${meur(coutImmediat(d, n, profil === 'confirmes'))} puis ${meur(n * coutParPersonne(d))} de salaires par an, sous le plafond. L’intégration fait baisser la cohésion quelques mois.`
+            : `Départ dans ${RECRUTEMENT_DEPARTEMENT.preavisSemaines} semaines ; indemnités ${meur(coutImmediat(d, n, false))}, sous le plafond ; la cohésion baisse.`}</p>}
+          <div class="actions"><button class="btn principal" onClick={() => agir('departement.effectif', { ecurie: e.id, departement: dep, nombre: n, profil }, n > 0 ? 'Recrutement lancé.' : 'Réduction décidée.')}>{n < 0 ? 'Réduire' : 'Recruter'}</button></div>
+        </>
+      )}
+      <h3>Installations techniques</h3>
+      <p class="muted petit">Enveloppe commune de {INVESTISSEMENT_ANNUEL_MAX} M€ par an hors plafond, un chantier à la fois. L’entretien (sous le plafond) croît avec le carré du niveau, et les niveaux au-delà de {INSTALLATIONS_COUT.seuilRendement} rapportent moins.</p>
+      {chantier && <p>Chantier en cours : {meur(chantier.depenseMEUR)} payés sur {meur(chantier.coutPrevuMEUR)} annoncés.</p>}
+      <ul class="liste-faits">{insts.map((i) => (
+        <li key={i.id}><strong>{LIB_INST[i.type]}</strong> : niveau {i.niveau}, {i.ageAnnees} ans, état {Math.round(i.etat)} %
+          {!rechercheDeleguee && !chantier && <>
+            {i.niveau < 10 && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'amelioration' }, 'Chantier lancé.')}>Agrandir ({meur(coutChantier(i, 'amelioration'))})</button></>}
+            {i.ageAnnees >= COUT_INFRASTRUCTURE.ageMinRenovation && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'renovation' }, 'Chantier lancé.')}>Rénover ({meur(coutChantier(i, 'renovation'))})</button></>}
+          </>}</li>
+      ))}</ul>
+      {rechercheDeleguee && <p class="muted petit">Recherche déléguée : votre directeur technique choisit aussi les chantiers.</p>}
+    </div>
+  );
+}
+
 export function EcranTechnique({ partie, nav }: { partie: Partie; nav: Navigation }) {
   const m = partie.monde;
   const e = ecurieJoueur(m)!;
@@ -65,6 +129,7 @@ export function EcranTechnique({ partie, nav }: { partie: Partie; nav: Navigatio
     <>
       {msg && <div class="carte retour" role="status">{msg}</div>}
       <CarteVoiture partie={partie} nav={nav} />
+      <CarteCapacites partie={partie} nav={nav} />
       <div class="carte">
         <h3>Savoir technique</h3>
         <p class="muted petit">Règlement en vigueur : {actuel ? `${ORIENTATIONS[actuel.orientation as keyof typeof ORIENTATIONS]?.libelle ?? 'règlement de départ'}, jusqu’en ${actuel.fin}` : '—'}.</p>

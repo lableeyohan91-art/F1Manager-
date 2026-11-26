@@ -5,10 +5,11 @@
  */
 import { useState } from 'preact/hooks';
 import {
-  allocationPeriode, architectureRecommandee, circuitsAVenir, coutTotal, dilemmes, fatiguePole, ecuriesActives, efficaciteAttendue, enveloppeRestante, estDelegue, indiceSurCircuit, meilleurProjet, paysage, paysagePercu,
+  allocationPeriode, architectureRecommandee, circuitsAVenir, coutTotal, departementDe, facteurIngenieurs, dilemmes, fatiguePole, ecuriesActives, efficaciteAttendue, enveloppeRestante, estDelegue, indiceSurCircuit, meilleurProjet, paysage, paysagePercu,
   piecesInstallees, projets, reglementAnnonce, type Circuit, type Ecurie, type Monde,
 } from '../../engine';
 import { PIECES, SOUFFLERIE, TYPES_PIECES, type TypePiece } from '../../engine/balance/monoplaces';
+import { ESSAIS_RENFORCES } from '../../engine/balance/capacites';
 import { commander, ecurieJoueur, meur, type Partie } from './partie';
 import type { Navigation } from './Jeu';
 
@@ -35,6 +36,7 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
   const [msg, setMsg] = useState<string | null>(null);
   const [type, setType] = useState<TypePiece>('aileron_arriere');
   const [concept, setConcept] = useState('0');
+  const [essais, setEssais] = useState('normaux');
   const delegue = estDelegue(m, e, 'recherche');
   const circuits = circuitsAVenir(m);
   const rangs = circuits.map((c) => ({ c, r: rangSur(m, e, c) }));
@@ -73,7 +75,8 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
         <h3>Équipes techniques</h3>
         {(['aero', 'conception'] as const).map((pole) => {
           const f = fatiguePole(m, e.id, pole);
-          return <p key={pole}>{pole === 'aero' ? 'Pôle aérodynamique' : 'Pôle conception'} : fatigue <strong style={{ color: couleurFatigue(f) }}>{Math.round(f)}</strong>/100
+          const eff = departementDe(m, e.id, pole)?.effectif ?? 0;
+          return <p key={pole}>{pole === 'aero' ? 'Pôle aérodynamique' : 'Pôle conception'} : <strong>{eff}</strong> ingénieurs, fatigue <strong style={{ color: couleurFatigue(f) }}>{Math.round(f)}</strong>/100
             <span class="muted petit"> · {f < 30 ? 'équipe fraîche' : f < 55 ? 'équipe fatiguée : erreurs plus probables' : 'équipe épuisée : ralentissez'}</span></p>;
         })}
         <p>Soufflerie : <strong>{Math.round(souff.heures)} h</strong> et {Math.round(souff.cfd)} simulations CFD par période ({Math.round(souff.bareme * 100)} % du barème, selon votre classement).</p>
@@ -124,6 +127,8 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
             const etat = p.fabricationJoursRestants !== undefined ? `fabrication, ${Math.max(0, Math.ceil(p.fabricationJoursRestants))} j` : `conception ${Math.round(100 * (1 - p.joursRestants / p.joursTotal))} %`;
             return <li key={p.id}><strong>{PIECES[t].libelle}</strong> ({libConcept(t, p.concept)}) : {etat}{p.fabricationJoursRestants === undefined ? `, rythme ${LIB_RYTHME[p.rythme ?? 'normal']}` : ''}
               {!delegue && p.fabricationJoursRestants === undefined && <> <select value={p.rythme ?? 'normal'} onChange={(v) => agir('conception.rythme', { projet: p.id, rythme: (v.target as HTMLSelectElement).value }, 'Rythme modifié.')}>{Object.entries(LIB_RYTHME).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></>}
+              {p.fabricationJoursRestants === undefined && <span class="muted petit"> · vitesse × {facteurIngenieurs(m, p).toLocaleString('fr-FR', { maximumFractionDigits: 2 })}{p.prioritaire ? ' (prioritaire)' : ''}{p.essaisRenforces ? ' · essais renforcés' : ''}</span>}
+              {!delegue && p.fabricationJoursRestants === undefined && <> <button class="btn" onClick={() => agir('conception.priorite', { projet: p.id, prioritaire: !p.prioritaire }, p.prioritaire ? 'Le projet n’est plus prioritaire.' : 'Projet prioritaire : il reçoit plus d’ingénieurs.')}>{p.prioritaire ? 'Retirer la priorité' : 'Prioritaire'}</button></>}
               {!delegue && p.fabricationJoursRestants === undefined && <> <button class="btn" onClick={() => agir('conception.annuler', { projet: p.id }, 'Projet abandonné (coût de conception non remboursé).')}>Abandonner</button></>}</li>;
           })}
         </ul>
@@ -134,13 +139,18 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
               <label class="champ">Concept <select value={concept} onChange={(v) => setConcept((v.target as HTMLSelectElement).value)}>
                 {[-1, -0.5, -0.25, 0, 0.25, 0.5, 1].map((c) => <option key={c} value={String(c)}>{c < 0 ? `${PIECES[type].conceptMoins} (${c})` : c > 0 ? `${PIECES[type].conceptPlus} (+${c})` : 'équilibré'}</option>)}
               </select></label>
+              <label class="champ">Essais <select value={essais} onChange={(v) => setEssais((v.target as HTMLSelectElement).value)}>
+                <option value="normaux">normaux</option>
+                <option value="renforces">renforcés (+{Math.round(100 * ESSAIS_RENFORCES.surcout)} % du coût de conception, résultat plus sûr)</option>
+              </select></label>
             </div>
             <p class="muted petit">
-              {PIECES[type].conceptionJours} jours de conception, {PIECES[type].fabricationJours} jours de fabrication, {meur(coutTotal(type))} en tout.
+              Les ingénieurs du pôle se partagent ses projets (au plus 3) : un projet seul avance plus vite, un projet prioritaire reçoit deux parts.
+              {' '}{PIECES[type].conceptionJours} jours de conception, {PIECES[type].fabricationJours} jours de fabrication, {meur(coutTotal(type))} en tout.
               Avis du responsable : {estime.gain > 0.005 ? `environ ${secondes(estime.gain)} par tour sur les circuits à venir avec un concept ${libConcept(type, estime.concept)}` : 'peu à gagner sur cette pièce pour l’instant'} ;
               efficacité visée {efficaciteAttendue(m, e, type, Number(concept)) >= (pieces.find((x) => x.type === type)?.efficacite ?? 0) ? 'en progrès' : 'en recul (concept trop différent de l’actuel)'}.
             </p>
-            <div class="actions"><button class="btn principal" onClick={() => agir('conception.lancer', { ecurie: e.id, type, concept: Number(concept) }, 'Projet lancé.')}>Lancer le projet</button></div>
+            <div class="actions"><button class="btn principal" onClick={() => agir('conception.lancer', { ecurie: e.id, type, concept: Number(concept), essais }, 'Projet lancé.')}>Lancer le projet</button></div>
           </>
         )}
       </div>

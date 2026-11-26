@@ -52,8 +52,8 @@ describe('Phase 12b — rythmes et fatigue', () => {
 
   it('charge d’un pôle : rythmes des projets en conception, rapportés aux équipes', () => {
     const p = (type: string, rythme: ProjetConception['rythme']) => ({ type, rythme } as ProjetConception);
-    expect(chargePole([p('aileron_avant', 'intensif'), p('fond_plat', 'normal')], 'aero', 2)).toBeCloseTo((1.35 + 1) / 2, 5);
-    expect(chargePole([p('chassis', 'intensif')], 'aero', 1)).toBe(0);
+    expect(chargePole([p('aileron_avant', 'intensif'), p('fond_plat', 'normal')], 'aero')).toBeCloseTo((1.35 + 1) / 2, 5);
+    expect(chargePole([p('chassis', 'intensif')], 'aero')).toBe(0);
   });
 });
 

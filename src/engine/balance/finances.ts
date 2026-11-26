@@ -38,8 +38,7 @@ export const ALEA_APPORT = 0.08;
 export const COUT_EMPLOYE = { base: 0.05, parPointNiveau: 0.003 };
 /** Opérations : logistique, déplacements, pièces de rechange, par Grand Prix. */
 export const OPERATIONS_PAR_GP = 1.2;
-/** Entretien d'une installation, par niveau, majoré avec l'âge (+ âge/30). */
-export const ENTRETIEN_PAR_NIVEAU = 0.25;
+/** Entretien d'une installation : remplacé par l'entretien progressif (D-181, balance/capacites.ts, INSTALLATIONS_COUT). */
 /** Marketing et hospitalité (hors plafond), en part des revenus commerciaux. */
 export const PART_MARKETING = 0.15;
 /** Nombre de cadres les mieux payés (hors pilotes) dont le salaire est hors plafond (règle réelle). */

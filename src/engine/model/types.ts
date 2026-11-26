@@ -477,6 +477,12 @@ export interface Departement {
   /** Phase 12b : fatigue du pôle (0 à 100 ; seuls les pôles aéro et conception) et semaine (rang) de sa dernière alerte. */
   fatigue?: number;
   derniereAlerte?: number;
+  /** D-181 : cohésion habituelle (vers laquelle la cohésion remonte ; l'effet sur la productivité est l'écart à cette valeur). */
+  cohesionHabituelle?: number;
+  /** D-181 : variation d'effectif décidée, effective à une date (recrues qui arrivent, ou départs après préavis), niveau des recrues. */
+  mouvement?: { nombre: number; niveau: number; effet: { annee: number; semaine: number } };
+  /** D-181 : rang de semaine du dernier recrutement (pas de licenciement juste après, sauf crise). */
+  dernierRecrutement?: number;
 }
 
 export type TypeInstallation =
@@ -597,6 +603,10 @@ export interface ProjetConception {
   cfd?: number;
   /** Phase 12b : rythme de travail (normal par défaut). */
   rythme?: 'allege' | 'normal' | 'intensif';
+  /** D-181 : projet prioritaire (reçoit plus d'ingénieurs du pôle). */
+  prioritaire?: boolean;
+  /** D-181 : essais renforcés (plus cher, résultat plus sûr). */
+  essaisRenforces?: boolean;
   /** Phase 12b : incidents survenus ; défaut caché (inconnu de l'écurie tant qu'il n'est pas découvert) ; projet devenu inutilisable. */
   incidents?: number;
   defaut?: { type: 'performance' | 'fragile'; ampleur: number };

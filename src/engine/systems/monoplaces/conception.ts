@@ -25,7 +25,9 @@ import {
 import { partRecherche, programmes, reglementAnnonce, reglementEnVigueur, savoir, savoirApplicable, savoirExistant } from '../technique/acces';
 import { repartirSoufflerie } from './soufflerie';
 import { depenser, enveloppeRestante } from './depenses';
-import { chargePole, departementPole, evoluerFatigue, facteurProductivite, fatiguePole, fraicheur, probaIncident, rythmeDe, type Pole } from './fatigue';
+import { chargePole, departementPole, evoluerFatigue, facteurProductivite, fatiguePole, fraicheur, partIngenieurs, probaIncident, rythmeDe, type Pole } from './fatigue';
+import { COHESION_DEPARTEMENT, ESSAIS_RENFORCES, FIABILITE_DEPARTEMENT, INGENIEURS, PRODUCTION, PROJETS_PAR_POLE } from '../../balance/capacites';
+import { facteurDetection, niveauUtile } from '../economie/capacites';
 import { alertesResponsables, creerDilemme, dilemmes, echeancesDilemmes, resoudre, responsable, stresser } from './dilemmes';
 import { presenterEvenement, tirerEvenement } from './evenements';
 import { rangSemaine } from '../../core/calendrier';
@@ -119,16 +121,41 @@ function departement(monde: Monde, idEcurie: string, pole: Pole): Departement | 
 }
 
 /** Projets simultanés possibles dans un pôle (effectif / taille d'équipe, borné). */
-export function emplacements(monde: Monde, idEcurie: string, pole: Pole): number {
-  return borner(Math.floor((departement(monde, idEcurie, pole)?.effectif ?? 0) / PROJETS.tailleEquipe), PROJETS.emplacementsMin, PROJETS.emplacementsMax);
+export function emplacements(_monde: Monde, _idEcurie: string, _pole: Pole): number {
+  // D-181 : même nombre pour toutes les écuries ; l'effectif agit sur la vitesse des projets (facteurIngenieurs).
+  return PROJETS_PAR_POLE;
 }
+
+/** D-181 : facteur de vitesse d'un projet selon les ingénieurs du pôle qui y travaillent (rendement décroissant). */
+export function facteurIngenieurs(monde: Monde, p: ProjetConception): number {
+  const pole = PIECES[p.type as TypePiece].pole as Pole;
+  const effectif = departement(monde, p.ecurie, pole)?.effectif ?? INGENIEURS.reference;
+  const affectes = effectif * partIngenieurs(projets(monde, p.ecurie), p);
+  return borner((affectes / INGENIEURS.reference) ** INGENIEURS.exposant, INGENIEURS.vitesseMin, INGENIEURS.vitesseMax);
+}
+
+/** D-181 : cohésion d'un département rapportée à sa valeur habituelle (intégration des recrues, licenciements). */
+export function facteurCohesion(d: Departement | undefined): number {
+  if (!d) return 1;
+  const ecart = d.cohesion - (d.cohesionHabituelle ?? d.cohesion);
+  return borner(1 + COHESION_DEPARTEMENT.effetParPoint * ecart, COHESION_DEPARTEMENT.facteurMin, COHESION_DEPARTEMENT.facteurMax);
+}
+
+/** D-181 : vitesse de fabrication selon l'effectif du département production. */
+export function facteurProduction(monde: Monde, idEcurie: string): number {
+  const d = (Object.values(table(monde, TABLES.departements)) as unknown as Departement[]).find((x) => x.ecurie === idEcurie && x.type === 'production');
+  if (!d) return 1;
+  return borner((d.effectif / PRODUCTION.reference) ** PRODUCTION.exposant, PRODUCTION.min, PRODUCTION.max) * facteurCohesion(d);
+}
+
 
 /** Productivité d'un pôle (jours de conception par jour de calendrier), installations et usure du succès comprises (D-140). */
 export function productivite(monde: Monde, idEcurie: string, pole: Pole): number {
   const niveau = departement(monde, idEcurie, pole)?.niveauMoyen ?? 10;
   const inst = (Object.values(table(monde, TABLES.installations)) as unknown as Installation[]).filter((i) => i.ecurie === idEcurie && INSTALLATIONS_POLE[pole].includes(i.type));
-  const niv = inst.length ? inst.reduce((a, i) => a + i.niveau, 0) / inst.length : 5;
-  return (PROJETS.productiviteBase + (PROJETS.productiviteNiveau * niveau) / 20) * (PROJETS.installationBase + PROJETS.installationParNiveau * (niv - 5));
+  // D-181 : rendement décroissant des installations au-dessus du seuil ; cohésion du département.
+  const niv = inst.length ? inst.reduce((a, i) => a + niveauUtile(i.niveau), 0) / inst.length : 5;
+  return (PROJETS.productiviteBase + (PROJETS.productiviteNiveau * niveau) / 20) * (PROJETS.installationBase + PROJETS.installationParNiveau * (niv - 5)) * facteurCohesion(departement(monde, idEcurie, pole));
 }
 
 /** Compétence de conception (sur 20) d'une écurie pour un pôle : directeur technique et responsable du pôle, motivation comprise. */
@@ -216,7 +243,9 @@ export function motifRefusProjet(monde: Monde, auteur: string, prm: Record<strin
   if (enCours.some((p) => p.type === type)) return 'Un projet est déjà en cours sur cette pièce.';
   const pole = PIECES[type].pole as Pole;
   if (enCours.filter((p) => PIECES[p.type as TypePiece].pole === pole && p.fabricationJoursRestants === undefined).length >= emplacements(monde, e.id, pole)) return 'Le pôle n’a plus d’équipe disponible.';
-  if (enveloppeRestante(monde, e.id) < coutTotal(type)) return 'Le budget de développement de l’année ne couvre pas ce projet.';
+  const essais = prm['essais'];
+  if (essais !== undefined && essais !== 'normaux' && essais !== 'renforces') return 'Essais : normaux ou renforcés.';
+  if (enveloppeRestante(monde, e.id) < coutTotal(type) + (essais === 'renforces' ? ESSAIS_RENFORCES.surcout * PIECES[type].coutProjetMEUR : 0)) return 'Le budget de développement de l’année ne couvre pas ce projet.';
   return null;
 }
 
@@ -226,11 +255,14 @@ export function lancerProjet(monde: Monde, auteur: string, prm: Record<string, u
   const type = String(prm['type']) as TypePiece;
   const def = PIECES[type];
   const id = `prj_${idEcurie.replace(/^eq_/, '')}_${type}_${monde.date.annee}_${monde.date.semaine}`;
-  const p: ProjetConception = { id, ecurie: idEcurie, type, concept: r2(Number(prm['concept'])), joursRestants: def.conceptionJours, joursTotal: def.conceptionJours, debut: { ...monde.date }, coutMEUR: def.coutProjetMEUR };
-  depenser(monde, idEcurie, def.coutProjetMEUR);
+  // D-181 : essais renforcés (plus cher, résultat plus sûr).
+  const essais = prm['essais'] === 'renforces';
+  const cout = r2(def.coutProjetMEUR * (essais ? 1 + ESSAIS_RENFORCES.surcout : 1));
+  const p: ProjetConception = { id, ecurie: idEcurie, type, concept: r2(Number(prm['concept'])), joursRestants: def.conceptionJours, joursTotal: def.conceptionJours, debut: { ...monde.date }, coutMEUR: cout, ...(essais ? { essaisRenforces: true } : {}) };
+  depenser(monde, idEcurie, cout);
   const evt = ajouterEvenement(monde, {
     type: 'conception.lancement', acteurs: [{ id: auteur, role: 'auteur' }, { id: idEcurie, role: 'ecurie' }], importance: 1, visibilite: 'prive',
-    contexte: { projet: id, piece: type, concept: p.concept, cout: def.coutProjetMEUR },
+    contexte: { projet: id, piece: type, concept: p.concept, cout, essaisRenforces: essais },
     texte: `Lancement d'un nouveau projet : ${def.libelle.toLowerCase()} (${p.concept > 0.05 ? def.conceptPlus : p.concept < -0.05 ? def.conceptMoins : 'concept équilibré'}).`,
   });
   p.evenement = evt.id;
@@ -335,7 +367,7 @@ function terminerConception(monde: Monde, p: ProjetConception): void {
   // selon la corrélation) : plus de CFD donne en moyenne une meilleure pièce, avec un rendement décroissant.
   const pole = PIECES[type].pole as Pole;
   const n = Math.min(SOUFFLERIE.variantesMax, 1 + Math.floor((p.cfd ?? 0) / SOUFFLERIE.cfdParVariante));
-  const sigmaExec = PROJETS.ecartExecution * Math.exp(-s / PROJETS.echelleSavoirExecution);
+  const sigmaExec = PROJETS.ecartExecution * Math.exp(-s / PROJETS.echelleSavoirExecution) * (p.essaisRenforces ? ESSAIS_RENFORCES.facteurIncertitude : 1);
   const sigmaPred = SOUFFLERIE.ecartPredictionCfd * (1.5 - correlation(monde, e.id, pole) / 20);
   let q = -Infinity, predite = -Infinity;
   for (let i = 0; i < n; i++) {
@@ -376,7 +408,8 @@ function terminerFabrication(monde: Monde, p: ProjetConception): void {
   });
   const pole = PIECES[type].pole as Pole;
   // Phase 12b, validation (soufflerie) : chaque heure de vent resserre l'estimation (rendement décroissant).
-  const sigma = (PROJETS.ecartEstimation * (1.5 - correlation(monde, e.id, pole) / 20) * (1 + fatiguePole(monde, e.id, pole) / 100)) / Math.sqrt(1 + (p.heures ?? 0) / SOUFFLERIE.heuresValidation);
+  const sigma = (PROJETS.ecartEstimation * (1.5 - correlation(monde, e.id, pole) / 20) * (1 + fatiguePole(monde, e.id, pole) / 100)) / Math.sqrt(1 + (p.heures ?? 0) / SOUFFLERIE.heuresValidation)
+    * (p.essaisRenforces ? ESSAIS_RENFORCES.facteurIncertitude : 1);
   const estimee = piece.efficacite + tirageLocal(monde, 'monoplaces.estimation', p.id).normale(0, sigma);
   const circuits = circuitsAVenir(monde);
   const avec = ecartMoyen(avecPiece(monde, e, type, estimee, piece.concept), circuits);
@@ -403,7 +436,7 @@ export function avancerProjetsConception(monde: Monde): void {
     // Phase 12b : fatigue des pôles selon la charge de la semaine, puis heures de soufflerie (moins utiles à une équipe fatiguée).
     for (const pole of ['aero', 'conception'] as Pole[]) {
       const d = departementPole(monde, id, pole);
-      if (d) evoluerFatigue(d, chargePole(liste, pole, emplacements(monde, id, pole)));
+      if (d) evoluerFatigue(d, chargePole(liste, pole));
     }
     repartirSoufflerie(monde, e, liste, fraicheur(fatiguePole(monde, id, 'aero')));
     for (const p of liste) avancerProjet(monde, p);
@@ -414,7 +447,7 @@ export function avancerProjetsConception(monde: Monde): void {
 /** Une semaine de travail sur un projet : avancement (rythme, fatigue), surcoût de l'intensif, incidents, alertes, événement prévu. */
 function avancerProjet(monde: Monde, p: ProjetConception): void {
   if (p.fabricationJoursRestants !== undefined) {
-    p.fabricationJoursRestants = r2(p.fabricationJoursRestants - 7);
+    p.fabricationJoursRestants = r2(p.fabricationJoursRestants - 7 * facteurProduction(monde, p.ecurie));
     if (p.fabricationJoursRestants <= 0) terminerFabrication(monde, p);
     return;
   }
@@ -422,7 +455,7 @@ function avancerProjet(monde: Monde, p: ProjetConception): void {
   const pole = PIECES[type].pole as Pole;
   const f = fatiguePole(monde, p.ecurie, pole);
   const rythme = rythmeDe(p);
-  const jours = 7 * productivite(monde, p.ecurie, pole) * RYTHMES.vitesse[rythme] * facteurProductivite(f);
+  const jours = 7 * productivite(monde, p.ecurie, pole) * facteurIngenieurs(monde, p) * RYTHMES.vitesse[rythme] * facteurProductivite(f);
   if (rythme === 'intensif') {
     // Surcoût variable (D-170 Q11) : heures supplémentaires, plus chères quand l'équipe est fatiguée ; stress du responsable.
     depenser(monde, p.ecurie, FATIGUE.surcout * p.coutMEUR * Math.min(1, jours / p.joursTotal) * (1 + f / 100));
@@ -442,7 +475,7 @@ function incidents(monde: Monde, p: ProjetConception, pole: Pole, f: number): vo
   p.incidents = (p.incidents ?? 0) + 1;
   stresser(monde, p.ecurie, pole, FATIGUE.stressIncident);
   const rigueur = responsable(monde, p.ecurie, pole)?.competences['rigueur'] ?? 10;
-  const equipe = (FATIGUE.detectionBase + (FATIGUE.detectionRigueur * rigueur) / 20) * fraicheur(f);
+  const equipe = Math.min(FIABILITE_DEPARTEMENT.detectionMax, (FATIGUE.detectionBase + (FATIGUE.detectionRigueur * rigueur) / 20) * fraicheur(f) * facteurDetection(monde, p.ecurie));
   const detecte = t.chance(1 - (1 - equipe) * Math.exp(-(p.heures ?? 0) / SOUFFLERIE.heuresDetection));
   if (detecte) {
     const retard = t.entier(FATIGUE.retardMinJours, FATIGUE.retardMaxJours);
@@ -487,6 +520,22 @@ export const commandeRythme: DefinitionCommande = {
     const p = table(monde, TABLES.projetsConception)[String(c.parametres['projet'])] as unknown as ProjetConception;
     p.rythme = String(c.parametres['rythme']) as ProjetConception['rythme'];
     ajouterEvenement(monde, { type: 'conception.rythme', acteurs: [{ id: c.auteur, role: 'auteur' }, { id: p.ecurie, role: 'ecurie' }], importance: 1, visibilite: 'prive', contexte: { projet: p.id, rythme: p.rythme } });
+  },
+};
+
+/** D-181 : projet prioritaire (il reçoit plus d'ingénieurs du pôle) : même commande pour le joueur et l'IA. */
+export const commandePriorite: DefinitionCommande = {
+  type: 'conception.priorite',
+  valider(monde, c) {
+    const p = table(monde, TABLES.projetsConception)[String(c.parametres['projet'] ?? '')] as unknown as ProjetConception | undefined;
+    if (!p || !auteurAutorise(monde, c.auteur, p.ecurie)) return 'Projet inconnu ou auteur non autorisé.';
+    if (p.fabricationJoursRestants !== undefined) return 'Le projet est déjà en fabrication.';
+    return typeof c.parametres['prioritaire'] === 'boolean' ? null : 'Préciser prioritaire : vrai ou faux.';
+  },
+  appliquer({ monde }, c) {
+    const p = table(monde, TABLES.projetsConception)[String(c.parametres['projet'])] as unknown as ProjetConception;
+    if (c.parametres['prioritaire'] === true) p.prioritaire = true; else delete p.prioritaire;
+    ajouterEvenement(monde, { type: 'conception.priorite', acteurs: [{ id: c.auteur, role: 'auteur' }, { id: p.ecurie, role: 'ecurie' }], importance: 1, visibilite: 'prive', contexte: { projet: p.id, prioritaire: !!p.prioritaire } });
   },
 };
 

@@ -350,6 +350,12 @@ const MIGRATIONS: Record<number, Migration> = {
   // v32 → v33 (D-179, piège de la pauvreté) : objectif du propriétaire et bonus d'apport (champs facultatifs des finances : le premier
   // objectif est fixé au bilan suivant). Rien à transformer.
   32: (m) => ({ ...m, versionFormat: 33 }),
+  // D-181 : cohésion habituelle des départements = cohésion au moment de la migration (l'effet part de zéro).
+  33: (m) => {
+    const deps = (m as { tables: Record<string, Record<string, { cohesion?: number; cohesionHabituelle?: number }>> }).tables['departements'] ?? {};
+    for (const d of Object.values(deps)) d.cohesionHabituelle ??= d.cohesion;
+    return { ...m, versionFormat: 34 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

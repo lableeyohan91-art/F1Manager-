@@ -417,13 +417,17 @@ export function construireMonde(graine: number, donnees: DonneesInitiales, scena
       strategie: chef('directeur_sportif'),
     };
     for (const [type, base] of Object.entries(DEPARTEMENTS.effectifs)) {
+      const niveauMoyen = note(f.normale(eq.niveauVoiture * 0.6 + 4, 1.5));
+      const cohesion = note(f.normale(12, 2.5));
       ajouter(monde, TABLES.departements, {
         id: nouvelIdentifiant(monde, 'dep'),
         ecurie: eq.id,
         type: type as Departement['type'],
         effectif: Math.round(base * facteur),
-        niveauMoyen: note(f.normale(eq.niveauVoiture * 0.6 + 4, 1.5)),
-        cohesion: note(f.normale(12, 2.5)),
+        niveauMoyen,
+        cohesion,
+        // D-181 : cohésion habituelle (l'effet sur la productivité est l'écart à cette valeur).
+        cohesionHabituelle: cohesion,
         responsable: responsables[type] ?? '',
       } satisfies Departement);
     }
