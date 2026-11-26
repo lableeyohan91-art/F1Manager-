@@ -125,18 +125,25 @@ describe('Audit — économie (phase 5 et sponsoring)', () => {
     const m = sc.creerMonde(12), moteur = sc.creerMoteur();
     executerCommandeJoueur(moteur, m, { type: 'joueur.prendre_ecurie', auteur: 'joueur', parametres: { ecurie: 'eq_haas', prenom: 'Camille', nom: 'Essai' } });
     const budget = (montant: number) => executerCommandeJoueur(moteur, m, { type: 'budget.developpement', auteur: m.joueur!.personne, parametres: { ecurie: 'eq_haas', montant } });
+    // D-181 : le joueur garde la main sur le personnel (sinon les frais d'un recrutement délégué faussent la comparaison des mois).
+    expect(executerCommandeJoueur(moteur, m, { type: 'joueur.deleguer', auteur: m.joueur!.personne, parametres: { ecurie: 'eq_haas', domaine: 'personnel', actif: false } }).ok).toBe(true);
     expect(budget(60).ok).toBe(true);
     moteur.avancer(m, 2);
     const fi = (Object.values(table(m, TABLES.finances)) as unknown as { ecurie: string; budget: { developpementMEUR: number } }[]).find((f) => f.ecurie === 'eq_haas')!;
     expect(fi.budget.developpementMEUR).toBe(60); // non écrasé par le budget annuel de la semaine 1
     while (m.date.semaine % 4 !== 1) moteur.avancer(m, 1); // juste après une écriture comptable
     const avant = facteurBudgetDeveloppement(m, 'eq_haas');
+    // D-181 : comparaison contrefactuelle (même monde, même période) : les projets se paient surtout en début d'année, deux mois
+    // successifs ne se comparent donc pas ; on compare le même mois payé avec 60 M€ et avec 200 M€.
+    const temoin = deserialiser(serialiser(m));
     expect(budget(200).ok).toBe(true); // D-166 : plus de délai entre deux modifications
     expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBe(avant); // rien n'a encore été payé : aucun effet
     moteur.avancer(m, 4); // l'écriture suivante paie le nouveau budget
-    expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBeGreaterThan(avant);
+    sc.creerMoteur().avancer(temoin, 4);
+    expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBeGreaterThan(facteurBudgetDeveloppement(temoin, 'eq_haas'));
+    const paye = facteurBudgetDeveloppement(m, 'eq_haas');
     expect(budget(15).ok).toBe(true);
-    expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBeGreaterThan(avant); // l'effet reste celui de l'argent déjà payé
+    expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBe(paye); // l'effet reste celui de l'argent déjà payé
   });
 
   it('5.2 : chaque année est jugée avec le plafond en vigueur cette année-là', () => {
