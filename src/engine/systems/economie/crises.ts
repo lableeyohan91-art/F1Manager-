@@ -9,7 +9,7 @@
  */
 
 import {
-  CRISE_MOTIVATION, LASSITUDE, LIMITE_DETTE_RECETTES, PERIODES_CRISE_AVANT_ADMINISTRATION, PERIODES_PAR_AN, RACHAT, REMBOURSEMENT, REPRENEURS,
+  CRISE_MOTIVATION, INVESTISSEUR, LASSITUDE, LIMITE_DETTE_RECETTES, PERIODES_CRISE_AVANT_ADMINISTRATION, PERIODES_PAR_AN, RACHAT, REMBOURSEMENT, REPRENEURS,
   RESERVE_MINIMALE_PERIODES, SAUVETAGE, TAUX_DETTE,
 } from '../../balance/finances';
 import { ajouterEvenement } from '../../core/evenements';
@@ -124,7 +124,7 @@ function tenterSauvetage(monde: Monde, e: Ecurie, fi: Finances, depensesPeriode:
 }
 
 /** Changement de propriétaire : nouveau type, nouvelle personnalité, dette en partie effacée, réserve injectée. */
-export function racheter(monde: Monde, e: Ecurie, fi: Finances, motif: 'administration' | 'lassitude', depensesPeriode: number): void {
+export function racheter(monde: Monde, e: Ecurie, fi: Finances, motif: 'administration' | 'lassitude' | 'investisseur', depensesPeriode: number, exigences: { apportMin?: number; ambitionMin?: number } = {}): void {
   const ancien = proprietaireActif(monde, e.id);
   const f = tirageLocal(monde, 'rachat', e.id, monde.date.annee, monde.date.semaine);
   const types = Object.keys(REPRENEURS) as TypeProprietaire[];
@@ -132,8 +132,8 @@ export function racheter(monde: Monde, e: Ecurie, fi: Finances, motif: 'administ
   const r = REPRENEURS[type]!;
   const trait = () => Math.round(borner(f.normale(10.5, 3.5), 1, 20));
   const nouveau: Proprietaire = {
-    id: nouvelIdentifiant(monde, 'pro'), ecurie: e.id, type, apportBaseMEUR: arrondi(r.apportMin + f.suivant() * (r.apportMax - r.apportMin)),
-    patience: trait(), ambition: trait(), risque: trait(), actif: true, depuis: monde.date.annee,
+    id: nouvelIdentifiant(monde, 'pro'), ecurie: e.id, type, apportBaseMEUR: arrondi(Math.max(exigences.apportMin ?? 0, r.apportMin + f.suivant() * (r.apportMax - r.apportMin))),
+    patience: trait(), ambition: Math.max(exigences.ambitionMin ?? 0, trait()), risque: trait(), actif: true, depuis: monde.date.annee,
   };
   if (ancien) ancien.actif = false;
   table(monde, TABLES.proprietaires)[nouveau.id] = nouveau as unknown as Entite;
@@ -148,7 +148,9 @@ export function racheter(monde: Monde, e: Ecurie, fi: Finances, motif: 'administ
   const ev = ajouterEvenement(monde, {
     type: 'proprietaire.rachat', acteurs: [{ id: e.id, role: 'ecurie' }, { id: nouveau.id, role: 'acheteur' }, ...(ancien ? [{ id: ancien.id, role: 'vendeur' }] : [])],
     importance: 4, visibilite: 'public', contexte: { motif, type, detteEffacee: arrondi(efface), injection: arrondi(injection) },
-    texte: `${e.nom} change de propriétaire (${motif === 'administration' ? 'rachat après administration' : 'vente par un propriétaire lassé'}).`,
+    texte: motif === 'investisseur'
+      ? `Un investisseur ambitieux rachète ${e.nom}, qui stagnait en fond de grille : plus de moyens, et de nouvelles exigences.`
+      : `${e.nom} change de propriétaire (${motif === 'administration' ? 'rachat après administration' : 'vente par un propriétaire lassé'}).`,
   });
   // Le nouveau propriétaire veut souvent son propre team principal.
   const tp = teamPrincipal(monde, e.id);
@@ -178,4 +180,27 @@ export function verifierLassitude(monde: Monde, e: Ecurie, fi: Finances, rangAtt
   if (rang <= rangAttendu) return;
   if (!tirageLocal(monde, 'proprietaire.lassitude', e.id, monde.date.annee).chance(LASSITUDE.probabilite)) return;
   racheter(monde, e, fi, 'lassitude', totalDepenses(h.at(-1)!) / PERIODES_PAR_AN);
+}
+
+/**
+ * D-179, levier A : investisseur d'opportunité (bilan annuel). Une écurie qui stagne dans les dernières places sans être en crise vaut peu ;
+ * un repreneur ambitieux peut l'acheter pour la faire monter. Mêmes règles pour l'écurie du joueur (nouveau patron, nouvelles exigences).
+ */
+export function verifierInvestisseur(monde: Monde, e: Ecurie, fi: Finances): void {
+  const p = proprietaireActif(monde, e.id);
+  if (!p || fi.etatCrise === 'administration') return;
+  if (p.depuis && monde.date.annee - p.depuis < INVESTISSEUR.delaiDepuisRachat) return;
+  const saisons = table(monde, TABLES.saisons);
+  let enBas = 0;
+  for (let k = 1; k <= INVESTISSEUR.fenetreSaisons; k++) {
+    const s = saisons[`ssn_${monde.date.annee - k}`] as unknown as Saison | undefined;
+    if (!s) return; // historique trop court
+    const rang = s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
+    if (rang > 0 && rang > s.constructeurs.length - INVESTISSEUR.placesBas) enBas++;
+  }
+  if (enBas < INVESTISSEUR.saisonsBasMin) return;
+  const proba = borner(INVESTISSEUR.probabiliteBase + INVESTISSEUR.parPointImpatience * (10 - p.patience), INVESTISSEUR.probabiliteMin, INVESTISSEUR.probabiliteMax);
+  if (!tirageLocal(monde, 'proprietaire.investisseur', e.id, monde.date.annee).chance(proba)) return;
+  const dernier = fi.historique.at(-1);
+  racheter(monde, e, fi, 'investisseur', dernier ? totalDepenses(dernier) / PERIODES_PAR_AN : 0, { apportMin: INVESTISSEUR.hausseApportMin * p.apportBaseMEUR, ambitionMin: INVESTISSEUR.ambitionMin });
 }

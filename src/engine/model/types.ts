@@ -930,6 +930,10 @@ export interface Finances {
   projets: ProjetInfrastructure[];
   /** Retrait du propriétaire en cours d'année (tiré au bilan, annoncé à la semaine indiquée). */
   chocApport?: { annee: number; semaine: number; facteur: number; annonce?: boolean };
+  /** D-179 : objectif fixé par le propriétaire pour la saison `annee` (place au championnat constructeurs, ou mieux). */
+  objectifProprietaire?: { annee: number; place: number };
+  /** D-179 : objectif atteint → apport de la saison `annee` multiplié par `facteur`. */
+  bonusApport?: { annee: number; facteur: number };
   /** Audit 5.12 : fait d'entrée dans la dernière crise (cause des suites). */
   evenementCrise?: string;
   /** Phase 12a : dépenses des projets de conception et de fabrication (année en cours, et reste à payer à la prochaine écriture). */

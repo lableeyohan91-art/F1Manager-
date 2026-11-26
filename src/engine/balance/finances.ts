@@ -153,6 +153,19 @@ export const SAUVETAGE: Record<string, number> = { constructeur: 0.7, milliardai
 export const PERIODES_CRISE_AVANT_ADMINISTRATION = 3;
 /** Lassitude : chaque année, un propriétaire impatient qui perd de l'argent et des places peut vendre. */
 export const LASSITUDE = { anneesDeficit: 3, probabilite: 0.12, patienceMax: 9 };
+/**
+ * Chantier 2, levier A (D-179) — investisseur d'opportunité : une écurie qui stagne dans les 3 dernières places (au moins `saisonsBasMin`
+ * des `fenetreSaisons` dernières saisons), hors crise, vaut peu et attire un repreneur. Chance par bilan annuel : `probabiliteBase` +
+ * `parPointImpatience` × (10 − patience du propriétaire), bornée à [`probabiliteMin`, `probabiliteMax`] ; jamais moins de
+ * `delaiDepuisRachat` saisons après un changement de propriétaire. Le repreneur apporte au moins `hausseApportMin` × l'apport de base de
+ * l'ancien propriétaire et son ambition vaut au moins `ambitionMin` (H : il achète pour faire monter l'écurie).
+ */
+export const INVESTISSEUR = { fenetreSaisons: 4, saisonsBasMin: 3, placesBas: 3, probabiliteBase: 0.25, parPointImpatience: 0.03, probabiliteMin: 0.1, probabiliteMax: 0.5, delaiDepuisRachat: 5, hausseApportMin: 1.4, ambitionMin: 12 };
+/**
+ * Chantier 2, levier C (D-179) — objectif du propriétaire : à chaque bilan, gagner `progressionPlaces` place(s) au championnat
+ * constructeurs (le champion : garder la première). Atteint : apport de la saison suivante × (1 + `bonusApport`).
+ */
+export const OBJECTIF_PROPRIETAIRE = { progressionPlaces: 1, bonusApport: 0.15 };
 /** Rachat : types de repreneurs (poids), apport annuel de base (M€, fourchette), part de la dette effacée, chance de changer de team principal. */
 export const REPRENEURS: Record<string, { poids: number; apportMin: number; apportMax: number }> = {
   constructeur: { poids: 2, apportMin: 100, apportMax: 200 },

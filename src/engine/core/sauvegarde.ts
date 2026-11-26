@@ -347,6 +347,9 @@ const MIGRATIONS: Record<number, Migration> = {
     tables['dilemmesTechniques'] ??= {};
     return { ...m, versionFormat: 32 };
   },
+  // v32 → v33 (D-179, piège de la pauvreté) : objectif du propriétaire et bonus d'apport (champs facultatifs des finances : le premier
+  // objectif est fixé au bilan suivant). Rien à transformer.
+  32: (m) => ({ ...m, versionFormat: 33 }),
 };
 
 export function serialiser(monde: Monde): string {

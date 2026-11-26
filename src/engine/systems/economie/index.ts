@@ -14,7 +14,7 @@
  */
 
 import {
-  ALEA_APPORT, BUDGET_IA, DIVIDENDES, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
+  ALEA_APPORT, BUDGET_IA, OBJECTIF_PROPRIETAIRE, DIVIDENDES, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
   DEVELOPPEMENT_MINIMUM, EFFORT_TECHNIQUE_REFERENCE, MARGE_SECURITE_PLAFOND, ENTRETIEN_PAR_NIVEAU, FACTEUR_BUDGET_DEV, OPERATIONS_PAR_GP, PART_MARKETING,
   PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
 } from '../../balance/finances';
@@ -32,7 +32,7 @@ import { ecuriesActives, indiceMoyen } from '../saison/performance';
 import { liberer, nePasProlonger, pourvoirPostes, proposerProlongation } from '../humain/contrats';
 import { forceEcurie, teamPrincipal, valeurMarche } from '../humain/decision';
 import { evaluerSponsors, initialiserSponsors, marcheSponsors, revenusSponsors } from './sponsors';
-import { capaciteEmprunt, gererTresorerie, proprietaireActif, tauxDette, verifierLassitude } from './crises';
+import { capaciteEmprunt, gererTresorerie, proprietaireActif, tauxDette, verifierInvestisseur, verifierLassitude } from './crises';
 import { avancerProjets, deciderProjet, negligerEntretien, vieillirInstallations } from './infrastructures';
 import { coutAnnuelAcademie } from '../juniors/academies';
 
@@ -171,7 +171,9 @@ function apportAnnuel(monde: Monde, e: Ecurie, fi: Finances, annee: number): num
   const deficit = dernier ? Math.max(0, totalDepenses(dernier) - totalRecettes(dernier)) / Math.max(1, totalRecettes(dernier)) : 0;
   const envie = 1 + profil.sensibiliteResultats * ((p.ambition - 10) / 10) * (proche - 0.3) - profil.sensibilitePertes * deficit;
   const variation = (1 - profil.stabilite) * f.normale(0, 1) + f.normale(0, ALEA_APPORT);
-  return Math.max(0, p.apportBaseMEUR * envie * (1 + variation));
+  // D-179, levier C : objectif de l'an dernier atteint → apport majoré cette saison.
+  const bonus = fi.bonusApport?.annee === annee ? fi.bonusApport.facteur : 1;
+  return Math.max(0, p.apportBaseMEUR * envie * (1 + variation) * bonus);
 }
 
 /** Dépenses fixes annuelles (hors développement), en séparant plafonné et hors plafond. */
@@ -347,6 +349,36 @@ function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
 
 /* ---------------------------------------------------------------- Conseil */
 
+/**
+ * D-179, levier C : objectif du propriétaire (bilan annuel). On juge l'objectif de la saison écoulée (atteint → apport majoré la saison
+ * qui commence), puis on fixe le suivant : gagner une place (le champion : la garder). Visible par le joueur (événement privé).
+ */
+function objectifProprietaire(monde: Monde, e: Ecurie, fi: Finances): void {
+  const p = proprietaireActif(monde, e.id);
+  const s = table(monde, TABLES.saisons)[`ssn_${monde.date.annee - 1}`] as unknown as Saison | undefined;
+  if (!p || !s) return;
+  const rang = s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
+  if (rang <= 0) return;
+  const o = fi.objectifProprietaire;
+  if (o && o.annee === monde.date.annee - 1) {
+    const atteint = rang <= o.place;
+    if (atteint) fi.bonusApport = { annee: monde.date.annee, facteur: 1 + OBJECTIF_PROPRIETAIRE.bonusApport };
+    ajouterEvenement(monde, {
+      type: 'proprietaire.objectif_bilan', acteurs: [{ id: p.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'prive',
+      contexte: { objectif: o.place, rang, atteint },
+      texte: atteint ? `Objectif du propriétaire atteint (${rang}e, objectif ${o.place}e) : son apport augmente de ${Math.round(100 * OBJECTIF_PROPRIETAIRE.bonusApport)} % cette saison.`
+        : `Objectif du propriétaire manqué (${rang}e, objectif ${o.place}e).`,
+    });
+  }
+  const place = Math.max(1, rang - OBJECTIF_PROPRIETAIRE.progressionPlaces);
+  fi.objectifProprietaire = { annee: monde.date.annee, place };
+  ajouterEvenement(monde, {
+    type: 'proprietaire.objectif', acteurs: [{ id: p.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'prive',
+    contexte: { place, annee: monde.date.annee },
+    texte: `Le propriétaire de ${e.nom} fixe l'objectif de la saison : ${place === 1 ? 'le titre' : `${place}e place ou mieux`} au championnat constructeurs.`,
+  });
+}
+
 /** Classement attendu par le conseil : rang des moyens financiers (recettes annuelles) parmi les écuries. */
 function rangAttendu(monde: Monde, idEcurie: string): number {
   const moyens = ecuriesActives(monde).map((e) => {
@@ -430,6 +462,8 @@ export const systemeEconomieAnnuelle: Systeme = {
       vieillirInstallations(monde, e, fi);
       evaluerTeamPrincipal(monde, e);
       verifierLassitude(monde, e, fi, rangAttendu(monde, e.id));
+      objectifProprietaire(monde, e, fi);
+      verifierInvestisseur(monde, e, fi);
     }
     // Un team principal remercié est remplacé avant de bâtir le budget.
     if (ecuriesActives(monde).some((e) => !teamPrincipal(monde, e.id))) pourvoirPostes(monde);

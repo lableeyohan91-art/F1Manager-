@@ -6,7 +6,7 @@ import {
 } from '../../engine';
 import { DOMAINES, LISTE_DOMAINES, ORIENTATIONS, PROGRAMMES } from '../../engine/balance/technique';
 import { ORIENTATIONS_STANDS } from '../../engine/balance/stands';
-import { DEVELOPPEMENT_MINIMUM } from '../../engine/balance/finances';
+import { DEVELOPPEMENT_MINIMUM, OBJECTIF_PROPRIETAIRE } from '../../engine/balance/finances';
 import { enregistrer, exporter, importer } from '../../platform/navigateur/stockage';
 import { commander, ecurieJoueur, mesurerAppareil, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, saisonCourante, type Partie } from './partie';
 import type { Navigation } from './Jeu';
@@ -140,6 +140,12 @@ export function EcranFinances({ partie, nav }: { partie: Partie; nav: Navigation
         <p>Trésorerie <strong>{meur(fi.tresorerieMEUR)}</strong>{fi.detteMEUR > 0 ? ` · dette ${meur(fi.detteMEUR)}` : ''} · état : {fi.etatCrise === 'sain' ? 'sain' : fi.etatCrise}</p>
         <p>Plafond budgétaire {meur(plafond(m))} · dépenses plafonnées depuis janvier {meur(plafonnees)}</p>
         <p class="muted">Recettes depuis janvier {meur(recettes)} (primes {meur(c.primes)}, commercial {meur(c.commercial)}, sponsors {meur(c.sponsors)}, propriétaire {meur(c.apport)})</p>
+        {/* D-179 : objectif du propriétaire de la saison, et bonus d'apport gagné l'an dernier. */}
+        {fi.objectifProprietaire?.annee === m.date.annee && (
+          <p>Objectif du propriétaire : <strong>{fi.objectifProprietaire.place === 1 ? 'le titre constructeurs' : `${fi.objectifProprietaire.place}e place ou mieux`}</strong>
+            <span class="muted petit"> · atteint, il augmente son apport de {Math.round(100 * OBJECTIF_PROPRIETAIRE.bonusApport)} % la saison suivante</span></p>
+        )}
+        {fi.bonusApport?.annee === m.date.annee && <p class="retour">Objectif de l'an dernier atteint : apport du propriétaire majoré de {Math.round(100 * (fi.bonusApport.facteur - 1))} % cette saison.</p>}
       </div>
       <Sponsors partie={partie} nav={nav} />
       <div class="carte">
