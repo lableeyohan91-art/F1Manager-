@@ -46,7 +46,37 @@ Deux coefficients nommés dans `balance/` (`REFORME.usureFondamentale`, `REFORME
 - Le champion sortant n'est ni protégé ni puni : il garde le titre une fois sur trois et reste dans les 4 premiers 4 fois sur 5, comme
   aujourd'hui (les grandes ont les meilleurs ingénieurs et pilotes, et préparent mieux).
 
-Campagne complète (10 graines × 30 saisons, tous les indicateurs) : `docs/rapports/phase-12d/` (en cours au moment de l'écriture).
+### Campagne complète (10 graines × 30 saisons, mêmes graines ; tous les indicateurs : `docs/rapports/phase-12d/donnees/`)
+
+| Indicateur | Objectif D-081 | Actuel | **Nouvelle ère** |
+| --- | --- | --- | --- |
+| Séries de 30 saisons avec 5 titres consécutifs ou plus | dynasties très rares | 60 % | **30 %** |
+| Plus longue série de titres constructeurs | — | 6,5 | **5,1** |
+| Titre ouvert avant la dernière manche | 30–50 % | 29 % | **38 %** ✓ |
+| Lutte jusqu'à la dernière manche entre écuries différentes | — | 22 % | **31 %** |
+| Dominations (≥ 120 points d'écart) | < 5 % | 10 % | **7 %** (encore au-dessus) |
+| Écart de points entre les deux premiers | — | 59 | 51 |
+| Champions constructeurs différents | 5–8 / 20 saisons | 6,5 | 6,3 |
+| Champions pilotes différents | — | 12,6 | 12,4 |
+| Remontées (+3 places) | — | 29,0 | 29,8 |
+| Écuries changeant d'étage par saison | 2,8–3,8 | 3,4 | 3,4 |
+| Transitions sans changement d'étage | — | 11 % | 9 % |
+| Vainqueurs différents par saison | — | 7,8 | 7,7 |
+| Écuries victorieuses par saison | 4–6 | 5,7 | 5,5 |
+| Part des victoires de l'écurie dominante | — | 46 % | 44 % |
+| Écart 1re–dernière voiture | — | 0,99 % | 1,06 % |
+| Corrélation voiture ↔ points | — | 0,76 | 0,77 |
+| **Dernière écurie qui marque** | 60–90 % | 71 % | **61 %** (défavorable, à la limite) |
+| **Écuries sans aucune victoire sur 30 saisons** | — | 0,2 | **0,5** (défavorable) |
+| Victoires inattendues par saison | — | 1,4 | 1,2 (défavorable) |
+| Plus forte progression d'une voiture dans la saison | — | 0,91 | 0,97 |
+| Taux d'abandon | — | 6 % | 6 % |
+
+Vitesse des voitures (4 graines × 30 saisons) : l'année d'une grande réforme, la grille recule de **2,1 points** en moyenne (79 % des
+écuries reculent) ; une année normale, +0,8. La grille plafonne vers 22–23 points au lieu de 24–25 : pas de course à l'infini.
+
+**Lecture** : la nouvelle ère divise par deux les dynasties et ouvre les championnats. Défavorable : la dernière écurie marque moins souvent
+et une écurie de plus, en moyenne, ne gagne jamais en 30 saisons — c'est encore le piège de la pauvreté (chantier 2).
 
 ## 4. Critères de réussite proposés
 
