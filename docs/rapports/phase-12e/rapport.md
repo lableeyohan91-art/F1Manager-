@@ -60,3 +60,24 @@
 
 **Lecture** : nette amélioration, objectifs **pas encore atteints** (une écurie reste encore trop longtemps en bas dans certaines parties).
 Le levier B (sponsor d'opportunité et pilote payant) vise précisément les écuries qui restent sans sponsor.
+
+## 5. Levier B (offre du pilote soutenu) : mesure du prototype (désactivé par défaut)
+
+Mesure par paires (20 graines × 30 saisons, chaque partie jouée avec et sans l'offre ; 47 offres acceptées par l'IA ; chèque moyen
+17 M€, groupe ≈ 28 M€ par an pendant 5 ans ; pilote 1,7 à 1,8 point sous la référence de l'écurie). Données : `donnees/pilote-soutenu-*`.
+
+| Saison après l'offre | Sponsor à la place d'un emplacement : effet sur la place | Argent en plus des sponsors : effet | Développement payé (en plus) |
+| --- | --- | --- | --- |
+| +1 | −0,77 | −0,60 | 68 → 73 M€ |
+| +2 | −0,89 | −0,69 | 68 → 75 M€ |
+| +3 | −0,79 | −0,44 | 67 → 74 M€ |
+| +4 | −0,52 | −0,14 | 67 → 73 M€ |
+| +5 | +0,34 | +0,08 | 66 → 74 M€ |
+
+- Version de la fiche : le sponsor du pilote prend la place d'un sponsor que l'écurie aurait eu de toute façon ; aucun argent en plus pour la
+  voiture ; seul reste le coût sportif.
+- Version additionnelle : 28 M€ par an ne deviennent que 5 à 8 M€ de développement (le reste est bloqué par le plafond budgétaire ou part en
+  trésorerie et en dividendes) ; le pilote plus faible coûte plus qu'il ne rapporte pendant 3 à 4 saisons. Même chez Haas (12 cas) :
+  développement +10 M€, place −0,1 à −0,5.
+- **Conclusion : sous cette forme, l'offre n'aide pas l'écurie.** Elle confirme le diagnostic 12d : le niveau des pilotes compte plus que
+  l'argent dépensé (corrélation avec la place 0,41 contre 0,14).
