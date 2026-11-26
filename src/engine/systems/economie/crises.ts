@@ -15,7 +15,7 @@ import {
 import { ajouterEvenement } from '../../core/evenements';
 import { nouvelIdentifiant } from '../../core/identifiants';
 import { tirageLocal } from '../../core/moteur';
-import { idsTries, table, type Entite, type Monde } from '../../core/monde';
+import { idsTries, parametre, table, type Entite, type Monde } from '../../core/monde';
 import { totalDepenses, totalRecettes } from '../../model/finances';
 import { TABLES, type Contrat, type Ecurie, type Finances, type Personne, type Proprietaire, type Saison, type TypeProprietaire } from '../../model/types';
 import { liberer, pourvoirPostes } from '../humain/contrats';
@@ -188,6 +188,7 @@ export function verifierLassitude(monde: Monde, e: Ecurie, fi: Finances, rangAtt
  */
 export function verifierInvestisseur(monde: Monde, e: Ecurie, fi: Finances): void {
   const p = proprietaireActif(monde, e.id);
+  if (parametre(monde, 'proprietaire.investisseur', 1) <= 0) return; // expérience : levier désactivé
   if (!p || fi.etatCrise === 'administration') return;
   if (p.depuis && monde.date.annee - p.depuis < INVESTISSEUR.delaiDepuisRachat) return;
   const saisons = table(monde, TABLES.saisons);
