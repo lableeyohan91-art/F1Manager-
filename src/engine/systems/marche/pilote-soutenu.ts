@@ -75,7 +75,9 @@ export function offrePiloteSoutenu(monde: Monde): void {
   if (typeof sig === 'string') return;
   fi.tresorerieMEUR += cheque;
   fi.comptes.apportsExceptionnels += cheque;
-  const sp = entrepriseLiee(monde, p, 'nat', montant);
+  // Variante (paramètre `pilotesSoutenus` = 2) : l'argent du groupe s'ajoute aux sponsors, sans occuper de place de sponsor.
+  const additionnel = parametre(monde, 'pilotesSoutenus', PILOTE_SOUTENU.actif) >= 2;
+  const sp = additionnel ? null : entrepriseLiee(monde, p, 'nat', montant);
   if (sp) {
     const libres = emplacementsLibres(monde, e.id, annee + 1);
     const rang = libres.titre > 0 ? 'titre' : libres.principal > 0 ? 'principal' : 'secondaire';
@@ -84,7 +86,7 @@ export function offrePiloteSoutenu(monde: Monde): void {
     c.fin = annee + PILOTE_SOUTENU.dureeSponsor;
     sp.derniereAnneeContrat = c.fin;
   }
-  fi.piloteSoutenu = { jusqua: annee + PILOTE_SOUTENU.dureeSponsor, pilote: p.id };
+  fi.piloteSoutenu = { jusqua: annee + PILOTE_SOUTENU.dureeSponsor, pilote: p.id, ...(additionnel ? { debut: annee + 1, montant } : {}) };
   ajouterEvenement(monde, {
     type: 'pilote_soutenu.accepte', acteurs: [{ id: e.id, role: 'ecurie' }, { id: p.id, role: 'pilote' }], importance: 3, visibilite: 'public', causes: [sig.id], contexte,
     texte: `${p.prenom} ${p.nom} arrive chez ${e.nom} avec le soutien d'un grand groupe de son pays : ${cheque} M€ à la signature et ${montant} M€ par an de sponsoring.`,

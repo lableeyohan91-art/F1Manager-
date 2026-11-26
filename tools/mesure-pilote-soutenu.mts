@@ -2,7 +2,7 @@
  * Levier B (prototype) — l'offre du pilote soutenu aide-t-elle vraiment l'écurie ? Mesure par paires : chaque graine est jouée sans puis avec
  * l'offre (paramètre `pilotesSoutenus`). Pour chaque offre acceptée (écurie E, saison A), on compare la place de E au championnat
  * constructeurs pendant les 5 saisons suivantes, avec et sans l'offre (même graine), ainsi que l'argent reçu et le développement payé.
- * Usage : npx tsx tools/mesure-pilote-soutenu.mts <graine de départ> <nombre> <saisons> <sortie.json>
+ * Usage : npx tsx tools/mesure-pilote-soutenu.mts <graine de départ> <nombre> <saisons> <sortie.json> [mode=1]
  */
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -11,9 +11,11 @@ const eng = await import(`${racine}/src/engine/index.ts`);
 const { lireDonneesGrille2026 } = await import(`${racine}/src/platform/node/donnees.ts`);
 const sc = eng.creerScenarioGrille2026(lireDonneesGrille2026(racine));
 const [g0, ng, S, sortie] = [Number(process.argv[2]), Number(process.argv[3]), Number(process.argv[4] ?? 30), process.argv[5]];
+/** Mode : 1 = sponsor à la place d'un emplacement ; 2 = argent du groupe en plus des sponsors (variante additionnelle). */
+const MODE = Number(process.argv[6] ?? 1);
 type Run = { places: Record<string, Record<number, number>>; dev: Record<string, Record<number, number>>; accepte: { ecurie: string; annee: number; cheque: number; sponsor: number; ecart: number }[]; refus: number };
 function jouer(g: number, actif: boolean): Run {
-  const m = sc.creerMonde(g); if (actif) m.parametres = { pilotesSoutenus: 1 };
+  const m = sc.creerMonde(g); if (actif) m.parametres = { pilotesSoutenus: MODE };
   const mo = sc.creerMoteur();
   // Les détails des événements sont compactés au fil des ans (mémoire bornée) : on les relève chaque saison.
   const vus = new Set(Object.keys(m.evenements));

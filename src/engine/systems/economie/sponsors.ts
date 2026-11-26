@@ -66,7 +66,11 @@ export function sponsorsEngages(monde: Monde, annee: number): Set<string> {
 
 /** Revenus de sponsoring prévus pour une année (hors primes d'objectif). */
 export function revenusSponsors(monde: Monde, idEcurie: string, annee: number): number {
-  return contratsActifs(monde, annee, idEcurie).reduce((a, c) => a + c.montantAnnuelMEUR, 0);
+  // Levier B (prototype, variante « additionnelle ») : le groupe qui soutient un pilote paie l'écurie en plus de ses sponsors.
+  const fi = (Object.values(table(monde, TABLES.finances)) as unknown as Finances[]).find((f) => f.ecurie === idEcurie);
+  const ps = fi?.piloteSoutenu;
+  const groupe = ps?.montant && ps.debut !== undefined && ps.jusqua !== undefined && annee >= ps.debut && annee <= ps.jusqua ? ps.montant : 0;
+  return contratsActifs(monde, annee, idEcurie).reduce((a, c) => a + c.montantAnnuelMEUR, 0) + groupe;
 }
 
 /* ---------------------------------------------------------------- Conjoncture */

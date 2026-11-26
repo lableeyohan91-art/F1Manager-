@@ -1,7 +1,7 @@
 """Levier B (prototype) — synthèse de tools/mesure-pilote-soutenu.mts. Usage : python3 tools/analyse-pilote-soutenu.py <dossier>"""
 import json, glob, sys
-S=sys.argv[1]; R=[]
-for f in sorted(glob.glob(f'{S}/ps-[0-9]*.json')): R+=json.load(open(f))
+S=sys.argv[1]; P=sys.argv[2] if len(sys.argv)>2 else 'ps-'; R=[]
+for f in sorted(glob.glob(f'{S}/{P}[0-9]*.json')): R+=json.load(open(f))
 moy=lambda v: sum(v)/len(v) if v else float('nan')
 acc=[a for r in R for a in r['avec']['accepte']]; ref=sum(r['avec']['refus'] for r in R)
 print(f"{len(R)} graines × 30 saisons : {len(acc)} offres acceptées, {ref} refusées ({(len(acc)+ref)/len(R):.1f} offres par partie)")
