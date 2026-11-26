@@ -365,7 +365,7 @@ function objectifProprietaire(monde: Monde, e: Ecurie, fi: Finances): void {
     // Le bonus récompense une PROGRESSION : garder la première place n'en donne pas (sinon le champion s'enrichit chaque année et
     // les dynasties remontent : mesuré, séries à 5 titres 30 % → 80 %).
     const bonus = parametre(monde, 'proprietaire.bonusObjectif', OBJECTIF_PROPRIETAIRE.bonusApport); // réglable pour les expériences
-    if (atteint && bonus > 0 && o.place < (o.depart ?? o.place + 1)) fi.bonusApport = { annee: monde.date.annee, facteur: 1 + bonus };
+    if (atteint && bonus > 0 && o.place < (o.depart ?? o.place + 1) && (o.depart ?? 0) >= OBJECTIF_PROPRIETAIRE.placeMinBonus) fi.bonusApport = { annee: monde.date.annee, facteur: 1 + bonus };
     ajouterEvenement(monde, {
       type: 'proprietaire.objectif_bilan', acteurs: [{ id: p.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'prive',
       contexte: { objectif: o.place, rang, atteint },

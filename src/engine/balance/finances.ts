@@ -164,9 +164,10 @@ export const INVESTISSEUR = { fenetreSaisons: 4, saisonsBasMin: 3, placesBas: 3,
 /**
  * Chantier 2, levier C (D-179) — objectif du propriétaire : à chaque bilan, gagner `progressionPlaces` place(s) au championnat
  * constructeurs (le champion : garder la première). Atteint par une progression : apport de la saison suivante × (1 + `bonusApport`) ;
- * garder la première place ne donne pas de bonus (mesuré : sinon les dynasties remontent).
+ * garder la première place ne donne pas de bonus, et seules les écuries parties de la `placeMinBonus`e place ou au-delà en reçoivent un
+ * (les grandes sont au plafond ; mesuré : un bonus pour les écuries de tête rendait les championnats moins disputés, titre ouvert 38 % → 27 %).
  */
-export const OBJECTIF_PROPRIETAIRE = { progressionPlaces: 1, bonusApport: 0.15 };
+export const OBJECTIF_PROPRIETAIRE = { progressionPlaces: 1, bonusApport: 0.15, placeMinBonus: 5 };
 /** Rachat : types de repreneurs (poids), apport annuel de base (M€, fourchette), part de la dette effacée, chance de changer de team principal. */
 export const REPRENEURS: Record<string, { poids: number; apportMin: number; apportMax: number }> = {
   constructeur: { poids: 2, apportMin: 100, apportMax: 200 },

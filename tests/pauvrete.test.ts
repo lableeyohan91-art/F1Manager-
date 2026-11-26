@@ -27,7 +27,8 @@ describe('D-179, levier C — objectifs du propriétaire', () => {
       const fi = financesDe(m, e.id) as Finances;
       const rang2028 = s2.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
       const rang2027 = s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
-      const atteint = rang2028 <= Math.max(1, rang2027 - 1) && rang2027 > 1; // garder la première place ne donne pas de bonus
+      // Bonus : une progression atteinte, par une écurie partie de la 5e place ou au-delà (les grandes sont au plafond).
+      const atteint = rang2028 <= Math.max(1, rang2027 - 1) && rang2027 >= OBJECTIF_PROPRIETAIRE.placeMinBonus;
       expect(fi.bonusApport?.annee === 2029).toBe(atteint);
       if (atteint) expect(fi.bonusApport!.facteur).toBeCloseTo(1 + OBJECTIF_PROPRIETAIRE.bonusApport, 5);
     }
