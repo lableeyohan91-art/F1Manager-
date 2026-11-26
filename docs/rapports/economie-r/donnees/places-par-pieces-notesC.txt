@@ -1,0 +1,16 @@
+eq_cadillac marge 1 {"conception.progression":2} IA normale
+graine 1 : T1 11.0e (4 p.) · T2 10.7e (4 p.) · T3 10.4e (5 p.) · T4 10.0e (7 p.) · T5 10.0e (3 p.) · T6 9.1e (8 p.) · T7 8.4e (2 p.) · T8 8.4e (0 p.)
+graine 2 : T1 11.0e (5 p.) · T2 11.0e (3 p.) · T3 11.0e (4 p.) · T4 10.8e (5 p.) · T5 11.0e (4 p.) · T6 9.6e (8 p.) · T7 8.4e (2 p.) · T8 8.4e (0 p.)
+graine 3 : T1 11.0e (4 p.) · T2 11.0e (5 p.) · T3 10.2e (8 p.) · T4 10.4e (5 p.) · T5 11.0e (7 p.) · T6 10.9e (7 p.) · T7 10.6e (1 p.) · T8 10.6e (0 p.)
+eq_williams marge 1 {"conception.progression":2} IA normale
+graine 1 : T1 5.3e (2 p.) · T2 5.6e (2 p.) · T3 5.4e (7 p.) · T4 5.0e (4 p.) · T5 6.0e (4 p.) · T6 6.0e (9 p.) · T7 5.0e (0 p.) · T8 4.4e (0 p.)
+graine 2 : T1 5.3e (2 p.) · T2 5.3e (3 p.) · T3 5.0e (6 p.) · T4 4.8e (6 p.) · T5 6.7e (3 p.) · T6 6.1e (5 p.) · T7 5.0e (3 p.) · T8 4.6e (0 p.)
+graine 3 : T1 5.7e (3 p.) · T2 5.9e (5 p.) · T3 5.2e (4 p.) · T4 5.2e (5 p.) · T5 7.0e (5 p.) · T6 5.7e (4 p.) · T7 5.2e (2 p.) · T8 4.8e (0 p.)
+eq_cadillac marge 1 {} IA normale
+graine 1 : T1 11.0e (2 p.) · T2 10.7e (4 p.) · T3 10.4e (4 p.) · T4 10.6e (5 p.) · T5 11.0e (3 p.) · T6 11.0e (7 p.) · T7 10.8e (1 p.) · T8 10.6e (0 p.)
+graine 2 : T1 11.0e (4 p.) · T2 11.0e (3 p.) · T3 10.6e (3 p.) · T4 10.6e (4 p.) · T5 11.0e (4 p.) · T6 10.4e (6 p.) · T7 10.0e (1 p.) · T8 9.8e (0 p.)
+graine 3 : T1 11.0e (4 p.) · T2 11.0e (2 p.) · T3 10.6e (3 p.) · T4 10.6e (3 p.) · T5 11.0e (4 p.) · T6 11.0e (4 p.) · T7 11.0e (2 p.) · T8 10.6e (2 p.)
+eq_williams marge 1 {} IA normale
+graine 1 : T1 5.3e (1 p.) · T2 5.3e (1 p.) · T3 5.2e (6 p.) · T4 4.6e (4 p.) · T5 6.0e (5 p.) · T6 6.0e (6 p.) · T7 5.4e (0 p.) · T8 5.2e (0 p.)
+graine 2 : T1 5.3e (1 p.) · T2 5.3e (1 p.) · T3 5.2e (4 p.) · T4 4.8e (3 p.) · T5 6.7e (5 p.) · T6 5.1e (3 p.) · T7 5.8e (2 p.) · T8 6.0e (0 p.)
+graine 3 : T1 5.7e (3 p.) · T2 5.7e (5 p.) · T3 5.2e (5 p.) · T4 4.8e (5 p.) · T5 6.0e (3 p.) · T6 5.1e (4 p.) · T7 4.6e (3 p.) · T8 4.8e (0 p.)
