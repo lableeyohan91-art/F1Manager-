@@ -15,11 +15,20 @@
 
 ## 2. Quand l'offre arrive (mêmes règles pour toutes les écuries)
 
-À l'ouverture du marché (semaine 26), une écurie reçoit au plus une offre par saison, avec une chance (≈ 50 %) si **toutes** ces
-conditions sont réunies :
+À l'ouverture du marché (semaine 26), une écurie peut recevoir l'offre si **toutes** ces conditions sont réunies :
 1. elle a un **baquet libre** pour la saison suivante (les pilotes payants remplissent un siège vacant ; on ne licencie personne) ;
 2. elle est **en difficulté** : pas de sponsor titre ni principal pour la saison suivante, **ou** trésorerie sous trois mois de dépenses ;
 3. elle est dans la **seconde moitié** du classement constructeurs en cours.
+
+**Fréquence (demande du porteur : « assez limité »)** — mesuré sur 6 graines × 30 saisons, sans le levier : les conditions sont réunies en
+moyenne pour **une écurie par saison** sur toute la grille (Haass 7 saisons sur 30, Racing Bulls 6, Williams 5, Cadillac 4, les grandes
+presque jamais). Pour que l'offre reste un **événement rare**, trois limites :
+- au plus **une offre par saison sur toute la grille** (à l'écurie la plus en difficulté parmi celles qui remplissent les conditions) ;
+- une chance de **25 %** par saison ;
+- pas de nouvelle offre à une écurie pendant un contrat de pilote soutenu en cours, ni dans les **3 saisons** qui suivent un refus.
+
+Estimation : environ **une offre toutes les 4 saisons** sur toute la grille, soit 7 à 8 en 30 saisons ; pour une écurie qui souffre
+longtemps, **une à deux fois** en 30 saisons.
 
 ## 3. Le contenu de l'offre
 
