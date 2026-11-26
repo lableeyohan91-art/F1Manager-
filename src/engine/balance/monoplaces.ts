@@ -219,7 +219,12 @@ export const FAMILLES_ARCHITECTURE: Record<string, readonly string[]> = {
  * - mauvais concept : avec la probabilité `probaConcept` × f, le concept visé est décalé de ± `decalageConcept`.
  * `ecurieExemptee` : laboratoire seulement (écurie jouée « sans erreur » par une stratégie de joueur), vide en jeu.
  */
-export const IA_ERREURS = { competenceSansErreur: 19, etendue: 8, ecartGain: 0.08, probaConcept: 0.8, decalageConcept: 0.75, ecurieExemptee: '' };
+export const IA_ERREURS = { competenceSansErreur: 19, etendue: 8, ecartGain: 0.08, probaConcept: 0.8, decalageConcept: 0.75, ecurieExemptee: '', facteurUniforme: 0.7 };
+/**
+ * Part de la compétence dans le facteur d'erreur (paramètre `ia.erreursCompetence`, 0 à 1 ; 1 par défaut) : f = poids × f(compétence)
+ * + (1 − poids) × `facteurUniforme`. Mesuré : des erreurs entièrement liées à la compétence frappent surtout les petites écuries et
+ * creusent la hiérarchie ; des erreurs uniformes la laissent intacte.
+ */
 
 export const IA_CONCEPTION = { pasConcept: 0.25, gainMin: 0.005, alea: 0.01 };
 

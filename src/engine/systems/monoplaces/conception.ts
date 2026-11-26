@@ -686,7 +686,9 @@ export function decisionsConception(monde: Monde, commander: Commander): void {
     const f = tirageLocal(monde, 'monoplaces.ia', e.id, monde.date.annee, monde.date.semaine);
     // Prototype : erreurs de développement selon la compétence de conception du pôle (IA_ERREURS, paramètre `ia.erreurs`).
     const erreurs = e.id === IA_ERREURS.ecurieExemptee ? 0 : parametre(monde, 'ia.erreurs', 0);
-    const facteurErreur = (t: TypePiece) => erreurs * borner((IA_ERREURS.competenceSansErreur - competence(monde, e.id, PIECES[t].pole as Pole)) / IA_ERREURS.etendue, 0, 1);
+    const poidsCompetence = parametre(monde, 'ia.erreursCompetence', 1);
+    const facteurErreur = (t: TypePiece) => erreurs * (poidsCompetence * borner((IA_ERREURS.competenceSansErreur - competence(monde, e.id, PIECES[t].pole as Pole)) / IA_ERREURS.etendue, 0, 1)
+      + (1 - poidsCompetence) * IA_ERREURS.facteurUniforme);
     const candidats = TYPES_PIECES.filter((t) => !enCours.has(t) && libres.includes(PIECES[t].pole as Pole)).map((t) => {
       const best = meilleurProjet(monde, e, t, circuits);
       const fe = facteurErreur(t);
