@@ -96,6 +96,14 @@ export const DECOUVERTES = { base: 0.004, ampleur: 15, diffusionParSaison: 0.5, 
  * Décisions de l'IA (mêmes règles que le joueur) : horizon selon la force sportive (un prétendant garde la voiture actuelle, une écurie
  * distancée prépare l'avenir), le goût du risque du directeur technique et l'aléa de jugement ; part selon le budget et le risque.
  */
+/**
+ * Variante R1 (PROTOTYPE DE MESURE, désactivé par défaut ; paramètre d'expérience `recherche.montant` = 1) — recherche payée au montant :
+ * le savoir gagné par un programme suit l'argent qui lui est réellement donné (budget de développement × part du programme, M€ par an),
+ * rapporté à `referenceMEUR`, à la puissance `exposant` (rendement décroissant), au lieu de la seule part du budget.
+ * Référence : part par défaut (0,15) × budget de développement moyen de la grille (≈ 100 M€).
+ */
+export const RECHERCHE_MONTANT = { actif: 0, referenceMEUR: 15, exposant: 0.5 };
+
 export const IA_RECHERCHE = { forcePretendant: 0.75, forceDistancee: 0.4, partDefaut: 0.15, partAudace: 0.15, alea: 0.15 };
 
 /** Historique de recherche, règlements terminés ou rejetés : conservés pendant ce nombre de saisons. */

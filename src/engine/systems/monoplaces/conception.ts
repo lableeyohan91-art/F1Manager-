@@ -10,7 +10,7 @@
  */
 
 import {
-  DOMAINES_SOUFFLERIE, EFFICACITE_REFERENCE, EVENEMENTS_CONCEPTION, FAMILLES_ARCHITECTURE, FATIGUE, FRONTIERE, IA_RYTHME, RYTHMES, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, SOUFFLERIE, TYPES_PIECES, type TypePiece,
+  DOMAINES_SOUFFLERIE, EFFICACITE_REFERENCE, PAQUETS, EVENEMENTS_CONCEPTION, FAMILLES_ARCHITECTURE, FATIGUE, FRONTIERE, IA_RYTHME, RYTHMES, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, SOUFFLERIE, TYPES_PIECES, type TypePiece,
 } from '../../balance/monoplaces';
 import { USURE_SUCCES } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
@@ -179,7 +179,8 @@ export function progressionAttendue(monde: Monde, e: Ecurie, type: TypePiece): n
   const pole = PIECES[type].pole as Pole;
   // Phase 12b : le barème selon le classement et la sanction d'un dépassement du plafond passent par les HEURES de soufflerie et de CFD
   // (soufflerie.ts), plus par un coefficient de vitesse.
-  return PROJETS.progressionBase * Math.sqrt(competence(monde, e.id, pole) / PROJETS.competenceReference);
+  // Variante R2 (prototype) : un « paquet » comble une plus grande part de l'écart.
+  return Math.min(PAQUETS.progressionMax, PROJETS.progressionBase * facteurPaquet(monde) * Math.sqrt(competence(monde, e.id, pole) / PROJETS.competenceReference));
 }
 
 /* ===================================================================== Estimation par circuit */
@@ -224,7 +225,9 @@ export const projets = (monde: Monde, idEcurie?: string) => idsTries(table(monde
   .map((id) => table(monde, TABLES.projetsConception)[id] as unknown as ProjetConception).filter((p) => !idEcurie || p.ecurie === idEcurie);
 
 /** Coût total d'un projet (conception + exemplaires fabriqués). */
-export const coutTotal = (type: TypePiece) => PIECES[type].coutProjetMEUR + PROJETS.exemplaires * PIECES[type].coutUnitaireMEUR;
+export const coutTotal = (type: TypePiece, paquet = 1) => paquet * (PIECES[type].coutProjetMEUR + PROJETS.exemplaires * PIECES[type].coutUnitaireMEUR);
+/** Variante R2 (prototype, `conception.paquets`) : facteur de taille des projets (1 = projets ordinaires). */
+export const facteurPaquet = (monde: Monde) => parametre(monde, 'conception.paquets', PAQUETS.facteur);
 
 function auteurAutorise(monde: Monde, auteur: string, idEcurie: string): boolean {
   const p = table(monde, TABLES.personnes)[auteur] as unknown as Personne | undefined;
@@ -245,7 +248,7 @@ export function motifRefusProjet(monde: Monde, auteur: string, prm: Record<strin
   if (enCours.filter((p) => PIECES[p.type as TypePiece].pole === pole && p.fabricationJoursRestants === undefined).length >= emplacements(monde, e.id, pole)) return 'Le pôle n’a plus d’équipe disponible.';
   const essais = prm['essais'];
   if (essais !== undefined && essais !== 'normaux' && essais !== 'renforces') return 'Essais : normaux ou renforcés.';
-  if (enveloppeRestante(monde, e.id) < coutTotal(type) + (essais === 'renforces' ? ESSAIS_RENFORCES.surcout * PIECES[type].coutProjetMEUR : 0)) return 'Le budget de développement de l’année ne couvre pas ce projet.';
+  if (enveloppeRestante(monde, e.id) < coutTotal(type, facteurPaquet(monde)) + (essais === 'renforces' ? ESSAIS_RENFORCES.surcout * PIECES[type].coutProjetMEUR * facteurPaquet(monde) : 0)) return 'Le budget de développement de l’année ne couvre pas ce projet.';
   return null;
 }
 
@@ -257,8 +260,9 @@ export function lancerProjet(monde: Monde, auteur: string, prm: Record<string, u
   const id = `prj_${idEcurie.replace(/^eq_/, '')}_${type}_${monde.date.annee}_${monde.date.semaine}`;
   // D-181 : essais renforcés (plus cher, résultat plus sûr).
   const essais = prm['essais'] === 'renforces';
-  const cout = r2(def.coutProjetMEUR * (essais ? 1 + ESSAIS_RENFORCES.surcout : 1));
-  const p: ProjetConception = { id, ecurie: idEcurie, type, concept: r2(Number(prm['concept'])), joursRestants: def.conceptionJours, joursTotal: def.conceptionJours, debut: { ...monde.date }, coutMEUR: cout, ...(essais ? { essaisRenforces: true } : {}) };
+  const k = facteurPaquet(monde);
+  const cout = r2(def.coutProjetMEUR * k * (essais ? 1 + ESSAIS_RENFORCES.surcout : 1));
+  const p: ProjetConception = { id, ecurie: idEcurie, type, concept: r2(Number(prm['concept'])), joursRestants: r2(def.conceptionJours * k), joursTotal: r2(def.conceptionJours * k), debut: { ...monde.date }, coutMEUR: cout, ...(essais ? { essaisRenforces: true } : {}) };
   depenser(monde, idEcurie, cout);
   const evt = ajouterEvenement(monde, {
     type: 'conception.lancement', acteurs: [{ id: auteur, role: 'auteur' }, { id: idEcurie, role: 'ecurie' }], importance: 1, visibilite: 'prive',
@@ -391,7 +395,7 @@ function terminerConception(monde: Monde, p: ProjetConception): void {
     });
     return;
   }
-  depenser(monde, e.id, PROJETS.exemplaires * PIECES[type].coutUnitaireMEUR);
+  depenser(monde, e.id, PROJETS.exemplaires * PIECES[type].coutUnitaireMEUR * facteurPaquet(monde));
 }
 
 /** Fin de fabrication : nouvelle version créée ; installée si le responsable l'estime meilleure (estimation imparfaite). */
@@ -681,9 +685,9 @@ export function decisionsConception(monde: Monde, commander: Commander): void {
     const enCours = new Set(enCoursListe.map((p) => p.type));
     const f = tirageLocal(monde, 'monoplaces.ia', e.id, monde.date.annee, monde.date.semaine);
     const candidats = TYPES_PIECES.filter((t) => !enCours.has(t) && libres.includes(PIECES[t].pole as Pole)).map((t) => ({ t, ...meilleurProjet(monde, e, t, circuits) }))
-      .map((x) => ({ ...x, score: (x.gain + f.normale(0, IA_CONCEPTION.alea)) / coutTotal(x.t) })).sort((a, b) => b.score - a.score);
+      .map((x) => ({ ...x, score: (x.gain + f.normale(0, IA_CONCEPTION.alea)) / coutTotal(x.t, facteurPaquet(monde)) })).sort((a, b) => b.score - a.score);
     for (const x of candidats) {
-      if (x.gain < IA_CONCEPTION.gainMin || disponible() < coutTotal(x.t)) continue;
+      if (x.gain < IA_CONCEPTION.gainMin || disponible() < coutTotal(x.t, facteurPaquet(monde))) continue;
       const prm = { ecurie: e.id, type: x.t, concept: x.concept };
       if (motifRefusProjet(monde, auteur.id, prm)) continue;
       commander({ type: 'conception.lancer', auteur: auteur.id, parametres: prm });

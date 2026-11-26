@@ -6,7 +6,7 @@
  *   - écart haut / milieu : indice de la voiture, niveau des deux pilotes titulaires, productivité des pôles, développement payé ;
  *   - classement constructeurs de la saison écoulée (rotation du bas) ;
  *   - erreurs de développement : pièces montées moins bonnes que celle qu'elles remplacent (la vérité est connue du laboratoire).
- * Usage : npx tsx tools/diagnostic-hierarchies.mts <graine de départ> <nombre de graines> <saisons> <sortie.json>
+ * Usage : npx tsx tools/diagnostic-hierarchies.mts <graine de départ> <nombre de graines> <saisons> <sortie.json> [réglages « nom=valeur,… »]
  */
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -17,11 +17,13 @@ const { FRONTIERE, TYPES_PIECES, PIECES } = await import(`${racine}/src/engine/b
 const { savoirExistant } = await import(`${racine}/src/engine/systems/technique/acces.ts`);
 const sc = eng.creerScenarioGrille2026(lireDonneesGrille2026(racine));
 const [g0, ng, S, sortie] = [Number(process.argv[2] ?? 1), Number(process.argv[3] ?? 1), Number(process.argv[4] ?? 30), process.argv[5] ?? 'diag.json'];
+const PARAMS: Record<string, number> = Object.fromEntries((process.argv[6] ?? '').split(',').filter(Boolean).map((x) => { const [k, v] = x.split('='); return [k!, Number(v)]; }));
 const moy = (v: number[]) => v.reduce((a, b) => a + b, 0) / Math.max(1, v.length);
 type E = { id: string };
 const resultat: unknown[] = [];
 for (let g = g0; g < g0 + ng; g++) {
   const m = sc.creerMonde(g), mo = sc.creerMoteur();
+  m.parametres = { ...(m.parametres ?? {}), ...PARAMS };
   const saisons: unknown[] = [];
   let reculs: Record<string, number> = {}, montees: Record<string, number> = {};
   const vus = new Set(Object.keys(m.evenements));

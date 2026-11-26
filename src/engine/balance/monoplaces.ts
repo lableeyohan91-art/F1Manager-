@@ -169,6 +169,13 @@ export const PROJETS = {
 export const INTERSAISON = { progression: 0.15 };
 
 /**
+ * Variante R2 (PROTOTYPE DE MESURE, désactivée par défaut ; paramètre d'expérience `conception.paquets` = facteur) — moins de pièces, plus
+ * grosses (« paquets d'évolutions ») : durée de conception, coût de conception et coût des exemplaires × facteur ; part de l'écart à la
+ * frontière comblée par un projet × facteur, bornée à `progressionMax`. Le total de l'année reste du même ordre ; chaque pièce se sent.
+ */
+export const PAQUETS = { facteur: 1, progressionMax: 0.6 };
+
+/**
  * Reconception à l'entrée d'un nouveau règlement ou d'une évolution mineure (remplace la conversion provisoire de la phase 8, qui
  * ramenait vers la moyenne de la grille) : pour une pièce touchée à l'intensité I,
  * efficacité = min + (1 − I) × (efficacité − min) + I × qualité × (frontière − min) (min : FRONTIERE.min),

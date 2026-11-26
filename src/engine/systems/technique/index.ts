@@ -17,7 +17,7 @@
 
 import { causesConnues } from '../humain/causes';
 import {
-  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, REFORME, SAVOIR, VOTE_IA,
+  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
@@ -25,7 +25,7 @@ import { ALLIANCES, INFLUENCE } from '../../balance/politique';
 import { allies, poidsOrientation } from '../politique/acces';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
-import { idsTries, table, type Entite, type Monde } from '../../core/monde';
+import { idsTries, parametre, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import {
   TABLES, type Decouverte, type Ecurie, type EvolutionMineure, type HistoriqueRecherche, type Installation, type Personne, type ProgrammeRecherche, type Reglement, type Savoir,
@@ -334,6 +334,17 @@ function facteurInstallations(monde: Monde, idEcurie: string, domaine: Domaine):
   return inst.length ? inst.reduce((a, i) => a + niveauEffectif(i), 0) / inst.length / FACTEURS_RECHERCHE.installationReference : FACTEURS_RECHERCHE.defaut;
 }
 
+/**
+ * Moyens d'un programme. Par défaut : sa part du budget de développement rapportée à la part par défaut. Variante R1 (prototype,
+ * `recherche.montant` = 1) : l'argent réellement donné au programme (budget × part, M€ par an) rapporté à la référence, rendement décroissant.
+ */
+function facteurMoyens(monde: Monde, idEcurie: string, part: number): number {
+  if (parametre(monde, 'recherche.montant', RECHERCHE_MONTANT.actif) <= 0) return part / IA_RECHERCHE.partDefaut;
+  const fi = (Object.values(table(monde, TABLES.finances)) as unknown as { ecurie: string; budget: { developpementMEUR: number } }[]).find((f) => f.ecurie === idEcurie);
+  const montant = (fi?.budget.developpementMEUR ?? 0) * part;
+  return (Math.max(0, montant) / RECHERCHE_MONTANT.referenceMEUR) ** RECHERCHE_MONTANT.exposant;
+}
+
 /** Progression des programmes (toutes les 4 semaines) : savoir gagné, voisinages, historique, découvertes. */
 export function avancerRecherche(monde: Monde): void {
   const actuel = reglementEnVigueur(monde);
@@ -353,7 +364,7 @@ export function avancerRecherche(monde: Monde): void {
       const efficacite = p.remiseEnRoute > 0 ? SAVOIR.efficaciteRemiseEnRoute : 1;
       p.remiseEnRoute = Math.max(0, p.remiseEnRoute - PROGRAMMES.periodeSemaines);
       const soufflerie = (DOMAINES_SOUFFLERIE as readonly string[]).includes(d) ? facteurRechercheSoufflerie(partAero > 0 ? (heures * p.part) / partAero : 0) : 1;
-      const gain = SAVOIR.gainBase * (p.part / IA_RECHERCHE.partDefaut) * cap * facteurCompetence(monde, e.id, d) * facteurInstallations(monde, e.id, d)
+      const gain = SAVOIR.gainBase * facteurMoyens(monde, e.id, p.part) * cap * facteurCompetence(monde, e.id, d) * facteurInstallations(monde, e.id, d)
         * efficacite * soufflerie / (1 + deja / SAVOIR.rendementK);
       s.fondamental = r3(s.fondamental + gain * SAVOIR.partFondamental);
       const specifique = gain * (1 - SAVOIR.partFondamental);

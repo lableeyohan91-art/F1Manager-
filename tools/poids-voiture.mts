@@ -3,7 +3,7 @@
  * 1. En course : écart-type, entre les partants d'un même Grand Prix, de chaque terme du temps de course (voiture, pilote, forme, aléa),
  *    en % du temps au tour ; part des victoires de la voiture la plus rapide du circuit ; corrélation de rang voiture ↔ arrivée.
  * 2. En développement : gain d'indice de chaque nouvelle pièce montée (points ; 1 point ≈ 0,28 % du temps au tour).
- * Usage : npx tsx tools/poids-voiture.mts [graines=3] [saisons=2]
+ * Usage : npx tsx tools/poids-voiture.mts [graines=3] [saisons=2] [réglages d'expérience « nom=valeur,… »]
  */
 import { resolve } from 'node:path';
 const racine = resolve('.');
@@ -11,6 +11,7 @@ const eng = await import(`${racine}/src/engine/index.ts`);
 const { lireDonneesGrille2026 } = await import(`${racine}/src/platform/node/donnees.ts`);
 const sc = eng.creerScenarioGrille2026(lireDonneesGrille2026(racine));
 const N = Number(process.argv[2] ?? 3), S = Number(process.argv[3] ?? 2);
+const PARAMS: Record<string, number> = Object.fromEntries((process.argv[4] ?? '').split(',').filter(Boolean).map((x) => { const [k, v] = x.split('='); return [k!, Number(v)]; }));
 const et = (v: number[]) => { const m = v.reduce((a, b) => a + b, 0) / v.length; return Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length); };
 const moy = (v: number[]) => v.reduce((a, b) => a + b, 0) / Math.max(1, v.length);
 const termes: Record<string, number[]> = { voiture: [], pilote: [], forme: [], alea: [] };
@@ -19,6 +20,7 @@ const progres: number[] = [], ecartFin: number[] = [], ecartDebut: number[] = []
 const grille = (m: unknown) => (eng.ecuriesActives(m) as unknown[]).map((e) => eng.indiceMoyen(m, e) as number);
 for (let g = 1; g <= N; g++) {
   const m = sc.creerMonde(g), mo = sc.creerMoteur();
+  m.parametres = { ...(m.parametres ?? {}), ...PARAMS };
   const vus = new Set(Object.keys(m.evenements));
   const i0 = grille(m); ecartDebut.push(Math.max(...i0) - Math.min(...i0));
   for (let w = 0; w < 52 * S; w++) {
