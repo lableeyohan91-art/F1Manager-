@@ -705,3 +705,13 @@ Aucun code à ce stade.
 - Tableau de bord prévisionnel (D-181) : `previsionFinances` (moteur, fonction pure), carte « Prévisions » dans l'écran Finances, seuils dans `balance/previsions.ts`.
 - Mesure de précision (`tools/precision-previsions.mts`), tests (`tests/previsions.test.ts`), rapport court `docs/rapports/economie-b/rapport.md`.
 - Fiche économie : version 2 du levier A selon les réponses du porteur (§E) ; glossaire : « prévisions », « dépense non dépensable ».
+
+## [Économie, levier A] — 26/11/2026
+
+### Ajouté
+- Capacités achetables (D-182) : ingénieurs par projet et projet prioritaire, essais renforcés, recrutement et réduction des départements (aéro, conception, production, fiabilité), cohésion d'intégration, chantiers lancés par le joueur ; carte « Effectifs et installations » (écran Technique) ; format 34.
+- Tests `tests/capacites.test.ts` ; rapport `docs/rapports/economie-a/rapport.md` (campagne 20 × 30 et rotation 10 × 30).
+
+### Modifié
+- Fatigue des pôles selon le rythme des projets ; entretien des installations en niveau² ; rendement décroissant au-dessus du niveau 8 ; production et fiabilité agissent sur la fabrication et les pannes.
+- Test D-166 rendu contrefactuel (même monde, deux budgets).

@@ -1,7 +1,7 @@
 # Économie — capacités achetables (A) et tableau de bord prévisionnel (B) (fiche de conception, 26/11/2026)
 
 > Demande du porteur : « Audit et amélioration de l'économie — inspiration F1 Manager 2024 », puis « on fait A et B et on fait un point
-> après ». Base : `docs/etudes/2026-11-26-audit-economie.md`. Statut : **B validé et mis en œuvre** (« ok pour B d'abord », 26/11/2026) ; **A révisé** après les réponses du porteur (§E), soumis à nouveau.
+> après ». Base : `docs/etudes/2026-11-26-audit-economie.md`. Statut : **B validé et mis en œuvre** (« ok pour B d'abord », 26/11/2026) ; **A version 2 (§E) validé et mis en œuvre** (« go », 26/11/2026 ; D-182, rapport `docs/rapports/economie-a/rapport.md`).
 > Version sauvegardée avant ce chantier : branche `sauvegarde-2026-11-26-avant-economie`.
 
 ## 0. Le problème en une phrase

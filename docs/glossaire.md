@@ -242,3 +242,6 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Projet de conception** | Travail d'un pôle technique pour créer une nouvelle version de pièce : durée et coût de F1 Manager 2024, puis fabrication et installation si le responsable l'estime meilleure. |
 | **Prévisions (financières)** | Projection, par le moteur et sans rien modifier, des comptes d'une écurie jusqu'à la fin de l'année au niveau actuel des recettes et des dépenses (trésorerie, plafond, développement, dividendes, saison suivante), hors imprévus (D-180). |
 | **Dépense non dépensable** | Part du budget de développement qu'une écurie ne pourra pas payer d'ici la fin de l'année au rythme actuel de ses projets (faute d'équipes ou de projets utiles). |
+| **Projet prioritaire** | Projet de conception qui reçoit deux parts des ingénieurs de son pôle (les autres une), donc avance plus vite (D-182). |
+| **Essais renforcés** | Option d'un projet de conception : coût de conception majoré, résultat plus sûr (aléa d'exécution et erreur d'estimation réduits) (D-182). |
+| **Argent libre** | Pour l'IA, l'argent qu'elle peut engager sans risque : le plus petit de la marge prévue sous le plafond et de la trésorerie qui partirait sinon en dividendes (D-182). |
