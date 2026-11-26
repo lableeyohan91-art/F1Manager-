@@ -227,8 +227,11 @@ describe('Phase 11c — objectifs de course du sponsor titre', () => {
     expect(gp.termine).toBe(true);
     const best = Math.min(...gp.resultats.filter((r) => r.ecurie === e.id && r.position !== null).map((r) => r.position!));
     const opt = o.options.find((x) => x.niveau === 'audacieux')!;
-    expect(c.primesVerseesMEUR - avant).toBeCloseTo(best <= opt.seuil ? opt.primeMEUR : 0, 5);
     const ev = Object.values(m.evenements).find((x) => x.type === 'sponsor.objectif_course' && x.contexte?.['gp'] === o.gp)!;
+    expect(Number(ev.contexte?.['montant'])).toBeCloseTo(best <= opt.seuil ? opt.primeMEUR : 0, 5);
+    // La période peut contenir deux Grands Prix consécutifs : le contrat reçoit exactement la somme des primes jugées.
+    const verse = Object.values(m.evenements).filter((x) => x.type === 'sponsor.objectif_course' && x.date && (x.date.annee > 2026)).reduce((a, x) => a + Number(x.contexte?.['montant'] ?? 0), 0);
+    expect(c.primesVerseesMEUR - avant).toBeCloseTo(verse, 5);
     expect(ev.contexte?.['choisiPar']).toBe('joueur');
     // Grand Prix suivant sans choix : l'équipe choisit, et la simulation ne s'arrête pas pour autant.
     expect(decisionsEnAttente(m).some((d) => d.type === 'offre_sponsor' || d.type === 'operation_sponsor')).toBe(false);
