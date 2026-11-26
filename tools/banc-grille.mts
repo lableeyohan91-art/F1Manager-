@@ -16,6 +16,8 @@ const notes = process.argv[2];
 if (notes) fichiers['voitures.csv'] = readFileSync(notes, 'utf8');
 // Variante de moteurs (facultative) : 3e argument, un fichier au format de data/grille-2026/motoristes.csv.
 if (process.argv[3]) fichiers['motoristes.csv'] = readFileSync(process.argv[3], 'utf8');
+// Laboratoire : accentuer la personnalité des voitures (CONCEPT="par point,max" ; conversion des notes en concepts de pièces).
+if (process.env.CONCEPT) { const { CONVERSION_DEPART } = await import(`${racine}/src/engine/balance/monoplaces.ts`); const [a, b] = process.env.CONCEPT.split(',').map(Number); CONVERSION_DEPART.conceptParPoint = a!; CONVERSION_DEPART.conceptMax = b!; }
 const m = eng.creerScenarioGrille2026(fichiers).creerMonde(1);
 const eq = eng.ecuriesActives(m) as { id: string }[];
 const nom = (id: string) => id.replace('eq_', '');
