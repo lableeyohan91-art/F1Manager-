@@ -12,14 +12,14 @@ import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 const sc = creerScenarioGrille2026(lireDonneesGrille2026());
 
 describe('D-179, levier C — objectifs du propriétaire', () => {
-  it('après une saison : chaque écurie a un objectif (gagner une place, le champion garde la première) ; atteint → apport majoré', () => {
+  it('après une saison : chaque écurie a un objectif (gagner une place, le champion garde la première) ; une progression atteinte → apport majoré', () => {
     const m = sc.creerMonde(2), moteur = sc.creerMoteur();
     moteur.avancer(m, 53);
     const s = table(m, TABLES.saisons)['ssn_2027'] as unknown as Saison;
     for (const e of ecuriesActives(m)) {
       const fi = financesDe(m, e.id) as Finances;
       const rang = s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
-      expect(fi.objectifProprietaire).toEqual({ annee: 2028, place: Math.max(1, rang - OBJECTIF_PROPRIETAIRE.progressionPlaces) });
+      expect(fi.objectifProprietaire).toEqual({ annee: 2028, place: Math.max(1, rang - OBJECTIF_PROPRIETAIRE.progressionPlaces), depart: rang });
     }
     moteur.avancer(m, 52);
     const s2 = table(m, TABLES.saisons)['ssn_2028'] as unknown as Saison;
@@ -27,7 +27,7 @@ describe('D-179, levier C — objectifs du propriétaire', () => {
       const fi = financesDe(m, e.id) as Finances;
       const rang2028 = s2.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
       const rang2027 = s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
-      const atteint = rang2028 <= Math.max(1, rang2027 - 1);
+      const atteint = rang2028 <= Math.max(1, rang2027 - 1) && rang2027 > 1; // garder la première place ne donne pas de bonus
       expect(fi.bonusApport?.annee === 2029).toBe(atteint);
       if (atteint) expect(fi.bonusApport!.facteur).toBeCloseTo(1 + OBJECTIF_PROPRIETAIRE.bonusApport, 5);
     }

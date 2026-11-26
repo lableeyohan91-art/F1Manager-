@@ -362,16 +362,18 @@ function objectifProprietaire(monde: Monde, e: Ecurie, fi: Finances): void {
   const o = fi.objectifProprietaire;
   if (o && o.annee === monde.date.annee - 1) {
     const atteint = rang <= o.place;
-    if (atteint) fi.bonusApport = { annee: monde.date.annee, facteur: 1 + OBJECTIF_PROPRIETAIRE.bonusApport };
+    // Le bonus récompense une PROGRESSION : garder la première place n'en donne pas (sinon le champion s'enrichit chaque année et
+    // les dynasties remontent : mesuré, séries à 5 titres 30 % → 80 %).
+    if (atteint && o.place < (o.depart ?? o.place + 1)) fi.bonusApport = { annee: monde.date.annee, facteur: 1 + OBJECTIF_PROPRIETAIRE.bonusApport };
     ajouterEvenement(monde, {
       type: 'proprietaire.objectif_bilan', acteurs: [{ id: p.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'prive',
       contexte: { objectif: o.place, rang, atteint },
-      texte: atteint ? `Objectif du propriétaire atteint (${rang}e, objectif ${o.place}e) : son apport augmente de ${Math.round(100 * OBJECTIF_PROPRIETAIRE.bonusApport)} % cette saison.`
-        : `Objectif du propriétaire manqué (${rang}e, objectif ${o.place}e).`,
+      texte: atteint && fi.bonusApport?.annee === monde.date.annee ? `Objectif du propriétaire atteint (${rang}e, objectif ${o.place}e) : son apport augmente de ${Math.round(100 * OBJECTIF_PROPRIETAIRE.bonusApport)} % cette saison.`
+        : atteint ? `Objectif du propriétaire atteint (${rang}e) : la première place est gardée.` : `Objectif du propriétaire manqué (${rang}e, objectif ${o.place}e).`,
     });
   }
   const place = Math.max(1, rang - OBJECTIF_PROPRIETAIRE.progressionPlaces);
-  fi.objectifProprietaire = { annee: monde.date.annee, place };
+  fi.objectifProprietaire = { annee: monde.date.annee, place, depart: rang };
   ajouterEvenement(monde, {
     type: 'proprietaire.objectif', acteurs: [{ id: p.id, role: 'auteur' }, { id: e.id, role: 'ecurie' }], importance: 2, visibilite: 'prive',
     contexte: { place, annee: monde.date.annee },

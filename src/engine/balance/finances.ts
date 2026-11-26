@@ -163,7 +163,8 @@ export const LASSITUDE = { anneesDeficit: 3, probabilite: 0.12, patienceMax: 9 }
 export const INVESTISSEUR = { fenetreSaisons: 4, saisonsBasMin: 3, placesBas: 3, probabiliteBase: 0.25, parPointImpatience: 0.03, probabiliteMin: 0.1, probabiliteMax: 0.5, delaiDepuisRachat: 5, hausseApportMin: 1.4, ambitionMin: 12 };
 /**
  * Chantier 2, levier C (D-179) — objectif du propriétaire : à chaque bilan, gagner `progressionPlaces` place(s) au championnat
- * constructeurs (le champion : garder la première). Atteint : apport de la saison suivante × (1 + `bonusApport`).
+ * constructeurs (le champion : garder la première). Atteint par une progression : apport de la saison suivante × (1 + `bonusApport`) ;
+ * garder la première place ne donne pas de bonus (mesuré : sinon les dynasties remontent).
  */
 export const OBJECTIF_PROPRIETAIRE = { progressionPlaces: 1, bonusApport: 0.15 };
 /** Rachat : types de repreneurs (poids), apport annuel de base (M€, fourchette), part de la dette effacée, chance de changer de team principal. */
