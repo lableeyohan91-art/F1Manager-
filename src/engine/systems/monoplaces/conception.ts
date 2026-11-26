@@ -10,7 +10,7 @@
  */
 
 import {
-  DOMAINES_SOUFFLERIE, EFFICACITE_REFERENCE, PAQUETS, EVENEMENTS_CONCEPTION, FAMILLES_ARCHITECTURE, FATIGUE, FRONTIERE, IA_RYTHME, RYTHMES, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, SOUFFLERIE, TYPES_PIECES, type TypePiece,
+  DOMAINES_SOUFFLERIE, EFFICACITE_REFERENCE, IA_ERREURS, PAQUETS, EVENEMENTS_CONCEPTION, FAMILLES_ARCHITECTURE, FATIGUE, FRONTIERE, IA_RYTHME, RYTHMES, IA_CONCEPTION, INTERSAISON, PAYSAGE, PIECES, PROJETS, RECONCEPTION, SOUFFLERIE, TYPES_PIECES, type TypePiece,
 } from '../../balance/monoplaces';
 import { USURE_SUCCES } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
@@ -684,8 +684,16 @@ export function decisionsConception(monde: Monde, commander: Commander): void {
     if (!libres.length || disponible() < Math.min(...TYPES_PIECES.map(coutTotal))) continue;
     const enCours = new Set(enCoursListe.map((p) => p.type));
     const f = tirageLocal(monde, 'monoplaces.ia', e.id, monde.date.annee, monde.date.semaine);
-    const candidats = TYPES_PIECES.filter((t) => !enCours.has(t) && libres.includes(PIECES[t].pole as Pole)).map((t) => ({ t, ...meilleurProjet(monde, e, t, circuits) }))
-      .map((x) => ({ ...x, score: (x.gain + f.normale(0, IA_CONCEPTION.alea)) / coutTotal(x.t, facteurPaquet(monde)) })).sort((a, b) => b.score - a.score);
+    // Prototype : erreurs de développement selon la compétence de conception du pôle (IA_ERREURS, paramètre `ia.erreurs`).
+    const erreurs = e.id === IA_ERREURS.ecurieExemptee ? 0 : parametre(monde, 'ia.erreurs', 0);
+    const facteurErreur = (t: TypePiece) => erreurs * borner((IA_ERREURS.competenceSansErreur - competence(monde, e.id, PIECES[t].pole as Pole)) / IA_ERREURS.etendue, 0, 1);
+    const candidats = TYPES_PIECES.filter((t) => !enCours.has(t) && libres.includes(PIECES[t].pole as Pole)).map((t) => {
+      const best = meilleurProjet(monde, e, t, circuits);
+      const fe = facteurErreur(t);
+      const concept = fe > 0 && f.chance(IA_ERREURS.probaConcept * fe) ? r2(borner(best.concept + (f.chance(0.5) ? 1 : -1) * IA_ERREURS.decalageConcept, -1, 1)) : best.concept;
+      return { t, gain: best.gain, concept, bruit: f.normale(0, IA_CONCEPTION.alea) + (fe > 0 ? f.normale(0, IA_ERREURS.ecartGain * fe) : 0) };
+    })
+      .map((x) => ({ ...x, score: (x.gain + x.bruit) / coutTotal(x.t, facteurPaquet(monde)) })).sort((a, b) => b.score - a.score);
     for (const x of candidats) {
       if (x.gain < IA_CONCEPTION.gainMin || disponible() < coutTotal(x.t, facteurPaquet(monde))) continue;
       const prm = { ecurie: e.id, type: x.t, concept: x.concept };

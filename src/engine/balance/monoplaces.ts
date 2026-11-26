@@ -211,6 +211,16 @@ export const FAMILLES_ARCHITECTURE: Record<string, readonly string[]> = {
  * Décisions de l'IA (et du directeur technique en délégation), mêmes règles que le joueur : candidats de concept autour du concept
  * actuel (± `pasConcept`) ; seuil de gain minimal (% de temps au tour) pour lancer un projet ; jugement à graine (% de temps au tour).
  */
+/**
+ * Erreurs de développement de l'IA (PROTOTYPE DE MESURE, paramètre d'expérience `ia.erreurs` : 0 = désactivé, 1 = actif ; demande du
+ * porteur : « l'IA DOIT faire des erreurs de développement »). Selon la compétence de conception du pôle (sur 20), facteur d'erreur
+ * f = (competenceSansErreur − compétence) / etendue, borné à [0, 1] : une équipe très compétente ne se trompe presque jamais.
+ * - mauvaise estimation des gains (choix de la pièce) : bruit d'écart type `ecartGain` × f (même unité que le gain, % du temps au tour) ;
+ * - mauvais concept : avec la probabilité `probaConcept` × f, le concept visé est décalé de ± `decalageConcept`.
+ * `ecurieExemptee` : laboratoire seulement (écurie jouée « sans erreur » par une stratégie de joueur), vide en jeu.
+ */
+export const IA_ERREURS = { competenceSansErreur: 19, etendue: 8, ecartGain: 0.08, probaConcept: 0.8, decalageConcept: 0.75, ecurieExemptee: '' };
+
 export const IA_CONCEPTION = { pasConcept: 0.25, gainMin: 0.005, alea: 0.01 };
 
 /**
