@@ -1,7 +1,8 @@
 import json, glob, statistics as st, sys
 S=sys.argv[1]  # dossier des fichiers diag-<graine>.json produits par tools/diagnostic-hierarchies.mts
 graines=[]
-for f in sorted(glob.glob(f'{S}/diag-[0-9]*.json')): graines+=json.load(open(f))
+PREFIXE=sys.argv[2] if len(sys.argv)>2 else 'diag-'  # préfixe des fichiers (variante)
+for f in sorted(glob.glob(f'{S}/{PREFIXE}[0-9]*.json')): graines+=json.load(open(f))
 print(f"{len(graines)} graines")
 moy=lambda v: sum(v)/len(v) if v else float('nan')
 MIN,ET=5,14
@@ -64,3 +65,22 @@ ids=[e['id'] for e in graines[0]['saisons'][0]['ecuries']]
 for i in sorted(ids):
     P=[next(e for e in s['ecuries'] if e['id']==i)['place'] for g in graines for s in g['saisons'][1:]]
     print(f"| {i.replace('eq_','')} | {100*sum(p>=9 for p in P)/len(P):.0f} % | {100*sum(1<=p<=4 for p in P)/len(P):.0f} % |")
+
+# D. Ce qui se passe à une grande réforme (entrée i : places de la saison écoulée ; « reforme » : le règlement change au début de la suivante)
+print("\n## D. Grandes réformes")
+etage=lambda p: 0 if p<=4 else (1 if p<=8 else 2)
+ch_ref,ch_norm,place_champion,top4=[],[],[],[]
+for g in graines:
+    sa=g['saisons']
+    for i in range(1,len(sa)-1):
+        a,b=sa[i],sa[i+1]
+        n=sum(etage(next(e for e in b['ecuries'] if e['id']==x['id'])['place'])!=etage(x['place']) for x in a['ecuries'])
+        (ch_ref if a['reforme'] else ch_norm).append(n)
+        if a['reforme']:
+            champ=next(e['id'] for e in a['ecuries'] if e['place']==1)
+            p=next(e for e in b['ecuries'] if e['id']==champ)['place']; place_champion.append(p); top4.append(p<=4)
+print(f"Écuries changeant d'étage : saison d'une grande réforme {moy(ch_ref):.1f} ({len(ch_ref)} cas) ; saison normale {moy(ch_norm):.1f}")
+print(f"Champion sortant, saison de la réforme : place moyenne {moy(place_champion):.1f} ; reste dans les 4 premiers {100*moy(top4):.0f} % ; garde le titre {100*moy([p==1 for p in place_champion]):.0f} %")
+
+ft=[e['frontiereTouchees'] for g in graines for s in g['saisons'] if s['reforme'] for e in s['ecuries'] if e.get('frontiereTouchees') is not None]
+if ft: print(f"Frontière des pièces touchées juste après une grande réforme : {moy(ft):.2f}, soit {100*moy([(x-MIN)/ET for x in ft]):.0f} % du plafond (début du jeu : 54 %)")

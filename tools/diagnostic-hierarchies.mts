@@ -52,6 +52,8 @@ for (let g = g0; g < g0 + ng; g++) {
       return {
         id: e.id, indice: eng.indiceMoyen(m, e), fondamental, propre,
         frontiere: moy(TYPES_PIECES.map((t: string) => eng.frontiere(m, e, t))), efficacite: moy(pcs.map((p) => p.efficacite)),
+        // Année de réforme : frontière des seules pièces touchées par le nouveau règlement (les autres gardent leur savoir, à raison).
+        frontiereTouchees: reforme ? moy(TYPES_PIECES.filter((t: string) => eng.pieceTouchee(r, t)).map((t: string) => eng.frontiere(m, e, t))) : null,
         pilotes: moy(pilotes.filter((p) => p.ecurie === e.id).map((p) => eng.niveauPilote(p, false))),
         productivite: (eng.productivite(m, e.id, 'aero') + eng.productivite(m, e.id, 'conception')) / 2,
         developpement: fi?.historique.find((h) => h.annee === annee)?.developpement ?? 0,
