@@ -3,6 +3,7 @@
  * Les sauvegardes du navigateur (secours, import) sont vérifiées par le parcours réel (tools/parcours-joueur.mjs).
  */
 import { describe, expect, it } from 'vitest';
+import { PLAFOND_BUDGETAIRE_MEUR } from '../src/engine/balance/reglement';
 import {
   ajouterSemaines, contratEmploi, creerScenarioGrille2026, decisionsEnAttente, deserialiser, executerCommandeJoueur, noterContact, poserQuestion,
   relation, relationBrute, serialiser, table, TABLE_NEGOCIATIONS, TABLES, teamPrincipal,
@@ -188,7 +189,7 @@ describe('Audit P10 — arbitrages du porteur', () => {
       executerCommandeJoueur(moteur, m, { type: 'joueur.prendre_ecurie', auteur: 'joueur', parametres: { ecurie: idEcurie, prenom: 'B', nom: 'Udget' } });
       moteur.avancer(m, 1);
       const tp = teamPrincipal(m, idEcurie)!;
-      expect(executerCommandeJoueur(moteur, m, { type: 'budget.developpement', auteur: tp.id, parametres: { ecurie: idEcurie, montant: 215 } })).toEqual({ ok: true });
+      expect(executerCommandeJoueur(moteur, m, { type: 'budget.developpement', auteur: tp.id, parametres: { ecurie: idEcurie, montant: PLAFOND_BUDGETAIRE_MEUR } })).toEqual({ ok: true });
       moteur.avancer(m, 50);
       const fi = (Object.values(table(m, TABLES.finances)) as unknown as { ecurie: string; tresorerieMEUR: number; budget: { developpementMEUR: number } }[]).find((f) => f.ecurie === idEcurie)!;
       const coupes = Object.values(m.evenements).filter((e) => e.type === 'finances.coupe_budget' && e.acteurs.some((a) => a.id === idEcurie)).length;

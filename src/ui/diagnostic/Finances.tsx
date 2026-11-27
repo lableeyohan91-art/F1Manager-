@@ -22,7 +22,7 @@ function LignesComptes({ c }: { c: ComptesAnnee }) {
   const lignes: [string, number, string][] = [
     ['Primes du championnat', c.primes, 'recette'], ['Revenus commerciaux', c.commercial, 'recette'], ['Sponsors', c.sponsors ?? 0, 'recette'], ['Apport du propriétaire', c.apport, 'recette'],
     ['Personnel plafonné', c.personnelPlafonne, 'plafond'], ['Départements', c.departements, 'plafond'], ['Opérations', c.operations, 'plafond'],
-    ['Entretien des installations', c.entretien, 'plafond'], ['Développement', c.developpement, 'plafond'],
+    ['Entretien des installations', c.entretien, 'plafond'], ['Entretien des installations (hors plafond)', c.entretienHorsPlafond ?? 0, 'hors'], ['Développement', c.developpement, 'plafond'],
     ['Pilotes et 3 cadres (hors plafond)', c.salairesHorsPlafond, 'hors'], ['Marketing', c.marketing, 'hors'],
     ['Indemnités', c.indemnites, 'hors'], ['Amendes', c.amendes, 'hors'], ['Dividendes', c.dividendes ?? 0, 'hors'],
     ['Intérêts de la dette', c.interets ?? 0, 'hors'], ['Investissements (infrastructures)', c.investissements ?? 0, 'hors'],

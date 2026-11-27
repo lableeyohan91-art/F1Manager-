@@ -103,7 +103,8 @@ describe('D-181 — essais renforcés, installations', () => {
     const e = table(m, TABLES.ecuries)['eq_mercedes'] as unknown as Ecurie;
     const inst = (Object.values(table(m, TABLES.installations)) as unknown as Installation[]).filter((i) => i.ecurie === e.id);
     const attendu = inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30), 0);
-    expect(depensesFixes(m, e).entretien).toBeCloseTo(attendu, 5);
+    const fx = depensesFixes(m, e);
+    expect(fx.entretien + fx.entretienHorsPlafond).toBeCloseTo(attendu, 5);
   });
 
   it('chantier : commande commune (le joueur choisit), un seul à la fois', () => {
@@ -132,11 +133,12 @@ describe('27/11 — réduire une installation (commande commune)', () => {
     inst.niveau = 10;
     const fi = financesDe(m, e) as Finances;
     fi.projets = [];
-    const avant = depensesFixes(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie).entretien;
+    const entretienTotal = () => { const f = depensesFixes(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie); return f.entretien + f.entretienHorsPlafond; };
+    const avant = entretienTotal();
     const cmd = () => moteur.commandes.executer(m, { type: 'infrastructure.reduire', auteur: tp.id, source: 'exterieur', parametres: { ecurie: e, installation: inst.id } });
     expect(cmd().ok).toBe(true);
     expect(inst.niveau).toBe(9);
-    const apres = depensesFixes(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie).entretien;
+    const apres = entretienTotal();
     expect(avant - apres).toBeCloseTo(INSTALLATIONS_COUT.entretienParNiveauCarre * 19 * (1 + Math.min(inst.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30), 5);
     expect(cmd().ok).toBe(false); // une fois par saison
     expect(Object.values(m.evenements).some((ev) => ev.type === 'infrastructure.reduction')).toBe(true);
@@ -155,6 +157,23 @@ describe('27/11 — réduire une installation (commande commune)', () => {
     const rien: unknown[] = [];
     deciderReductions(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie, fi, (c) => rien.push(c));
     expect(rien.length).toBe(0); // pas étranglée : le coût de l'entretien reste le frein
+  }, 120_000);
+});
+
+describe('Format 35 (D-191)', () => {
+  it('migration v34 → v35 : un plafond voté baisse de 30 M€ ; la partie avance, entretien payé hors plafond', () => {
+    const m = sc.creerMonde(5);
+    sc.creerMoteur().avancer(m, 2);
+    const fed = table(m, TABLES.federation)['federation'] as unknown as { regles: Record<string, number> };
+    fed.regles['plafondMEUR'] = 220;
+    const texte = serialiser(m).replaceAll(`"versionFormat":${VERSION_FORMAT}`, '"versionFormat":34');
+    const migre = deserialiser(texte);
+    expect(migre.versionFormat).toBe(VERSION_FORMAT);
+    expect((table(migre, TABLES.federation)['federation'] as unknown as { regles: Record<string, number> }).regles['plafondMEUR']).toBe(190);
+    sc.creerMoteur().avancer(migre, 5);
+    const fi = financesDe(migre, 'eq_mercedes') as Finances;
+    expect(fi.comptes.entretien).toBe(0);
+    expect(fi.comptes.entretienHorsPlafond ?? 0).toBeGreaterThan(0);
   }, 120_000);
 });
 

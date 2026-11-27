@@ -247,3 +247,5 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Argent libre** | Pour l'IA, l'argent qu'elle peut engager sans risque : le plus petit de la marge prévue sous le plafond et de la trésorerie qui partirait sinon en dividendes (D-182). |
 | **Mode de départ** | Situation de départ proposée au joueur en V1 (fond de grille, milieu de grille), qui impose l'écurie dont il prend la tête ; donnée de `departs.csv` (D-185). |
 | **Réduction (d'une installation)** | Retrait d'un niveau d'une installation, sans frais, pour économiser son entretien sous le plafond ; une fois par saison et par installation (D-186). |
+| **Écurie dominante (de l'ère)** | Écurie qui a au moins 3 titres constructeurs depuis le début du règlement en vigueur, ou les 2 derniers titres ; visée par l'anti-domination aux réformes (D-190). |
+| **Entretien hors plafond** | Depuis D-191, l'entretien des installations se paie avec l'argent de l'écurie, en dehors du plafond budgétaire. |

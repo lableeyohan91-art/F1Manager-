@@ -97,14 +97,14 @@ function CarteCapacites({ partie, nav }: { partie: Partie; nav: Navigation }) {
         </>
       )}
       <h3>Installations</h3>
-      <p class="muted petit">Enveloppe commune de {INVESTISSEMENT_ANNUEL_MAX} M€ par an hors plafond, un chantier à la fois. L’entretien (sous le plafond) croît avec le carré du niveau et avec l’âge (une rénovation le fait baisser), et les niveaux au-delà de {INSTALLATIONS_COUT.seuilRendement} rapportent moins.</p>
+      <p class="muted petit">Enveloppe commune de {INVESTISSEMENT_ANNUEL_MAX} M€ par an hors plafond, un chantier à la fois. L’entretien, payé avec l’argent de l’écurie (hors plafond), croît avec le carré du niveau et avec l’âge (une rénovation le fait baisser), et les niveaux au-delà de {INSTALLATIONS_COUT.seuilRendement} rapportent moins.</p>
       {chantier && <p>Chantier en cours : {meur(chantier.depenseMEUR)} payés sur {meur(chantier.coutPrevuMEUR)} annoncés.</p>}
       <ul class="liste-faits">{insts.map((i) => (
         <li key={i.id}><strong>{LIB_INST[i.type]}</strong> : niveau {i.niveau}, {i.ageAnnees} ans, état {Math.round(i.etat)} %
           {!rechercheDeleguee && !chantier && <>
             {i.niveau < 10 && TECHNIQUES.has(i.type) && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'amelioration' }, 'Chantier lancé.')}>Agrandir ({meur(coutChantier(i, 'amelioration'))})</button></>}
             {i.ageAnnees >= COUT_INFRASTRUCTURE.ageMinRenovation && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'renovation' }, 'Chantier lancé.')}>Rénover ({meur(coutChantier(i, 'renovation'))})</button></>}
-            {i.niveau > 1 && <> <button class="btn" title="Désaffecter le niveau le plus haut : moins de performance, moins d'entretien sous le plafond (une fois par saison)" onClick={() => agir('infrastructure.reduire', { ecurie: e.id, installation: i.id }, 'Installation réduite.')}>Réduire (−{meur(economieReduction(i))}/an)</button></>}
+            {i.niveau > 1 && <> <button class="btn" title="Désaffecter le niveau le plus haut : moins de performance, moins d'entretien à payer (une fois par saison)" onClick={() => agir('infrastructure.reduire', { ecurie: e.id, installation: i.id }, 'Installation réduite.')}>Réduire (−{meur(economieReduction(i))}/an)</button></>}
           </>}</li>
       ))}</ul>
       {rechercheDeleguee && <p class="muted petit">Recherche déléguée : votre directeur technique choisit aussi les chantiers.</p>}

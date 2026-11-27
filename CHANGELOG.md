@@ -751,3 +751,13 @@ Aucun code à ce stade.
 ### Modifié
 - Pas de dividendes pour une écurie de la seconde moitié du classement (D-188, A).
 - Prévisions : primes estimées avec la part variable au rang actuel.
+
+## [Économie v2, anti-domination] — 27/11/2026
+
+### Modifié
+- Entretien des installations payé hors plafond ; plafond de départ 185 M€ ; recettes des grandes écuries resserrées (D-191). Format 35.
+- Dividendes retenus seulement quand le développement a été limité par l'argent (D-188).
+
+### Ajouté
+- Anti-domination aux réformes (D-190) : règlement écrit contre les points forts du dominant, excès de confiance, malus de savoir.
+- Fiche `docs/systemes/economie-v2-argent-utile.md`.

@@ -134,9 +134,9 @@ describe('Audit — économie (phase 5 et sponsoring)', () => {
     while (m.date.semaine % 4 !== 1) moteur.avancer(m, 1); // juste après une écriture comptable
     const avant = facteurBudgetDeveloppement(m, 'eq_haas');
     // D-181 : comparaison contrefactuelle (même monde, même période) : les projets se paient surtout en début d'année, deux mois
-    // successifs ne se comparent donc pas ; on compare le même mois payé avec 60 M€ et avec 200 M€.
+    // successifs ne se comparent donc pas ; on compare le même mois payé avec 60 M€ et avec 170 M€ (D-191 : plafond de 185 M€).
     const temoin = deserialiser(serialiser(m));
-    expect(budget(200).ok).toBe(true); // D-166 : plus de délai entre deux modifications
+    expect(budget(170).ok).toBe(true); // D-166 : plus de délai entre deux modifications
     expect(facteurBudgetDeveloppement(m, 'eq_haas')).toBe(avant); // rien n'a encore été payé : aucun effet
     moteur.avancer(m, 4); // l'écriture suivante paie le nouveau budget
     sc.creerMoteur().avancer(temoin, 4);

@@ -1,12 +1,12 @@
 ecurie;tresorerieMEUR;typeProprietaire;apportAnnuelMEUR;revenusCommerciauxMEUR;verification
-eq_mercedes;180;constructeur;140;230;estimation de game design
-eq_ferrari;200;constructeur;120;280;estimation de game design (forte popularité)
-eq_mclaren;150;consortium;60;250;estimation de game design
-eq_redbull;160;milliardaire;150;200;estimation de game design (groupe propriétaire très investi)
-eq_aston;90;milliardaire;200;140;estimation de game design (propriétaire très dépensier)
-eq_alpine;70;constructeur;100;110;estimation de game design
-eq_williams;60;fonds;70;120;estimation de game design
-eq_racingbulls;40;milliardaire;100;80;estimation de game design (écurie sœur)
-eq_audi;120;constructeur;180;90;estimation de game design (constructeur en montée en puissance)
-eq_haas;30;famille;60;100;estimation de game design
-eq_cadillac;100;constructeur;150;90;estimation de game design (nouvelle venue)
+eq_mercedes;180;constructeur;70;140;économie v2 (D-191) : recettes resserrées
+eq_ferrari;200;constructeur;60;140;économie v2 (D-191) : recettes resserrées
+eq_mclaren;150;consortium;40;150;économie v2 (D-191) : recettes resserrées
+eq_redbull;160;milliardaire;80;120;économie v2 (D-191) : recettes resserrées
+eq_aston;90;milliardaire;110;100;économie v2 (D-191) : recettes resserrées
+eq_alpine;70;constructeur;100;110;estimation de game design (inchangé en v2)
+eq_williams;60;fonds;70;120;estimation de game design (inchangé en v2)
+eq_racingbulls;40;milliardaire;100;80;estimation de game design (inchangé en v2)
+eq_audi;120;constructeur;140;90;économie v2 (D-191) : recettes resserrées
+eq_haas;30;famille;60;100;estimation de game design (inchangé en v2)
+eq_cadillac;100;constructeur;130;90;économie v2 (D-191) : recettes resserrées

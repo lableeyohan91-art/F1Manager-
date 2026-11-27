@@ -16,4 +16,5 @@ export const ENVELOPPE_PRIMES_MEUR = 1100;
 export const PARTS_PRIMES = [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 5];
 
 /** Plafond budgétaire (M€). Documenté seulement en phase 3 (D-055), appliqué en phase 5. */
-export const PLAFOND_BUDGETAIRE_MEUR = 215;
+// D-191 (économie v2) : 215 → 185 M€, l'entretien des installations étant payé hors plafond (le plafond baisse d'autant, en moyenne).
+export const PLAFOND_BUDGETAIRE_MEUR = 185;

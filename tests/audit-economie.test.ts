@@ -25,7 +25,7 @@ describe('Audit économique — A et B', () => {
       const rang = s.constructeurs.findIndex((c) => c.ecurie === e.id) + 1;
       // A : seconde moitié du classement et développement limité par l'argent → pas de dividendes (contrôle large : au moins quand
       // l'écurie a laissé beaucoup de place sous le plafond).
-      if (rang > n / 2 && (h.plafondMEUR ?? 215) - h.plafonnees >= 3 * DIVIDENDES_RESULTATS.margeMinMEUR) expect(h.dividendes).toBe(0);
+      if (rang > n / 2 && (h.plafondMEUR ?? 185) - h.plafonnees >= 3 * DIVIDENDES_RESULTATS.margeMinMEUR) expect(h.dividendes).toBe(0);
     }
     expect(total).toBeCloseTo(ENVELOPPE_PRIMES_MEUR, 0);
   }, 180_000);

@@ -356,6 +356,13 @@ const MIGRATIONS: Record<number, Migration> = {
     for (const d of Object.values(deps)) d.cohesionHabituelle ??= d.cohesion;
     return { ...m, versionFormat: 34 };
   },
+  // v34 → v35 (D-191, économie v2) : l'entretien des installations sort du plafond, qui baisse de 215 à 185 M€. Un plafond voté (en
+  // vigueur ou à venir) baisse d'autant ; le champ « entretien hors plafond » des comptes est facultatif (0 avant la migration).
+  34: (m) => {
+    const fed = (m as { tables: Record<string, Record<string, { regles?: Record<string, number>; reglesAVenir?: Record<string, number> }>> }).tables['federation']?.['federation'];
+    for (const r of [fed?.regles, fed?.reglesAVenir]) if (r && typeof r['plafondMEUR'] === 'number') r['plafondMEUR'] = r['plafondMEUR'] - 30;
+    return { ...m, versionFormat: 35 };
+  },
 };
 
 export function serialiser(monde: Monde): string {

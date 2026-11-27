@@ -65,9 +65,7 @@ export function proprietaireDe(monde: Monde, idEcurie: string): Proprietaire | u
 /** Plafond budgétaire en vigueur (paramètre du règlement, modifiable par vote en phase 8). */
 export function plafond(monde: Monde): number {
   // Phase 8d-4 : la valeur votée sert de valeur par défaut ; un réglage d'expérience la remplace.
-  // Économie v2 (D-189, en mesure) : entretien hors plafond → plafond baissé d'autant (le vote du plafond sera à revoir si la règle est adoptée).
-  const v2 = parametre(monde, 'economie.entretienHorsPlafond', ECONOMIE_V2.entretienHorsPlafond) > 0;
-  return parametre(monde, 'reglement.plafondMEUR', v2 ? ECONOMIE_V2.plafondAvecEntretienHorsMEUR : regleVotee(monde, 'plafondMEUR', PLAFOND_BUDGETAIRE_MEUR));
+  return parametre(monde, 'reglement.plafondMEUR', regleVotee(monde, 'plafondMEUR', PLAFOND_BUDGETAIRE_MEUR));
 }
 
 /** Rang au dernier classement constructeurs terminé (1 = premier) ; à défaut, rang de l'indice voiture. */

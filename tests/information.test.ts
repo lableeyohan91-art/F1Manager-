@@ -21,9 +21,9 @@ function promesseRompue(m: Monde) {
 
 describe('Phase 8c — fuites et rumeurs', () => {
   it('un fait privé est suivi, circule le long des relations, reste borné ; les rumeurs pèsent plus, selon la croyance', () => {
-    // Graine 3 (phase 12b ; avant : 2, phase 11b ; 1) : la fuite est probabiliste ; certaines graines tombent sur un secret bien gardé
+    // Graine 4 (D-191 ; avant : 3, phase 12b ; 2, phase 11b ; 1) : la fuite est probabiliste ; certaines graines tombent sur un secret bien gardé
     // (fuite sur 6 graines sur 8 mesurées). Les assertions sont inchangées.
-    const m = sc.creerMonde(3);
+    const m = sc.creerMonde(4);
     const moteur = sc.creerMoteur();
     moteur.avancer(m, 30);
     const { tp, pilote, e } = promesseRompue(m);
