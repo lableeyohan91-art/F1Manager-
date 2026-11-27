@@ -17,7 +17,7 @@
 
 import { causesConnues } from '../humain/causes';
 import {
-  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, ANTI_DOMINATION, DIFFUSION, DIFFUSION_RETARD, IA_RECHERCHE, LECTURE_REGLEMENT, LISTE_DOMAINES, ORIENTATIONS, PISTE_CONCURRENT, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
+  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, ANTI_DOMINATION, MALUS_DOMINANT, DIFFUSION, DIFFUSION_RETARD, IA_RECHERCHE, LECTURE_REGLEMENT, LISTE_DOMAINES, ORIENTATIONS, PISTE_CONCURRENT, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
@@ -314,6 +314,23 @@ export function entreeEnVigueur(monde: Monde): boolean {
     noterObsolescence(monde, s, (s.parReglement[ancien.id] ?? 0) - garde + s.pourSaisonSuivante * i);
     s.pourSaisonSuivante = r3(s.pourSaisonSuivante * (1 - i));
     delete s.parReglement[ancien.id];
+  }
+  // D-190, option 3 : malus assumé pour l'écurie qui dominait l'ère (tout son savoir, tous les domaines).
+  const malus = MALUS_DOMINANT.malusSavoir * parametre(monde, 'reforme.malusDominant', MALUS_DOMINANT.actif);
+  if (dominanteLecture && malus > 0) {
+    for (const s of Object.values(table(monde, TABLES.savoirs)) as unknown as Savoir[]) {
+      if (s.ecurie !== dominanteLecture) continue;
+      const perte = s.fondamental * malus + (s.parReglement[nouveau.id] ?? 0) * malus;
+      s.fondamental = r3(s.fondamental * (1 - malus));
+      s.parReglement[nouveau.id] = r3((s.parReglement[nouveau.id] ?? 0) * (1 - malus));
+      noterObsolescence(monde, s, perte);
+    }
+    const e = table(monde, TABLES.ecuries)[dominanteLecture] as unknown as Ecurie | undefined;
+    ajouterEvenement(monde, {
+      type: 'reglement.malus_dominant', acteurs: [{ id: dominanteLecture, role: 'ecurie' }], importance: 3, visibilite: 'public',
+      contexte: { reglement: nouveau.id, malus },
+      texte: `Le nouveau règlement frappe de plein fouet ${e?.nom ?? dominanteLecture} : une large part de ce qui faisait sa domination ne sert plus.`,
+    });
   }
   // Phase 12a : pari de concept (architecture choisie, sinon recommandée par le DT), puis reconception absolue des pièces.
   fixerArchitectures(monde, ecuriesActives(monde), nouveau);

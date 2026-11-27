@@ -91,6 +91,13 @@ export const LECTURE_REGLEMENT = { actif: 1, dispersion: 0.5, usureMax: 0.95 };
  * Paramètre `reforme.antiDomination` (1 = actif, 0 = désactivé). Sans unité.
  */
 export const ANTI_DOMINATION = { actif: 1, titresEre: 3, titresConsecutifs: 2, domainesVises: 3, hausseIntensite: 0.3, biaisLecture: 0.5 };
+/**
+ * Option 3 (porteur : « selon le résultat on passe au 3 » ; mesuré : les options 1 et 2 seules ne changent presque rien, le champion sortant
+ * garde son titre à la réforme 47 % du temps) : malus assumé. À l'entrée en vigueur d'une réforme, l'écurie qui dominait l'ère perd en plus
+ * la part `malusSavoir` de tout son savoir (fondamental et préparé pour le nouveau règlement), dans tous les domaines. Paramètre
+ * `reforme.malusDominant` (multiplie le malus ; 0 = désactivé). Sans unité.
+ */
+export const MALUS_DOMINANT = { actif: 1, malusSavoir: 0.35 };
 
 export const SAVOIR = { gainBase: 2.2, rendementK: 40, partVoisins: 0.15, partFondamental: 0.3, partFondamentalRejet: 0.3, vieillissementAnnuel: 0.01, remiseEnRouteSemaines: 6, efficaciteRemiseEnRoute: 0.5 };
 

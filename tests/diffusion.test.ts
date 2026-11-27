@@ -111,3 +111,23 @@ describe('D-190 — anti-domination aux réformes (options 1 et 2)', () => {
     for (const p of props) for (const d of vises) expect(p.intensites[d]!).toBeGreaterThanOrEqual(Math.min(1, ANTI_DOMINATION.hausseIntensite) - 1e-9);
   });
 });
+
+describe('D-190 — option 3 : malus assumé du dominant à la réforme', () => {
+  it('l’écurie dominante perd en plus la part malusSavoir de tout son savoir ; un événement l’annonce', async () => {
+    const { MALUS_DOMINANT } = await import('../src/engine/balance/technique');
+    const m = sc.creerMonde(6);
+    sc.creerMoteur().avancer(m, 2);
+    m.parametres = { ...(m.parametres ?? {}), 'reforme.lecture': 0 };
+    const ancien = reglementEnVigueur(m)!;
+    const pal = table(m, TABLES.palmares);
+    for (const id of Object.keys(pal)) delete pal[id];
+    for (let k = 0; k < 3; k++) pal[`pal_t${k}`] = { id: `pal_t${k}`, saison: ancien.debut + k, championPilote: '', ecurieChampionPilote: '', championConstructeurs: 'eq_ferrari', note: '' } as never;
+    for (const e of ['eq_ferrari', 'eq_haas']) { const s = savoir(m, e, 'chassis'); s.fondamental = 10; s.parReglement[ancien.id] = 0; }
+    const nouveau = { id: 'reg_t', generation: 2, orientation: 'aero', debut: m.date.annee, fin: m.date.annee + 4, statut: 'annonce', intensites: Object.fromEntries(LISTE_DOMAINES.map((d) => [d, 0])), pneus: 1 } as unknown as Reglement;
+    table(m, TABLES.reglements)[nouveau.id] = nouveau as never;
+    expect(entreeEnVigueur(m)).toBe(true);
+    expect(savoir(m, 'eq_haas', 'chassis').fondamental).toBeCloseTo(10, 3);
+    expect(savoir(m, 'eq_ferrari', 'chassis').fondamental).toBeCloseTo(10 * (1 - MALUS_DOMINANT.malusSavoir), 3);
+    expect(Object.values(m.evenements).some((e) => e.type === 'reglement.malus_dominant')).toBe(true);
+  });
+});
