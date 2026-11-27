@@ -375,7 +375,7 @@ export function decisionsEnAttente(monde: Monde, idEcurie = ecurieDuJoueur(monde
   // Phase 12b : dilemmes techniques ; bloquants (D-170 Q10, interprétation « bloquant » à confirmer) quand la recherche n'est pas
   // déléguée (sinon le directeur technique les a déjà tranchés et ils n'apparaissent pas).
   for (const d of dilemmes(monde, idEcurie)) {
-    res.push({ type: 'dilemme_technique', titre: d.famille === 'alerte' ? 'Alerte de votre responsable technique' : 'Décision technique', detail: d.texte, consequence: 'Sans réponse, la recommandation du responsable s’applique.', echeance: d.echeance, urgente: urgente(d.echeance), bloquante: true, dilemme: d.id });
+    res.push({ type: 'dilemme_technique', titre: d.famille === 'alerte' ? 'Alerte de votre responsable technique' : d.famille === 'imitation' ? 'Une piste chez un concurrent' : 'Décision technique', detail: d.texte, consequence: 'Sans réponse, la recommandation du responsable s’applique.', echeance: d.echeance, urgente: urgente(d.echeance), bloquante: true, dilemme: d.id });
   }
   return res.sort((a, b) => Number(b.bloquante) - Number(a.bloquante) || Number(b.urgente) - Number(a.urgente) || (a.echeance ? rang(a.echeance) : 1e9) - (b.echeance ? rang(b.echeance) : 1e9));
 }

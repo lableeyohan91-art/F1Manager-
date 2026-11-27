@@ -71,7 +71,8 @@ export const EVOLUTIONS_MINEURES = { probabilite: 0.6, semaine: 44, domainesMin:
  * - `transfertExposant` : le savoir propre à l'ancien règlement passe au nouveau dans la proportion (1 − I)^transfertExposant (avant : 1).
  * Mesuré : pièces touchées à 55 % du plafond juste après une réforme (73 % avant ; 54 % au début du jeu) ; dynasties 60 % → 30 % des séries.
  */
-export const REFORME = { usureFondamentale: 0.5, transfertExposant: 2 };
+// Porteur (27/11) : « à la nouvelle ère, on repart vraiment de loin, vraiment de la perte de savoir » : 0,5 → 0,75 et (1 − I)² → (1 − I)³.
+export const REFORME = { usureFondamentale: 0.75, transfertExposant: 3 };
 
 export const SAVOIR = { gainBase: 2.2, rendementK: 40, partVoisins: 0.15, partFondamental: 0.3, partFondamentalRejet: 0.3, vieillissementAnnuel: 0.01, remiseEnRouteSemaines: 6, efficaciteRemiseEnRoute: 0.5 };
 
@@ -118,6 +119,20 @@ export const RECHERCHE_MONTANT = { actif: 0, referenceMEUR: 15, exposant: 0.5, p
  * `recherche.diffusion` (multiplie le taux ; 0 = désactivé).
  */
 export const DIFFUSION = { base: 0.01, parAnneeEre: 0.012, max: 0.06, seuilEvenement: 1 };
+/**
+ * Copie des pièces (le savoir seul ne suffisait pas : mesuré, le bas de grille ne remontait pas) : un projet vise, au-delà de sa propre
+ * frontière, la part `base` + `parAnneeEre` × (âge de l'ère), au plus `max`, de l'écart entre cette frontière et la meilleure pièce du même
+ * type sur la grille (solution vue et copiée). Le règlement en vigueur seulement ; mêmes règles pour toutes les écuries.
+ */
+export const COPIE_PIECES = { base: 0.1, parAnneeEre: 0.15, max: 0.8 };
+/**
+ * Piste trouvée chez un concurrent (porteur, 27/11 : « un retour d'un de nos personnels importants… grâce à nos enquêtes sur les voitures
+ * concurrentes, on pense avoir trouvé ça ; voulez-vous qu'on travaille sur cette piste ? ») : toutes les 4 semaines, avec la probabilité
+ * `probaParPeriode`, une écurie en retard d'au moins `ecartMin` (savoir du règlement en vigueur) dans un domaine reçoit une proposition de
+ * son responsable : étudier la piste coûte `coutMEUR` (sous le plafond) et rattrape la part `part` de ce retard ; c'est une fausse piste
+ * avec la probabilité `fausseBase` − `faussePointCorrelation` × (corrélation du responsable − 10), bornée à [`fausseMin`, `fausseMax`].
+ */
+export const PISTE_CONCURRENT = { probaParPeriode: 0.12, ecartMin: 2, part: 0.25, coutMEUR: 1.5, fausseBase: 0.3, faussePointCorrelation: 0.015, fausseMin: 0.1, fausseMax: 0.5 };
 
 export const IA_RECHERCHE = { forcePretendant: 0.75, forceDistancee: 0.4, partDefaut: 0.15, partAudace: 0.15, alea: 0.15 };
 

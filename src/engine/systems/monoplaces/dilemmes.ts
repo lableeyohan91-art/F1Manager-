@@ -6,6 +6,8 @@
  */
 
 import { ALERTES, PIECES, SOUFFLERIE, type TypePiece } from '../../balance/monoplaces';
+import { DOMAINES, PISTE_CONCURRENT } from '../../balance/technique';
+import { savoir } from '../technique/acces';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterSemaines, rangSemaine } from '../../core/calendrier';
 import { ajouterEvenement } from '../../core/evenements';
@@ -52,6 +54,8 @@ export function creerDilemme(monde: Monde, d: Omit<DilemmeTechnique, 'id' | 'cre
 }
 
 function choixIA(monde: Monde, d: DilemmeTechnique): string {
+  // Piste chez un concurrent : l'IA l'étudie si son enveloppe le permet (même règle que le joueur, sans connaître la vérité).
+  if (d.famille === 'imitation') return enveloppeRestante(monde, d.ecurie) >= PISTE_CONCURRENT.coutMEUR ? 'etudier' : 'ignorer';
   if (d.famille !== 'alerte') return choixEvenementIA(monde, d);
   // Une vérification se paie sur l'enveloppe de l'année : sans argent, on ralentit (aucun dépassement involontaire du plafond).
   return d.recommandation === 'verifier' && enveloppeRestante(monde, d.ecurie) < ALERTES.verificationMEUR ? 'ralentir' : d.recommandation;
@@ -62,7 +66,8 @@ export function resoudre(monde: Monde, d: DilemmeTechnique, option: string, aute
   delete table(monde, TABLES.dilemmesTechniques)[d.id];
   const p = projetDe(monde, d.projet);
   let detail = '';
-  if (p) {
+  if (d.famille === 'imitation') detail = appliquerPiste(monde, d, option);
+  else if (p) {
     const pole = PIECES[p.type as TypePiece].pole as Pole;
     if (d.famille === 'alerte') {
       if (option === 'ralentir') { p.rythme = 'allege'; detail = 'rythme allégé'; }
@@ -79,6 +84,38 @@ export function resoudre(monde: Monde, d: DilemmeTechnique, option: string, aute
   ajouterEvenement(monde, {
     type: 'conception.choix', acteurs: [{ id: d.ecurie, role: 'ecurie' }, ...(auteur !== 'ia' ? [{ id: auteur, role: 'auteur' }] : [])], importance: 1, visibilite: 'prive',
     contexte: { dilemme: d.id, famille: d.famille, option, detail, delegue: auteur === 'ia' },
+  });
+}
+
+/** Piste chez un concurrent : étudier (coût sous le plafond) rattrape une part du retard, sauf fausse piste. */
+function appliquerPiste(monde: Monde, d: DilemmeTechnique, option: string): string {
+  if (option !== 'etudier') return 'piste ignorée';
+  depenser(monde, d.ecurie, PISTE_CONCURRENT.coutMEUR);
+  if (d.verite['fausse']) return 'fausse piste : rien de récupérable';
+  const s = savoir(monde, d.ecurie, String(d.verite['domaine']));
+  const reg = String(d.verite['reglement']);
+  const gain = Math.round(PISTE_CONCURRENT.part * Number(d.verite['ecart']) * 1000) / 1000;
+  s.parReglement[reg] = Math.round(((s.parReglement[reg] ?? 0) + gain) * 1000) / 1000;
+  return `savoir du domaine ${DOMAINES[String(d.verite['domaine']) as keyof typeof DOMAINES]?.libelle ?? ''} +${gain}`;
+}
+
+/**
+ * Proposition d'un responsable : une piste vue chez l'écurie la plus avancée dans un domaine. Appelée par la diffusion du savoir
+ * (toutes les 4 semaines) ; au plus une piste en attente par écurie.
+ */
+export function proposerPiste(monde: Monde, e: Ecurie, domaine: string, idReglement: string, leader: Ecurie, ecart: number): void {
+  if (dilemmes(monde, e.id).some((x) => x.famille === 'imitation')) return;
+  const pole: Pole = ['aero_avant', 'aero_arriere', 'fond_plat', 'refroidissement'].includes(domaine) ? 'aero' : 'conception';
+  const resp = responsable(monde, e.id, pole);
+  const t = tirageLocal(monde, 'technique.piste', e.id, rangSemaine(monde.date));
+  const correlation = resp?.competences['correlation'] ?? 10;
+  const pFausse = Math.min(PISTE_CONCURRENT.fausseMax, Math.max(PISTE_CONCURRENT.fausseMin, PISTE_CONCURRENT.fausseBase - PISTE_CONCURRENT.faussePointCorrelation * (correlation - 10)));
+  const libelle = (DOMAINES[domaine as keyof typeof DOMAINES]?.libelle ?? domaine).toLowerCase();
+  creerDilemme(monde, {
+    ecurie: e.id, projet: `piste_${e.id}`, famille: 'imitation', options: ['etudier', 'ignorer'],
+    recommandation: enveloppeRestante(monde, e.id) >= PISTE_CONCURRENT.coutMEUR ? 'etudier' : 'ignorer',
+    texte: `Chef, en analysant les photos et les données de ${leader.nom}, on pense avoir compris une partie de leur avance (${libelle}). Une étude coûterait ${PISTE_CONCURRENT.coutMEUR} M€ ; on pourrait rattraper environ ${Math.round(100 * PISTE_CONCURRENT.part)} % de notre retard dans ce domaine. Est-ce qu'on travaille sur cette piste ?`,
+    verite: { domaine, reglement: idReglement, ecart: Math.round(ecart * 1000) / 1000, fausse: t.chance(pFausse), leader: leader.id },
   });
 }
 

@@ -1,5 +1,6 @@
 /** Phases 8a et 8b — règlements et recherche (D-128, D-132). */
 import { describe, expect, it } from 'vitest';
+import { REFORME } from '../src/engine/balance/technique';
 import {
   copierMonde, creerScenarioGrille2026, deserialiser, empreinte, enveloppeRestante, entreeEnVigueur, partRecherche, piecesInstallees, programmes, propositions, reconcevoir, reglementAnnonce, reglementEnVigueur,
   reglements, rejeter, savoir, serialiser, table, TABLES, teamPrincipal, VERSION_FORMAT, voitureDe, type Ecurie, type Monde, type Personne, type Reglement,
@@ -53,9 +54,9 @@ describe('Phase 8a — règlements', () => {
     const nouveau: Reglement = { id: 'reg_test', generation: 2, orientation: 'aero', debut: m.date.annee, fin: m.date.annee + 4, statut: 'annonce', intensites: Object.fromEntries(LISTE_DOMAINES.map((d) => [d, d === 'aero_avant' ? 0.75 : 0])), pneus: 1 };
     table(m, TABLES.reglements)[nouveau.id] = nouveau as never;
     expect(entreeEnVigueur(m)).toBe(true);
-    expect(s.parReglement['reg_test']).toBeCloseTo(40 * 0.25 * 0.25, 3); // (1 − 0,75)² de l'ancienne ère
+    expect(s.parReglement['reg_test']).toBeCloseTo(40 * 0.25 ** REFORME.transfertExposant, 3); // (1 − 0,75)^exposant de l'ancienne ère
     expect(s.parReglement[ancien.id]).toBeUndefined();
-    expect(s.fondamental).toBeCloseTo(10 * (1 - 0.5 * 0.75), 3); // le savoir de fond s'use avec l'intensité
+    expect(s.fondamental).toBeCloseTo(10 * (1 - REFORME.usureFondamentale * 0.75), 3); // le savoir de fond s'use avec l'intensité
     expect(autre.fondamental).toBeCloseTo(10, 3); // domaine non touché : rien n'est perdu
     expect(reglementEnVigueur(m)!.id).toBe('reg_test');
   });

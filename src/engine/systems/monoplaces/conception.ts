@@ -26,6 +26,7 @@ import { partRecherche, programmes, reglementAnnonce, reglementEnVigueur, savoir
 import { repartirSoufflerie } from './soufflerie';
 import { depenser, enveloppeRestante } from './depenses';
 import { chargePole, departementPole, evoluerFatigue, facteurProductivite, fatiguePole, fraicheur, partIngenieurs, probaIncident, rythmeDe, type Pole } from './fatigue';
+import { COPIE_PIECES } from '../../balance/technique';
 import { COHESION_DEPARTEMENT, ESSAIS_RENFORCES, FIABILITE_DEPARTEMENT, INGENIEURS, PRODUCTION, PROJETS_PAR_POLE } from '../../balance/capacites';
 import { facteurDetection, niveauUtile } from '../economie/capacites';
 import { alertesResponsables, creerDilemme, dilemmes, echeancesDilemmes, resoudre, responsable, stresser } from './dilemmes';
@@ -212,10 +213,25 @@ export function avecPiece(monde: Monde, e: Ecurie, type: TypePiece, efficacite: 
 }
 
 /** Efficacité attendue d'une nouvelle version (concept visé), avant l'aléa d'exécution. */
+/**
+ * Cible d'un projet : la frontière de l'écurie, relevée vers la meilleure pièce du même type sur la grille selon l'âge de l'ère (copie des
+ * solutions vues chez les rivaux ; COPIE_PIECES). Paramètre d'expérience `recherche.diffusion` (0 = pas de copie).
+ */
+export function cibleProjet(monde: Monde, e: Ecurie, type: TypePiece): number {
+  const f = frontiere(monde, e, type);
+  const r = reglementEnVigueur(monde);
+  const facteur = parametre(monde, 'recherche.diffusion', 1);
+  if (!r || facteur <= 0) return f;
+  const meilleure = Math.max(...(Object.values(table(monde, TABLES.pieces)) as unknown as PieceVoiture[]).filter((x) => x.installee && x.type === type && x.ecurie !== e.id).map((x) => x.efficacite), -Infinity);
+  if (!(meilleure > f)) return f;
+  const part = facteur * Math.min(COPIE_PIECES.max, COPIE_PIECES.base + COPIE_PIECES.parAnneeEre * Math.max(0, monde.date.annee - r.debut));
+  return f + part * (meilleure - f);
+}
+
 export function efficaciteAttendue(monde: Monde, e: Ecurie, type: TypePiece, concept: number): number {
   const actuelle = piecesInstallees(monde, e.id).find((x) => x.type === type);
   const base = actuelle?.efficacite ?? EFFICACITE_REFERENCE;
-  const f = frontiere(monde, e, type);
+  const f = cibleProjet(monde, e, type);
   return base + progressionAttendue(monde, e, type) * Math.max(0, f - base) - PROJETS.penaliteConcept * Math.abs(concept - (actuelle?.concept ?? 0));
 }
 
@@ -381,7 +397,7 @@ function terminerConception(monde: Monde, p: ProjetConception): void {
   }
   q = Math.max(PROJETS.progressionMin, q);
   // Phase 12b : choix faits pendant le projet (part du gain obtenue, bonus d'une piste ou d'un matériau) et défaut caché de performance.
-  const gain = q * Math.max(0, frontiere(monde, e, type) - base) * (p.facteurGain ?? 1) * (p.defaut?.type === 'performance' ? 1 - p.defaut.ampleur : 1);
+  const gain = q * Math.max(0, cibleProjet(monde, e, type) - base) * (p.facteurGain ?? 1) * (p.defaut?.type === 'performance' ? 1 - p.defaut.ampleur : 1);
   p.efficacite = r2(base + gain + (p.bonusEfficacite ?? 0) - PROJETS.penaliteConcept * Math.abs(p.concept - (actuelle?.concept ?? 0)));
   // Phase 12b, expertise : la conception et les essais font gagner du savoir propre au règlement dans les domaines de la pièce.
   apprendre(monde, e.id, type, r?.id, p.joursTotal + SOUFFLERIE.joursParHeure * (p.heures ?? 0) + SOUFFLERIE.joursParUniteCfd * (p.cfd ?? 0));

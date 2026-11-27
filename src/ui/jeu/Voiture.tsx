@@ -18,6 +18,7 @@ const LIB_OPTION: Record<string, string> = {
   refuser: 'Refuser', explorer: 'Explorer (2 semaines, 0,45 M€)', explorer_soufflerie: 'Explorer avec la soufflerie (2 semaines, 0,45 M€)',
   prudence: 'Jouer la prudence', poursuivre: 'Poursuivre', tenter: 'Tenter', essais: 'Essais de résistance (0,4 M€, 1 semaine)', conserver: 'Garder la solution éprouvée',
   reorienter: 'Réorienter (1 semaine)',
+  etudier: 'Étudier la piste', ignorer: 'Ignorer',
 };
 const LIB_RYTHME: Record<string, string> = { allege: 'allégé', normal: 'normal', intensif: 'intensif' };
 const couleurFatigue = (f: number) => (f < 30 ? 'var(--green)' : f < 55 ? 'var(--yellow)' : 'var(--accent)');
@@ -65,7 +66,7 @@ export function CarteVoiture({ partie, nav }: { partie: Partie; nav: Navigation 
       {msg && <div class="carte retour" role="status">{msg}</div>}
       {enAttente.map((d) => (
         <div key={d.id} class="carte attention">
-          <h3>❗ {d.famille === 'alerte' ? 'Alerte de votre responsable' : 'Décision technique'}</h3>
+          <h3>❗ {d.famille === 'alerte' ? 'Alerte de votre responsable' : d.famille === 'imitation' ? 'Une piste chez un concurrent' : 'Décision technique'}</h3>
           <p>« {d.texte} »</p>
           <div class="actions">{d.options.map((o) => <button key={o} class={`btn ${o === d.recommandation ? 'principal' : ''}`} onClick={() => agir('conception.dilemme', { dilemme: d.id, option: o }, 'Décision prise.')}>{LIB_OPTION[o] ?? o}</button>)}</div>
           <p class="muted petit">Le bouton en rouge est la recommandation de votre responsable : ses conseils sont plus fiables quand il est compétent et reposé, jamais certains.</p>

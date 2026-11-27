@@ -17,7 +17,7 @@
 
 import { causesConnues } from '../humain/causes';
 import {
-  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, DIFFUSION, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
+  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, DIFFUSION, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PISTE_CONCURRENT, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
@@ -35,6 +35,7 @@ import { ecuriesActives } from '../saison/performance';
 import { capaciteDeveloppement } from '../saison';
 import { niveauEffectif } from '../economie/infrastructures';
 import { forceEcurie, teamPrincipal } from '../humain/decision';
+import { proposerPiste } from '../monoplaces/dilemmes';
 import { avantProjets, intensitePercue, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable, savoirExistant } from './acces';
 import { fixerArchitectures, intersaison, reconcevoir } from '../monoplaces/conception';
 import { facteurRechercheSoufflerie } from '../monoplaces/soufflerie';
@@ -374,6 +375,19 @@ export function diffuserSavoir(monde: Monde): void {
       s.parReglement[r.id] = r3(v + g);
       gains.set(e.id, (gains.get(e.id) ?? 0) + g);
     }
+  }
+  // Piste chez un concurrent : une proposition de temps en temps, sur le domaine où le retard est le plus grand.
+  for (const e of ecuries) {
+    const t = tirageLocal(monde, 'technique.piste.tirage', e.id, monde.date.annee, monde.date.semaine);
+    if (!t.chance(PISTE_CONCURRENT.probaParPeriode)) continue;
+    let pire: { d: string; ecart: number; leader: Ecurie } | undefined;
+    for (const d of LISTE_DOMAINES) {
+      const propres = ecuries.map((x) => ({ x, v: savoirExistant(monde, x.id, d)?.parReglement[r.id] ?? 0 }));
+      const top = propres.reduce((a, b) => (b.v > a.v ? b : a));
+      const ecart = top.v - (propres.find((y) => y.x.id === e.id)?.v ?? 0);
+      if (top.x.id !== e.id && ecart >= PISTE_CONCURRENT.ecartMin && (!pire || ecart > pire.ecart)) pire = { d, ecart, leader: top.x };
+    }
+    if (pire) proposerPiste(monde, e, pire.d, r.id, pire.leader, pire.ecart);
   }
   for (const e of ecuries) {
     const g = gains.get(e.id) ?? 0;
