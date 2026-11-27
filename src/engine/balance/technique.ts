@@ -109,6 +109,16 @@ export const RECHERCHE_MONTANT = { actif: 0, referenceMEUR: 15, exposant: 0.5, p
  * Vitesse du savoir (prototype, paramètre `recherche.vitesse`, 1 par défaut) : multiplie le gain de savoir de toute la grille.
  */
 
+/**
+ * Diffusion du savoir (porteur, 27/11 : « en fin d'ère, des choses relativement serrées, qui se resserrent via la diffusion du savoir ») :
+ * toutes les 4 semaines, chaque écurie rattrape la part `base` + `parAnneeEre` × (années depuis l'entrée en vigueur du règlement), au plus
+ * `max`, de l'écart entre son savoir PROPRE AU RÈGLEMENT EN VIGUEUR et celui de la meilleure écurie, domaine par domaine (solutions
+ * visibles copiées : photos, ingénieurs qui changent d'écurie). Le savoir fondamental et la préparation du règlement suivant ne se copient
+ * pas. Événement si le rattrapage d'une écurie dépasse `seuilEvenement` (somme des domaines) sur la période. Paramètre d'expérience
+ * `recherche.diffusion` (multiplie le taux ; 0 = désactivé).
+ */
+export const DIFFUSION = { base: 0.01, parAnneeEre: 0.012, max: 0.06, seuilEvenement: 1 };
+
 export const IA_RECHERCHE = { forcePretendant: 0.75, forceDistancee: 0.4, partDefaut: 0.15, partAudace: 0.15, alea: 0.15 };
 
 /** Historique de recherche, règlements terminés ou rejetés : conservés pendant ce nombre de saisons. */

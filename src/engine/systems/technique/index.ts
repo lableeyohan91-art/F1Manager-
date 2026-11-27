@@ -17,7 +17,7 @@
 
 import { causesConnues } from '../humain/causes';
 import {
-  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
+  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, DIFFUSION, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
@@ -35,7 +35,7 @@ import { ecuriesActives } from '../saison/performance';
 import { capaciteDeveloppement } from '../saison';
 import { niveauEffectif } from '../economie/infrastructures';
 import { forceEcurie, teamPrincipal } from '../humain/decision';
-import { avantProjets, intensitePercue, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable } from './acces';
+import { avantProjets, intensitePercue, programmes, propositions, reglementAnnonce, reglementConnu, reglementEnVigueur, reglements, savoir, savoirApplicable, savoirExistant } from './acces';
 import { fixerArchitectures, intersaison, reconcevoir } from '../monoplaces/conception';
 import { facteurRechercheSoufflerie } from '../monoplaces/soufflerie';
 import { DOMAINES_SOUFFLERIE } from '../../balance/monoplaces';
@@ -351,6 +351,41 @@ function facteurMoyens(monde: Monde, idEcurie: string, part: number): number {
   return (Math.max(0, montant) / parametre(monde, 'recherche.reference', RECHERCHE_MONTANT.referenceMEUR)) ** RECHERCHE_MONTANT.exposant;
 }
 
+/**
+ * Diffusion du savoir (DIFFUSION) : chaque écurie rattrape une part de l'écart à la meilleure, domaine par domaine, sur le savoir propre au
+ * règlement en vigueur ; la part grandit avec l'âge de l'ère (les solutions sont connues et copiées). Mêmes règles pour toutes les écuries.
+ */
+export function diffuserSavoir(monde: Monde): void {
+  const r = reglementEnVigueur(monde);
+  if (!r) return;
+  const facteur = parametre(monde, 'recherche.diffusion', 1);
+  const taux = facteur * Math.min(DIFFUSION.max, DIFFUSION.base + DIFFUSION.parAnneeEre * Math.max(0, monde.date.annee - r.debut));
+  if (taux <= 0) return;
+  const ecuries = ecuriesActives(monde);
+  const gains = new Map<string, number>();
+  for (const d of LISTE_DOMAINES) {
+    // Instantané avant mise à jour : tout le monde copie le même meilleur.
+    const propres = ecuries.map((e) => ({ e, v: savoirExistant(monde, e.id, d)?.parReglement[r.id] ?? 0 }));
+    const meilleur = Math.max(0, ...propres.map((x) => x.v));
+    for (const { e, v } of propres) {
+      const g = taux * (meilleur - v);
+      if (g <= 0) continue;
+      const s = savoir(monde, e.id, d);
+      s.parReglement[r.id] = r3(v + g);
+      gains.set(e.id, (gains.get(e.id) ?? 0) + g);
+    }
+  }
+  for (const e of ecuries) {
+    const g = gains.get(e.id) ?? 0;
+    if (g < DIFFUSION.seuilEvenement) continue;
+    ajouterEvenement(monde, {
+      type: 'technique.diffusion', acteurs: [{ id: e.id, role: 'ecurie' }], importance: 1, visibilite: 'prive',
+      contexte: { reglement: r.id, gain: r3(g), taux: r3(taux), anneesEre: monde.date.annee - r.debut },
+      texte: `${e.nom} reprend des solutions vues chez ses rivaux (savoir du règlement en vigueur : +${r3(g)}).`,
+    });
+  }
+}
+
 /** Progression des programmes (toutes les 4 semaines) : savoir gagné, voisinages, historique, découvertes. */
 export function avancerRecherche(monde: Monde): void {
   const actuel = reglementEnVigueur(monde);
@@ -633,7 +668,7 @@ export const systemeTechnique: Systeme = {
       decisionsRecherche(monde, (c) => commanderIA(c));
     }
     if (date.semaine === EVOLUTIONS_MINEURES.semaine) deciderEvolutionMineure(monde);
-    if (date.semaine % PROGRAMMES.periodeSemaines === 2) avancerRecherche(monde);
+    if (date.semaine % PROGRAMMES.periodeSemaines === 2) { avancerRecherche(monde); diffuserSavoir(monde); }
   },
 };
 
