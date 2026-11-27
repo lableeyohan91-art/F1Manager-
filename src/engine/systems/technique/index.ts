@@ -17,7 +17,7 @@
 
 import { causesConnues } from '../humain/causes';
 import {
-  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, DIFFUSION, IA_RECHERCHE, LISTE_DOMAINES, ORIENTATIONS, PISTE_CONCURRENT, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
+  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, DIFFUSION, DIFFUSION_RETARD, IA_RECHERCHE, LECTURE_REGLEMENT, LISTE_DOMAINES, ORIENTATIONS, PISTE_CONCURRENT, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
@@ -243,10 +243,27 @@ export function entreeEnVigueur(monde: Monde): boolean {
   if (!nouveau || !ancien || nouveau.debut !== monde.date.annee) return false;
   ancien.statut = 'termine';
   nouveau.statut = 'en_vigueur';
+  // Piste 1 (27/11) : lecture du nouveau règlement, bonne ou mauvaise selon l'écurie (un tirage par écurie et par réforme).
+  const dispersion = LECTURE_REGLEMENT.dispersion * parametre(monde, 'reforme.lecture', 0);
+  const lecture = new Map<string, number>();
+  if (dispersion > 0) {
+    for (const e of ecuriesActives(monde)) {
+      const u = 2 * tirageLocal(monde, 'reglement.lecture', nouveau.id, e.id).suivant() - 1;
+      lecture.set(e.id, 1 + dispersion * u);
+      ajouterEvenement(monde, {
+        type: 'reglement.lecture', acteurs: [{ id: e.id, role: 'ecurie' }], importance: Math.abs(u) > 0.6 ? 3 : 1, visibilite: Math.abs(u) > 0.6 ? 'public' : 'prive',
+        causes: [], contexte: { reglement: nouveau.id, facteurPerte: r3(1 + dispersion * u) },
+        texte: u < -0.6 ? `${e.nom} a parfaitement lu le nouveau règlement : son savoir résiste mieux que celui de ses rivaux.`
+          : u > 0.6 ? `${e.nom} a mal interprété le nouveau règlement : une grande partie de son savoir ne sert plus.`
+          : `${e.nom} aborde le nouveau règlement avec une lecture ${u < 0 ? 'plutôt juste' : 'imparfaite'}.`,
+      });
+    }
+  }
   for (const s of Object.values(table(monde, TABLES.savoirs)) as unknown as Savoir[]) {
-    const i = nouveau.intensites[s.domaine] ?? 0;
+    const lec = lecture.get(s.ecurie) ?? 1;
+    const i = Math.min(1, (nouveau.intensites[s.domaine] ?? 0) * lec);
     // D-178 : nouvelle ère. Le savoir de fond s'use avec l'intensité de la réforme ; l'ancienne ère n'est presque plus transférée.
-    const usure = s.fondamental * REFORME.usureFondamentale * i;
+    const usure = s.fondamental * Math.min(LECTURE_REGLEMENT.usureMax, REFORME.usureFondamentale * i);
     s.fondamental = r3(s.fondamental - usure);
     noterObsolescence(monde, s, usure);
     const garde = (s.parReglement[ancien.id] ?? 0) * Math.pow(1 - i, REFORME.transfertExposant);
@@ -368,8 +385,10 @@ export function diffuserSavoir(monde: Monde): void {
     // Instantané avant mise à jour : tout le monde copie le même meilleur.
     const propres = ecuries.map((e) => ({ e, v: savoirExistant(monde, e.id, d)?.parReglement[r.id] ?? 0 }));
     const meilleur = Math.max(0, ...propres.map((x) => x.v));
+    const bonus = DIFFUSION_RETARD.bonusSavoir * parametre(monde, 'recherche.diffusionRetard', 0);
     for (const { e, v } of propres) {
-      const g = taux * (meilleur - v);
+      // Piste 2 (27/11) : ce qui est loin devant se copie plus facilement.
+      const g = taux * (meilleur - v) * (meilleur > 0 ? 1 + bonus * (meilleur - v) / meilleur : 1);
       if (g <= 0) continue;
       const s = savoir(monde, e.id, d);
       s.parReglement[r.id] = r3(v + g);

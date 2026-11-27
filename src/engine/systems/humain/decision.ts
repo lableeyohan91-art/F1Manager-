@@ -7,7 +7,7 @@
 
 import { COMPETENCES_TRANSVERSALES, courbeAge } from '../../balance/personnages';
 import { CROISSANCE_SALAIRE_PAR_POINT, PENALITE_AGE_RECRUTEMENT, PENALITE_BAISSE_SALAIRE, PRIME_PALMARES, RETOUR_APRES_DEPART, SALAIRE_REFERENCE_MEUR, UTILITE, VALEUR_MARCHE } from '../../balance/contrats';
-import { idsTries, table, type Monde } from '../../core/monde';
+import { idsTries, parametre, table, type Monde } from '../../core/monde';
 import { tirageLocal } from '../../core/moteur';
 import { TABLES, type Carriere, type Contrat, type Ecurie, type Palmares, type Personne, type Saison } from '../../model/types';
 import { relation, souvenirsDe } from '../memoire';
@@ -17,7 +17,7 @@ import { PROMOTION_AFFILIE, REPUTATION_RECRUTEMENT_F1 } from '../../balance/juni
 import { potentielEstime } from '../carriere/estimation';
 import { AGENTS } from '../../balance/commercial';
 import { agentDe } from '../marche/commercial';
-import { ATTRAIT_POSTE_SUPERIEUR, LASSITUDE_PERSONNEL, LASSITUDE_PILOTE, PREDATEUR, RANG_POSTE, USURE_SUCCES } from '../../balance/marche';
+import { ATTRAIT_POSTE_SUPERIEUR, LASSITUDE_PERSONNEL, LASSITUDE_PILOTE, PREDATEUR, RANG_POSTE, USURE_SUCCES, USURE_SUCCES_RENFORCEE } from '../../balance/marche';
 import { utiliteImage } from '../medias/acces';
 
 const borner = (x: number, min = -1, max = 1) => Math.min(max, Math.max(min, x));
@@ -275,7 +275,11 @@ export function usureSucces(monde: Monde, p: Personne, anneesConnues?: Set<numbe
   const titres = pilote ? Math.max(constructeurs, pal.filter((x) => x.championPilote === p.id && x.ecurieChampionPilote === p.ecurie && annees.has(x.saison)).length) : constructeurs;
   const seuil = seuilPersonnel(p);
   const depart = seuil - USURE_SUCCES.anticipation;
-  const usure = Math.min(USURE_SUCCES.max, Math.max(0, USURE_SUCCES.parTitre * (titres - depart)));
+  // Piste 3 (27/11) : usure renforcée, réglable.
+  const r = parametre(monde, 'usure.renforcee', 0);
+  const parTitre = USURE_SUCCES.parTitre * (1 + r * (USURE_SUCCES_RENFORCEE.facteur - 1));
+  const max = USURE_SUCCES.max + r * (USURE_SUCCES_RENFORCEE.maxAbsolu - USURE_SUCCES.max);
+  const usure = Math.min(max, Math.max(0, parTitre * (titres - depart)));
   return { usure, titres, seuil, signal: titres >= depart };
 }
 

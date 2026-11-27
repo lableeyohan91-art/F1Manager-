@@ -26,7 +26,7 @@ import { partRecherche, programmes, reglementAnnonce, reglementEnVigueur, savoir
 import { repartirSoufflerie } from './soufflerie';
 import { depenser, enveloppeRestante } from './depenses';
 import { chargePole, departementPole, evoluerFatigue, facteurProductivite, fatiguePole, fraicheur, partIngenieurs, probaIncident, rythmeDe, type Pole } from './fatigue';
-import { COPIE_PIECES } from '../../balance/technique';
+import { COPIE_PIECES, DIFFUSION_RETARD } from '../../balance/technique';
 import { COHESION_DEPARTEMENT, ESSAIS_RENFORCES, FIABILITE_DEPARTEMENT, INGENIEURS, PRODUCTION, PROJETS_PAR_POLE } from '../../balance/capacites';
 import { facteurDetection, niveauUtile } from '../economie/capacites';
 import { alertesResponsables, creerDilemme, dilemmes, echeancesDilemmes, resoudre, responsable, stresser } from './dilemmes';
@@ -224,7 +224,10 @@ export function cibleProjet(monde: Monde, e: Ecurie, type: TypePiece): number {
   if (!r || facteur <= 0) return f;
   const meilleure = Math.max(...(Object.values(table(monde, TABLES.pieces)) as unknown as PieceVoiture[]).filter((x) => x.installee && x.type === type && x.ecurie !== e.id).map((x) => x.efficacite), -Infinity);
   if (!(meilleure > f)) return f;
-  const part = facteur * Math.min(COPIE_PIECES.max, COPIE_PIECES.base + COPIE_PIECES.parAnneeEre * Math.max(0, monde.date.annee - r.debut));
+  const base = facteur * Math.min(COPIE_PIECES.max, COPIE_PIECES.base + COPIE_PIECES.parAnneeEre * Math.max(0, monde.date.annee - r.debut));
+  // Piste 2 (27/11) : ce qui est loin devant se copie plus facilement.
+  const bonus = DIFFUSION_RETARD.bonusPieces * parametre(monde, 'recherche.diffusionRetard', 0);
+  const part = Math.min(Math.max(base, DIFFUSION_RETARD.partPiecesMax), base * (1 + bonus * (meilleure - f) / meilleure));
   return f + part * (meilleure - f);
 }
 
