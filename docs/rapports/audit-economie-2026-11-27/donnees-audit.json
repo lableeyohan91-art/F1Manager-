@@ -1,0 +1,706 @@
+{
+ "ecuries": [
+  {
+   "nom": "McLaren",
+   "place": 5.006666666666667,
+   "rec": 468.48166819871915,
+   "primes": 111.72615384615385,
+   "commercial": 136.88575,
+   "sponsors": 149.63228205128203,
+   "apport": 68.35495903540641,
+   "plaf": 198.54293242735042,
+   "dep": 71.8542978974359,
+   "entretien": 36.41212606837607,
+   "dev": 56.72287974358974,
+   "fixes": 141.82005268376068,
+   "salHors": 56.27120512820513,
+   "marketing": 38.05263814102564,
+   "invest": 12.9365140562249,
+   "div": 150.19017386807036,
+   "treso": 179.51366666666667,
+   "sousPlafond": 16.457067572649578
+  },
+  {
+   "nom": "Ferrari",
+   "place": 5.046666666666667,
+   "rec": 570.2477945208942,
+   "primes": 110.74179487179488,
+   "commercial": 158.71595384615384,
+   "sponsors": 167.38558974358975,
+   "apport": 132.32522035877278,
+   "plaf": 200.81448393162393,
+   "dep": 73.77683564102564,
+   "entretien": 37.0868764957265,
+   "dev": 56.59925692307692,
+   "fixes": 144.215227008547,
+   "salHors": 57.16515384615384,
+   "marketing": 43.274231538461535,
+   "invest": 12.847666666666667,
+   "div": 241.86228480141625,
+   "treso": 251.51666666666668,
+   "sousPlafond": 14.185516068376074
+  },
+  {
+   "nom": "Alpine",
+   "place": 5.386666666666667,
+   "rec": 343.1000299233559,
+   "primes": 105.17128205128205,
+   "commercial": 52.49260076923076,
+   "sponsors": 80.27146153846154,
+   "apport": 104.4930188977149,
+   "plaf": 183.3130810854701,
+   "dep": 56.087448179487176,
+   "entretien": 20.62215982905983,
+   "dev": 74.28449871794872,
+   "fixes": 109.02858236752137,
+   "salHors": 47.12887179487179,
+   "marketing": 16.623709346153845,
+   "invest": 14.663990327189792,
+   "div": 72.89366757225515,
+   "treso": 115.54333333333334,
+   "sousPlafond": 31.68691891452991
+  },
+  {
+   "nom": "Mercedes",
+   "place": 5.806666666666667,
+   "rec": 531.0802087476368,
+   "primes": 103.78076923076924,
+   "commercial": 123.26996846153847,
+   "sponsors": 149.46520512820513,
+   "apport": 153.004286708389,
+   "plaf": 200.8931586239316,
+   "dep": 75.44509725641025,
+   "entretien": 39.18803162393162,
+   "dev": 53.93782256410256,
+   "fixes": 146.95533605982905,
+   "salHors": 51.41771794871795,
+   "marketing": 35.816942705128206,
+   "invest": 12.23894839018066,
+   "div": 216.80998099634158,
+   "treso": 211.189,
+   "sousPlafond": 14.106841376068388
+  },
+  {
+   "nom": "Red Bull",
+   "place": 5.836666666666667,
+   "rec": 517.6709422029775,
+   "primes": 103.29564102564103,
+   "commercial": 104.8112,
+   "sponsors": 128.5151282051282,
+   "apport": 178.13237393290666,
+   "plaf": 200.13656247863247,
+   "dep": 72.31964794871794,
+   "entretien": 37.13347094017094,
+   "dev": 58.29215128205128,
+   "fixes": 141.84441119658118,
+   "salHors": 52.090333333333334,
+   "marketing": 30.584082564102562,
+   "invest": 13.200619327231427,
+   "div": 197.8009219175371,
+   "treso": 453.9223333333333,
+   "sousPlafond": 14.86343752136753
+  },
+  {
+   "nom": "Cadillac",
+   "place": 5.876666666666667,
+   "rec": 396.93671439425873,
+   "primes": 99.20307692307692,
+   "commercial": 41.30478,
+   "sponsors": 70.90441025641026,
+   "apport": 183.95813979254007,
+   "plaf": 186.5851491794872,
+   "dep": 55.66053738461539,
+   "entretien": 14.647385897435898,
+   "dev": 84.27638487179487,
+   "fixes": 102.30876430769231,
+   "salHors": 46.756025641025644,
+   "marketing": 13.81246187179487,
+   "invest": 13.655185557382165,
+   "div": 125.8075325380693,
+   "treso": 162.73366666666666,
+   "sousPlafond": 28.41485082051281
+  },
+  {
+   "nom": "Aston Martin",
+   "place": 6.006666666666667,
+   "rec": 501.1975677560614,
+   "primes": 98.37384615384616,
+   "commercial": 68.37731384615384,
+   "sponsors": 92.5733076923077,
+   "apport": 240.17449828396175,
+   "plaf": 195.88272819658118,
+   "dep": 65.46603546153845,
+   "entretien": 23.589854273504272,
+   "dev": 74.04052769230769,
+   "fixes": 121.84220050427349,
+   "salHors": 49.16530769230769,
+   "marketing": 20.495509897435895,
+   "invest": 15.5841733920481,
+   "div": 201.3895981113773,
+   "treso": 402.28866666666664,
+   "sousPlafond": 19.117271803418816
+  },
+  {
+   "nom": "Audi",
+   "place": 6.233333333333333,
+   "rec": 436.0910061984168,
+   "primes": 96.37128205128205,
+   "commercial": 41.85942923076922,
+   "sponsors": 75.21307692307693,
+   "apport": 220.36161180893163,
+   "plaf": 191.41191264957266,
+   "dep": 60.01864743589744,
+   "entretien": 20.63731752136752,
+   "dev": 78.7109076923077,
+   "fixes": 112.70100495726496,
+   "salHors": 49.46184615384615,
+   "marketing": 15.151409256410256,
+   "invest": 14.676943553812752,
+   "div": 148.82881971433287,
+   "treso": 185.21066666666667,
+   "sousPlafond": 23.588087350427344
+  },
+  {
+   "nom": "Williams",
+   "place": 6.333333333333333,
+   "rec": 341.56039282658725,
+   "primes": 97.31615384615385,
+   "commercial": 58.38206769230769,
+   "sponsors": 103.6595641025641,
+   "apport": 80.9160466420956,
+   "plaf": 179.3393703846154,
+   "dep": 58.20943012820513,
+   "entretien": 23.157553846153846,
+   "dev": 66.4287582051282,
+   "fixes": 112.91061217948719,
+   "salHors": 47.96502564102564,
+   "marketing": 19.516761435897436,
+   "invest": 14.417150062884277,
+   "div": 68.43587127917192,
+   "treso": 93.22166666666666,
+   "sousPlafond": 35.66062961538461
+  },
+  {
+   "nom": "Racing Bulls",
+   "place": 6.553333333333334,
+   "rec": 310.8572217258282,
+   "primes": 94.17128205128205,
+   "commercial": 35.417353846153844,
+   "sponsors": 64.52958974358974,
+   "apport": 115.79288848899243,
+   "plaf": 181.82661155555556,
+   "dep": 56.21218958974359,
+   "entretien": 24.4327952991453,
+   "dev": 70.37504205128205,
+   "fixes": 111.45156950427351,
+   "salHors": 41.767871794871795,
+   "marketing": 12.52677487179487,
+   "invest": 14.54269696969697,
+   "div": 47.332956470433245,
+   "treso": 156.857,
+   "sousPlafond": 33.17338844444444
+  },
+  {
+   "nom": "Haas",
+   "place": 7.913333333333333,
+   "rec": 271.19360608821864,
+   "primes": 79.84871794871795,
+   "commercial": 41.41110769230768,
+   "sponsors": 47.86571794871795,
+   "apport": 99.31042460418202,
+   "plaf": 161.37537106837607,
+   "dep": 49.92532320512821,
+   "entretien": 19.038305555555556,
+   "dev": 61.987138205128204,
+   "fixes": 99.38823286324786,
+   "salHors": 39.32751282051282,
+   "marketing": 11.65219051282051,
+   "invest": 11.041802344513188,
+   "div": 33.967310446444884,
+   "treso": 96.95633333333333,
+   "sousPlafond": 53.62462893162393
+  }
+ ],
+ "comparaison": [
+  [
+   "Vainqueurs de Grand Prix différents par saison",
+   "8,7",
+   "8,6",
+   "8,7"
+  ],
+  [
+   "Écuries victorieuses par saison",
+   "6,4",
+   "6,3",
+   "6,4"
+  ],
+  [
+   "Part des victoires de l'écurie dominante",
+   "38 %",
+   "38 %",
+   "38 %"
+  ],
+  [
+   "Taux d’abandon par départ",
+   "7 %",
+   "7 %",
+   "7 %"
+  ],
+  [
+   "Écart de performance 1re–dernière voiture (% temps au tour)",
+   "0,76",
+   "0,76",
+   "0,71"
+  ],
+  [
+   "Écart de points entre les deux premiers",
+   "53",
+   "52",
+   "53"
+  ],
+  [
+   "Changements de leader du championnat",
+   "3,7",
+   "3,5",
+   "3,7"
+  ],
+  [
+   "Doublés par saison (toutes écuries)",
+   "2,0",
+   "2,0",
+   "2,0"
+  ],
+  [
+   "Corrélation voiture ↔ points constructeurs (Spearman)",
+   "0,58",
+   "0,58",
+   "0,56"
+  ],
+  [
+   "Plus forte progression d’une voiture dans la saison (points d’indice)",
+   "1,04",
+   "1,05",
+   "1,03"
+  ],
+  [
+   "Victoires inattendues par saison",
+   "1,1",
+   "1,0",
+   "1,0"
+  ],
+  [
+   "Courses sous la pluie par saison",
+   "2,3",
+   "2,3",
+   "2,3"
+  ],
+  [
+   "Champions pilotes différents sur 30 saisons",
+   "13,2",
+   "13,6",
+   "13,2"
+  ],
+  [
+   "Champions constructeurs différents sur 30 saisons",
+   "8,6",
+   "8,9",
+   "8,9"
+  ],
+  [
+   "Plus longue série de titres constructeurs consécutifs",
+   "4,5",
+   "4,6",
+   "4,2"
+  ],
+  [
+   "Écuries sans aucune victoire sur 30 saisons",
+   "0,0",
+   "0,0",
+   "0,0"
+  ],
+  [
+   "Remontées (+3 places ou plus d’une saison à l’autre)",
+   "43,6",
+   "44,2",
+   "44,7"
+  ],
+  [
+   "Écuries changeant d’étage par saison (étages 1–4 / 5–8 / 9+, D-081)",
+   "4,1",
+   "4,2",
+   "4,3"
+  ],
+  [
+   "Transitions de saison sans aucun changement d’étage (D-081)",
+   "5 %",
+   "6 %",
+   "4 %"
+  ],
+  [
+   "Saisons où la dernière écurie marque au moins 1 point",
+   "83 %",
+   "83 %",
+   "86 %"
+  ],
+  [
+   "Séries de 30 saisons avec 5 titres constructeurs consécutifs ou plus",
+   "50 %",
+   "60 %",
+   "35 %"
+  ],
+  [
+   "Titre encore ouvert avant la dernière manche (définition exacte)",
+   "35 %",
+   "34 %",
+   "35 %"
+  ],
+  [
+   "Retournement à la dernière manche (le leader perd le titre)",
+   "10 %",
+   "10 %",
+   "11 %"
+  ],
+  [
+   "Champion et vice-champion coéquipiers",
+   "13 %",
+   "16 %",
+   "14 %"
+  ],
+  [
+   "Lutte jusqu’à la dernière manche entre coéquipiers",
+   "5 %",
+   "4 %",
+   "4 %"
+  ],
+  [
+   "Lutte jusqu’à la dernière manche entre écuries différentes",
+   "30 %",
+   "30 %",
+   "32 %"
+  ],
+  [
+   "Saisons très serrées entre écuries différentes (≤ 10 points entre le champion et le meilleur pilote d’une autre écurie)",
+   "13 %",
+   "15 %",
+   "14 %"
+  ],
+  [
+   "Dominations (≥ 120 points d’avance sur le meilleur pilote d’une autre écurie)",
+   "11 %",
+   "13 %",
+   "13 %"
+  ],
+  [
+   "Écart moyen entre le champion et le meilleur pilote d’une autre écurie (points)",
+   "59",
+   "59",
+   "59"
+  ],
+  [
+   "Championnat constructeurs serré (≤ 25 points entre les deux premiers)",
+   "23 %",
+   "21 %",
+   "21 %"
+  ],
+  [
+   "Domination constructeurs (≥ 150 points entre les deux premiers)",
+   "21 %",
+   "22 %",
+   "22 %"
+  ],
+  [
+   "Saisons très serrées, coéquipiers compris (≤ 10 points entre les deux premiers pilotes ; ancienne mesure)",
+   "14 %",
+   "16 %",
+   "16 %"
+  ],
+  [
+   "Dominations, coéquipiers compris (≥ 120 points entre les deux premiers pilotes ; ancienne mesure)",
+   "8 %",
+   "8 %",
+   "9 %"
+  ],
+  [
+   "Coéquipiers : écart moyen à l’arrivée (% temps au tour)",
+   "0,43",
+   "0,43",
+   "0,43"
+  ],
+  [
+   "Coéquipiers : écart moyen dû aux compétences",
+   "0,22",
+   "0,22",
+   "0,22"
+  ],
+  [
+   "Coéquipiers : écart moyen dû à la forme",
+   "0,02",
+   "0,02",
+   "0,02"
+  ],
+  [
+   "Coéquipiers : écart moyen dû à l’aléa",
+   "0,36",
+   "0,36",
+   "0,36"
+  ],
+  [
+   "Coéquipiers : part de l’écart quadratique due aux compétences",
+   "27 %",
+   "27 %",
+   "26 %"
+  ],
+  [
+   "Coéquipiers : part de l’écart quadratique due à la forme",
+   "0 %",
+   "0 %",
+   "0 %"
+  ],
+  [
+   "Coéquipiers : part de l’écart quadratique due à l’aléa",
+   "73 %",
+   "73 %",
+   "74 %"
+  ],
+  [
+   "Pilotes : mobilité — corrélation classement à 25 % ↔ final",
+   "0,84",
+   "0,84",
+   "0,83"
+  ],
+  [
+   "Pilotes : mobilité — corrélation classement à 50 % ↔ final",
+   "0,93",
+   "0,93",
+   "0,93"
+  ],
+  [
+   "Pilotes : mobilité — corrélation classement à 75 % ↔ final",
+   "0,97",
+   "0,97",
+   "0,97"
+  ],
+  [
+   "Pilotes : déplacement moyen entre la mi-saison et la fin (places)",
+   "1,68",
+   "1,70",
+   "1,73"
+  ],
+  [
+   "Pilotes : part gagnant ou perdant ≥ 2 places en seconde moitié",
+   "43 %",
+   "44 %",
+   "44 %"
+  ],
+  [
+   "Pilotes : changements de position par concurrent sur la saison",
+   "9,1",
+   "9,1",
+   "9,3"
+  ],
+  [
+   "Pilotes : écart moyen entre voisins (points) — haut",
+   "30,3",
+   "29,8",
+   "29,7"
+  ],
+  [
+   "Pilotes : écart moyen entre voisins (points) — milieu",
+   "12,7",
+   "13,0",
+   "12,6"
+  ],
+  [
+   "Pilotes : écart moyen entre voisins (points) — bas",
+   "6,0",
+   "5,9",
+   "5,9"
+  ],
+  [
+   "Pilotes : frontières mathématiquement disputées à 3 manches de la fin",
+   "98 %",
+   "98 %",
+   "98 %"
+  ],
+  [
+   "Pilotes : frontières raisonnablement disputées à 3 manches — toutes",
+   "81 %",
+   "81 %",
+   "82 %"
+  ],
+  [
+   "Pilotes : frontières raisonnablement disputées — haut",
+   "52 %",
+   "53 %",
+   "53 %"
+  ],
+  [
+   "Pilotes : frontières raisonnablement disputées — milieu",
+   "82 %",
+   "82 %",
+   "83 %"
+  ],
+  [
+   "Pilotes : frontières raisonnablement disputées — bas",
+   "97 %",
+   "97 %",
+   "97 %"
+  ],
+  [
+   "Pilotes : positions déjà acquises à 3 manches de la fin",
+   "1 %",
+   "1 %",
+   "1 %"
+  ],
+  [
+   "Pilotes : positions déjà acquises — haut",
+   "5 %",
+   "4 %",
+   "4 %"
+  ],
+  [
+   "Pilotes : positions déjà acquises — milieu",
+   "0 %",
+   "0 %",
+   "0 %"
+  ],
+  [
+   "Pilotes : positions déjà acquises — bas",
+   "0 %",
+   "0 %",
+   "0 %"
+  ],
+  [
+   "Pilotes : positions stables mais disputées (voisin à moins d’une victoire)",
+   "34 %",
+   "34 %",
+   "34 %"
+  ],
+  [
+   "Pilotes : positions isolées (voisins à plus de 3 victoires)",
+   "1 %",
+   "1 %",
+   "1 %"
+  ],
+  [
+   "Constructeurs : mobilité — corrélation classement à 25 % ↔ final",
+   "0,86",
+   "0,86",
+   "0,84"
+  ],
+  [
+   "Constructeurs : mobilité — corrélation classement à 50 % ↔ final",
+   "0,93",
+   "0,93",
+   "0,93"
+  ],
+  [
+   "Constructeurs : mobilité — corrélation classement à 75 % ↔ final",
+   "0,97",
+   "0,96",
+   "0,96"
+  ],
+  [
+   "Constructeurs : déplacement moyen entre la mi-saison et la fin (places)",
+   "0,74",
+   "0,73",
+   "0,77"
+  ],
+  [
+   "Constructeurs : part gagnant ou perdant ≥ 2 places en seconde moitié",
+   "17 %",
+   "17 %",
+   "18 %"
+  ],
+  [
+   "Constructeurs : changements de position par concurrent sur la saison",
+   "6,0",
+   "6,0",
+   "6,2"
+  ],
+  [
+   "Constructeurs : écart moyen entre voisins (points) — haut",
+   "66,1",
+   "66,6",
+   "66,2"
+  ],
+  [
+   "Constructeurs : écart moyen entre voisins (points) — milieu",
+   "31,4",
+   "31,4",
+   "30,6"
+  ],
+  [
+   "Constructeurs : écart moyen entre voisins (points) — bas",
+   "23,0",
+   "22,5",
+   "23,0"
+  ],
+  [
+   "Constructeurs : frontières mathématiquement disputées à 3 manches de la fin",
+   "96 %",
+   "95 %",
+   "95 %"
+  ],
+  [
+   "Constructeurs : frontières raisonnablement disputées à 3 manches — toutes",
+   "62 %",
+   "61 %",
+   "62 %"
+  ],
+  [
+   "Constructeurs : frontières raisonnablement disputées — haut",
+   "45 %",
+   "44 %",
+   "45 %"
+  ],
+  [
+   "Constructeurs : frontières raisonnablement disputées — milieu",
+   "70 %",
+   "68 %",
+   "70 %"
+  ],
+  [
+   "Constructeurs : frontières raisonnablement disputées — bas",
+   "79 %",
+   "80 %",
+   "79 %"
+  ],
+  [
+   "Constructeurs : positions déjà acquises à 3 manches de la fin",
+   "2 %",
+   "2 %",
+   "2 %"
+  ],
+  [
+   "Constructeurs : positions déjà acquises — haut",
+   "6 %",
+   "7 %",
+   "6 %"
+  ],
+  [
+   "Constructeurs : positions déjà acquises — milieu",
+   "0 %",
+   "0 %",
+   "0 %"
+  ],
+  [
+   "Constructeurs : positions déjà acquises — bas",
+   "0 %",
+   "0 %",
+   "0 %"
+  ],
+  [
+   "Constructeurs : positions stables mais disputées (voisin à moins d’une victoire)",
+   "48 %",
+   "48 %",
+   "47 %"
+  ],
+  [
+   "Constructeurs : positions isolées (voisins à plus de 3 victoires)",
+   "3 %",
+   "3 %",
+   "3 %"
+  ]
+ ]
+}
