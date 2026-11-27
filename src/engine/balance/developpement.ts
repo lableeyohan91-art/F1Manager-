@@ -34,3 +34,11 @@ export const MOTORISTE_ALEA_ANNUEL = 0.6;
 
 /** Bornes des caractéristiques (décimales en interne). */
 export const BORNES_CARACTERISTIQUE = { min: 1, max: 24 };
+
+/**
+ * Fiabilité et gestion des pneus (développement abstrait, hors pièces) — rapport du 27/11 : sans plafond sur l'échelle des notes ni
+ * rattrapage, elles divergeaient sans fin (Ferrari à 24 en pneus, Haas à 12 en 2031) et creusaient la hiérarchie. Plafond `plafond`
+ * (rendement décroissant vers `plafond` + 1 : `plafondRendement`) ; chaque mois, une écurie reprend la part `rattrapageMensuel` de l'écart à
+ * la meilleure (solutions connues et copiées, comme les pièces).
+ */
+export const CARACS_ABSTRAITES = { plafond: 20, plafondRendement: 21, rattrapageMensuel: 0.02 };

@@ -17,7 +17,7 @@ import {
   MULTIPLICATEUR_ALEA_PLUIE, SEUIL_SURPRISE_PCT,
 } from '../../balance/course';
 import {
-  ALEA_DEVELOPPEMENT_MENSUEL, ALEA_INTERSAISON, BORNES_CARACTERISTIQUE, BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET, MOIS_EQUIVALENTS_INTERSAISON,
+  ALEA_DEVELOPPEMENT_MENSUEL, ALEA_INTERSAISON, BORNES_CARACTERISTIQUE, CARACS_ABSTRAITES, BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET, MOIS_EQUIVALENTS_INTERSAISON,
   MOTORISTE_ALEA_ANNUEL, MOTORISTE_PROGRESSION_ANNUELLE, PLAFOND_TECHNIQUE, POIDS_CAPACITE, TAUX_DEVELOPPEMENT_MENSUEL,
 } from '../../balance/developpement';
 import { BAREME_POINTS, ENVELOPPE_PRIMES_MEUR, PARTS_PRIMES } from '../../balance/reglement';
@@ -342,8 +342,11 @@ function developper(monde: Monde, e: Ecurie, mois: number, alea: number, cle: st
   for (const c of CARACS_VOITURE) {
     const f = tirageLocal(monde, 'developpement', e.id, cle, c);
     const gain = TAUX_DEVELOPPEMENT_MENSUEL * mois * cap * partDeveloppement * bonusSavoirDeveloppement(monde, e.id, c)
-      * Math.max(0, 1 - v[c] / PLAFOND_TECHNIQUE);
-    v[c] = borner(v[c] + gain + f.normale(0, alea), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
+      * Math.max(0, 1 - v[c] / CARACS_ABSTRAITES.plafondRendement);
+    // Rapport du 27/11 : rattrapage vers la meilleure de la grille (copie), au prorata des mois écoulés.
+    const meilleure = Math.max(...ecuriesActives(monde).map((x) => voitureDe(monde, x.id)[c]));
+    const rattrapage = Math.max(0, meilleure - v[c]) * Math.min(1, CARACS_ABSTRAITES.rattrapageMensuel * mois);
+    v[c] = borner(v[c] + gain + rattrapage + f.normale(0, alea), BORNES_CARACTERISTIQUE.min, CARACS_ABSTRAITES.plafond);
   }
 }
 
