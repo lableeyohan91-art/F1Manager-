@@ -236,9 +236,23 @@ function Accueil({ demarrer }: { demarrer: (p: Partie, message?: string) => void
                 <label class="champ">Nom <input value={nomManager} maxLength={30} onInput={(x) => setNomManager((x.target as HTMLInputElement).value)} /></label>
               </div>
             </div>
-            <h3>Choisir une écurie</h3>
+            <h3>{sc().departs ? 'Choisir votre départ' : 'Choisir une écurie'}</h3>
             <div class="liste-cartes">
-              {ecuriesActives(apercu.current.monde).sort((a, b) => b.prestige - a.prestige).map((e) => {
+              {/* D-185 : en V1, le joueur choisit un mode de départ (données : departs.csv) ; l'écurie est imposée par ce mode. */}
+              {sc().departs?.map((d) => {
+                const m = apercu.current!.monde;
+                const e = ecuriesActives(m).find((x) => x.id === d.ecurie);
+                if (!e) return null;
+                const fi = financesDe(m, e.id);
+                return (
+                  <button key={d.mode} class={`carte-choix ${choix === e.id ? 'actif' : ''}`} onClick={() => setChoix(e.id)}>
+                    <strong>{d.libelle} : {e.nom}</strong>
+                    <span class="muted">{d.description}</span>
+                    <span class="muted">Budget {meur(e.budgetMEUR)}{fi ? ` · trésorerie ${meur(fi.tresorerieMEUR)}` : ''}</span>
+                  </button>
+                );
+              })}
+              {!sc().departs && ecuriesActives(apercu.current.monde).sort((a, b) => b.prestige - a.prestige).map((e) => {
                 const m = apercu.current!.monde;
                 const fi = financesDe(m, e.id);
                 return (

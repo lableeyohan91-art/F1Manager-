@@ -7,6 +7,7 @@ import { creerMondeVide, table, type Monde } from './core/monde';
 import { Moteur } from './core/moteur';
 import { installerDemo } from './systems/demo';
 import { chargerDonnees, type FichiersDonnees } from './generation/chargement';
+import { ErreurDonnees, Lecteur, lireCsv } from './generation/csv';
 import { construireMonde } from './generation/construction';
 import { installerSaison } from './systems/saison';
 import { installerHumain } from './systems/humain';
@@ -23,9 +24,14 @@ import { installerJoueur } from './systems/joueur';
 import { installerMedias } from './systems/medias';
 import { installerSponsoring } from './systems/economie/sponsoring';
 
+/** D-185 : départs proposés au joueur (V1 : écurie imposée selon le mode choisi), lus dans `departs.csv` (données, jamais dans le code). */
+export interface DepartPropose { mode: string; ecurie: string; libelle: string; description: string }
+
 export interface Scenario {
   nom: string;
   description: string;
+  /** D-185 : départs proposés au joueur ; absent = choix libre parmi toutes les écuries. */
+  departs?: DepartPropose[];
   creerMonde(graine: number): Monde;
   creerMoteur(): Moteur;
 }
@@ -67,9 +73,23 @@ export function nomsScenarios(): string[] {
 export function creerScenarioGrille2026(fichiers: FichiersDonnees): Scenario {
   const donnees = chargerDonnees(fichiers);
   return {
+    departs: lireDeparts(fichiers, new Set(donnees.ecuries.map((e) => e.id))),
     nom: 'grille-2026',
     description: 'Départ en 2027 avec la grille inspirée de 2026 (data/grille-2026).',
     creerMonde: (graine) => construireMonde(graine, donnees, 'grille-2026'),
     creerMoteur: () => installerSponsoring(installerMedias(installerJoueur(installerDeveloppeur(installerStands(installerInformation(installerJuniors(installerCarriere(installerHumain(installerPolitique(installerMonoplaces(installerTechnique(installerSaison(installerEconomie(new Moteur())))))))))))))),
   };
+}
+
+/** D-185 : lecture de `departs.csv` (facultatif) ; chaque écurie doit exister. */
+function lireDeparts(fichiers: FichiersDonnees, ecuries: Set<string>): DepartPropose[] | undefined {
+  const texte = fichiers['departs.csv'];
+  if (texte === undefined) return undefined;
+  const r = new Lecteur('departs.csv');
+  const res = lireCsv('departs.csv', texte, ['mode', 'ecurie', 'libelle', 'description']).map((l) => ({
+    mode: r.texte(l, 'mode'), ecurie: r.texte(l, 'ecurie'), libelle: r.texte(l, 'libelle'), description: r.texte(l, 'description'),
+  }));
+  const inconnues = [...r.problemes, ...res.filter((d) => !ecuries.has(d.ecurie)).map((d) => `departs.csv : écurie inconnue ${d.ecurie}`)];
+  if (inconnues.length) throw new ErreurDonnees(inconnues);
+  return res;
 }

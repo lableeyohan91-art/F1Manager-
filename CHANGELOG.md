@@ -733,3 +733,10 @@ Aucun code à ce stade.
 ### Corrigé
 - Enveloppe de développement : décompte des écritures restantes aligné sur les prévisions (une écriture oubliée en fin d'année).
 - L'IA ne passe un projet en intensif que si l'enveloppe couvre le surcoût.
+
+## [Mode de départ, réduction des installations] — 27/11/2026
+
+### Ajouté
+- Départs proposés au joueur (D-185) : fond de grille ou milieu de grille, écurie imposée, lus dans `data/grille-2026/departs.csv`.
+- Réduction d'une installation (commande commune, bouton « Réduire » dans Gestion) et réductions de l'IA étranglée (D-186).
+- Diagnostic des hiérarchies (`docs/rapports/diagnostic-hierarchies/`).
