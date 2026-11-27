@@ -78,7 +78,7 @@ export const EFFICACITE_REFERENCE = 10;
  * davantage une autre ». Multiplie tous les vecteurs `compromis` : le compromis reste neutre sur un circuit moyen, mais gagne et perd plus
  * selon les circuits ; une voiture ne peut plus être bonne partout à la fois.
  */
-export const COMPROMIS = { echelle: 1 };
+export const COMPROMIS = { echelle: 3 };
 
 /**
  * Refroidissement (fiche principale §4.2) : marge de la voiture de référence (points) ; besoin d'un circuit = (température de l'air
@@ -102,7 +102,8 @@ export const REFROIDISSEMENT = { margeReference: 6, temperatureNeutreC: 22, parD
  */
 export const CONVERSION_DEPART = {
   // S1 (rapport de nuit du 27/11, porteur : « met-le en œuvre ») : concepts plus marqués (0,25 → 0,4 par point ; plafond 0,6 → 1).
-  noteReference: 14, parPoint: 0.7, conceptParPoint: 0.3, conceptMax: 1,
+  // Compromis × 3 (porteur, 27/11) : les concepts de départ sont divisés d'autant (0,3 → 0,1 par point) pour garder les identités de départ.
+  noteReference: 14, parPoint: 0.7, conceptParPoint: 0.1, conceptMax: 0.34,
   notes: {
     // S3 : chaque caractéristique alimente deux pièces (avant : virages rapides et efficacité aéro trois, motricité une demie).
     chassis: ['viragesLents', 'motricite'], aileron_avant: ['viragesRapides', 'efficaciteAero'], aileron_arriere: ['efficaciteAero', 'vitessePointe'],
