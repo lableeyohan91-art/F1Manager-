@@ -905,6 +905,8 @@ export interface ComptesAnnee {
   apportsExceptionnels: number;
   /** Phase 6b-2 : académie (financement des affiliés) et missions de repérage, hors plafond. */
   academie?: number;
+  /** Économie v2 (D-189) : entretien des installations payé hors plafond (si la règle est active). */
+  entretienHorsPlafond?: number;
   /** Audit 5.2 : plafond en vigueur pendant cette année (un plafond voté ne s'applique pas rétroactivement). */
   plafondMEUR?: number;
   /** Phase 7a : indemnités de transfert reçues (rachat d'un pilote ou d'un affilié par une autre écurie), recette hors plafond. */

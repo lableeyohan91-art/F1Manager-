@@ -18,5 +18,5 @@ export function totalPlafonne(c: ComptesAnnee): number {
 }
 
 export function totalDepenses(c: ComptesAnnee): number {
-  return totalPlafonne(c) + c.salairesHorsPlafond + c.marketing + c.indemnites + c.amendes + (c.dividendes ?? 0) + (c.interets ?? 0) + (c.investissements ?? 0) + (c.academie ?? 0);
+  return totalPlafonne(c) + c.salairesHorsPlafond + c.marketing + c.indemnites + c.amendes + (c.dividendes ?? 0) + (c.interets ?? 0) + (c.investissements ?? 0) + (c.academie ?? 0) + (c.entretienHorsPlafond ?? 0);
 }

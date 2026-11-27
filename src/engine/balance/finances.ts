@@ -219,6 +219,12 @@ export const INVESTISSEMENT_MODULE = { actif: 0, bonusParNiveau: 8, bonusMax: 25
  * la règle actuelle (classement de l'an dernier, étalé sur l'année).
  */
 export const PRIMES_PAR_GP = { partVariable: 0.5 };
+/**
+ * Économie v2 (D-189, fiche economie-v2-argent-utile.md ; porteur : « oui ») — EN MESURE, désactivé par défaut : `entretienHorsPlafond`
+ * (paramètre `economie.entretienHorsPlafond`, 1 = actif) fait payer l'entretien des installations avec l'argent de l'écurie, hors plafond ;
+ * le plafond est alors baissé d'autant : `plafondAvecEntretienHorsMEUR` (M€), sauf réglage explicite `reglement.plafondMEUR`.
+ */
+export const ECONOMIE_V2 = { entretienHorsPlafond: 0, plafondAvecEntretienHorsMEUR: 190 };
 /** Coût d'une amélioration (niveau n → n+1) = base × (n+1) ; rénovation = base × niveau ; durées (semaines). */
 export const COUT_INFRASTRUCTURE = { ameliorationParNiveau: 4, renovationParNiveau: 1.5, ageMinRenovation: 12 };
 export const DUREE_INFRASTRUCTURE = { amelioration: { min: 40, max: 80 }, renovation: { min: 26, max: 52 } };

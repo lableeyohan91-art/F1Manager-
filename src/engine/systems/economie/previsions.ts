@@ -85,7 +85,7 @@ export function previsionFinances(monde: Monde, idEcurie: string): PrevisionFina
   const devRestant = R * recherchePeriode + projetsRestants + aPayer;
 
   const plafonneesFixesPeriode = (fixes.personnelPlafonne + fixes.departements + fixes.operations + fixes.entretien) / n;
-  const horsPlafondPeriode = (fixes.salairesHorsPlafond + fixes.marketing + coutAnnuelAcademie(monde, idEcurie)) / n;
+  const horsPlafondPeriode = (fixes.salairesHorsPlafond + fixes.marketing + fixes.entretienHorsPlafond + coutAnnuelAcademie(monde, idEcurie)) / n;
 
   // Chantiers d'installations : paiement au rythme prévu, dans l'enveloppe annuelle restante.
   let enveloppe = Math.max(0, enveloppeInvestissement(monde, idEcurie) - c.investissements);

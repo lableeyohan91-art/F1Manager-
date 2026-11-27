@@ -16,7 +16,7 @@
 import {
   ALEA_APPORT, BUDGET_IA, OBJECTIF_PROPRIETAIRE, DIVIDENDES, DIVIDENDES_RESULTATS, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
   DEVELOPPEMENT_MINIMUM, EFFORT_TECHNIQUE_REFERENCE, MARGE_SECURITE_PLAFOND, FACTEUR_BUDGET_DEV, OPERATIONS_PAR_GP, PART_MARKETING,
-  PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, PRIMES_PAR_GP, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
+  PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, ECONOMIE_V2, PRIMES_PAR_GP, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
 } from '../../balance/finances';
 import { ENVELOPPE_PRIMES_MEUR, PARTS_PRIMES, PLAFOND_BUDGETAIRE_MEUR } from '../../balance/reglement';
 import { SOUFFLERIE } from '../../balance/monoplaces';
@@ -65,7 +65,9 @@ export function proprietaireDe(monde: Monde, idEcurie: string): Proprietaire | u
 /** Plafond budgétaire en vigueur (paramètre du règlement, modifiable par vote en phase 8). */
 export function plafond(monde: Monde): number {
   // Phase 8d-4 : la valeur votée sert de valeur par défaut ; un réglage d'expérience la remplace.
-  return parametre(monde, 'reglement.plafondMEUR', regleVotee(monde, 'plafondMEUR', PLAFOND_BUDGETAIRE_MEUR));
+  // Économie v2 (D-189, en mesure) : entretien hors plafond → plafond baissé d'autant (le vote du plafond sera à revoir si la règle est adoptée).
+  const v2 = parametre(monde, 'economie.entretienHorsPlafond', ECONOMIE_V2.entretienHorsPlafond) > 0;
+  return parametre(monde, 'reglement.plafondMEUR', v2 ? ECONOMIE_V2.plafondAvecEntretienHorsMEUR : regleVotee(monde, 'plafondMEUR', PLAFOND_BUDGETAIRE_MEUR));
 }
 
 /** Rang au dernier classement constructeurs terminé (1 = premier) ; à défaut, rang de l'indice voiture. */
@@ -181,7 +183,7 @@ export function apportAnnuel(monde: Monde, e: Ecurie, fi: Finances, annee: numbe
 }
 
 /** Dépenses fixes annuelles (hors développement), en séparant plafonné et hors plafond. */
-export function depensesFixes(monde: Monde, e: Ecurie): { personnelPlafonne: number; departements: number; operations: number; entretien: number; salairesHorsPlafond: number; marketing: number } {
+export function depensesFixes(monde: Monde, e: Ecurie): { personnelPlafonne: number; departements: number; operations: number; entretien: number; entretienHorsPlafond: number; salairesHorsPlafond: number; marketing: number } {
   const contrats = (Object.values(table(monde, TABLES.contrats)) as unknown as Contrat[]).filter((c) => c.statut === 'actif' && c.type === 'emploi' && c.organisation === e.id);
   const pilotes = contrats.filter((c) => c.poste === 'pilote_titulaire');
   const cadres = contrats.filter((c) => c.poste !== 'pilote_titulaire').sort((a, b) => b.salaireMEUR - a.salaireMEUR);
@@ -190,12 +192,16 @@ export function depensesFixes(monde: Monde, e: Ecurie): { personnelPlafonne: num
   const deps = (Object.values(table(monde, TABLES.departements)) as unknown as Departement[]).filter((d) => d.ecurie === e.id);
   const inst = (Object.values(table(monde, TABLES.installations)) as unknown as Installation[]).filter((i) => i.ecurie === e.id);
   const fi = financesDe(monde, e.id);
+  const entretien = inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30), 0);
+  const horsPlafond_ = parametre(monde, 'economie.entretienHorsPlafond', ECONOMIE_V2.entretienHorsPlafond) > 0;
   return {
     personnelPlafonne: plafonnes.reduce((a, c) => a + c.salaireMEUR, 0),
     departements: deps.reduce((a, d) => a + d.effectif * (COUT_EMPLOYE.base + COUT_EMPLOYE.parPointNiveau * d.niveauMoyen), 0),
     operations: OPERATIONS_PAR_GP * nombreGrandsPrix(monde),
     // D-181 : entretien progressif (niveau²) : rester au sommet coûte, rattraper coûte moins cher.
-    entretien: inst.reduce((a, i) => a + INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * (1 + Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30), 0),
+    entretien: horsPlafond_ ? 0 : entretien,
+    // Économie v2 (D-189) : avec la règle active, l'entretien se paie avec l'argent de l'écurie, hors plafond.
+    entretienHorsPlafond: horsPlafond_ ? entretien : 0,
     salairesHorsPlafond: horsPlafond.reduce((a, c) => a + c.salaireMEUR, 0),
     marketing: fi ? PART_MARKETING * (commercialAnnuel(monde, e, fi) + revenusSponsors(monde, e.id, monde.date.annee)) : 0,
   };
@@ -263,7 +269,7 @@ export function deciderBudget(monde: Monde, e: Ecurie, fi: Finances): number {
   // Engagements hors exploitation (phase 5b) : intérêts de la dette, chantiers en cours (dans l'enveloppe annuelle).
   const engagements = fi.detteMEUR * tauxDette(fi, recettes) + coutAnnuelAcademie(monde, e.id)
     + Math.min(enveloppeInvestissement(monde, e.id), fi.projets.reduce((a, p) => a + Math.max(0, p.coutPrevuMEUR - p.depenseMEUR), 0));
-  const fixesTotal = fixes.personnelPlafonne + fixes.departements + fixes.operations + fixes.entretien + fixes.salairesHorsPlafond + fixes.marketing + engagements;
+  const fixesTotal = fixes.personnelPlafonne + fixes.departements + fixes.operations + fixes.entretien + fixes.entretienHorsPlafond + fixes.salairesHorsPlafond + fixes.marketing + engagements;
   const proprietaire = proprietaireDe(monde, e.id);
   const tp = teamPrincipal(monde, e.id);
   const prudence = 1 + ((proprietaire?.patience ?? 10) - (tp?.traits['risque'] ?? 10)) / 40;
@@ -360,7 +366,7 @@ function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
     // Phase 12a : le développement payé = la part des programmes de recherche (au fil de l'année) + les projets de conception et de
     // fabrication réellement engagés depuis la dernière écriture (coûts de F1 Manager 2024) ; le budget n'est plus qu'un plafond de dépense.
     entretien: fixes.entretien / n, developpement: fi.budget.developpementMEUR * partRecherche(monde, e.id) / n + (fi.depensesTechniques?.aPayerMEUR ?? 0),
-    salairesHorsPlafond: fixes.salairesHorsPlafond / n, marketing: fixes.marketing / n,
+    salairesHorsPlafond: fixes.salairesHorsPlafond / n, marketing: fixes.marketing / n, entretienHorsPlafond: fixes.entretienHorsPlafond / n,
     // Phase 6b-2 : financement des affiliés de l'académie (hors plafond).
     academie: coutAnnuelAcademie(monde, e.id) / n,
   };
