@@ -85,3 +85,29 @@ describe('Trois pistes du 27/11 (activées)', () => {
     expect(Object.values(m.evenements).filter((e) => e.type === 'reglement.lecture').length).toBe(ecuriesActives(m).length);
   });
 });
+
+describe('D-190 — anti-domination aux réformes (options 1 et 2)', () => {
+  it('une écurie avec 3 titres dans l’ère est dominante ; les réformes préparées visent ses points forts', async () => {
+    const { ecurieDominante, preparerReformes, propositions, avantProjets } = await import('../src/engine/systems/technique');
+    const { ANTI_DOMINATION } = await import('../src/engine/balance/technique');
+    const m = sc.creerMonde(6);
+    sc.creerMoteur().avancer(m, 2);
+    const r = reglementEnVigueur(m)!;
+    const pal = table(m, TABLES.palmares);
+    for (const id of Object.keys(pal)) delete pal[id];
+    for (let k = 0; k < 3; k++) pal[`pal_t${k}`] = { id: `pal_t${k}`, saison: r.debut + k, championPilote: '', ecurieChampionPilote: '', championConstructeurs: 'eq_ferrari', note: '' } as never;
+    expect(ecurieDominante(m)).toBe('eq_ferrari');
+    m.parametres = { ...(m.parametres ?? {}), 'reforme.antiDomination': 0 };
+    expect(ecurieDominante(m)).toBeUndefined();
+    m.parametres = { ...(m.parametres ?? {}), 'reforme.antiDomination': 1 };
+    for (const p of [...propositions(m), ...avantProjets(m)]) delete table(m, TABLES.reglements)[p.id];
+    preparerReformes(m);
+    const props = [...propositions(m), ...avantProjets(m)];
+    expect(props.length).toBeGreaterThan(0);
+    const ev = Object.values(m.evenements).find((e) => e.type === 'reglement.anti_domination')!;
+    expect(ev).toBeDefined();
+    const vises = ev.contexte['domaines'] as string[];
+    expect(vises.length).toBe(ANTI_DOMINATION.domainesVises);
+    for (const p of props) for (const d of vises) expect(p.intensites[d]!).toBeGreaterThanOrEqual(Math.min(1, ANTI_DOMINATION.hausseIntensite) - 1e-9);
+  });
+});

@@ -81,6 +81,16 @@ export const REFORME = { usureFondamentale: 0.75, transfertExposant: 3 };
  * 0 = désactivé ; activé par le porteur le 27/11). Rebat les cartes sans regarder le classement (D-169 : aucun malus selon le rang).
  */
 export const LECTURE_REGLEMENT = { actif: 1, dispersion: 0.5, usureMax: 0.95 };
+/**
+ * Anti-domination aux réformes (porteur, 27/11 : « on va scripter de gros changements en cas de domination aux changements d'ère, il faut
+ * l'accepter pour avoir un bon jeu » ; options 1 et 2 retenues, D-190, modifie D-169). Une écurie domine si elle a au moins `titresEre`
+ * titres constructeurs depuis le début du règlement en vigueur, ou les `titresConsecutifs` derniers titres. Alors :
+ * (1) la fédération écrit les réformes contre ses points forts : dans chaque proposition, l'intensité des `domainesVises` domaines où son
+ *     savoir est le plus en avance sur la grille augmente de `hausseIntensite` (au plus 1) ;
+ * (2) excès de confiance : son tirage de lecture du nouveau règlement est décalé de `biaisLecture` vers la mauvaise lecture (u ∈ [−1, 1]).
+ * Paramètre `reforme.antiDomination` (1 = actif, 0 = désactivé). Sans unité.
+ */
+export const ANTI_DOMINATION = { actif: 1, titresEre: 3, titresConsecutifs: 2, domainesVises: 3, hausseIntensite: 0.3, biaisLecture: 0.5 };
 
 export const SAVOIR = { gainBase: 2.2, rendementK: 40, partVoisins: 0.15, partFondamental: 0.3, partFondamentalRejet: 0.3, vieillissementAnnuel: 0.01, remiseEnRouteSemaines: 6, efficaciteRemiseEnRoute: 0.5 };
 

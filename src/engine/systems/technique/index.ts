@@ -17,7 +17,7 @@
 
 import { causesConnues } from '../humain/causes';
 import {
-  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, DIFFUSION, DIFFUSION_RETARD, IA_RECHERCHE, LECTURE_REGLEMENT, LISTE_DOMAINES, ORIENTATIONS, PISTE_CONCURRENT, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
+  CALENDRIER_REGLEMENT, CHOIX_DOMAINE_IA, DECOUVERTES, DECOUVERTES_FACTEURS, DOMAINES, FACTEURS_RECHERCHE, EVOLUTIONS_MINEURES, CONCEPTION_PROVISOIRE, HISTORIQUE_RECHERCHE, ANTI_DOMINATION, DIFFUSION, DIFFUSION_RETARD, IA_RECHERCHE, LECTURE_REGLEMENT, LISTE_DOMAINES, ORIENTATIONS, PISTE_CONCURRENT, PNEUS_REFORME, PROGRAMMES, RECHERCHE_MONTANT, REFORME, SAVOIR, VOTE_IA,
   type Domaine, type Orientation,
 } from '../../balance/technique';
 import { FUITES_REGLEMENT } from '../../balance/information';
@@ -29,7 +29,7 @@ import { idsTries, parametre, table, type Entite, type Monde } from '../../core/
 import { COUT_EMPLOYE } from '../../balance/finances';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import {
-  TABLES, type Decouverte, type Ecurie, type EvolutionMineure, type HistoriqueRecherche, type Installation, type Personne, type ProgrammeRecherche, type Reglement, type Savoir,
+  TABLES, type Decouverte, type Ecurie, type EvolutionMineure, type HistoriqueRecherche, type Installation, type Personne, type ProgrammeRecherche, type Palmares, type Reglement, type Savoir,
 } from '../../model/types';
 import { ecuriesActives } from '../saison/performance';
 import { capaciteDeveloppement } from '../saison';
@@ -59,6 +59,33 @@ function tirerIntensites(monde: Monde, orientation: Orientation, cle: string): R
     res[d] = r3(vise ? o.min + (o.max - o.min) * f.suivant() : o.autres[0] + (o.autres[1] - o.autres[0]) * f.suivant());
   }
   return res;
+}
+
+/**
+ * D-190 : écurie dominante de l'ère en cours (au moins ANTI_DOMINATION.titresEre titres constructeurs depuis le début du règlement en vigueur,
+ * ou les ANTI_DOMINATION.titresConsecutifs derniers titres), ou undefined.
+ */
+export function ecurieDominante(monde: Monde, debutEre?: number): string | undefined {
+  if (parametre(monde, 'reforme.antiDomination', ANTI_DOMINATION.actif) <= 0) return undefined;
+  const debut = debutEre ?? reglementEnVigueur(monde)?.debut;
+  if (debut === undefined) return undefined;
+  const pal = (Object.values(table(monde, TABLES.palmares)) as unknown as Palmares[]).filter((p) => p.championConstructeurs).sort((a, b) => a.saison - b.saison);
+  const compte = new Map<string, number>();
+  for (const p of pal) if (p.saison >= debut) compte.set(p.championConstructeurs, (compte.get(p.championConstructeurs) ?? 0) + 1);
+  const ere = [...compte.entries()].filter(([, n]) => n >= ANTI_DOMINATION.titresEre).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0];
+  if (ere) return ere;
+  const derniers = pal.slice(-ANTI_DOMINATION.titresConsecutifs).map((p) => p.championConstructeurs);
+  return derniers.length === ANTI_DOMINATION.titresConsecutifs && derniers.every((x) => x === derniers[0]) ? derniers[0] : undefined;
+}
+
+/** D-190 (1) : domaines où l'écurie a le plus d'avance de savoir (règlement en vigueur) sur la moyenne de la grille. */
+function pointsForts(monde: Monde, idEcurie: string, n: number): string[] {
+  const r = reglementEnVigueur(monde);
+  if (!r) return [];
+  const ecuries = ecuriesActives(monde);
+  const v = (id: string, d: string) => { const s = savoirExistant(monde, id, d); return (s?.fondamental ?? 0) + (s?.parReglement[r.id] ?? 0); };
+  return [...LISTE_DOMAINES].map((d) => ({ d, avance: v(idEcurie, d) - ecuries.reduce((a, e) => a + v(e.id, d), 0) / Math.max(1, ecuries.length) }))
+    .sort((a, b) => b.avance - a.avance || a.d.localeCompare(b.d)).slice(0, n).map((x) => x.d);
 }
 
 /** Règlement de départ (en vigueur depuis la saison précédant la partie), créé à la première exécution. */
@@ -95,10 +122,22 @@ export function preparerReformes(monde: Monde): void {
   }
   const generation = Math.max(...reglements(monde).map((r) => r.generation)) + 1;
   const prolongation = f.entier(1, CALENDRIER_REGLEMENT.prolongationMax);
+  // D-190 (1) : la fédération écrit les réformes contre les points forts de l'écurie qui domine l'ère.
+  const dominante = ecurieDominante(monde);
+  const vises = dominante ? pointsForts(monde, dominante, ANTI_DOMINATION.domainesVises) : [];
+  if (dominante) {
+    const e = table(monde, TABLES.ecuries)[dominante] as unknown as Ecurie | undefined;
+    ajouterEvenement(monde, {
+      type: 'reglement.anti_domination', acteurs: [{ id: dominante, role: 'ecurie' }], importance: 3, visibilite: 'public',
+      contexte: { domaines: vises, hausse: ANTI_DOMINATION.hausseIntensite },
+      texte: `La fédération prépare un règlement pensé pour relancer la compétition : les points forts de ${e?.nom ?? dominante} seront les plus touchés.`,
+    });
+  }
   choisies.forEach((o, i) => {
     const debut = actuel.fin + 1;
     const id = `reg_${generation}_${i + 1}`;
     const intensites = tirerIntensites(monde, o, id);
+    for (const d of vises) intensites[d] = r3(Math.min(1, (intensites[d] ?? 0) + ANTI_DOMINATION.hausseIntensite));
     // Les pneumatiques peuvent accompagner une réforme : le domaine « interface pneus » change alors aussi.
     const pneus = f.chance(CALENDRIER_REGLEMENT.pneusAvecReforme) ? actuel.pneus + 1 : actuel.pneus;
     if (pneus !== actuel.pneus) intensites['interface_pneus'] = Math.max(intensites['interface_pneus'] ?? 0, PNEUS_REFORME.intensiteInterface);
@@ -246,9 +285,12 @@ export function entreeEnVigueur(monde: Monde): boolean {
   // Piste 1 (27/11) : lecture du nouveau règlement, bonne ou mauvaise selon l'écurie (un tirage par écurie et par réforme).
   const dispersion = LECTURE_REGLEMENT.dispersion * parametre(monde, 'reforme.lecture', LECTURE_REGLEMENT.actif);
   const lecture = new Map<string, number>();
+  const dominanteLecture = ecurieDominante(monde, ancien.debut); // l'ère qui se termine
   if (dispersion > 0) {
     for (const e of ecuriesActives(monde)) {
-      const u = 2 * tirageLocal(monde, 'reglement.lecture', nouveau.id, e.id).suivant() - 1;
+      // D-190 (2) : excès de confiance de l'écurie qui domine l'ère (lecture décalée vers la mauvaise lecture).
+      const biais = e.id === dominanteLecture ? ANTI_DOMINATION.biaisLecture : 0;
+      const u = Math.max(-1, Math.min(1, 2 * tirageLocal(monde, 'reglement.lecture', nouveau.id, e.id).suivant() - 1 + biais));
       lecture.set(e.id, 1 + dispersion * u);
       ajouterEvenement(monde, {
         type: 'reglement.lecture', acteurs: [{ id: e.id, role: 'ecurie' }], importance: Math.abs(u) > 0.6 ? 3 : 1, visibilite: Math.abs(u) > 0.6 ? 'public' : 'prive',
