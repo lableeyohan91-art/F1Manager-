@@ -715,3 +715,12 @@ Aucun code à ce stade.
 ### Modifié
 - Fatigue des pôles selon le rythme des projets ; entretien des installations en niveau² ; rendement décroissant au-dessus du niveau 8 ; production et fiabilité agissent sur la fabrication et les pannes.
 - Test D-166 rendu contrefactuel (même monde, deux budgets).
+
+## [Équilibre, diffusion et ères] — 27/11/2026
+
+### Ajouté
+- Diffusion du savoir et copie des pièces en cours d'ère ; décision « piste chez un concurrent » ; rattrapage annuel des motoristes (D-183).
+- Outils `tools/analyse-eres.py`, `tools/banc-caracteristiques.mts` ; rapports `docs/rapports/equilibre-circuits/` et `docs/rapports/diffusion-eres/`.
+
+### Modifié
+- Circuits rééquilibrés, notes b3, compromis de concept × 3, nouvelle ère plus dure, fiabilité et pneus plafonnés à 20 avec rattrapage.
