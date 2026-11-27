@@ -63,3 +63,54 @@ export const INCIDENT = { base: 0.018, parPoint: 0.003, multiplicateurPluie: 1.8
  * sur la meilleure voiture du circuit (≈ 2 points d'indice).
  */
 export const SEUIL_SURPRISE_PCT = 0.4;
+
+/* ===================================================================== Phase 13a — course tour par tour (D-192) */
+
+/**
+ * Durée et tours (fiche phase-13a §2) : nombre de tours = `dureeCibleS` / temps au tour de référence du circuit (s), borné à
+ * [`toursMin`, `toursMax`] ; `tempsTourDefautS` si le circuit n'a pas de profil de vitesse. Valeurs PROVISOIRES (D-120).
+ */
+export const COURSE_TOURS = { dureeCibleS: 5000, toursMin: 40, toursMax: 80, tempsTourDefautS: 90 };
+
+/**
+ * Composés (fiche §3), en % du temps au tour : `ecart` = retard à neuf sur le tendre ; `usure` = perte par tour de relais ; `vie` = tours
+ * avant la falaise ; `falaise` = perte supplémentaire par tour au-delà. L'usure est multipliée par degradationPneus / `degradationReference`.
+ * Le composé « pluie » sert sur piste mouillée (pas d'arrêt obligatoire).
+ */
+export const COMPOSES = {
+  tendre: { ecart: 0, usure: 0.09, vie: 18 },
+  moyen: { ecart: 0.35, usure: 0.055, vie: 28 },
+  dur: { ecart: 0.65, usure: 0.035, vie: 40 },
+  pluie: { ecart: 0, usure: 0.04, vie: 60 },
+} as const;
+export const PNEUS_COURSE = {
+  falaise: 0.3, degradationReference: 3,
+  /** Gestion des pneus : usure × (1 − parPoint × (note − référence)), pour le pilote (compétence /20) et la voiture (caractéristique). */
+  parPointPilote: 0.03, referencePilote: 12, parPointVoiture: 0.03, referenceVoiture: 16, facteurMin: 0.6,
+};
+
+/**
+ * Consignes (fiche §5) : `rythme` = gain (négatif = plus rapide) en % du tour ; `usure` = multiplicateur d'usure des pneus ;
+ * `incident` = multiplicateur du risque d'incident ; `conso` = multiplicateur de consommation ; `batterie` = énergie dépensée par tour
+ * (unités de la réserve ; négatif = recharge).
+ */
+export const CONSIGNES = {
+  conduite: { agressive: { rythme: -0.15, usure: 1.25, incident: 1.5 }, neutre: { rythme: 0, usure: 1, incident: 1 }, conservatrice: { rythme: 0.12, usure: 0.85, incident: 0.7 } },
+  pneus: { agressive: { rythme: -0.1, usure: 1.3 }, neutre: { rythme: 0, usure: 1 }, conservatrice: { rythme: 0.1, usure: 0.75 } },
+  carburant: { agressive: { rythme: -0.12, conso: 1.04 }, neutre: { rythme: 0, conso: 1 }, conservatrice: { rythme: 0.1, conso: 0.97 } },
+  batterie: { agressive: { rythme: -0.1, energie: 1 }, neutre: { rythme: 0, energie: 0 }, conservatrice: { rythme: 0.03, energie: -0.5 } },
+} as const;
+
+/**
+ * Carburant et batterie (fiche §4) : marge de carburant (part de la course) ; perte par tour de carburant manquant (économie forcée,
+ * % du tour · tour) ; réserve de batterie (unités) et perte par tour quand elle est vide (recharge forcée, % du tour).
+ */
+export const RESSOURCES = { margeCarburant: 0.01, economieParTourManquant: 5, reserveBatterie: 4, rechargeForcee: 0.12 };
+
+/**
+ * Arrêts (fiche §6) : perte dans la voie des stands (s) ; immobilisation = `immobilisationMinS` + (100 − rapidité) × `parPointRapidite`
+ * + fatigue × `parPointFatigue` (s, équipe des stands de la phase 8d, échelles 0–100) ; erreur avec la probabilité
+ * (100 − précision) × `erreurParPoint`, qui coûte `perteErreurS` ; équipe absente : `defaut`. Stratégie : au plus `arretsMax` arrêts ;
+ * l'ingénieur estime l'usure avec une erreur relative d'écart type `erreurEstimation`.
+ */
+export const ARRETS = { perteVoieS: 21, immobilisationMinS: 2, parPointRapidite: 0.015, parPointFatigue: 0.005, erreurParPoint: 0.002, perteErreurS: 4, defaut: 70, arretsMax: 3, erreurEstimation: 0.1 };

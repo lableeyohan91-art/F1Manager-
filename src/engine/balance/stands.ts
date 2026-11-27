@@ -1,8 +1,7 @@
 /**
  * Phase 8d — équipe des stands (D-129, D-132 questions 13 à 16 ; fiche phase 8 §9 bis).
- * Dimension humaine seulement : aucun temps d'arrêt ni probabilité d'erreur avant la phase 13.
- * EXCEPTION TEMPORAIRE DOCUMENTÉE (D-132, question 13) : rapidité, précision et cohésion ne sont lues par aucune formule de course
- * avant la phase 13 ; elles le sont par l'entraînement, le recrutement et les décisions de l'IA.
+ * Phase 13a (D-192) : rapidité, précision et fatigue sont lues par les arrêts aux stands (balance/course.ts, ARRETS) ; la cohésion
+ * le sera en 13c (l'exception temporaire de D-132, question 13, est levée pour les trois premières).
  * Échelles : rapidité, précision, cohésion, fatigue et expérience collective de 0 à 100 ; valeurs PROVISOIRES (D-120).
  */
 

@@ -137,8 +137,24 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
     if (ev?.type === 'negociation.impossible') return `Impossible : ${String(ev.contexte['motif'])}`;
     return 'Proposition faite.';
   });
+  // Phase 13a : consignes de course (commande commune `course.consignes`), pour les pilotes titulaires.
+  const consignes = ecurieJoueur(m)?.consignesCourse?.[x.id] ?? { conduite: 'neutre', batterie: 'neutre', carburant: 'neutre', pneus: 'neutre' };
+  const LEVIERS: [keyof typeof consignes, string][] = [['conduite', 'Conduite'], ['pneus', 'Pneus'], ['carburant', 'Carburant'], ['batterie', 'Batterie']];
   return (
     <>
+      {x.poste === 'pilote_titulaire' && (
+        <div class="carte">
+          <h3>Consignes de course</h3>
+          <p class="muted petit">Valables jusqu’à nouvel ordre. Agressive : plus rapide, mais pneus, carburant ou batterie s’épuisent plus vite (et plus d’incidents en conduite) ; conservatrice : l’inverse.</p>
+          <div class="ligne-champs">
+            {LEVIERS.map(([k, lib]) => (
+              <label key={k} class="champ">{lib} <select value={consignes[k]} onChange={(v) => agir('course.consignes', { ecurie: ecurieJoueur(m)!.id, pilote: x.id, [k]: (v.target as HTMLSelectElement).value }, 'Consigne enregistrée.')}>
+                <option value="agressive">agressive</option><option value="neutre">neutre</option><option value="conservatrice">conservatrice</option>
+              </select></label>
+            ))}
+          </div>
+        </div>
+      )}
       {c.demandeAugmentation !== undefined && (
         <div class="carte attention">
           <h3>Demande d’augmentation : {c.demandeAugmentation} M€ par an</h3>

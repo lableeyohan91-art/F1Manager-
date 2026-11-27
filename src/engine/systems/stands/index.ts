@@ -7,7 +7,7 @@
  * - cohésion : construite par l'entraînement « coordination », les Grands Prix, la stabilité, sous un plafond fixé par l'encadrement ;
  * - fatigue : entraînement et calendrier ; expérience collective ; part de mécaniciens expérimentés ;
  * - plan d'entraînement (orientation, intensité) modifiable à tout moment ; recrutement par vagues ; départs naturels chaque hiver.
- * Aucune formule de course ne lit ces données avant la phase 13 (exception temporaire documentée, balance/stands.ts).
+ * Phase 13a : rapidité, précision et fatigue font la durée et les erreurs des arrêts (saison/course-tours.ts).
  */
 
 import { causesConnues, dernierFait } from '../humain/causes';

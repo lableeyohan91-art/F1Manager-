@@ -121,6 +121,8 @@ export interface Ecurie {
   reputationPredateur?: number;
   /** Phase 8b (D-132, question 9) : le joueur confie ses programmes de recherche à son directeur technique (décisions de l'IA). */
   delegationRecherche?: boolean;
+  /** Phase 13a (D-192) : consignes de course par pilote (absentes = neutres). Commande commune `course.consignes`. */
+  consignesCourse?: Record<string, ConsignesCourse>;
   /** Phase 10 : domaines que le joueur confie à son équipe (règles de l'IA). Absent = le joueur décide (défauts inscrits à la prise de fonction). */
   delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands' | 'communication' | 'commercial', boolean>>;
   /** Phase 11 : image publique de l'écurie (−100 à 100, absente = 0). Lue par les sponsors, le conseil et les candidats. */
@@ -624,6 +626,11 @@ export interface ProjetConception {
 
 export type CauseAbandon = 'mecanique' | 'incident';
 
+/** Phase 13a : niveau d'une consigne de course. */
+export type NiveauConsigne = 'agressive' | 'neutre' | 'conservatrice';
+/** Phase 13a : les quatre consignes d'un pilote (fiche d'intention §4). */
+export interface ConsignesCourse { conduite: NiveauConsigne; batterie: NiveauConsigne; carburant: NiveauConsigne; pneus: NiveauConsigne }
+
 export interface ResultatPilote {
   pilote: string;
   ecurie: string;
@@ -641,7 +648,13 @@ export interface ResultatPilote {
    * Décomposition du « temps » (en %), conservée 2 saisons : voiture, pilote (affinité et nouveauté comprises), forme, aléa ;
    * phase 6a complémentaire : part de l'affinité, de la nouveauté (circuit, écurie) et erreur sous pression.
    */
-  explication?: { voiture: number; pilote: number; forme: number; alea: number; affinite?: number; nouveaute?: number; pression?: number };
+  explication?: {
+    voiture: number; pilote: number; forme: number; alea: number; affinite?: number; nouveaute?: number; pression?: number;
+    /** Phase 13a : part des pneus, du carburant, de la batterie, des consignes et des arrêts (en % du tour, moyenne de la course). */
+    pneus?: number; carburant?: number; batterie?: number; consignes?: number; arrets?: number;
+    /** Phase 13a : stratégie suivie (composés dans l'ordre) et nombre de tours de la course. */
+    strategie?: string[]; tours?: number;
+  };
 }
 
 export interface GrandPrix {

@@ -363,6 +363,9 @@ const MIGRATIONS: Record<number, Migration> = {
     for (const r of [fed?.regles, fed?.reglesAVenir]) if (r && typeof r['plafondMEUR'] === 'number') r['plafondMEUR'] = r['plafondMEUR'] - 30;
     return { ...m, versionFormat: 35 };
   },
+  // v35 → v36 (phase 13a, D-192) : consignes de course facultatives (absentes = neutres), détail des résultats facultatif. Rien à
+  // transformer : les courses à venir sont simulées tour par tour.
+  35: (m) => ({ ...m, versionFormat: 36 }),
 };
 
 export function serialiser(monde: Monde): string {
