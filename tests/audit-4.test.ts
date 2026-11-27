@@ -115,6 +115,7 @@ describe('Audit n°4 — non-régression', () => {
 
   it('7. clôture de la fenêtre : une offre de la semaine 48 reçoit une réponse définitive ou expire avec notification', () => {
     const m = sc.creerMonde(1);
+    m.parametres = { ...(m.parametres ?? {}), 'marche.toutLAnnee': 0 }; // ancien mode à fenêtre (D-193 : marché ouvert toute l'année)
     const moteur = sc.creerMoteur();
     m.tables['ecuries']!['eq_williams']!['pilotee'] = true;
     const c = contrats(m).find((x) => x.organisation === 'eq_williams' && x.poste === 'pilote_titulaire' && x.statut === 'actif')!;

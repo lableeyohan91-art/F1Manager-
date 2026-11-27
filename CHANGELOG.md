@@ -761,3 +761,9 @@ Aucun code à ce stade.
 ### Ajouté
 - Anti-domination aux réformes (D-190) : règlement écrit contre les points forts du dominant, excès de confiance, malus de savoir.
 - Fiche `docs/systemes/economie-v2-argent-utile.md`.
+
+## [Phase 13a, mercato toute l'année] — 27/11/2026 (nuit, carte blanche)
+
+### Ajouté
+- Course tour par tour (D-192) : composés, usure, falaise, carburant, batterie, quatre consignes par pilote (commande `course.consignes`, fiche pilote), stratégie choisie par l'ingénieur sur une estimation, arrêts selon l'équipe des stands. Format 36. Outil `tools/banc-consignes.mts`.
+- Marché des pilotes ouvert toute l'année (D-193), offres qui expirent après 8 semaines.

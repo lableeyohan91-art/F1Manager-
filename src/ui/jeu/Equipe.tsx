@@ -233,6 +233,7 @@ function FormulaireOffre({ partie, x }: { partie: Partie; x: Personne }) {
     <div class="carte">
       <h3>Faire une offre pour {m.date.annee + 1}</h3>
       {!enFenetre(m) && <p class="muted">Le marché est fermé : il ouvre en semaine 26 et ferme en semaine 48.</p>}
+      {enFenetre(m) && <p class="muted petit">Le marché est ouvert toute l’année ; les autres écuries sont surtout actives de fin juin à fin novembre. Une offre sans réponse expire au bout de 8 semaines.</p>}
       <div class="ligne-champs">
         <label class="champ">Salaire (M€/an) <input class="num" inputMode="decimal" value={salaire} onInput={(z) => setSalaire((z.target as HTMLInputElement).value)} /></label>
         <label class="champ">Durée (ans) <select value={duree} onChange={(z) => setDuree((z.target as HTMLSelectElement).value)}>{[1, 2, 3, 4, 5].map((d) => <option key={d}>{d}</option>)}</select></label>
@@ -270,7 +271,7 @@ export function EcranMarche({ partie, nav }: { partie: Partie; nav: Navigation }
   return (
     <>
       <div class="carte">
-        <p class="muted petit">{enFenetre(m) ? 'Le marché est ouvert jusqu’à la semaine 48. Les contrats signés prennent effet la saison suivante.' : 'Le marché est fermé (ouverture en semaine 26). Vous pouvez déjà repérer des cibles.'}</p>
+        <p class="muted petit">{enFenetre(m) ? 'Le marché est ouvert toute l’année (les autres écuries surtout de fin juin à fin novembre). Les contrats signés prennent effet la saison suivante.' : 'Le marché est fermé (ouverture en semaine 26). Vous pouvez déjà repérer des cibles.'}</p>
         <div class="onglets">
           {POSTES_MARCHE.map((q) => <button key={q} class={`btn ${filtre === q ? 'actif' : ''}`} onClick={() => setFiltre(q)}>{poste(q)}</button>)}
         </div>

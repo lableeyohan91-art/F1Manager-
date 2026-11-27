@@ -14,11 +14,11 @@
 import { causesConnues, dernierFait } from '../humain/causes';
 import { AGE_MINIMAL_F1 } from '../../balance/carriere';
 import { PRIME_CONTINUITE, SEMAINE_FIN_CONTRATS } from '../../balance/contrats';
-import { CANDIDATURES, DEPART_GROUPE, PERSONNEL_MARCHE, RACHAT, CONTRE_ATTAQUE, FENETRE, HORIZON, INERTIE_CONTRAT, OFFRE_MARCHE, PLAN_MARCHE, PREDATEUR, TOURS_MARCHE } from '../../balance/marche';
+import { CANDIDATURES, DEPART_GROUPE, PERSONNEL_MARCHE, RACHAT, CONTRE_ATTAQUE, FENETRE, HORIZON, INERTIE_CONTRAT, MERCATO, OFFRE_MARCHE, PLAN_MARCHE, PREDATEUR, TOURS_MARCHE } from '../../balance/marche';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement, type Evenement } from '../../core/evenements';
 import { nouvelIdentifiant } from '../../core/identifiants';
-import { idsTries, table, type Entite, type Monde } from '../../core/monde';
+import { idsTries, parametre, table, type Entite, type Monde } from '../../core/monde';
 import { tirageLocal, type Systeme } from '../../core/moteur';
 import { TABLES, type Contrat, type Departement, type Ecurie, type Finances, type OffreMarche, type Personne, type Poste } from '../../model/types';
 import { potentielEstime } from '../carriere/estimation';
@@ -76,7 +76,28 @@ export function offresMarche(monde: Monde): OffreMarche[] {
 }
 
 export function enFenetre(monde: Monde): boolean {
+  if (parametre(monde, 'marche.toutLAnnee', MERCATO.ouvertToutLAnnee) > 0) return true;
   return monde.date.semaine >= FENETRE.debut && monde.date.semaine <= FENETRE.fin;
+}
+
+/** D-193 : pic d'activité de l'IA (l'ancienne fenêtre). */
+export function enPicIA(monde: Monde): boolean {
+  return monde.date.semaine >= FENETRE.debut && monde.date.semaine <= FENETRE.fin;
+}
+
+/** D-193 : une offre sans accord expire après MERCATO.delaiOffreSemaines semaines, ou dès que la saison qu'elle visait a commencé. */
+export function expirerOffres(monde: Monde): void {
+  const maintenant = monde.date.annee * 52 + monde.date.semaine;
+  for (const o of offresMarche(monde)) {
+    if (o.statut !== 'en_attente' && o.statut !== 'contre_offre') continue;
+    if (maintenant - (o.annee * 52 + o.semaine) < MERCATO.delaiOffreSemaines && o.debut > monde.date.annee) continue;
+    o.statut = 'expiree';
+    ajouterEvenement(monde, {
+      type: 'marche.offre_expiree', acteurs: [{ id: o.personne, role: 'personne' }, { id: o.decideur, role: 'auteur' }, { id: o.ecurie, role: 'organisation' }],
+      importance: 1, visibilite: 'prive', contexte: { offre: o.id, salaire: o.salaireMEUR, debut: o.debut, salaireDemande: o.salaireDemande ?? null },
+      texte: `L'offre de ${nom(monde, o.ecurie)} à ${nom(monde, o.personne)} expire sans accord.`,
+    });
+  }
 }
 
 /** Contrat signé (pas encore commencé) d'une personne. */
@@ -187,7 +208,7 @@ export function motifRefusOffre(monde: Monde, auteur: string, prm: Record<string
   if (!e || e.statut !== 'active') return 'Écurie inconnue.';
   const tp = teamPrincipal(monde, e.id);
   if (!tp || tp.id !== auteur) return 'Seul le team principal de l’écurie peut faire une offre.';
-  if (!enFenetre(monde)) return `Le marché n’est ouvert que de la semaine ${FENETRE.debut} à la semaine ${FENETRE.fin}.`;
+  if (!enFenetre(monde)) return `Le marché n’est ouvert que de la semaine ${FENETRE.debut} à la semaine ${FENETRE.fin}.`; // si MERCATO.ouvertToutLAnnee = 0
   const p = table(monde, TABLES.personnes)[String(prm['personne'] ?? '')] as unknown as Personne | undefined;
   if (!p) return 'Personne inconnue.';
   if (p.joueur) return 'Le manager du joueur n’est pas sur le marché.';
@@ -689,8 +710,15 @@ export function reprendreProlongationsPilotes(monde: Monde, idEcurie: string): v
 export const systemeMarche: Systeme = {
   nom: 'marche.transferts',
   executer({ monde, date, commanderIA }) {
-    if (date.semaine === FENETRE.cloture) { cloturerFenetre(monde); return; }
+    const toutLAnnee = parametre(monde, 'marche.toutLAnnee', MERCATO.ouvertToutLAnnee) > 0;
+    if (!toutLAnnee && date.semaine === FENETRE.cloture) { cloturerFenetre(monde); return; }
+    // D-193 : hors du pic de l'IA, le marché reste ouvert : réponses aux offres et expiration, tous les FENETRE.pas semaines.
+    if (toutLAnnee && !enPicIA(monde)) {
+      if (date.semaine % FENETRE.pas === 0) { repondreAuxOffres(monde); expirerOffres(monde); }
+      return;
+    }
     if (date.semaine < FENETRE.debut || date.semaine > FENETRE.fin || (date.semaine - FENETRE.debut) % FENETRE.pas !== 0) return;
+    if (toutLAnnee) expirerOffres(monde);
     const liste = vivier(monde);
     if (date.semaine === FENETRE.debut) prolongationsTitulaires(monde, liste);
     if (date.semaine === FENETRE.debut) offrePiloteSoutenu(monde); // levier B (prototype, désactivé par défaut)

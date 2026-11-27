@@ -9,6 +9,13 @@
  * Les contrats prennent effet en semaine 50.
  */
 export const FENETRE = { debut: 26, fin: 48, pas: 2, cloture: 49 };
+/**
+ * D-187 / D-193 (porteur : « mercato toute l'année ») : avec `ouvertToutLAnnee` à 1, les offres sont possibles toute l'année (pour la
+ * saison suivante ou celle d'après) et reçoivent une réponse tous les FENETRE.pas semaines ; FENETRE devient le **pic d'activité de l'IA**
+ * (la « silly season » de l'été et de l'automne) ; plus de clôture en semaine 49 : une offre sans accord expire après
+ * `delaiOffreSemaines` semaines, ou dès que la saison qu'elle visait a commencé.
+ */
+export const MERCATO = { ouvertToutLAnnee: 1, delaiOffreSemaines: 8 };
 
 /** Nombre de tours de négociation d'une offre (offre, contre-offre, offre finale). */
 export const TOURS_MARCHE = 3;

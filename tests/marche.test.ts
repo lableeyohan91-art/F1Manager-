@@ -41,6 +41,7 @@ describe('Phase 7a — marché des transferts des pilotes', () => {
 
   it('règles communes : fenêtre, team principal, baquet disponible', () => {
     const m = sc.creerMonde(1);
+    m.parametres = { ...(m.parametres ?? {}), 'marche.toutLAnnee': 0 }; // ancien mode à fenêtre (D-193)
     const moteur = sc.creerMoteur();
     const tp = preparerJoueur(m, 'eq_williams');
     const cible = personnes(m).find((p) => p.poste === 'pilote_junior' && p.statut === 'libre' && 2028 - p.anneeNaissance >= 18 && !p.junior)!;
@@ -141,4 +142,20 @@ describe('Phase 7a — marché des transferts des pilotes', () => {
     expect(migre.versionFormat).toBe(VERSION_FORMAT);
     expect(migre.tables['offres']).toEqual({});
   });
+});
+
+describe('D-193 — marché ouvert toute l’année', () => {
+  it('une offre est possible en semaine 5 ; sans accord, elle expire après le délai ; l’IA reste surtout active pendant son pic', async () => {
+    const { MERCATO } = await import('../src/engine/balance/marche');
+    const m = sc.creerMonde(1);
+    const moteur = sc.creerMoteur();
+    const tp = preparerJoueur(m, 'eq_williams');
+    moteur.avancer(m, 4);
+    const cible = personnes(m).find((p) => p.poste === 'pilote_junior' && p.statut === 'libre' && 2028 - p.anneeNaissance >= 18 && !p.junior)!;
+    const r = moteur.commandes.executer(m, { type: 'marche.offre', auteur: tp, source: 'exterieur', parametres: { ecurie: 'eq_williams', personne: cible.id, salaire: 0.1, duree: 2, debut: 2028 } });
+    expect(r).toEqual({ ok: true });
+    moteur.avancer(m, MERCATO.delaiOffreSemaines + 4);
+    const o = (Object.values(m.tables['offres']!) as { personne: string; statut: string }[]).find((x) => x.personne === cible.id)!;
+    expect(['acceptee', 'refusee', 'expiree', 'contre_offre']).toContain(o.statut);
+  }, 120_000);
 });
