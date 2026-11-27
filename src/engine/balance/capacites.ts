@@ -66,3 +66,13 @@ export const INSTALLATIONS_COUT = { entretienParNiveauCarre: 0.05, seuilRendemen
  * quand son budget de développement est déjà sous `devMinAgrandissementMEUR` (l'entretien en plus serait pris sur les pièces).
  */
 export const IA_INSTALLATIONS = { devMinAgrandissementMEUR: 60 };
+/**
+ * Réduction d'une installation (diagnostic du 27/11, porteur : « oui, mais attention, c'est notre levier principal d'équilibrage ») : une
+ * écurie peut désaffecter le niveau le plus haut de n'importe laquelle de ses installations (−1 niveau, immédiat, sans frais ni remboursement), pour
+ * économiser son entretien sous le plafond. Au plus une réduction par installation et par saison (commande commune `infrastructure.reduire`).
+ * L'IA ne le fait que si elle est étranglée : budget de développement sous `devMinAgrandissementMEUR`, et seulement pour les niveaux au-delà
+ * du seuil de rendement (`INSTALLATIONS_COUT.seuilRendement`, ceux qui rapportent le moins), au plus `reductionsParAn` par saison. Le coût de
+ * l'entretien reste donc le frein des écuries riches ; il ne devient plus une spirale de déclin.
+ * Départements : dans la même situation, l'IA ramène un département au-delà de son effectif visé vers cet effectif (une campagne à la fois).
+ */
+export const IA_REDUCTIONS = { reductionsParAn: 2 };

@@ -7,7 +7,7 @@
  */
 
 import { COUT_EMPLOYE } from '../../balance/finances';
-import { COHESION_DEPARTEMENT, FIABILITE_DEPARTEMENT, IA_EFFECTIFS, PROJETS_PAR_POLE, RECRUTEMENT_DEPARTEMENT } from '../../balance/capacites';
+import { COHESION_DEPARTEMENT, FIABILITE_DEPARTEMENT, IA_EFFECTIFS, IA_INSTALLATIONS, PROJETS_PAR_POLE, RECRUTEMENT_DEPARTEMENT } from '../../balance/capacites';
 import { rangSemaine, ajouterSemaines } from '../../core/calendrier';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
@@ -180,6 +180,19 @@ function decisionsIA(monde: Monde, commander: (c: { type: string; auteur: string
       continue;
     }
     if (fi.etatCrise !== 'sain') continue;
+    // 27/11 : étranglée par ses coûts fixes (budget de développement sous le seuil), l'IA ramène ses départements surdimensionnés vers
+    // l'effectif visé au lieu de recruter (indemnités sous le plafond, même commande que le joueur).
+    if (fi.budget.annee === monde.date.annee && fi.budget.developpementMEUR < IA_INSTALLATIONS.devMinAgrandissementMEUR) {
+      for (const type of ['production', 'conception', 'aero', 'fiabilite']) {
+        const d = departementDe(monde, e.id, type);
+        if (!d || d.mouvement) continue;
+        const exces = d.effectif - effectifVise(type);
+        if (exces < RECRUTEMENT_DEPARTEMENT.campagneMin) continue;
+        const prm = { ecurie: e.id, departement: type, nombre: -Math.min(RECRUTEMENT_DEPARTEMENT.campagneMax, exces) };
+        if (!motifRefusEffectifDepartement(monde, tp.id, prm)) commander({ type: 'departement.effectif', auteur: tp.id, parametres: prm });
+      }
+      continue;
+    }
     const prev = previsionFinances(monde, e.id);
     if (!prev) continue;
     const risque = tp.traits['risque'] ?? 10;

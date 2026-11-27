@@ -7,7 +7,7 @@
  * - Enveloppe réglementaire d'investissement par an, hors plafond : l'argent compte, mais dans une limite connue de tous.
  */
 
-import { IA_INSTALLATIONS, INSTALLATIONS_COUT } from '../../balance/capacites';
+import { IA_INSTALLATIONS, IA_REDUCTIONS, INSTALLATIONS_COUT } from '../../balance/capacites';
 import type { DefinitionCommande } from '../../core/commandes';
 import {
   COUT_INFRASTRUCTURE, DUREE_INFRASTRUCTURE, INSTALLATIONS_TECHNIQUES, INVESTISSEMENT_ANNUEL_MAX, MARGE_LANCEMENT_PROJET, PERIODES_PAR_AN,
@@ -120,6 +120,73 @@ export const commandeChantier: DefinitionCommande = {
     lancerChantier(monde, e, fi, table(monde, TABLES.installations)[String(c.parametres['installation'])] as unknown as Installation, c.parametres['nature'] as ProjetInfrastructure['nature']);
   },
 };
+
+const LIB_REDUCTION: Record<string, string> = {
+  soufflerie: 'sa soufflerie', cfd: 'son centre de calcul (CFD)', simulateur: 'son simulateur', bureau_etudes: "son bureau d'études", usine: 'son usine',
+  centre_recherche: 'son centre de recherche', centre_formation: 'son centre de formation', installations_personnel: 'ses installations pour le personnel',
+};
+
+/** Réduction (27/11) : désaffecter le niveau le plus haut d'une installation (toutes, entretenues sous le plafond) pour économiser son entretien. */
+export function motifRefusReduction(monde: Monde, auteur: string, prm: Record<string, unknown>): string | null {
+  const idEcurie = String(prm['ecurie'] ?? '');
+  const e = table(monde, TABLES.ecuries)[idEcurie] as unknown as Ecurie | undefined;
+  const fi = (Object.values(table(monde, TABLES.finances)) as unknown as Finances[]).find((f) => f.ecurie === idEcurie);
+  if (!e || e.statut !== 'active' || !fi) return 'Écurie inconnue.';
+  const p = table(monde, TABLES.personnes)[auteur] as unknown as Personne | undefined;
+  if (!p || p.statut !== 'actif' || p.ecurie !== idEcurie || (p.poste !== 'team_principal' && p.poste !== 'directeur_technique')) return 'Seuls le team principal et le directeur technique décident d’une réduction.';
+  const i = table(monde, TABLES.installations)[String(prm['installation'] ?? '')] as unknown as Installation | undefined;
+  if (!i || i.ecurie !== idEcurie) return 'Installation inconnue.';
+  if (i.niveau <= 1) return 'Installation déjà au niveau minimal.';
+  if (fi.projets.some((x) => x.installation === i.id)) return 'Un chantier est en cours sur cette installation.';
+  if (reduiteCetteSaison(monde, i)) return 'Cette installation a déjà été réduite cette saison.';
+  return null;
+}
+
+/** Une réduction par installation et par saison : lue dans les événements de l'année (pas de champ de sauvegarde en plus). */
+function reduiteCetteSaison(monde: Monde, i: Installation): boolean {
+  return Object.values(monde.evenements).some((ev) => ev.type === 'infrastructure.reduction' && ev.date.annee === monde.date.annee && ev.contexte?.['installationId'] === i.id);
+}
+
+/** Économie annuelle d'entretien (sous le plafond) si l'installation perd un niveau. */
+export function economieReduction(i: Installation): number {
+  return INSTALLATIONS_COUT.entretienParNiveauCarre * (i.niveau ** 2 - (i.niveau - 1) ** 2) * (1 + Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30);
+}
+
+export const commandeReduction: DefinitionCommande = {
+  type: 'infrastructure.reduire',
+  valider: (monde, c) => motifRefusReduction(monde, c.auteur, c.parametres),
+  appliquer({ monde }, c) {
+    const e = table(monde, TABLES.ecuries)[String(c.parametres['ecurie'])] as unknown as Ecurie;
+    const i = table(monde, TABLES.installations)[String(c.parametres['installation'])] as unknown as Installation;
+    const economie = arrondi(economieReduction(i));
+    i.niveau -= 1;
+    ajouterEvenement(monde, {
+      type: 'infrastructure.reduction', acteurs: [{ id: e.id, role: 'ecurie' }, { id: c.auteur, role: 'decideur' }], importance: 2, visibilite: 'public',
+      contexte: { installation: i.type, installationId: i.id, niveau: i.niveau, economieAnnuelle: economie },
+      texte: `${e.nom} réduit ${LIB_REDUCTION[i.type] ?? i.type} (niveau ${i.niveau + 1} → ${i.niveau}) pour économiser environ ${economie} M€ d’entretien par an.`,
+    });
+  },
+};
+
+/**
+ * Décision de l'IA (27/11) : si elle est étranglée (budget de développement sous le seuil), réduire les installations au-delà du seuil de
+ * rendement, en commençant par la plus coûteuse à entretenir (au plus IA_REDUCTIONS.reductionsParAn par saison). Même commande que le joueur.
+ */
+export function deciderReductions(monde: Monde, e: Ecurie, fi: Finances, commander: (c: { type: string; auteur: string; parametres: Record<string, unknown> }) => unknown): void {
+  if (fi.budget.developpementMEUR >= IA_INSTALLATIONS.devMinAgrandissementMEUR || (e.pilotee && !e.delegationRecherche)) return;
+  const auteur = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'team_principal');
+  if (!auteur) return;
+  const candidates = installationsDe(monde, e.id).filter((i) => i.niveau > INSTALLATIONS_COUT.seuilRendement)
+    .sort((a, b) => economieReduction(b) - economieReduction(a) || a.id.localeCompare(b.id));
+  let n = 0;
+  for (const i of candidates) {
+    if (n >= IA_REDUCTIONS.reductionsParAn) break;
+    const prm = { ecurie: e.id, installation: i.id };
+    if (motifRefusReduction(monde, auteur.id, prm)) continue;
+    commander({ type: 'infrastructure.reduire', auteur: auteur.id, parametres: prm });
+    n++;
+  }
+}
 
 /**
  * Décision annuelle de l'IA (après le budget) : si aucun projet n'est en cours et que la trésorerie le permet, lancer le projet au

@@ -1,7 +1,7 @@
 /** Phase 10 — écrans Technique, Finances, Championnat, Direction et Réglages. */
 import { useState } from 'preact/hooks';
 import {
-  budgetMaxJoueur, candidatsPresidence, previsionFinances, coutChantier, coutImmediat, coutParPersonne, departementDe, DEPARTEMENTS_REGLABLES, niveauRecrues, type Installation, copierMonde, ecuriesActives, profilTechnique, DOMAINES_DELEGATION, equipeStands, estDelegue, federation, financesDe, plafond, programmes,
+  budgetMaxJoueur, candidatsPresidence, previsionFinances, coutChantier, economieReduction, coutImmediat, coutParPersonne, departementDe, DEPARTEMENTS_REGLABLES, niveauRecrues, type Installation, copierMonde, ecuriesActives, profilTechnique, DOMAINES_DELEGATION, equipeStands, estDelegue, federation, financesDe, plafond, programmes,
   propositions, reglementEnVigueur, serialiser, table, TABLES, type DomaineJoueur, type Monde, type Saison,
 } from '../../engine';
 import { DOMAINES, LISTE_DOMAINES, ORIENTATIONS, PROGRAMMES } from '../../engine/balance/technique';
@@ -102,6 +102,7 @@ function CarteCapacites({ partie, nav }: { partie: Partie; nav: Navigation }) {
           {!rechercheDeleguee && !chantier && <>
             {i.niveau < 10 && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'amelioration' }, 'Chantier lancé.')}>Agrandir ({meur(coutChantier(i, 'amelioration'))})</button></>}
             {i.ageAnnees >= COUT_INFRASTRUCTURE.ageMinRenovation && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'renovation' }, 'Chantier lancé.')}>Rénover ({meur(coutChantier(i, 'renovation'))})</button></>}
+            {i.niveau > 1 && <> <button class="btn" title="Désaffecter le niveau le plus haut : moins de performance, moins d'entretien sous le plafond (une fois par saison)" onClick={() => agir('infrastructure.reduire', { ecurie: e.id, installation: i.id }, 'Installation réduite.')}>Réduire (−{meur(economieReduction(i))}/an)</button></>}
           </>}</li>
       ))}</ul>
       {rechercheDeleguee && <p class="muted petit">Recherche déléguée : votre directeur technique choisit aussi les chantiers.</p>}

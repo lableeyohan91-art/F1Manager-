@@ -4,10 +4,10 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
-  chargePole, creerScenarioGrille2026, depensesFixes, deserialiser, departementDe, facteurAbandon, facteurIngenieurs, financesDe, niveauUtile,
+  chargePole, creerScenarioGrille2026, deciderReductions, depensesFixes, deserialiser, departementDe, facteurAbandon, facteurIngenieurs, financesDe, niveauUtile,
   serialiser, table, TABLES, teamPrincipal, VERSION_FORMAT, type Ecurie, type Finances, type Installation, type ProjetConception,
 } from '../src/engine';
-import { COHESION_DEPARTEMENT, ESSAIS_RENFORCES, INGENIEURS, INSTALLATIONS_COUT, RECRUTEMENT_DEPARTEMENT } from '../src/engine/balance/capacites';
+import { COHESION_DEPARTEMENT, ESSAIS_RENFORCES, IA_INSTALLATIONS, IA_REDUCTIONS, INGENIEURS, INSTALLATIONS_COUT, RECRUTEMENT_DEPARTEMENT } from '../src/engine/balance/capacites';
 import { PIECES } from '../src/engine/balance/monoplaces';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 
@@ -119,6 +119,42 @@ describe('D-181 — essais renforcés, installations', () => {
     expect(cmd().ok).toBe(true);
     expect(fi.projets.length).toBe(1);
     expect(cmd().ok).toBe(false);
+  }, 120_000);
+});
+
+describe('27/11 — réduire une installation (commande commune)', () => {
+  it('−1 niveau, économie d’entretien, une fois par saison ; l’IA étranglée réduit d’elle-même au-delà du seuil de rendement', () => {
+    const m = sc.creerMonde(4), moteur = sc.creerMoteur();
+    moteur.avancer(m, 2);
+    const e = 'eq_haas';
+    const tp = teamPrincipal(m, e)!;
+    const inst = (Object.values(table(m, TABLES.installations)) as unknown as Installation[]).find((i) => i.ecurie === e && i.type === 'simulateur')!;
+    inst.niveau = 10;
+    const fi = financesDe(m, e) as Finances;
+    fi.projets = [];
+    const avant = depensesFixes(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie).entretien;
+    const cmd = () => moteur.commandes.executer(m, { type: 'infrastructure.reduire', auteur: tp.id, source: 'exterieur', parametres: { ecurie: e, installation: inst.id } });
+    expect(cmd().ok).toBe(true);
+    expect(inst.niveau).toBe(9);
+    const apres = depensesFixes(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie).entretien;
+    expect(avant - apres).toBeCloseTo(INSTALLATIONS_COUT.entretienParNiveauCarre * 19 * (1 + Math.min(inst.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30), 5);
+    expect(cmd().ok).toBe(false); // une fois par saison
+    expect(Object.values(m.evenements).some((ev) => ev.type === 'infrastructure.reduction')).toBe(true);
+    // IA : budget de développement sous le seuil → réduction des niveaux au-delà du seuil de rendement.
+    const autre = (Object.values(table(m, TABLES.installations)) as unknown as Installation[]).find((i) => i.ecurie === e && i.type === 'cfd')!;
+    autre.niveau = 10;
+    expect(autre.id).toBeDefined();
+    fi.budget.developpementMEUR = IA_INSTALLATIONS.devMinAgrandissementMEUR - 10;
+    const cmds: { type: string; parametres: Record<string, unknown> }[] = [];
+    deciderReductions(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie, fi, (c) => cmds.push(c));
+    expect(cmds.length).toBeGreaterThan(0);
+    expect(cmds.length).toBeLessThanOrEqual(IA_REDUCTIONS.reductionsParAn);
+    for (const c of cmds) expect((table(m, TABLES.installations)[String(c.parametres['installation'])] as unknown as Installation).niveau).toBeGreaterThan(INSTALLATIONS_COUT.seuilRendement);
+    expect(cmds.every((c) => c.parametres['installation'] !== inst.id)).toBe(true); // déjà réduite cette saison
+    fi.budget.developpementMEUR = IA_INSTALLATIONS.devMinAgrandissementMEUR + 10;
+    const rien: unknown[] = [];
+    deciderReductions(m, table(m, TABLES.ecuries)[e] as unknown as Ecurie, fi, (c) => rien.push(c));
+    expect(rien.length).toBe(0); // pas étranglée : le coût de l'entretien reste le frein
   }, 120_000);
 });
 

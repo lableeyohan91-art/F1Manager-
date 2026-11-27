@@ -34,7 +34,7 @@ import { liberer, nePasProlonger, pourvoirPostes, proposerProlongation } from '.
 import { forceEcurie, teamPrincipal, valeurMarche } from '../humain/decision';
 import { evaluerSponsors, initialiserSponsors, marcheSponsors, revenusSponsors } from './sponsors';
 import { capaciteEmprunt, gererTresorerie, proprietaireActif, tauxDette, verifierInvestisseur, verifierLassitude } from './crises';
-import { avancerProjets, commandeChantier, deciderProjet, negligerEntretien, vieillirInstallations } from './infrastructures';
+import { avancerProjets, commandeChantier, commandeReduction, deciderProjet, deciderReductions, negligerEntretien, vieillirInstallations } from './infrastructures';
 import { commandeEffectif, systemeCapacites } from './capacites';
 import { coutAnnuelAcademie } from '../juniors/academies';
 
@@ -480,6 +480,8 @@ export const systemeEconomieAnnuelle: Systeme = {
       const fi = financesDe(monde, e.id);
       if (!fi || fi.budget.annee === date.annee) continue;
       const reserve = deciderBudget(monde, e, fi);
+      // 27/11 : une écurie étranglée par ses coûts fixes réduit d'abord ses installations les moins rentables (même commande que le joueur).
+      deciderReductions(monde, e, fi, commanderIA);
       deciderProjet(monde, e, fi, reserve, commanderIA);
     }
   },
@@ -507,7 +509,7 @@ export const systemeConseil: Systeme = {
 
 /** À installer AVANT les systèmes de la saison (le budget doit exister avant le développement d'intersaison). */
 export function installerEconomie(moteur: Moteur): Moteur {
-  moteur.commandes.enregistrer(commandeEffectif).enregistrer(commandeChantier);
+  moteur.commandes.enregistrer(commandeEffectif).enregistrer(commandeChantier).enregistrer(commandeReduction);
   return moteur.ajouterSysteme(systemeEconomieAnnuelle).ajouterSysteme(systemeComptabilite).ajouterSysteme(systemeConseil).ajouterSysteme(systemeCapacites);
 }
 
