@@ -14,7 +14,7 @@
  */
 
 import {
-  ALEA_APPORT, BUDGET_IA, OBJECTIF_PROPRIETAIRE, DIVIDENDES, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
+  ALEA_APPORT, BUDGET_IA, OBJECTIF_PROPRIETAIRE, DIVIDENDES, DIVIDENDES_RESULTATS, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
   DEVELOPPEMENT_MINIMUM, EFFORT_TECHNIQUE_REFERENCE, MARGE_SECURITE_PLAFOND, FACTEUR_BUDGET_DEV, OPERATIONS_PAR_GP, PART_MARKETING,
   PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, PRIMES_PAR_GP, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
 } from '../../balance/finances';
@@ -227,8 +227,11 @@ function cloturer(monde: Monde, e: Ecurie, fi: Finances): void {
   // Dividendes : le propriétaire retire une part de la trésorerie excédentaire.
   const seuil = DIVIDENDES.seuilAnneesDepenses * totalDepenses(c);
   const p = proprietaireDe(monde, e.id);
-  if (p && fi.tresorerieMEUR > seuil) {
-    const retrait = (PART_DIVIDENDES[p.type] ?? 0.5) * (fi.tresorerieMEUR - seuil);
+  // Solution A (27/11) : pas de dividendes (ou réduits) pour une écurie dans la seconde moitié du classement qui vient de se terminer.
+  const { rang, n: nEcuries } = rangPrecedent(monde, e.id);
+  const facteurResultats = rang > nEcuries / 2 ? DIVIDENDES_RESULTATS.facteurSecondeMoitie : 1;
+  if (p && fi.tresorerieMEUR > seuil && facteurResultats > 0) {
+    const retrait = facteurResultats * (PART_DIVIDENDES[p.type] ?? 0.5) * (fi.tresorerieMEUR - seuil);
     fi.tresorerieMEUR -= retrait;
     c.dividendes += retrait;
     ajouterEvenement(monde, {
@@ -323,6 +326,18 @@ export function primesPeriode(monde: Monde, idEcurie: string, n: number): number
   const total = parts.reduce((a, b) => a + b, 0) || 1;
   const partEcurie = (parts[i] ?? parts.at(-1) ?? 5) / total;
   return (1 - part) * fixe + part * ENVELOPPE_PRIMES_MEUR * partEcurie * (courus / gps.length);
+}
+
+/** Primes estimées sur l'année (prévisions, budget) : part fixe + part variable au rang actuel (solution B). */
+export function primesAnnuellesEstimees(monde: Monde, idEcurie: string): number {
+  const part = parametre(monde, 'economie.primesParGP', PRIMES_PAR_GP.partVariable);
+  const fixe = primesAttendues(monde, idEcurie);
+  const s = table(monde, TABLES.saisons)[`ssn_${monde.date.annee}`] as unknown as Saison | undefined;
+  const i = s ? s.constructeurs.findIndex((c) => c.ecurie === idEcurie) : -1;
+  if (part <= 0 || !s || i < 0) return fixe;
+  const parts = PARTS_PRIMES.slice(0, s.constructeurs.length);
+  const total = parts.reduce((a, b) => a + b, 0) || 1;
+  return (1 - part) * fixe + part * ENVELOPPE_PRIMES_MEUR * (parts[i] ?? parts.at(-1) ?? 5) / total;
 }
 
 /** Écriture d'une période comptable (1/13 de l'année). */

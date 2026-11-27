@@ -49,7 +49,9 @@ function Delegation({ partie, domaine, nav }: { partie: Partie; domaine: Domaine
 /** D-181, levier A : effectifs des départements réglables et chantiers d'installations (commandes communes au joueur et à l'IA). */
 const LIB_DEP: Record<string, string> = { aero: 'Aérodynamique', conception: 'Conception', production: 'Production', fiabilite: 'Fiabilité' };
 const ROLE_DEP: Record<string, string> = { aero: 'vitesse des projets aéro', conception: 'vitesse des projets châssis et suspensions', production: 'vitesse de fabrication des pièces', fiabilite: 'pannes en course, erreurs détectées' };
-const LIB_INST: Record<string, string> = { soufflerie: 'Soufflerie', cfd: 'Centre de calcul (CFD)', simulateur: 'Simulateur', bureau_etudes: 'Bureau d’études' };
+const LIB_INST: Record<string, string> = { soufflerie: 'Soufflerie', cfd: 'Centre de calcul (CFD)', simulateur: 'Simulateur', bureau_etudes: 'Bureau d’études', usine: 'Usine', centre_recherche: 'Centre de recherche', centre_formation: 'Centre de formation', installations_personnel: 'Installations du personnel' };
+/** Seules les installations techniques peuvent être agrandies (les autres : rénover ou réduire). */
+const TECHNIQUES = new Set(['soufflerie', 'cfd', 'simulateur', 'bureau_etudes']);
 function CarteCapacites({ partie, nav }: { partie: Partie; nav: Navigation }) {
   const m = partie.monde;
   const e = ecurieJoueur(m)!;
@@ -94,13 +96,13 @@ function CarteCapacites({ partie, nav }: { partie: Partie; nav: Navigation }) {
           <div class="actions"><button class="btn principal" onClick={() => agir('departement.effectif', { ecurie: e.id, departement: dep, nombre: n, profil }, n > 0 ? 'Recrutement lancé.' : 'Réduction décidée.')}>{n < 0 ? 'Réduire' : 'Recruter'}</button></div>
         </>
       )}
-      <h3>Installations techniques</h3>
-      <p class="muted petit">Enveloppe commune de {INVESTISSEMENT_ANNUEL_MAX} M€ par an hors plafond, un chantier à la fois. L’entretien (sous le plafond) croît avec le carré du niveau, et les niveaux au-delà de {INSTALLATIONS_COUT.seuilRendement} rapportent moins.</p>
+      <h3>Installations</h3>
+      <p class="muted petit">Enveloppe commune de {INVESTISSEMENT_ANNUEL_MAX} M€ par an hors plafond, un chantier à la fois. L’entretien (sous le plafond) croît avec le carré du niveau et avec l’âge (une rénovation le fait baisser), et les niveaux au-delà de {INSTALLATIONS_COUT.seuilRendement} rapportent moins.</p>
       {chantier && <p>Chantier en cours : {meur(chantier.depenseMEUR)} payés sur {meur(chantier.coutPrevuMEUR)} annoncés.</p>}
       <ul class="liste-faits">{insts.map((i) => (
         <li key={i.id}><strong>{LIB_INST[i.type]}</strong> : niveau {i.niveau}, {i.ageAnnees} ans, état {Math.round(i.etat)} %
           {!rechercheDeleguee && !chantier && <>
-            {i.niveau < 10 && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'amelioration' }, 'Chantier lancé.')}>Agrandir ({meur(coutChantier(i, 'amelioration'))})</button></>}
+            {i.niveau < 10 && TECHNIQUES.has(i.type) && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'amelioration' }, 'Chantier lancé.')}>Agrandir ({meur(coutChantier(i, 'amelioration'))})</button></>}
             {i.ageAnnees >= COUT_INFRASTRUCTURE.ageMinRenovation && <> <button class="btn" onClick={() => agir('infrastructure.lancer', { ecurie: e.id, installation: i.id, nature: 'renovation' }, 'Chantier lancé.')}>Rénover ({meur(coutChantier(i, 'renovation'))})</button></>}
             {i.niveau > 1 && <> <button class="btn" title="Désaffecter le niveau le plus haut : moins de performance, moins d'entretien sous le plafond (une fois par saison)" onClick={() => agir('infrastructure.reduire', { ecurie: e.id, installation: i.id }, 'Installation réduite.')}>Réduire (−{meur(economieReduction(i))}/an)</button></>}
           </>}</li>

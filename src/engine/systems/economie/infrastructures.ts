@@ -7,7 +7,7 @@
  * - Enveloppe réglementaire d'investissement par an, hors plafond : l'argent compte, mais dans une limite connue de tous.
  */
 
-import { IA_INSTALLATIONS, IA_REDUCTIONS, INSTALLATIONS_COUT } from '../../balance/capacites';
+import { IA_INSTALLATIONS, IA_REDUCTIONS, IA_RENOVATION, INSTALLATIONS_COUT } from '../../balance/capacites';
 import type { DefinitionCommande } from '../../core/commandes';
 import {
   COUT_INFRASTRUCTURE, DUREE_INFRASTRUCTURE, INSTALLATIONS_TECHNIQUES, INVESTISSEMENT_ANNUEL_MAX, INVESTISSEMENT_MODULE, MARGE_LANCEMENT_PROJET, PERIODES_PAR_AN,
@@ -26,6 +26,7 @@ const LIB: Record<string, string> = {
 /** Phase 11 (correction d'accord) : « l'agrandissement de sa soufflerie », « de son simulateur ». */
 const LIB_DE: Record<string, string> = {
   soufflerie: 'de sa soufflerie', cfd: 'de son centre de calcul (CFD)', simulateur: 'de son simulateur', bureau_etudes: "de son bureau d'études",
+  usine: 'de son usine', centre_recherche: 'de son centre de recherche', centre_formation: 'de son centre de formation', installations_personnel: 'de ses installations pour le personnel',
 };
 
 /** D-181 : niveau utile d'une installation (rendement décroissant au-dessus du seuil : le sommet rapporte moins). */
@@ -83,9 +84,10 @@ export function motifRefusChantier(monde: Monde, auteur: string, prm: Record<str
   const p = table(monde, TABLES.personnes)[auteur] as unknown as Personne | undefined;
   if (!p || p.statut !== 'actif' || p.ecurie !== idEcurie || (p.poste !== 'team_principal' && p.poste !== 'directeur_technique')) return 'Seuls le team principal et le directeur technique lancent un chantier.';
   const i = table(monde, TABLES.installations)[String(prm['installation'] ?? '')] as unknown as Installation | undefined;
-  if (!i || i.ecurie !== idEcurie || !(INSTALLATIONS_TECHNIQUES as readonly string[]).includes(i.type)) return 'Installation technique inconnue.';
   const nature = prm['nature'];
   if (nature !== 'amelioration' && nature !== 'renovation') return 'Nature : amélioration ou rénovation.';
+  // Solution C (27/11) : toutes les installations peuvent être rénovées ; l'agrandissement reste réservé aux installations techniques.
+  if (!i || i.ecurie !== idEcurie || (nature === 'amelioration' && !(INSTALLATIONS_TECHNIQUES as readonly string[]).includes(i.type))) return 'Installation inconnue (agrandissement : installations techniques seulement).';
   if (fi.projets.length) return 'Un chantier est déjà en cours (un seul à la fois).';
   if (fi.etatCrise !== 'sain') return 'Pas de chantier tant que les finances ne sont pas saines.';
   if (nature === 'amelioration' && i.niveau >= 10) return 'Installation déjà au niveau maximal.';
@@ -155,6 +157,11 @@ function reduiteCetteSaison(monde: Monde, i: Installation): boolean {
   return Object.values(monde.evenements).some((ev) => ev.type === 'infrastructure.reduction' && ev.date.annee === monde.date.annee && ev.contexte?.['installationId'] === i.id);
 }
 
+/** Économie annuelle d'entretien (sous le plafond) si l'installation est rénovée (âge remis à 0). */
+export function economieRenovation(i: Installation): number {
+  return INSTALLATIONS_COUT.entretienParNiveauCarre * i.niveau ** 2 * Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30;
+}
+
 /** Économie annuelle d'entretien (sous le plafond) si l'installation perd un niveau. */
 export function economieReduction(i: Installation): number {
   return INSTALLATIONS_COUT.entretienParNiveauCarre * (i.niveau ** 2 - (i.niveau - 1) ** 2) * (1 + Math.min(i.ageAnnees, INSTALLATIONS_COUT.ageMaxEntretien) / 30);
@@ -217,6 +224,16 @@ export function deciderProjet(monde: Monde, e: Ecurie, fi: Finances, reserveVise
       const ratio = (niveauUtile(i.niveau) - actuel) / cout;
       if (!meilleur || ratio > meilleur.ratio) meilleur = { i, nature: 'renovation', cout, ratio };
     }
+  }
+  // Solution C (27/11) : étranglée par ses coûts fixes mais avec de l'argent qui dort, l'écurie rénove ce qui coûte le plus à entretenir.
+  if (fi.budget.developpementMEUR < IA_INSTALLATIONS.devMinAgrandissementMEUR) {
+    let renov: { i: Installation; cout: number; gain: number } | undefined;
+    for (const i of installationsDe(monde, e.id).filter((x) => x.ageAnnees >= COUT_INFRASTRUCTURE.ageMinRenovation)) {
+      const cout = coutChantier(i, 'renovation');
+      const gain = economieRenovation(i) / cout;
+      if (gain >= IA_RENOVATION.economieMinParMEUR && (!renov || gain > renov.gain)) renov = { i, cout, gain };
+    }
+    if (renov && fi.tresorerieMEUR - reserveVisee >= renov.cout) meilleur = { i: renov.i, nature: 'renovation', cout: renov.cout, ratio: renov.gain };
   }
   if (!meilleur || fi.tresorerieMEUR - reserveVisee < MARGE_LANCEMENT_PROJET * meilleur.cout) return;
   const auteur = (Object.values(table(monde, TABLES.personnes)) as unknown as Personne[]).find((p) => p.statut === 'actif' && p.ecurie === e.id && p.poste === 'team_principal');

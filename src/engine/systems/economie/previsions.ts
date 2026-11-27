@@ -15,7 +15,7 @@ import { TABLES, type ClauseSponsor, type Contrat, type Ecurie, type Finances, t
 import { coutAnnuelAcademie } from '../juniors/academies';
 import { partRecherche } from '../technique/acces';
 import { tauxDette } from './crises';
-import { apportAnnuel, commercialAnnuel, depensesFixes, financesDe, plafond, primesAttendues, proprietaireDe, rangPrecedent } from './index';
+import { apportAnnuel, commercialAnnuel, depensesFixes, financesDe, plafond, primesAnnuellesEstimees, primesAttendues, proprietaireDe, rangPrecedent } from './index';
 import { enveloppeInvestissement } from './infrastructures';
 import { bilanSaison } from './probabilites';
 import { contratsActifs, revenusSponsors } from './sponsors';
@@ -63,7 +63,7 @@ export function previsionFinances(monde: Monde, idEcurie: string): PrevisionFina
   // Recettes d'une écriture (mêmes formules que la comptabilité ; retrait du propriétaire compté seulement s'il est annoncé).
   const ch = fi.chocApport;
   const apportAn = apportAnnuel(monde, e, fi, annee) * (ch && ch.annee === annee && ch.annonce ? ch.facteur : 1);
-  const rec = { primes: primesAttendues(monde, idEcurie) / n, droits: commercialAnnuel(monde, e, fi) / n, sponsors: revenusSponsors(monde, idEcurie, annee) / n, apport: apportAn / n };
+  const rec = { primes: primesAnnuellesEstimees(monde, idEcurie) / n, droits: commercialAnnuel(monde, e, fi) / n, sponsors: revenusSponsors(monde, idEcurie, annee) / n, apport: apportAn / n };
   const recPeriode = rec.primes + rec.droits + rec.sponsors + rec.apport;
 
   // Développement : la recherche au fil de l'année ; les projets selon les Grands Prix restants. Une pièce vaut par les courses qui

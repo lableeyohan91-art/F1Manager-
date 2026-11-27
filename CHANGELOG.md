@@ -740,3 +740,14 @@ Aucun code à ce stade.
 - Départs proposés au joueur (D-185) : fond de grille ou milieu de grille, écurie imposée, lus dans `data/grille-2026/departs.csv`.
 - Réduction d'une installation (commande commune, bouton « Réduire » dans Gestion) et réductions de l'IA étranglée (D-186).
 - Diagnostic des hiérarchies (`docs/rapports/diagnostic-hierarchies/`).
+
+## [Audit économique, solutions A B C] — 27/11/2026
+
+### Ajouté
+- Audit du modèle économique (Word, données, variantes mesurées) : `docs/rapports/audit-economie-2026-11-27/`.
+- Primes du championnat à moitié versées à chaque Grand Prix selon le classement en cours (D-188, B).
+- Rénovation de toutes les installations ; l'IA étranglée rénove avec sa trésorerie dormante (D-188, C).
+
+### Modifié
+- Pas de dividendes pour une écurie de la seconde moitié du classement (D-188, A).
+- Prévisions : primes estimées avec la part variable au rang actuel.

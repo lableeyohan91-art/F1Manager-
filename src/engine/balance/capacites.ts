@@ -76,3 +76,10 @@ export const IA_INSTALLATIONS = { devMinAgrandissementMEUR: 60 };
  * Départements : dans la même situation, l'IA ramène un département au-delà de son effectif visé vers cet effectif (une campagne à la fois).
  */
 export const IA_REDUCTIONS = { reductionsParAn: 2 };
+/**
+ * Audit économique du 27/11, solution C (porteur : « A B C ») : la trésorerie dormante finance la modernisation. Une écurie étranglée
+ * (budget de développement sous `IA_INSTALLATIONS.devMinAgrandissementMEUR`) qui a, au-delà de sa réserve, de quoi payer **tout** le chantier,
+ * rénove l'installation dont la rénovation économise le plus d'entretien par million investi (l'âge revient à 0, donc l'entretien baisse
+ * jusqu'à un tiers). Toutes les installations peuvent être rénovées (l'agrandissement reste réservé aux installations techniques).
+ */
+export const IA_RENOVATION = { economieMinParMEUR: 0.05 };

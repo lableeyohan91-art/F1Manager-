@@ -28,6 +28,12 @@ export const PROPRIETAIRES: Record<string, { stabilite: number; sensibiliteResul
  * Raison : sans ce mécanisme, les écuries riches accumulaient 1 000 à 1 500 M€ en 5 saisons (premier essai 5a).
  */
 export const DIVIDENDES = { seuilAnneesDepenses: 0.25 };
+/**
+ * Audit économique du 27/11, solution A (porteur : « A B C ») : le propriétaire d'une écurie classée dans la seconde moitié du championnat
+ * constructeurs qui vient de se terminer ne prend que `facteurSecondeMoitie` des dividendes habituels (0 = il laisse tout l'excédent à
+ * l'écurie). Mesuré avant : Haas versait 34 M€ par an en étant dernière, avec 54 M€ de marge inutilisée sous le plafond.
+ */
+export const DIVIDENDES_RESULTATS = { facteurSecondeMoitie: 0 };
 export const PART_DIVIDENDES: Record<string, number> = { constructeur: 0.6, milliardaire: 0.3, fonds: 0.8, famille: 0.5, consortium: 0.6 };
 /** Variation aléatoire annuelle de l'apport (écart type, part de l'apport). */
 export const ALEA_APPORT = 0.08;
@@ -204,12 +210,12 @@ export const INVESTISSEMENT_ANNUEL_MAX = 25;
  */
 export const INVESTISSEMENT_MODULE = { actif: 0, bonusParNiveau: 8, bonusMax: 25 };
 /**
- * Audit économique du 27/11 (porteur : « à chaque GP on a la part fixe et la part variable selon nos résultats ») — VARIANTE DE MESURE,
- * désactivée par défaut (paramètre `economie.primesParGP` = part variable, 0 = désactivé) : une part `partVariable` de l'enveloppe des primes
+ * Audit économique du 27/11 (porteur : « à chaque GP on a la part fixe et la part variable selon nos résultats » ; solution B retenue) :
+ * activée (paramètre `economie.primesParGP` = part variable, 0 = ancienne règle) : une part `partVariable` de l'enveloppe des primes
  * est versée Grand Prix par Grand Prix selon le classement constructeurs **en cours** (mêmes parts que le barème annuel) ; le reste garde
  * la règle actuelle (classement de l'an dernier, étalé sur l'année).
  */
-export const PRIMES_PAR_GP = { partVariable: 0 };
+export const PRIMES_PAR_GP = { partVariable: 0.5 };
 /** Coût d'une amélioration (niveau n → n+1) = base × (n+1) ; rénovation = base × niveau ; durées (semaines). */
 export const COUT_INFRASTRUCTURE = { ameliorationParNiveau: 4, renovationParNiveau: 1.5, ageMinRenovation: 12 };
 export const DUREE_INFRASTRUCTURE = { amelioration: { min: 40, max: 80 }, renovation: { min: 26, max: 52 } };
