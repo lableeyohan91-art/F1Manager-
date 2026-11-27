@@ -43,3 +43,24 @@ Tableau complet de tous les indicateurs : `comparaison-pistes.md`.
 - **P3 (usure renforcée)** casse un peu les longues séries (plus longue série 4,9, remontées 42,5, McLaren 57 → 49 titres), au prix de saisons moins serrées (15 → 11 %).
 - **Les trois ensemble** : meilleur résultat sur les dynasties (50 %), les champions différents (8,8) et les remontées (43) ; début d'ère le plus écarté (0,92 %, objectif « repartir de loin » approché) ; défavorable : coéquipiers champion et vice-champion 21 %, dernière écurie qui marque 77 %, saisons serrées 11 %, domination constructeurs 28 %.
 - **Objectif non atteint dans tous les cas** : le bas de grille ne se resserre pas en fin d'ère (4e–11e ≈ 0,55–0,60 %). La cause n'est pas encore identifiée (pistes à vérifier : budget et part de recherche, moteurs clients, pilotes). Dynasties toujours au-dessus de l'objectif 0–25 %.
+
+## Confirmation sur 20 graines (après correction de l'enveloppe de fin d'année)
+
+Mêmes graines 1 à 20, mêmes mécaniques (correction comprise des deux côtés) ; seule différence : les trois pistes. Tableau complet : `confirmation-20-graines-comparaison.md`.
+
+| Indicateur | Pistes coupées | Pistes actives |
+| --- | --- | --- |
+| Dynasties (5 titres ou plus) | 50 % | 50 % |
+| Plus longue série | 4,7 | 4,5 |
+| Champions constructeurs différents | 8,6 | 8,4 |
+| Remontées | 42,9 | 42,5 |
+| Titre ouvert | 31 % | 32 % |
+| Lutte finale entre écuries | 26 % | 28 % |
+| Dominations entre écuries | 12 % | **16 %** (défavorable) |
+| Domination constructeurs | 22 % | 25 % (défavorable) |
+| Dernière écurie qui marque | 79 % | 83 % |
+| Début d'ère, 1re–11e | 0,79 % | 0,82 % |
+| Saison 4 de l'ère, 4e–11e | 0,57 % | 0,51 % |
+| Titres de McLaren (sur 600) | 118 | 121 |
+
+**Correction de la conclusion précédente** : sur 20 graines, l'effet des trois pistes est **faible**. La baisse des dynasties mesurée sur 10 graines (70 → 50 %) ne venait pas des pistes : la version sans pistes, avec la correction de l'enveloppe, est déjà à 50 % sur 20 graines (bruit de l'échantillon de 10 graines et effet de la correction). Ce que les pistes apportent vraiment : un début d'ère un peu plus écarté, un bas de grille un peu plus serré en milieu d'ère (0,57 → 0,51 %), des événements racontables (lecture du règlement) ; en échange, un peu plus de dominations (12 → 16 %). McLaren reste en tête (≈ 20 % des titres).
