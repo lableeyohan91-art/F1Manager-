@@ -155,7 +155,7 @@ describe('D-193 — marché ouvert toute l’année', () => {
     const r = moteur.commandes.executer(m, { type: 'marche.offre', auteur: tp, source: 'exterieur', parametres: { ecurie: 'eq_williams', personne: cible.id, salaire: 0.1, duree: 2, debut: 2028 } });
     expect(r).toEqual({ ok: true });
     moteur.avancer(m, MERCATO.delaiOffreSemaines + 4);
-    const o = (Object.values(m.tables['offres']!) as { personne: string; statut: string }[]).find((x) => x.personne === cible.id)!;
+    const o = (Object.values(m.tables['offres']!) as unknown as { personne: string; statut: string }[]).find((x) => x.personne === cible.id)!;
     expect(['acceptee', 'refusee', 'expiree', 'contre_offre']).toContain(o.statut);
   }, 120_000);
 });
