@@ -38,7 +38,7 @@ describe('D-180, levier B — prévisions financières', () => {
     const e = ecuriesActives(m)[0]!;
     const fi = financesDe(m, e.id) as Finances;
     const p0 = previsionFinances(m, e.id)!;
-    fi.depensesTechniques = { annee: m.date.annee, projetsMEUR: fi.depensesTechniques?.projetsMEUR ?? 0, aPayerMEUR: p0.plafond.marge + 20 };
+    fi.depensesTechniques = { annee: m.date.annee, projetsMEUR: fi.depensesTechniques?.projetsMEUR ?? 0, aPayerMEUR: (fi.depensesTechniques?.aPayerMEUR ?? 0) + p0.plafond.marge + 20 };
     const p = previsionFinances(m, e.id)!;
     expect(p.plafond.depassementPrevu).toBeGreaterThan(15);
     expect(p.alertes.some((a) => a.startsWith('Dépassement du plafond prévu'))).toBe(true);

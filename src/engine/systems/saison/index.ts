@@ -17,7 +17,7 @@ import {
   MULTIPLICATEUR_ALEA_PLUIE, SEUIL_SURPRISE_PCT,
 } from '../../balance/course';
 import {
-  ALEA_DEVELOPPEMENT_MENSUEL, ALEA_INTERSAISON, BORNES_CARACTERISTIQUE, CARACS_ABSTRAITES, BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET, MOIS_EQUIVALENTS_INTERSAISON,
+  ALEA_DEVELOPPEMENT_MENSUEL, ALEA_INTERSAISON, BORNES_CARACTERISTIQUE, CARACS_ABSTRAITES, MOTORISTE_RATTRAPAGE, BUDGET_REFERENCE_MEUR, FACTEUR_BUDGET, MOIS_EQUIVALENTS_INTERSAISON,
   MOTORISTE_ALEA_ANNUEL, MOTORISTE_PROGRESSION_ANNUELLE, PLAFOND_TECHNIQUE, POIDS_CAPACITE, TAUX_DEVELOPPEMENT_MENSUEL,
 } from '../../balance/developpement';
 import { BAREME_POINTS, ENVELOPPE_PRIMES_MEUR, PARTS_PRIMES } from '../../balance/reglement';
@@ -428,7 +428,9 @@ export const systemeIntersaison: Systeme = {
         if (aduoActif && retardPct >= ADUO.seuil2Pct) { evolutions += ADUO.evolutions2; m.aduoReport = ADUO.evolutions2 * ADUO.saisonsSuivantes2; }
         else if (aduoActif && retardPct >= ADUO.seuil1Pct) evolutions += ADUO.evolutions1;
         const rendement = Math.max(0, 1 - m.niveau / PLAFOND_TECHNIQUE);
-        m.niveau = borner(m.niveau + (MOTORISTE_PROGRESSION_ANNUELLE + evolutions * ADUO.gainParEvolution) * rendement + f.normale(0, MOTORISTE_ALEA_ANNUEL), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
+        // Rapport du 27/11 : rattrapage vers le meilleur motoriste (la grille se resserre aussi côté moteur), en plus de l'ADUO.
+        const rattrapage = MOTORISTE_RATTRAPAGE.partAnnuelle * Math.max(0, meilleur - m.niveau);
+        m.niveau = borner(m.niveau + (MOTORISTE_PROGRESSION_ANNUELLE + evolutions * ADUO.gainParEvolution) * rendement + rattrapage + f.normale(0, MOTORISTE_ALEA_ANNUEL), BORNES_CARACTERISTIQUE.min, BORNES_CARACTERISTIQUE.max);
         if (evolutions > 0) ajouterEvenement(monde, {
           type: 'motoriste.aduo', acteurs: [{ id: m.id, role: 'motoriste' }], importance: 2, visibilite: 'public', contexte: { retardPct: Math.round(retardPct * 10) / 10, evolutions },
           texte: `${m.nom}, en retard de ${(Math.round(retardPct * 10) / 10).toLocaleString('fr-FR')} % de puissance, obtient ${evolutions} évolution${evolutions > 1 ? 's' : ''} supplémentaire${evolutions > 1 ? 's' : ''} de son moteur (ADUO).`,

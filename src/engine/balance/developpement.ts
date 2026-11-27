@@ -41,4 +41,6 @@ export const BORNES_CARACTERISTIQUE = { min: 1, max: 24 };
  * (rendement décroissant vers `plafond` + 1 : `plafondRendement`) ; chaque mois, une écurie reprend la part `rattrapageMensuel` de l'écart à
  * la meilleure (solutions connues et copiées, comme les pièces).
  */
+/** Rapport du 27/11 : rattrapage annuel des motoristes vers le meilleur (part de l'écart de niveau ; idées copiées, comme les pièces). */
+export const MOTORISTE_RATTRAPAGE = { partAnnuelle: 0.15 };
 export const CARACS_ABSTRAITES = { plafond: 20, plafondRendement: 21, rattrapageMensuel: 0.02 };
