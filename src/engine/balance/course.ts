@@ -95,9 +95,11 @@ export const PNEUS_COURSE = {
  * (unités de la réserve ; négatif = recharge).
  */
 export const CONSIGNES = {
-  conduite: { agressive: { rythme: -0.15, usure: 1.25, incident: 1.5 }, neutre: { rythme: 0, usure: 1, incident: 1 }, conservatrice: { rythme: 0.12, usure: 0.85, incident: 0.7 } },
-  pneus: { agressive: { rythme: -0.1, usure: 1.3 }, neutre: { rythme: 0, usure: 1 }, conservatrice: { rythme: 0.1, usure: 0.75 } },
-  carburant: { agressive: { rythme: -0.12, conso: 1.04 }, neutre: { rythme: 0, conso: 1 }, conservatrice: { rythme: 0.1, conso: 0.97 } },
+  // Banc du 27/11 (tools/banc-consignes.mts, 8 saisons × 2 écuries) : avec les premières valeurs, « pneus conservateurs » gagnait partout
+  // (+25 à +30 % de points) ; rythme des consignes de pneus et de conduite ajusté pour qu'aucune ne domine (l'usure du circuit tranche).
+  conduite: { agressive: { rythme: -0.22, usure: 1.25, incident: 1.5 }, neutre: { rythme: 0, usure: 1, incident: 1 }, conservatrice: { rythme: 0.14, usure: 0.85, incident: 0.7 } },
+  pneus: { agressive: { rythme: -0.22, usure: 1.3 }, neutre: { rythme: 0, usure: 1 }, conservatrice: { rythme: 0.18, usure: 0.78 } },
+  carburant: { agressive: { rythme: -0.12, conso: 1.04 }, neutre: { rythme: 0, conso: 1 }, conservatrice: { rythme: 0.04, conso: 0.97 } },
   batterie: { agressive: { rythme: -0.1, energie: 1 }, neutre: { rythme: 0, energie: 0 }, conservatrice: { rythme: 0.03, energie: -0.5 } },
 } as const;
 
