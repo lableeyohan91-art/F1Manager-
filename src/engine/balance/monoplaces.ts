@@ -74,6 +74,13 @@ export const PIECES = {
 export const EFFICACITE_REFERENCE = 10;
 
 /**
+ * Échelle des compromis de concept (sans unité ; 1 = valeurs de la 12a). Porteur, 27/11 : « améliorer une caractéristique doit en dégrader
+ * davantage une autre ». Multiplie tous les vecteurs `compromis` : le compromis reste neutre sur un circuit moyen, mais gagne et perd plus
+ * selon les circuits ; une voiture ne peut plus être bonne partout à la fois.
+ */
+export const COMPROMIS = { echelle: 1 };
+
+/**
  * Refroidissement (fiche principale §4.2) : marge de la voiture de référence (points) ; besoin d'un circuit = (température de l'air
  * pendant la course − `temperatureNeutreC`) × `parDegre` + altitude / `altitudeParPoint` ; chaque point de besoin non couvert coûte
  * `perteParPoint` % de puissance (gestion thermique simple, la phase 13 la détaillera).

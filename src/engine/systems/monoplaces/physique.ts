@@ -7,7 +7,7 @@
  * vitesse sur son tracé réel (tools/circuits/sensibilites-voiture.mts). Module pur de lecture : aucune écriture, aucun hasard.
  */
 
-import { EFFICACITE_REFERENCE, FATIGUE, MOTORISTE_PUISSANCE, PARAMETRES_SENSIBILITE, PIECES, REFROIDISSEMENT, SENSIBILITES_MOYENNES, type ParametreVoiture, type TypePiece } from '../../balance/monoplaces';
+import { COMPROMIS, EFFICACITE_REFERENCE, FATIGUE, MOTORISTE_PUISSANCE, PARAMETRES_SENSIBILITE, PIECES, REFROIDISSEMENT, SENSIBILITES_MOYENNES, type ParametreVoiture, type TypePiece } from '../../balance/monoplaces';
 import { table, type Monde } from '../../core/monde';
 import { TABLES, type Circuit, type Ecurie, type Motoriste, type PieceVoiture } from '../../model/types';
 
@@ -24,7 +24,7 @@ export function effetPiece(type: TypePiece, efficacite: number, concept: number)
   const res: Partial<ParametresVoiture> = {};
   const ajouter = (k: string, x: number) => { (res as Record<string, number>)[k] = ((res as Record<string, number>)[k] ?? 0) + x; };
   for (const [k, x] of Object.entries(def.gain)) ajouter(k, (x as number) * (efficacite - EFFICACITE_REFERENCE));
-  for (const [k, x] of Object.entries(def.compromis)) ajouter(k, (x as number) * concept);
+  for (const [k, x] of Object.entries(def.compromis)) ajouter(k, (x as number) * concept * COMPROMIS.echelle);
   return res;
 }
 
