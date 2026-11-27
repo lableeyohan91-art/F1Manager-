@@ -229,7 +229,9 @@ function cloturer(monde: Monde, e: Ecurie, fi: Finances): void {
   const p = proprietaireDe(monde, e.id);
   // Solution A (27/11) : pas de dividendes (ou réduits) pour une écurie dans la seconde moitié du classement qui vient de se terminer.
   const { rang, n: nEcuries } = rangPrecedent(monde, e.id);
-  const placeInutilisee = plafond(monde) - plafonnees;
+  // Retenue seulement si le développement de l'année a été limité par l'argent (et non par le plafond) : budget de développement inférieur
+  // d'au moins margeMinMEUR à la place qui restait sous le plafond après les frais fixes.
+  const placeInutilisee = plafond(monde) * (1 - MARGE_SECURITE_PLAFOND) - (c.personnelPlafonne + c.departements + c.operations + c.entretien) - fi.budget.developpementMEUR;
   const facteurResultats = rang > nEcuries / 2 && placeInutilisee >= DIVIDENDES_RESULTATS.margeMinMEUR ? DIVIDENDES_RESULTATS.facteurSecondeMoitie : 1;
   if (p && fi.tresorerieMEUR > seuil && facteurResultats > 0) {
     const retrait = facteurResultats * (PART_DIVIDENDES[p.type] ?? 0.5) * (fi.tresorerieMEUR - seuil);
