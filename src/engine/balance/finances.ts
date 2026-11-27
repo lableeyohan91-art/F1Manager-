@@ -33,7 +33,10 @@ export const DIVIDENDES = { seuilAnneesDepenses: 0.25 };
  * constructeurs qui vient de se terminer ne prend que `facteurSecondeMoitie` des dividendes habituels (0 = il laisse tout l'excédent à
  * l'écurie). Mesuré avant : Haas versait 34 M€ par an en étant dernière, avec 54 M€ de marge inutilisée sous le plafond.
  */
-export const DIVIDENDES_RESULTATS = { facteurSecondeMoitie: 0 };
+// Mesuré (27/11) : sans condition, les grandes écuries passées dans la seconde moitié accumulaient une trésorerie inutile (jusqu'à 1,3 Md€),
+// faute de place sous le plafond. Les dividendes ne sont donc retenus que si l'écurie a eu au moins `margeMinMEUR` de place inutilisée
+// sous le plafond l'année écoulée (elle peut s'en servir pour la voiture).
+export const DIVIDENDES_RESULTATS = { facteurSecondeMoitie: 0, margeMinMEUR: 10 };
 export const PART_DIVIDENDES: Record<string, number> = { constructeur: 0.6, milliardaire: 0.3, fonds: 0.8, famille: 0.5, consortium: 0.6 };
 /** Variation aléatoire annuelle de l'apport (écart type, part de l'apport). */
 export const ALEA_APPORT = 0.08;
