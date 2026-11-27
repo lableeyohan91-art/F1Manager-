@@ -16,7 +16,7 @@
 import {
   ALEA_APPORT, BUDGET_IA, OBJECTIF_PROPRIETAIRE, DIVIDENDES, PART_DIVIDENDES, CADRES_HORS_PLAFOND, COMMERCIAL, CONSEIL, CONSEIL_CONTRE_OFFRE, COUPE_EN_COURS, COUT_EMPLOYE, DEPASSEMENT_VOLONTAIRE,
   DEVELOPPEMENT_MINIMUM, EFFORT_TECHNIQUE_REFERENCE, MARGE_SECURITE_PLAFOND, FACTEUR_BUDGET_DEV, OPERATIONS_PAR_GP, PART_MARKETING,
-  PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
+  PART_DROITS_COMMERCIAUX, RETRAIT_PROPRIETAIRE, EMPRUNT_OFFENSIF, PERIODES_PAR_AN, PROPRIETAIRES, INVESTISSEMENT_ANNUEL_MAX, PRIMES_PAR_GP, RESTRICTIONS_AERO, SANCTION_PLAFOND, SEUIL_DEPASSEMENT_MINEUR,
 } from '../../balance/finances';
 import { ENVELOPPE_PRIMES_MEUR, PARTS_PRIMES, PLAFOND_BUDGETAIRE_MEUR } from '../../balance/reglement';
 import { SOUFFLERIE } from '../../balance/monoplaces';
@@ -27,14 +27,14 @@ import { idsTries, parametre, table, type Monde } from '../../core/monde';
 import { tirageLocal, type Moteur, type Systeme } from '../../core/moteur';
 import { comptesVides, totalDepenses, totalPlafonne, totalRecettes } from '../../model/finances';
 import {
-  TABLES, type Contrat, type Departement, type Ecurie, type Finances, type Installation, type Personne, type Proprietaire, type Saison,
+  TABLES, type Contrat, type Departement, type Ecurie, type Finances, type GrandPrix, type Installation, type Personne, type Proprietaire, type Saison,
 } from '../../model/types';
 import { ecuriesActives, indiceMoyen } from '../saison/performance';
 import { liberer, nePasProlonger, pourvoirPostes, proposerProlongation } from '../humain/contrats';
 import { forceEcurie, teamPrincipal, valeurMarche } from '../humain/decision';
 import { evaluerSponsors, initialiserSponsors, marcheSponsors, revenusSponsors } from './sponsors';
 import { capaciteEmprunt, gererTresorerie, proprietaireActif, tauxDette, verifierInvestisseur, verifierLassitude } from './crises';
-import { avancerProjets, commandeChantier, commandeReduction, deciderProjet, deciderReductions, negligerEntretien, vieillirInstallations } from './infrastructures';
+import { avancerProjets, commandeChantier, commandeReduction, deciderProjet, deciderReductions, enveloppeInvestissement, negligerEntretien, vieillirInstallations } from './infrastructures';
 import { commandeEffectif, systemeCapacites } from './capacites';
 import { coutAnnuelAcademie } from '../juniors/academies';
 
@@ -256,7 +256,7 @@ export function deciderBudget(monde: Monde, e: Ecurie, fi: Finances): number {
   const recettes = primesAttendues(monde, e.id) + commercialAnnuel(monde, e, fi) + revenusSponsors(monde, e.id, annee) + apportAnnuel(monde, e, fi, annee);
   // Engagements hors exploitation (phase 5b) : intérêts de la dette, chantiers en cours (dans l'enveloppe annuelle).
   const engagements = fi.detteMEUR * tauxDette(fi, recettes) + coutAnnuelAcademie(monde, e.id)
-    + Math.min(INVESTISSEMENT_ANNUEL_MAX, fi.projets.reduce((a, p) => a + Math.max(0, p.coutPrevuMEUR - p.depenseMEUR), 0));
+    + Math.min(enveloppeInvestissement(monde, e.id), fi.projets.reduce((a, p) => a + Math.max(0, p.coutPrevuMEUR - p.depenseMEUR), 0));
   const fixesTotal = fixes.personnelPlafonne + fixes.departements + fixes.operations + fixes.entretien + fixes.salairesHorsPlafond + fixes.marketing + engagements;
   const proprietaire = proprietaireDe(monde, e.id);
   const tp = teamPrincipal(monde, e.id);
@@ -303,6 +303,28 @@ export function deciderBudget(monde: Monde, e: Ecurie, fi: Finances): number {
   return reserve;
 }
 
+/**
+ * Primes d'une période. Règle actuelle : 1/13 des primes dues au classement de l'an dernier. Variante de mesure (audit du 27/11,
+ * `economie.primesParGP` = part variable) : cette part de l'enveloppe est versée pour chaque Grand Prix couru dans la période, selon le
+ * classement constructeurs en cours (mêmes parts que le barème annuel).
+ */
+export function primesPeriode(monde: Monde, idEcurie: string, n: number): number {
+  const part = parametre(monde, 'economie.primesParGP', PRIMES_PAR_GP.partVariable);
+  const fixe = primesAttendues(monde, idEcurie) / n;
+  if (part <= 0) return fixe;
+  const s = table(monde, TABLES.saisons)[`ssn_${monde.date.annee}`] as unknown as Saison | undefined;
+  if (!s) return fixe;
+  const gps = (Object.values(table(monde, TABLES.grandsPrix)) as unknown as GrandPrix[]).filter((g) => g.saison === monde.date.annee);
+  // Grands Prix des 4 semaines écoulées (celui de la semaine en cours sera compté à la période suivante : il n'est pas encore couru).
+  const courus = gps.filter((g) => g.semaine >= monde.date.semaine - 4 && g.semaine < monde.date.semaine).length;
+  if (!gps.length) return fixe;
+  const i = s.constructeurs.findIndex((c) => c.ecurie === idEcurie);
+  const parts = PARTS_PRIMES.slice(0, s.constructeurs.length);
+  const total = parts.reduce((a, b) => a + b, 0) || 1;
+  const partEcurie = (parts[i] ?? parts.at(-1) ?? 5) / total;
+  return (1 - part) * fixe + part * ENVELOPPE_PRIMES_MEUR * partEcurie * (courus / gps.length);
+}
+
 /** Écriture d'une période comptable (1/13 de l'année). */
 function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
   const annee = monde.date.annee;
@@ -310,7 +332,7 @@ function passerPeriode(monde: Monde, e: Ecurie, fi: Finances): void {
   const fixes = depensesFixes(monde, e);
   const c = fi.comptes;
   const recettes = {
-    primes: primesAttendues(monde, e.id) / n,
+    primes: primesPeriode(monde, e.id, n),
     commercial: commercialAnnuel(monde, e, fi) / n,
     sponsors: revenusSponsors(monde, e.id, annee) / n,
     apport: apportPeriode(monde, e, fi, annee) / n,

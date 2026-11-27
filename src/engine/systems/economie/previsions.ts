@@ -16,6 +16,7 @@ import { coutAnnuelAcademie } from '../juniors/academies';
 import { partRecherche } from '../technique/acces';
 import { tauxDette } from './crises';
 import { apportAnnuel, commercialAnnuel, depensesFixes, financesDe, plafond, primesAttendues, proprietaireDe, rangPrecedent } from './index';
+import { enveloppeInvestissement } from './infrastructures';
 import { bilanSaison } from './probabilites';
 import { contratsActifs, revenusSponsors } from './sponsors';
 
@@ -87,7 +88,7 @@ export function previsionFinances(monde: Monde, idEcurie: string): PrevisionFina
   const horsPlafondPeriode = (fixes.salairesHorsPlafond + fixes.marketing + coutAnnuelAcademie(monde, idEcurie)) / n;
 
   // Chantiers d'installations : paiement au rythme prévu, dans l'enveloppe annuelle restante.
-  let enveloppe = Math.max(0, parametre(monde, 'reglement.investissementAnnuelMax', INVESTISSEMENT_ANNUEL_MAX) - c.investissements);
+  let enveloppe = Math.max(0, enveloppeInvestissement(monde, idEcurie) - c.investissements);
   let chantiers = 0, chantierPeriode = 0;
   for (const p of fi.projets) {
     const restantSemaines = Math.max(4, p.dureeReelleSemaines - p.avancementSemaines);

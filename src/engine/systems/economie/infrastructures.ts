@@ -10,7 +10,7 @@
 import { IA_INSTALLATIONS, IA_REDUCTIONS, INSTALLATIONS_COUT } from '../../balance/capacites';
 import type { DefinitionCommande } from '../../core/commandes';
 import {
-  COUT_INFRASTRUCTURE, DUREE_INFRASTRUCTURE, INSTALLATIONS_TECHNIQUES, INVESTISSEMENT_ANNUEL_MAX, MARGE_LANCEMENT_PROJET, PERIODES_PAR_AN,
+  COUT_INFRASTRUCTURE, DUREE_INFRASTRUCTURE, INSTALLATIONS_TECHNIQUES, INVESTISSEMENT_ANNUEL_MAX, INVESTISSEMENT_MODULE, MARGE_LANCEMENT_PROJET, PERIODES_PAR_AN,
   RISQUES_INFRASTRUCTURE, VIEILLISSEMENT,
 } from '../../balance/finances';
 import { ajouterEvenement } from '../../core/evenements';
@@ -57,8 +57,16 @@ export function negligerEntretien(monde: Monde, e: Ecurie): void {
   for (const i of installationsDe(monde, e.id)) i.etat = Math.max(0, i.etat - VIEILLISSEMENT.perteEtatCrise / PERIODES_PAR_AN);
 }
 
-function enveloppe(monde: Monde): number {
-  return parametre(monde, 'reglement.investissementAnnuelMax', INVESTISSEMENT_ANNUEL_MAX);
+/** Enveloppe annuelle d'investissement (hors plafond) d'une écurie ; variante modulée selon le retard d'installations (audit du 27/11). */
+export function enveloppeInvestissement(monde: Monde, idEcurie: string): number {
+  const base = parametre(monde, 'reglement.investissementAnnuelMax', INVESTISSEMENT_ANNUEL_MAX);
+  if (parametre(monde, 'reglement.investissementModule', INVESTISSEMENT_MODULE.actif) <= 0) return base;
+  const niveaux = new Map<string, number[]>();
+  for (const i of Object.values(table(monde, TABLES.installations)) as unknown as Installation[]) (niveaux.get(i.ecurie) ?? niveaux.set(i.ecurie, []).get(i.ecurie)!).push(i.niveau);
+  const moy = (v: number[]) => v.reduce((a, b) => a + b, 0) / Math.max(1, v.length);
+  const grille = moy([...niveaux.values()].map(moy));
+  const retard = Math.max(0, grille - moy(niveaux.get(idEcurie) ?? []));
+  return base + Math.min(INVESTISSEMENT_MODULE.bonusMax, INVESTISSEMENT_MODULE.bonusParNiveau * retard);
 }
 
 /** Coût annoncé d'un chantier (amélioration n → n+1, ou rénovation). */
@@ -92,7 +100,7 @@ function lancerChantier(monde: Monde, e: Ecurie, fi: Finances, i: Installation, 
   const f = tirageLocal(monde, 'infrastructure', e.id, monde.date.annee);
   const d = DUREE_INFRASTRUCTURE[nature];
   // La durée annoncée tient compte de l'enveloppe annuelle : un chantier ne peut pas être payé plus vite qu'elle ne le permet.
-  const dureePrevue = Math.max(f.entier(d.min, d.max), Math.ceil((cout / enveloppe(monde)) * 52 * 1.1));
+  const dureePrevue = Math.max(f.entier(d.min, d.max), Math.ceil((cout / enveloppeInvestissement(monde, e.id)) * 52 * 1.1));
   const retard = f.chance(RISQUES_INFRASTRUCTURE.probabiliteRetard) ? 1 + f.suivant() * RISQUES_INFRASTRUCTURE.retardMax : 1;
   const surcout = f.chance(RISQUES_INFRASTRUCTURE.probabiliteSurcout) ? 1 + f.suivant() * RISQUES_INFRASTRUCTURE.surcoutMax : 1;
   const p: ProjetInfrastructure = {
@@ -246,7 +254,7 @@ export function avancerProjets(monde: Monde, e: Ecurie, fi: Finances): void {
     }
     const restantSemaines = Math.max(4, p.dureeReelleSemaines - p.avancementSemaines);
     const besoin = Math.max(0, ((p.coutReelMEUR - p.depenseMEUR) * 4) / restantSemaines);
-    const disponible = Math.max(0, enveloppe(monde) - fi.comptes.investissements);
+    const disponible = Math.max(0, enveloppeInvestissement(monde, e.id) - fi.comptes.investissements);
     const paye = Math.min(besoin, disponible);
     p.depenseMEUR += paye;
     fi.comptes.investissements += paye;

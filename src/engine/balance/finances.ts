@@ -196,6 +196,20 @@ export const INSTALLATIONS_TECHNIQUES = ['soufflerie', 'cfd', 'simulateur', 'bur
 export const VIEILLISSEMENT = { perteParAn: 0.012, plancher: 0.7, perteEtatCrise: 15, recuperationEtat: 10 };
 /** Enveloppe réglementaire d'investissement en infrastructures (hors plafond), par an (M€). */
 export const INVESTISSEMENT_ANNUEL_MAX = 25;
+/**
+ * Audit économique du 27/11 (porteur : « je ne vois pas pourquoi on limite les infrastructures à 25 M€ par an, ce n'est pas équitable ») —
+ * VARIANTE DE MESURE, désactivée par défaut (paramètre `reglement.investissementModule`, 0 = désactivé, 1 = actif) : l'enveloppe annuelle
+ * d'investissement d'une écurie reçoit `bonusParNiveau` M€ par point de retard de son niveau moyen d'installations sur la moyenne de la
+ * grille (équilibrage des moyens déclaré, D-169), au plus `bonusMax` M€.
+ */
+export const INVESTISSEMENT_MODULE = { actif: 0, bonusParNiveau: 8, bonusMax: 25 };
+/**
+ * Audit économique du 27/11 (porteur : « à chaque GP on a la part fixe et la part variable selon nos résultats ») — VARIANTE DE MESURE,
+ * désactivée par défaut (paramètre `economie.primesParGP` = part variable, 0 = désactivé) : une part `partVariable` de l'enveloppe des primes
+ * est versée Grand Prix par Grand Prix selon le classement constructeurs **en cours** (mêmes parts que le barème annuel) ; le reste garde
+ * la règle actuelle (classement de l'an dernier, étalé sur l'année).
+ */
+export const PRIMES_PAR_GP = { partVariable: 0 };
 /** Coût d'une amélioration (niveau n → n+1) = base × (n+1) ; rénovation = base × niveau ; durées (semaines). */
 export const COUT_INFRASTRUCTURE = { ameliorationParNiveau: 4, renovationParNiveau: 1.5, ageMinRenovation: 12 };
 export const DUREE_INFRASTRUCTURE = { amelioration: { min: 40, max: 80 }, renovation: { min: 26, max: 52 } };
