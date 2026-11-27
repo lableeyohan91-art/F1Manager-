@@ -244,7 +244,7 @@ export function entreeEnVigueur(monde: Monde): boolean {
   ancien.statut = 'termine';
   nouveau.statut = 'en_vigueur';
   // Piste 1 (27/11) : lecture du nouveau règlement, bonne ou mauvaise selon l'écurie (un tirage par écurie et par réforme).
-  const dispersion = LECTURE_REGLEMENT.dispersion * parametre(monde, 'reforme.lecture', 0);
+  const dispersion = LECTURE_REGLEMENT.dispersion * parametre(monde, 'reforme.lecture', LECTURE_REGLEMENT.actif);
   const lecture = new Map<string, number>();
   if (dispersion > 0) {
     for (const e of ecuriesActives(monde)) {
@@ -385,7 +385,7 @@ export function diffuserSavoir(monde: Monde): void {
     // Instantané avant mise à jour : tout le monde copie le même meilleur.
     const propres = ecuries.map((e) => ({ e, v: savoirExistant(monde, e.id, d)?.parReglement[r.id] ?? 0 }));
     const meilleur = Math.max(0, ...propres.map((x) => x.v));
-    const bonus = DIFFUSION_RETARD.bonusSavoir * parametre(monde, 'recherche.diffusionRetard', 0);
+    const bonus = DIFFUSION_RETARD.bonusSavoir * parametre(monde, 'recherche.diffusionRetard', DIFFUSION_RETARD.actif);
     for (const { e, v } of propres) {
       // Piste 2 (27/11) : ce qui est loin devant se copie plus facilement.
       const g = taux * (meilleur - v) * (meilleur > 0 ? 1 + bonus * (meilleur - v) / meilleur : 1);

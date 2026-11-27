@@ -78,9 +78,9 @@ export const REFORME = { usureFondamentale: 0.75, transfertExposant: 3 };
  * grande réforme, chaque écurie lit plus ou moins bien les nouvelles règles : sa perte de savoir (fondamental et ancien règlement) est
  * multipliée par (1 + dispersion × u), u tiré uniformément dans [−1, 1] (flux `reglement.lecture`, un tirage par écurie et par réforme,
  * le même pour tous les domaines). Part perdue bornée à `usureMax`. Sans unité. Paramètre `reforme.lecture` (multiplie la dispersion ;
- * 0 = désactivé). Rebat les cartes sans regarder le classement (D-169 : aucun malus selon le rang).
+ * 0 = désactivé ; activé par le porteur le 27/11). Rebat les cartes sans regarder le classement (D-169 : aucun malus selon le rang).
  */
-export const LECTURE_REGLEMENT = { dispersion: 0.5, usureMax: 0.95 };
+export const LECTURE_REGLEMENT = { actif: 1, dispersion: 0.5, usureMax: 0.95 };
 
 export const SAVOIR = { gainBase: 2.2, rendementK: 40, partVoisins: 0.15, partFondamental: 0.3, partFondamentalRejet: 0.3, vieillissementAnnuel: 0.01, remiseEnRouteSemaines: 6, efficaciteRemiseEnRoute: 0.5 };
 
@@ -130,9 +130,9 @@ export const DIFFUSION = { base: 0.01, parAnneeEre: 0.012, max: 0.06, seuilEvene
 /**
  * Piste 2 du rapport « diffusion et ères » : ce qui est loin devant se copie plus facilement (solutions visibles, écart évident). Le gain de
  * diffusion du savoir et la part copiée des pièces sont multipliés par (1 + bonus × retard relatif), le retard relatif étant l'écart au
- * meilleur divisé par la valeur du meilleur (0 à 1). Sans unité. Paramètre `recherche.diffusionRetard` (multiplie le bonus ; 0 = désactivé).
+ * meilleur divisé par la valeur du meilleur (0 à 1). Sans unité. Paramètre `recherche.diffusionRetard` (multiplie le bonus ; 0 = désactivé ; activé par le porteur le 27/11).
  */
-export const DIFFUSION_RETARD = { bonusSavoir: 3, bonusPieces: 3, partPiecesMax: 0.9 };
+export const DIFFUSION_RETARD = { actif: 1, bonusSavoir: 3, bonusPieces: 3, partPiecesMax: 0.9 };
 /**
  * Copie des pièces (le savoir seul ne suffisait pas : mesuré, le bas de grille ne remontait pas) : un projet vise, au-delà de sa propre
  * frontière, la part `base` + `parAnneeEre` × (âge de l'ère), au plus `max`, de l'écart entre cette frontière et la meilleure pièce du même

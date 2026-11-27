@@ -45,6 +45,7 @@ describe('Phase 8a — règlements', () => {
 
   it('D-178, nouvelle ère : l’ancienne ère est transférée à hauteur de (1 − I)², le savoir de fond touché s’use de 50 % × I, un domaine non touché ne perd rien', () => {
     const { m } = mondeJoueur();
+    m.parametres = { ...(m.parametres ?? {}), 'reforme.lecture': 0 }; // règle de base, sans la lecture du règlement (piste 1)
     const ancien = reglementEnVigueur(m)!;
     const s = savoir(m, 'eq_mercedes', 'aero_avant');
     s.parReglement[ancien.id] = 40;

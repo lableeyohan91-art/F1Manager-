@@ -724,3 +724,12 @@ Aucun code à ce stade.
 
 ### Modifié
 - Circuits rééquilibrés, notes b3, compromis de concept × 3, nouvelle ère plus dure, fiabilité et pneus plafonnés à 20 avec rattrapage.
+
+## [Trois pistes activées] — 27/11/2026
+
+### Ajouté
+- Lecture du nouveau règlement aux réformes, copie facilitée pour les retardataires, usure du succès renforcée (D-184), avec leurs tests.
+
+### Corrigé
+- Enveloppe de développement : décompte des écritures restantes aligné sur les prévisions (une écriture oubliée en fin d'année).
+- L'IA ne passe un projet en intensif que si l'enveloppe couvre le surcoût.

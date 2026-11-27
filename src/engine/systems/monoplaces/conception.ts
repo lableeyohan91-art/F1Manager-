@@ -226,7 +226,7 @@ export function cibleProjet(monde: Monde, e: Ecurie, type: TypePiece): number {
   if (!(meilleure > f)) return f;
   const base = facteur * Math.min(COPIE_PIECES.max, COPIE_PIECES.base + COPIE_PIECES.parAnneeEre * Math.max(0, monde.date.annee - r.debut));
   // Piste 2 (27/11) : ce qui est loin devant se copie plus facilement.
-  const bonus = DIFFUSION_RETARD.bonusPieces * parametre(monde, 'recherche.diffusionRetard', 0);
+  const bonus = DIFFUSION_RETARD.bonusPieces * parametre(monde, 'recherche.diffusionRetard', DIFFUSION_RETARD.actif);
   const part = Math.min(Math.max(base, DIFFUSION_RETARD.partPiecesMax), base * (1 + bonus * (meilleure - f) / meilleure));
   return f + part * (meilleure - f);
 }
@@ -688,7 +688,11 @@ export function decisionsConception(monde: Monde, commander: Commander): void {
       const f = fatiguePole(monde, e.id, PIECES[p.type as TypePiece].pole as Pole);
       // Coup de collier pour finir une pièce (les dernières semaines), si l'équipe n'est pas déjà fatiguée ; repos d'une équipe épuisée.
       const finProche = p.joursRestants <= IA_RYTHME.joursFinProjet;
-      const voulu = f >= IA_RYTHME.fatigueRepos ? 'allege' : (finProche && f < IA_RYTHME.fatigueFinProjet) || (f < IA_RYTHME.fatigueIntensif && enjeu) ? 'intensif' : 'normal';
+      // Le surcoût de l'intensif se paie chaque semaine : l'IA ne le choisit que si l'enveloppe couvre le pire cas (équipe épuisée, ×2) pour
+      // le reste du projet ; sinon le plafond peut être dépassé de quelques centaines de milliers d'euros (test « aucun dépassement »).
+      const surcoutMax = FATIGUE.surcout * p.coutMEUR * Math.min(1, Math.max(0, p.joursRestants) / p.joursTotal) * 2;
+      const intensifPayable = enveloppeRestante(monde, e.id) >= surcoutMax;
+      const voulu = f >= IA_RYTHME.fatigueRepos ? 'allege' : intensifPayable && ((finProche && f < IA_RYTHME.fatigueFinProjet) || (f < IA_RYTHME.fatigueIntensif && enjeu)) ? 'intensif' : 'normal';
       if (rythmeDe(p) !== voulu) commander({ type: 'conception.rythme', auteur: auteur.id, parametres: { projet: p.id, rythme: voulu } });
     }
     const voulue = partSouffleriePolitique(monde, e);

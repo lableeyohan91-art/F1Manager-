@@ -106,9 +106,9 @@ export const LASSITUDE_PERSONNEL = { anneesMin: 4, parAnnee: 0.02, parTitre: 0.0
  */
 /**
  * Piste 3 du rapport « diffusion et ères » : usure du succès renforcée (exception D-140, décidée par le porteur). Avec le paramètre
- * `usure.renforcee` à 1, l'usure par titre est multipliée par `facteur` et son maximum porté à `maxAbsolu` (part, sans unité). 0 = désactivé.
+ * `usure.renforcee` à 1, l'usure par titre est multipliée par `facteur` et son maximum porté à `maxAbsolu` (part, sans unité). 0 = désactivé ; activé par le porteur le 27/11.
  */
-export const USURE_SUCCES_RENFORCEE = { facteur: 1.7, maxAbsolu: 0.9 };
+export const USURE_SUCCES_RENFORCEE = { actif: 1, facteur: 1.7, maxAbsolu: 0.9 };
 export const USURE_SUCCES = { seuilMin: 3, seuilMax: 5, loyauteImmunite: 17, anticipation: 1, parTitre: 0.15, max: 0.6, motivationParPoint: 50, effetCourse: 0.1, motivationReference: 60, effetDeveloppement: 0.7 };
 
 /** Attrait d'une offre pour un poste plus élevé (utilité × ambition/20). */

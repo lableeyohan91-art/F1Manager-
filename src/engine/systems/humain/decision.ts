@@ -276,7 +276,7 @@ export function usureSucces(monde: Monde, p: Personne, anneesConnues?: Set<numbe
   const seuil = seuilPersonnel(p);
   const depart = seuil - USURE_SUCCES.anticipation;
   // Piste 3 (27/11) : usure renforcée, réglable.
-  const r = parametre(monde, 'usure.renforcee', 0);
+  const r = parametre(monde, 'usure.renforcee', USURE_SUCCES_RENFORCEE.actif);
   const parTitre = USURE_SUCCES.parTitre * (1 + r * (USURE_SUCCES_RENFORCEE.facteur - 1));
   const max = USURE_SUCCES.max + r * (USURE_SUCCES_RENFORCEE.maxAbsolu - USURE_SUCCES.max);
   const usure = Math.min(max, Math.max(0, parTitre * (titres - depart)));

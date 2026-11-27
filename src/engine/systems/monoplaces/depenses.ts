@@ -28,7 +28,9 @@ export function enveloppeRestante(monde: Monde, idEcurie: string): number {
   const e = table(monde, TABLES.ecuries)[idEcurie] as unknown as Ecurie | undefined;
   if (!e || fi.comptes.annee !== monde.date.annee) return budget;
   const n = PERIODES_PAR_AN;
-  const restantes = Math.max(0, n - Math.round((monde.date.semaine / 52) * n));
+  // Écritures encore à passer cette année (même décompte que les prévisions, `periodesRestantes`) : avant, l'arrondi comptait 0 écriture
+  // en semaines 49 à 52 alors qu'il en restait une, et le plafond pouvait être dépassé de quelques centaines de milliers d'euros.
+  const restantes = Math.max(0, n - Math.floor((monde.date.semaine - 1) / 4));
   const f = depensesFixes(monde, e);
   const aVenir = restantes * ((f.personnelPlafonne + f.departements + f.operations + f.entretien) / n + (fi.budget.developpementMEUR * recherche) / n);
   const place = fi.budget.plafondVise * (1 - MARGE_SECURITE_PLAFOND) - totalPlafonne(fi.comptes) - aVenir - (fi.depensesTechniques?.aPayerMEUR ?? 0);
