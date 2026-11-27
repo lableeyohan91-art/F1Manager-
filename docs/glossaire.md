@@ -245,3 +245,5 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Projet prioritaire** | Projet de conception qui reçoit deux parts des ingénieurs de son pôle (les autres une), donc avance plus vite (D-182). |
 | **Essais renforcés** | Option d'un projet de conception : coût de conception majoré, résultat plus sûr (aléa d'exécution et erreur d'estimation réduits) (D-182). |
 | **Argent libre** | Pour l'IA, l'argent qu'elle peut engager sans risque : le plus petit de la marge prévue sous le plafond et de la trésorerie qui partirait sinon en dividendes (D-182). |
+| **Mode de départ** | Situation de départ proposée au joueur en V1 (fond de grille, milieu de grille), qui impose l'écurie dont il prend la tête ; donnée de `departs.csv` (D-185). |
+| **Réduction (d'une installation)** | Retrait d'un niveau d'une installation, sans frais, pour économiser son entretien sous le plafond ; une fois par saison et par installation (D-186). |
