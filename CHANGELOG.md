@@ -810,3 +810,9 @@ Aucun code à ce stade.
 
 ### Modifié
 - Qualification : part propre au tour lancé et forme du week-end comptée à 60 % (la pole gagnait trop souvent).
+
+## [Phase 13d — décisions en course] — 28/11/2026
+
+### Ajouté
+- Stratège de chaque écurie (directeur sportif) : undercut, couverture, arrêts sous neutralisation et réaction à la météo selon son style et sa compétence stratégie.
+- Commande commune `course.style` (prudent, équilibré, offensif) et son choix dans la fiche d'un pilote titulaire ; arrêts décidés en course dans le détail des résultats.

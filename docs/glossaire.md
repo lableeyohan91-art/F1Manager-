@@ -259,3 +259,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Petite erreur** | Faute légère d'un pilote pendant un tour (sortie large, blocage de roue), qui coûte 1 à 3 s sans abandon ; dépend de la régularité, de la fatigue et de la pression (phase 13c). |
 | **Changement de météo** | Tour où la piste passe de sèche à mouillée ou l'inverse pendant la course ; chaque voiture rentre changer de pneus après un délai qui dépend de l'intelligence de course (phase 13c). |
 | **Fatigue physique (en course)** | Perte de rythme en seconde moitié de course, selon l'exigence physique du circuit et la condition du pilote (phase 13c). |
+| **Stratège** | Le directeur sportif dans son rôle de course : il peut avancer l'arrêt d'un pilote pendant la course, selon un style et sa compétence stratégie (phase 13d). |
+| **Undercut** | S'arrêter avant la voiture qu'on suit pour la passer grâce aux pneus neufs pendant qu'elle reste dehors (phase 13d). |
+| **Couverture** | S'arrêter juste après la voiture qui suivait, pour garder la place face à son undercut (phase 13d). |
+| **Style de stratégie** | Prudent (couvre), équilibré (couvre et tente l'undercut), offensif (tente l'undercut, s'arrête plus tôt sous neutralisation) ; choisi par le joueur, ou selon la propension au risque du directeur sportif (phase 13d). |
