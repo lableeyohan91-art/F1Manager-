@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { creerScenarioGrille2026, table, TABLES, type Circuit, type GrandPrix } from '../src/engine';
 import { Flux, etatInitialFlux } from '../src/engine/core/hasard';
-import { NEUTRALISATIONS, PISTE } from '../src/engine/balance/course';
+import { METEO, NEUTRALISATIONS, PISTE } from '../src/engine/balance/course';
 import { avancerTour, courirSurPiste, initialiserCourse, qualifier, type Partant } from '../src/engine/systems/saison/course-piste';
 import { CONSIGNES_NEUTRES, meilleureStrategie } from '../src/engine/systems/saison/course-tours';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
@@ -119,5 +119,29 @@ describe('Phase 13c-1 — neutralisations', () => {
     }
     const p = NEUTRALISATIONS.scAccidentBase + 4 * NEUTRALISATIONS.scAccidentParRisque;
     expect(n / 20).toBeGreaterThan((p + (1 - p) * NEUTRALISATIONS.vscAccident) * 0.6);
+  });
+});
+
+describe('Phase 13c-2 — la pluie arrive pendant la course', () => {
+  const pluieAu = (intelligence: number, g: number) => {
+    const ps = partants(6, 0.1).map((p) => ({ ...p, intelligence }));
+    const e = courirSurPiste(ps.map((p) => p.id), ps, 50, 90, { facilite: 0.5, airPerturbe: 0.2, perteVoieS: 20, changementsMeteo: [20] }, 0, tirage(g));
+    return e;
+  };
+  it('toutes les voitures passent aux pneus pluie peu après l’arrivée de la pluie', () => {
+    const e = pluieAu(10, 1);
+    for (const v of Object.values(e.voitures)) expect(v.composes).toContain('pluie');
+  });
+  it('un pilote à forte intelligence de course réagit en moyenne plus tôt', () => {
+    const tourPluie = (ia: number) => {
+      let somme = 0, n = 0;
+      for (let g = 1; g <= 10; g++) {
+        const e = pluieAu(ia, g);
+        for (const v of Object.values(e.voitures)) { const k = v.composes.indexOf('pluie'); somme += v.plan.slice(0, k).reduce((a, b) => a + b, 0); n++; }
+      }
+      return somme / n;
+    };
+    expect(tourPluie(18)).toBeLessThan(tourPluie(4));
+    expect(tourPluie(4)).toBeLessThanOrEqual(20 + METEO.delaiMax);
   });
 });

@@ -4,7 +4,7 @@
  * ressortir à sa vraie place, abandons au tour où ils arrivent). Fonctions pures : l'état d'une course est un objet sérialisable, avancé
  * tour par tour (`avancerTour`), ce qui permettra de l'arrêter et de la reprendre (13e). Unités : secondes et % du tour de référence.
  */
-import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES } from '../../balance/course';
+import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, METEO, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES } from '../../balance/course';
 import { CONDITIONS_COURSE, VOITURE_REFERENCE } from '../../balance/profil';
 import type { Flux } from '../../core/hasard';
 import type { CauseAbandon, ConsignesCourse, Neutralisation } from '../../model/types';
@@ -64,6 +64,9 @@ export interface Partant {
   abandonCause?: CauseAbandon;
   /** 13c-1 : probabilité d'une petite erreur à chaque tour (régularité, consigne, pluie, circuit). */
   pErreur?: number;
+  /** 13c-2 : écart de rythme du pilote sous la pluie par rapport au sec (% du tour, positif = plus lent ; compétence pluie, hors
+   * ralentissement commun) ; intelligence de course (délai avant de changer de pneus). */
+  ecartMeteo?: number; intelligence?: number;
 }
 
 export interface EtatVoiture {
@@ -71,6 +74,8 @@ export interface EtatVoiture {
   depassements: number; positionsGagnees: number; erreursArret: number;
   /** 13c-1 : longueurs des relais (copie de la stratégie, recalculée après un arrêt sous neutralisation) ; petites erreurs commises. */
   plan: number[]; erreurs: number;
+  /** 13c-2 : composés des relais (copie de la stratégie, changée quand la météo change) ; tour où la voiture rentrera changer de pneus. */
+  composes: Compose[]; changementPrevu?: number;
 }
 export interface EtatCourse {
   tour: number; tours: number; tempsS: number; ordre: string[]; voitures: Record<string, EtatVoiture>;
@@ -78,6 +83,8 @@ export interface EtatCourse {
   neutralisation?: { type: Neutralisation['type']; toursRestants: number };
   neutralisations: Neutralisation[];
   debrisTour: number | null;
+  /** 13c-2 : piste mouillée au départ ; tours où elle change. */
+  departPluie?: boolean; changementsMeteo?: number[];
 }
 
 /** Perte de masse : % du tour pour un écart de masse (kg) à la masse moyenne de course, selon la sensibilité du circuit (s par % de masse). */
@@ -93,7 +100,7 @@ export function initialiserCourse(grille: string[], partants: Partant[], tours: 
     const p = parId.get(id)!;
     const f = tirage(`${id}|depart`);
     const depart = i * PISTE.ecartGrilleS - PISTE.departParPoint * (p.depart - PISTE.departReference) + f.normale(0, PISTE.departSigmaS);
-    voitures[id] = { id, temps: Math.max(0, depart), tour: 0, relais: 0, tourRelais: 0, reserve: RESSOURCES.reserveBatterie, enCourse: true, depassements: 0, positionsGagnees: 0, erreursArret: 0, plan: [...p.strategie.relais], erreurs: 0 };
+    voitures[id] = { id, temps: Math.max(0, depart), tour: 0, relais: 0, tourRelais: 0, reserve: RESSOURCES.reserveBatterie, enCourse: true, depassements: 0, positionsGagnees: 0, erreursArret: 0, plan: [...p.strategie.relais], erreurs: 0, composes: [...p.strategie.composes] };
   });
   const ordre = [...grille].sort((a, b) => voitures[a]!.temps - voitures[b]!.temps || grille.indexOf(a) - grille.indexOf(b));
   const fd = tirage('debris');
@@ -105,12 +112,12 @@ export function initialiserCourse(grille: string[], partants: Partant[], tours: 
  * Données du circuit lues sur la piste : facilité de dépassement (multiplicateur de la probabilité), perte dans l'air perturbé (s par tour)
  * perte d'un passage par la voie des stands hors immobilisation (s, fiche du circuit) ; risque d'accident (neutralisations, erreurs).
  */
-export interface CircuitPiste { facilite: number; airPerturbe: number; perteVoieS: number; /** 13c-1 : risque d'accident (1–5). */ risque?: number }
+export interface CircuitPiste { facilite: number; airPerturbe: number; perteVoieS: number; /** 13c-1 : risque d'accident (1–5). */ risque?: number; /** 13c-2 : météo. */ departPluie?: boolean; changementsMeteo?: number[] }
 
 /** Temps (s) du prochain tour d'une voiture, hors effets de position ; et si elle s'arrête aux stands à la fin de ce tour. */
 function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number, perteVoieS: number, chance: (x: number) => boolean, facteurStand = 1): { s: number; arret: boolean; perteArretS: number } {
   const t = e.tour + 1;
-  const compose = p.strategie.composes[v.relais] as Compose;
+  const compose = v.composes[v.relais] as Compose;
   const k = COMPOSES[compose];
   const n = v.tourRelais + 1; // tour du relais (1 = pneus neufs)
   const vie = k.vie / Math.sqrt(Math.max(PNEUS_COURSE.facteurVieMin, p.fReel));
@@ -125,7 +132,13 @@ function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number
   const manque = Math.max(0, conso - e.tours * (1 + RESSOURCES.margeCarburant + charge));
   carburant += (manque * RESSOURCES.economieParTourManquant) / e.tours;
   const rythme = CONSIGNES.conduite[p.consignes.conduite].rythme + CONSIGNES.pneus[p.consignes.pneus].rythme + CONSIGNES.carburant[p.consignes.carburant].rythme;
-  let s = e.tempsS * (1 + (p.base + pneus + carburant + rythme) / 100);
+  // 13c-2 : piste mouillée ou sèche à ce tour, par rapport au départ ; pneus inadaptés.
+  const mouille = meteoAuTour(e, t);
+  let meteo = mouille ? METEO.lentPluiePct : 0;
+  if (mouille !== !!e.departPluie) meteo += (mouille ? 1 : -1) * (p.ecartMeteo ?? 0);
+  if (mouille && compose !== 'pluie') meteo += METEO.slickMouillePct;
+  if (!mouille && compose === 'pluie' && e.changementsMeteo?.length) meteo += METEO.pluieSecPct;
+  let s = e.tempsS * (1 + (p.base + pneus + carburant + rythme + meteo) / 100);
   const arret = v.relais < v.plan.length - 1 && n >= v.plan[v.relais]!;
   let perteArretS = 0;
   if (arret) {
@@ -151,6 +164,7 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   const propre = new Map<string, { fin: number; arret: boolean; tourS: number }>();
   for (const id of prevOrdre) {
     const v = e.voitures[id]!, p = partants.get(id)!;
+    reagirMeteo(e, v, p, t, tirage);
     const f = tirage(`${id}|t${t}`);
     const { s, arret } = tempsDuTour(e, v, p, d1MasseS, circuit.perteVoieS, (x) => f.chance(x));
     let tourS = s + e.tempsS * (f.normale(0, PISTE.aleaTourPct) / 100);
@@ -215,6 +229,31 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   declencherNeutralisation(e, partants, circuit, t, tirage);
 }
 
+/* ===================================================================== 13c-2 : météo */
+
+/** Piste mouillée au tour `t` ? (état du départ, inversé à chaque changement déjà survenu). */
+export function meteoAuTour(e: EtatCourse, t: number): boolean {
+  const n = (e.changementsMeteo ?? []).filter((x) => x <= t).length;
+  return !!e.departPluie !== (n % 2 === 1);
+}
+
+/** Pneus inadaptés à la piste : la voiture rentrera après un délai (intelligence de course) ; le plan des relais est alors remplacé. */
+function reagirMeteo(e: EtatCourse, v: EtatVoiture, p: Partant, t: number, tirage: (cle: string) => Flux): void {
+  if (!e.changementsMeteo?.length) return;
+  const mouille = meteoAuTour(e, t), pneuPluie = v.composes[v.relais] === 'pluie';
+  if (mouille === pneuPluie) { delete v.changementPrevu; return; }
+  if (v.changementPrevu === undefined) {
+    const f = tirage(`${v.id}|m${t}`);
+    v.changementPrevu = t + Math.max(0, Math.min(METEO.delaiMax, Math.round(METEO.delaiBase - METEO.delaiParPoint * ((p.intelligence ?? 10) - 10) + f.normale(0, METEO.delaiSigma))));
+  }
+  const reste = e.tours - t;
+  if (t < v.changementPrevu || reste <= 0) return;
+  const nouveau: Compose = mouille ? 'pluie' : reste <= COMPOSES.tendre.vie ? 'tendre' : reste <= COMPOSES.moyen.vie ? 'moyen' : 'dur';
+  v.composes = [...v.composes.slice(0, v.relais + 1), nouveau];
+  v.plan = [...v.plan.slice(0, v.relais), v.tourRelais + 1, reste];
+  delete v.changementPrevu;
+}
+
 /* ===================================================================== 13c-1 : neutralisations */
 
 /** Le relais en cours s'arrête après `fin` tours ; les tours restants sont répartis entre les relais suivants, dans les mêmes proportions. */
@@ -275,6 +314,7 @@ function tourNeutralise(e: EtatCourse, partants: Map<string, Partant>, circuit: 
       // Drapeau rouge : pneus neufs pour tous au premier tour, sans perte (le relais suivant commence si un arrêt restait à faire).
       if (premier) { if (restants > 0) { replanifier(v, v.tourRelais, e.tours - e.tour); v.relais++; } v.tourRelais = 0; }
     } else if (restants > 0 && v.tourRelais + 1 >= N.partRelaisArret * v.plan[v.relais]!) replanifier(v, v.tourRelais + 1, e.tours - t);
+    reagirMeteo(e, v, p, t, tirage);
     const f = tirage(`${id}|t${t}`);
     const { arret, perteArretS } = tempsDuTour(e, v, p, d1MasseS, circuit.perteVoieS, (x) => f.chance(x), facteurStand);
     arrets.set(id, arret ? perteArretS : 0);
@@ -307,6 +347,8 @@ function tourNeutralise(e: EtatCourse, partants: Map<string, Partant>, circuit: 
 /** Course complète : départ puis tous les tours. Renvoie l'état final (ordre d'arrivée des voitures encore en course, puis abandons). */
 export function courirSurPiste(grille: string[], partants: Partant[], tours: number, tempsS: number, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux): EtatCourse {
   const e = initialiserCourse(grille, partants, tours, tempsS, tirage);
+  if (circuit.departPluie) e.departPluie = true;
+  if (circuit.changementsMeteo?.length) e.changementsMeteo = [...circuit.changementsMeteo];
   const parId = new Map(partants.map((p) => [p.id, p]));
   while (e.tour < tours) avancerTour(e, parId, circuit, d1MasseS, tirage);
   for (const id of grille) { const pos = e.ordre.indexOf(id); if (pos >= 0) e.voitures[id]!.positionsGagnees = grille.indexOf(id) - pos; }

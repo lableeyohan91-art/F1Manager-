@@ -38,7 +38,7 @@ import { avecVivier, circuitsDeLaSaison, moisDeSemaine } from './calendrier';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 import { CONSIGNES_NEUTRES, arretEquipe, commandeConsignes, courirTours, facteurUsure, meilleureStrategie, tempsTourS, toursCourse, type EquipeArret } from './course-tours';
-import { ARRETS, CONSIGNES, NEUTRALISATIONS, PISTE, QUALIFS } from '../../balance/course';
+import { ARRETS, CONSIGNES, METEO, NEUTRALISATIONS, PISTE, QUALIFS } from '../../balance/course';
 import { courirSurPiste, qualifier, type Partant } from './course-piste';
 import { commandeProgrammesEssais, essaisLibres, type EffetsEssais } from './essais';
 import { fiabiliteVoiture } from '../monoplaces/physique';
@@ -122,7 +122,11 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const ecuries = new Map(ecuriesActives(monde).map((e) => [e.id, e]));
   // Phase 11b : climat réel du mois où le Grand Prix a lieu (un Grand Prix déplacé change de climat) ; sinon, ancienne classe de pluie.
   const pluie = circuit.pluieMensuelle ? circuit.pluieMensuelle[moisDeSemaine(gp.semaine) - 1]! : (PROBABILITE_PLUIE[circuit.climatPluie] ?? 0.1);
-  gp.pluie = tirageLocal(monde, 'meteo', gp.id).chance(pluie);
+  // 13c-2 : avec la course sur la piste, la pluie peut arriver ou s'arrêter pendant la course (paramètre `course.meteoVariable`, 1 par
+  // défaut) ; la probabilité du mois se répartit entre départ sous la pluie et pluie en cours de course.
+  const fm = tirageLocal(monde, 'meteo', gp.id);
+  const meteoVariable = parametre(monde, 'course.meteoVariable', 1) > 0 && parametre(monde, 'course.tours', 1) > 0 && parametre(monde, 'course.piste', 1) > 0;
+  gp.pluie = fm.chance(meteoVariable ? pluie * METEO.partDepart : pluie);
   // Banc d'essai (audit APEX, point 10) : météo imposée par paramètre d'expérience (−1 = tirage normal, 0 = sec, 1 = pluie).
   const meteoForcee = parametre(monde, 'course.meteoForcee', -1);
   if (meteoForcee >= 0) gp.pluie = meteoForcee >= 1;
@@ -145,6 +149,17 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const parTours = parametre(monde, 'course.tours', 1) > 0;
   const tours = toursCourse(circuit), tempsS = tempsTourS(circuit);
   // Phase 13b : perte réelle de la voie des stands du circuit (fiche), sinon valeur par défaut.
+  const changementsMeteo: number[] = [];
+  if (meteoVariable && meteoForcee < 0) {
+    const entre = (a: number, b: number) => Math.round(tours * (a + fm.suivant() * (b - a)));
+    if (gp.pluie) { if (fm.chance(METEO.secheEnCours)) changementsMeteo.push(entre(...METEO.secheEntre)); }
+    else if (fm.chance(pluie * METEO.partArrivee)) {
+      const debut = entre(...METEO.arriveeEntre);
+      const fin = debut + METEO.dureeTours[0] + Math.floor(fm.suivant() * (METEO.dureeTours[1] - METEO.dureeTours[0] + 1));
+      changementsMeteo.push(debut, ...(fin < tours ? [fin] : []));
+    }
+  }
+  if (changementsMeteo.length) gp.changementsMeteo = changementsMeteo;
   const perteVoie = circuit.course ? circuit.course.perteVoieS + ARRETS.perteEntreeSortieS : ARRETS.perteVoieS;
   // Phase 13b+ : essais libres (programmes de chaque titulaire, pièce fragile trouvée, jeune pilote). Paramètre `course.essais` (1 par
   // défaut ; 0 = sans essais libres, aucun effet).
@@ -173,6 +188,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const ecartPilote = parametre(monde, 'course.ecartPiloteParPoint', ECART_PILOTE_PAR_POINT) * (DIFFICULTE_CIRCUIT.min + DIFFICULTE_CIRCUIT.parPoint * circuit.exigences.difficulte);
     const mod = modificateurNiveau(monde, p, circuit, el?.facteurNouveaute ?? 1);
     const pilote = (niveauPilote(p, gp.pluie, circuit.exigences) + mod.affinite + mod.nouveaute) * ecartPilote;
+    // 13c-2 : écart du pilote entre pluie et sec (lu seulement si la piste change pendant la course).
+    const ecartMeteo = changementsMeteo.length ? (niveauPilote(p, false, circuit.exigences) - niveauPilote(p, true, circuit.exigences)) * ecartPilote : 0;
     // Banc d'essai : `course.pression` = 0 neutralise l'erreur sous pression (1 par défaut).
     const pression = erreurPression(monde, p, saison, gp.manche, gp.id) * parametre(monde, 'course.pression', 1);
     // D-140 : un pilote démotivé (usure du succès) perd un peu de rythme ; une motivation élevée n'apporte rien de plus.
@@ -190,7 +207,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const abandonsActifs = parametre(monde, 'course.abandons', 1) > 0;
     const abandon = !abandonsActifs ? null : f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : course?.panneSeche ? ('carburant' as const) : null;
     return {
-      p, e, temps: -(voiture + pilote + forme) + alea + pression + reglage + (course?.total ?? 0), abandon, consignes, piste, voiture, pilote, forme, alea, pression, reglage, el,
+      p, e, temps: -(voiture + pilote + forme) + alea + pression + reglage + (course?.total ?? 0), abandon, consignes, piste, voiture, pilote, forme, alea, pression, reglage, el, ecartMeteo,
       explication: {
         // Sauvegarde bornée : composantes arrondies au millième de % du tour (bien en dessous de toute différence visible).
         voiture: r3(voiture), pilote: r3(pilote), forme: r3(forme), alea: r3(alea), affinite: r3(mod.affinite * ecartPilote), nouveaute: r3(mod.nouveaute * ecartPilote), pression: r3(pression),
@@ -208,7 +225,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   let grille: string[] | undefined;
   const surPiste = parTours && parametre(monde, 'course.piste', 1) > 0;
   const ecartReel = new Map<string, number>();
-  const detailPiste = new Map<string, { grille: number; depassements?: number; erreurs?: number }>();
+  const detailPiste = new Map<string, { grille: number; depassements?: number; erreurs?: number; strategie: string }>();
   if (surPiste) {
     const cq = { ...circuit, sensibilites: circuit.sensibilitesQualif ?? circuit.sensibilites };
     const indQ = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, cq, mois)]));
@@ -223,19 +240,22 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       depart: c.p.competences['departs'] ?? 10, depassement: c.p.competences['depassement'] ?? 10, defense: c.p.competences['defense'] ?? 10,
       abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null, ...(c.abandon ? { abandonCause: c.abandon } : {}),
       // 13c-1 : petite erreur possible à chaque tour (régularité, consigne de conduite, pluie, circuit).
+      ecartMeteo: c.ecartMeteo, intelligence: c.p.competences['intelligenceCourse'] ?? 10,
       pErreur: (NEUTRALISATIONS.erreurBase + NEUTRALISATIONS.erreurParPoint * (20 - (c.p.competences['regularite'] ?? 10))) * CONSIGNES.conduite[c.consignes.conduite].incident
         * (gp.pluie ? NEUTRALISATIONS.erreurPluie : 1) * (circuit.exigences.risqueAccident / NEUTRALISATIONS.risqueReference),
     }));
     const facilite = circuit.course ? PISTE.faciliteParDifficulte[circuit.course.difficulteDepassement - 1]!
       : PISTE.facileBase + PISTE.facileParPoint * ((circuit.exigences.lignesDroites ?? 3) - 1);
-    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie, risque: circuit.exigences.risqueAccident },
+    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie, risque: circuit.exigences.risqueAccident, departPluie: gp.pluie, changementsMeteo },
       circuit.sensibilites?.d1['masseKg'] ?? 0, (cle) => tirageLocal(monde, 'course.piste', gp.id, cle));
     const parId = new Map(calcul.map((c) => [c.p.id, c]));
     arrives = etat.ordre.filter((id) => etat.voitures[id]!.enCourse).map((id) => parId.get(id)!);
     const t0 = etat.voitures[arrives[0]?.p.id ?? '']?.temps ?? 0;
     for (const id of etat.ordre) ecartReel.set(id, Math.round(((etat.voitures[id]!.temps - t0) / (tours * tempsS)) * 100 * 1000) / 1000);
     // Grille et dépassements gardés dans l'explication du résultat (dépassements omis quand nuls, pour borner la sauvegarde).
-    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, ...(etat.voitures[id]!.depassements ? { depassements: etat.voitures[id]!.depassements } : {}), ...(etat.voitures[id]!.erreurs ? { erreurs: etat.voitures[id]!.erreurs } : {}) });
+    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, ...(etat.voitures[id]!.depassements ? { depassements: etat.voitures[id]!.depassements } : {}), ...(etat.voitures[id]!.erreurs ? { erreurs: etat.voitures[id]!.erreurs } : {}),
+      // Pneus réellement utilisés (arrêts sous neutralisation, changements de météo).
+      strategie: etat.voitures[id]!.composes.slice(0, etat.voitures[id]!.relais + 1).map((x) => ({ tendre: 'T', moyen: 'M', dur: 'D', pluie: 'P' })[x]).join('-') });
     // 13c-1 : neutralisations gardées dans le Grand Prix, chacune avec son événement (cause : pilote et type d'abandon, ou débris).
     if (etat.neutralisations.length) {
       gp.neutralisations = etat.neutralisations;

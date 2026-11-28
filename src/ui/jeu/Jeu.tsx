@@ -328,6 +328,7 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
           <h3>Prochain Grand Prix</h3>
           {gp ? <p>{nomCircuit(m, gp.circuit)} <span class="muted">· manche {gp.manche}, semaine {gp.semaine}</span></p> : <p class="muted">{grandsPrix(m).length ? 'Aucun d’ici la fin de saison.' : 'Le calendrier de la saison sera publié la semaine prochaine.'}</p>}
           {derniers && <p class="muted">Dernier : {nomCircuit(m, derniers.circuit)}, vainqueur {nom(personne(m, derniers.resultats.find((r) => r.position === 1)?.pilote ?? ''))}</p>}
+          {derniers?.changementsMeteo?.length ? <p class="muted petit">Météo : départ {derniers.pluie ? 'sous la pluie' : 'au sec'}, puis {derniers.changementsMeteo.map((t, i) => `${(derniers.pluie ? i % 2 === 0 : i % 2 === 1) ? 'piste qui sèche' : 'pluie'} au tour ${t}`).join(', ')}.</p> : null}
           {derniers?.neutralisations?.length ? <p class="muted petit">Neutralisations : {derniers.neutralisations.map((n) => `${({ sc: 'voiture de sécurité', vsc: 'VSC', rouge: 'drapeau rouge' })[n.type]} au tour ${n.tour} (${n.cause === 'debris' ? 'débris' : `${n.cause === 'incident' ? 'accident' : 'panne'} de ${nom(personne(m, n.pilote ?? ''))}`})`).join(' ; ')}</p> : null}
           {/* Phase 13a : la course de vos pilotes (place, stratégie, arrêts). */}
           {derniers && derniers.resultats.filter((r) => r.ecurie === e.id).map((r) => (

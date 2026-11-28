@@ -57,6 +57,38 @@ résultat : nombre de petites erreurs. Événement `course.neutralisation` (caus
 Fréquences par circuit ; part des victoires depuis la pole (13b : 75 %, beaucoup trop) ; corrélation grille → arrivée par circuit ;
 dépassements ; campagne courte contre la 13b+.
 
-## 2. 13c-2 et 13c-3
+## 2. 13c-2 — la pluie qui arrive ou qui s'arrête
 
-Conception détaillée écrite avant leur code, sur le même modèle (après la mesure de la 13c-1).
+### 2.1 La météo de la course
+
+La probabilité de pluie du mois (climat réel du circuit, phase 11b) se répartit désormais entre trois cas :
+- **départ sous la pluie** : probabilité × 0,65 ; la piste peut **sécher** pendant la course (35 % des cas, à un tour tiré entre 25 % et
+  80 % de la course) ;
+- **départ au sec, pluie en cours de course** : probabilité × 0,5 ; la pluie arrive à un tour tiré entre 20 % et 85 % de la course et dure
+  8 à 30 tours (elle peut durer jusqu'à l'arrivée) ;
+- sinon, course au sec.
+« Courses sous la pluie » (indicateur) compte les départs sous la pluie : il baissera mécaniquement, à lire avec le nouvel indicateur
+« courses avec pluie à un moment ».
+
+### 2.2 Ce que la pluie change à chaque tour
+
+- Un tour mouillé est plus lent pour tous (+8 %) ; l'écart entre pilotes suit leur **compétence pluie** (rythme sous la pluie − rythme au sec).
+- Pneus inadaptés : pneus secs sur piste mouillée +15 % ; pneus pluie sur piste sèche +4 %.
+- La règle des deux composés secs ne s'applique plus dès qu'il a plu (comme en F1).
+
+### 2.3 Réagir : quand changer de pneus (même règle pour toutes les écuries)
+
+Quand la piste change, chaque voiture rentre changer de pneus après un **délai** de 0 à 4 tours : 2 tours − 0,25 × (intelligence de course
+− 10), plus un aléa (écart type 1 tour), borné. C'est la **situation de la compétence intelligence de course**. Si la piste redevient comme
+avant pendant le délai, la voiture ne rentre pas. Pneus pluie jusqu'à la fin (ou jusqu'à ce que la piste sèche) ; au retour du sec, le
+composé sec qui tient jusqu'au bout (tendre, moyen ou dur selon les tours restants).
+
+Le choix volontaire (anticiper, tenter le coup) viendra avec les décisions en course (13d) : à ce stade, seule la règle commune s'applique.
+
+### 2.4 Ce que l'on garde
+
+Grand Prix : départ sous la pluie ou non, tours où la piste change (fiche du Grand Prix, chronique).
+
+## 3. 13c-3
+
+Conception détaillée écrite avant son code, sur le même modèle.

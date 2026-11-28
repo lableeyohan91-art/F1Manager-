@@ -696,6 +696,8 @@ export interface GrandPrix {
   resultats: ResultatPilote[];
   /** Phase 13c-1 : neutralisations de la course (lues par la fiche du Grand Prix et la chronique). */
   neutralisations?: Neutralisation[];
+  /** Phase 13c-2 : tours où la piste change (mouillée ↔ sèche) ; `pluie` donne l'état au départ. */
+  changementsMeteo?: number[];
 }
 
 export interface LigneClassementPilote {

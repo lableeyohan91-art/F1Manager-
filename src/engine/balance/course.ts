@@ -207,3 +207,17 @@ export const NEUTRALISATIONS = {
   partRelaisArret: 0.6,
   erreurBase: 0.002, erreurParPoint: 0.0004, erreurPluie: 2, risqueReference: 3, erreurPerteMinS: 1, erreurPerteMaxS: 3,
 };
+
+/**
+ * Phase 13c-2 — météo qui change pendant la course (fiche phase-13c-aleas-de-course.md §2). Probabilités sans unité, parts de la course,
+ * tours, % du tour. Départ sous la pluie : probabilité du mois × `partDepart` ; la piste sèche avec `secheEnCours`, entre `secheEntre`
+ * de la course. Départ au sec : la pluie arrive avec la probabilité du mois × `partArrivee`, entre `arriveeEntre`, pour `dureeTours`.
+ * Tour mouillé : +`lentPluiePct` pour tous ; pneus secs sur le mouillé +`slickMouillePct`, pneus pluie sur le sec +`pluieSecPct`.
+ * Délai avant de changer de pneus : delaiBase − delaiParPoint × (intelligence de course − 10) + aléa (écart type delaiSigma), borné à
+ * [0, delaiMax] tours.
+ */
+export const METEO = {
+  partDepart: 0.65, secheEnCours: 0.35, secheEntre: [0.25, 0.8] as const, partArrivee: 0.5, arriveeEntre: [0.2, 0.85] as const, dureeTours: [8, 30] as const,
+  lentPluiePct: 8, slickMouillePct: 15, pluieSecPct: 4,
+  delaiBase: 2, delaiParPoint: 0.25, delaiSigma: 1, delaiMax: 4,
+};
