@@ -1,6 +1,6 @@
 ecurie;viragesLents;viragesRapides;vitessePointe;efficaciteAero;fiabilite;gestionPneus;motricite;verification
 eq_mercedes;17;18;17;17;17;16;16;identités du porteur (25/11) ajustées le 27/11 : une spécialité par grande écurie
-eq_mclaren;18;16;16;16;16;16;16;identités du porteur (25/11) ajustées le 27/11 : une spécialité par grande écurie
+eq_mclaren;17;16;16;16;16;16;16;identités du porteur (25/11) ajustées le 27/11, virages lents 18 → 17 le 28/11 (porteur : réduire l'avance de départ)
 eq_ferrari;16;17;20;18;15;16;16;identités du porteur (25/11) ajustées le 27/11 : une spécialité par grande écurie
 eq_redbull;17;20;17;18;14;17;17;identités du porteur (25/11) ajustées le 27/11 : une spécialité par grande écurie
 eq_williams;11;11;16;13;14;12;12;proposition du porteur 25/11/2026 (motricité provisoire : moyenne virages lents et pneus)

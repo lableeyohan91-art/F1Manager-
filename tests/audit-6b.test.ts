@@ -68,7 +68,8 @@ describe('Audit indépendant 6b (ChatGPT, commit f3120105) — non-régression',
 describe('Cohérence des promesses d’académie (rapport 6b-2)', () => {
   it('les promesses de titularisation sont le plus souvent tenues (le baquet promis est réellement libéré)', () => {
     let tenues = 0, rompues = 0;
-    for (const g of [1, 2, 3]) {
+    // 28/11 : 6 graines au lieu de 3 (avec 3, l'échantillon tombait à 2 tenues pour 1 rompue : trop peu pour juger).
+    for (const g of [1, 2, 3, 4, 5, 6]) {
       const m = sc.creerMonde(g);
       sc.creerMoteur().avancer(m, 10 * 52);
       for (const p of Object.values(m.tables['promesses'] ?? {}) as unknown as { type: string; statut: string }[]) {
@@ -78,5 +79,5 @@ describe('Cohérence des promesses d’académie (rapport 6b-2)', () => {
       }
     }
     expect(tenues).toBeGreaterThan(2 * rompues);
-  }, 300_000); // plusieurs saisons simulées : ≈ 100 s sur une machine d’intégration chargée (CI n°188)
+  }, 900_000); // plusieurs saisons simulées : ≈ 200 s sur une machine d’intégration chargée (CI n°188, 6 graines)
 });

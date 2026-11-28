@@ -77,7 +77,7 @@ describe('Phase 13a — dans le jeu', () => {
     const r = gp.resultats.find((x) => x.pilote === pilote.id)!;
     expect(r.explication?.strategie?.length).toBeGreaterThanOrEqual(1);
     expect(r.explication?.tours).toBeGreaterThanOrEqual(40);
-    expect(r.explication?.consignes).toBeCloseTo(0.01, 5); // conduite agressive + pneus conservateurs : −0,17 + 0,18
+    expect(r.explication?.consignes).toBeCloseTo(CONSIGNES.conduite.agressive.rythme + CONSIGNES.pneus.conservatrice.rythme, 5);
   }, 120_000);
 
   it('format 36 : une sauvegarde v35 se charge et la partie avance', () => {
