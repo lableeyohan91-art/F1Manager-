@@ -775,3 +775,16 @@ Aucun code à ce stade.
 - Pneus : mise en température, écarts et usures plus contrastés, chaleur du mois, vie qui dépend de l'usure ; stratégies à 1 ou 2 arrêts selon le circuit.
 - Carburant : charge de départ (réduite, neutre, réserve) avec gain de masse, économie forcée et panne sèche ; cause d'abandon « carburant ».
 - Outils : `tools/banc-philosophies.mts`, `tools/banc-pilotes.mts`, `tools/sensibilites-course.mts`, `tools/md-vers-docx.cjs` ; audit du moteur de course.
+
+## [Phase 13b — positions sur la piste] — 28/11/2026
+
+### Ajouté
+- Qualifications au vrai format Q1, Q2, Q3 (deux tours lancés par séance, erreurs selon la régularité, piste qui s'améliore, forme du week-end).
+- Départ (compétence départs), course tour par tour avec de vraies positions : air perturbé, aspiration, trafic, dépassements (compétences dépassement et défense, batterie pour attaquer ou défendre, conduite agressive et accrochages), arrêts qui font ressortir la voiture à sa vraie place, abandons au tour où ils arrivent.
+- Données des fiches de circuits branchées : difficulté de dépassement et perte réelle de la voie des stands (`data/grille-2026/course-circuits.csv`, outil `tools/circuits/course-circuits.mts`).
+- Fiche du Grand Prix : place de départ et dépassements de chaque pilote.
+- Outil `tools/banc-pilotes-piste.mts` (22 pilotes sur la piste, compétences en situation) ; tests `tests/course-piste.test.ts`.
+
+### Modifié
+- Dépassement, défense et départs ne comptent plus dans le rythme moyen du pilote : ils jouent en situation (D-194).
+- McLaren : virages lents 18 → 17 au départ (avance trop forte avec les sensibilités de course).

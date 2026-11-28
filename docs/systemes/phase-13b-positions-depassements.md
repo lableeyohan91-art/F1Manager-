@@ -102,3 +102,26 @@ Elle **lit** l'état de course : aucune règle propre.
 
 Format 37 : état de la course en cours (positions, écarts, ressources) quand le joueur l'a arrêtée ; grille de départ et classement des
 qualifications dans les résultats. Migration et test.
+
+## 11. Mise en œuvre (28/11, carte blanche — valeurs PROVISOIRES, D-120)
+
+Code : `src/engine/systems/saison/course-piste.ts` ; coefficients `PISTE` et `QUALIFS` dans `src/engine/balance/course.ts` ; branché dans
+`simulerGrandPrix` (paramètre d'expérience `course.piste`, 1 par défaut, 0 = classement au temps total de la 13a).
+
+- **Qualifications** : Q1 (toutes), Q2, Q3 (10) ; 2 tours lancés par séance ; voiture de qualification (sensibilités de qualification) ;
+  aléa de tour 0,12 % ; erreur selon la régularité ; piste qui s'améliore. La **forme du week-end** (aléa de course) compte aussi en
+  qualification : sans elle, le favori prenait la pole même les jours sans, puis la gardait (30 poles sur 60 pour le même pilote).
+- **Départ** : écart de grille 0,25 s par place, compétence départs (0,05 s par point), aléa 0,35 s.
+- **Course** : rythme de base + pneus du tour du relais + masse réelle du carburant + consignes ; air perturbé (moins d'1 s derrière) selon
+  les virages rapides du circuit ; écart minimal 0,3 s ; au plus un dépassement par voiture et par tour.
+- **Dépassement** : probabilité = facilité du circuit × (base + avance du tour + compétence dépassement − défense + aspiration + batterie
+  de l'attaquant − batterie du défenseur + conduite agressive), bornée. La **facilité** vient de la difficulté de dépassement de la fiche
+  du circuit (1 → 1 ; 2 → 0,75 ; 3 → 0,5 ; 4 → 0,3 ; 5 → 0,12), fichier `data/grille-2026/course-circuits.csv`
+  (outil `tools/circuits/course-circuits.mts`). Tentative agressive ratée : accrochage possible (+3 s).
+- **Arrêts** : perte de la voie des stands **propre au circuit** (fiche, hors immobilisation) + 6 s d'entrée et de sortie, + immobilisation
+  de l'équipe des stands ; la voiture ressort à sa vraie place. Une voiture qui s'arrête se fait passer sans combat.
+- **Abandons** : au tour tiré, la voiture quitte la piste.
+- **Résultat** : l'explication garde la place de grille et le nombre de dépassements (affichés dans la fiche du Grand Prix).
+
+Reportés (aucune lecture tant que la course regardée n'existe pas, règle « un attribut non lu n'existe pas ») : format 37 (état d'une
+course arrêtée) et vue 2D → avec la course regardée (13e). Test des deux finesses → quand la finesse « fine » existera.

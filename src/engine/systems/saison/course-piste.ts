@@ -150,7 +150,9 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
       const finDevant = e.voitures[devant]!.temps; // déjà mis à jour
       const devantAuxStands = propre.get(devant)!.arret;
       if (fin < finDevant + PISTE.ecartMinS) {
-        const veutPasser = fin < finDevant;
+        // Collée derrière (à moins de l'écart minimal) : elle tente sa chance, même sans être plus rapide sur ce tour ; la réussite
+        // dépend alors surtout du talent, de l'aspiration et de la batterie (avance négative ou nulle).
+        const veutPasser = PISTE.tenterCollee ? true : fin < finDevant;
         let passe = false;
         if (veutPasser && devantAuxStands) passe = true;
         else if (veutPasser && !propre.get(id)!.arret) {

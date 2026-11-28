@@ -331,6 +331,7 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
           {/* Phase 13a : la course de vos pilotes (place, stratégie, arrêts). */}
           {derniers && derniers.resultats.filter((r) => r.ecurie === e.id).map((r) => (
             <p key={r.pilote} class="muted petit">{nom(personne(m, r.pilote))} : {r.position ? `${r.position}e` : `abandon (${r.abandon === 'mecanique' ? 'panne' : r.abandon === 'carburant' ? 'panne sèche' : 'incident'})`}
+              {r.explication?.grille ? ` · parti ${r.explication.grille}e${r.explication.depassements ? `, ${r.explication.depassements} dépassement${r.explication.depassements > 1 ? 's' : ''}` : ''}` : ''}
               {r.explication?.strategie ? ` · ${r.explication.strategie.split('-').map((x) => ({ T: 'tendre', M: 'moyen', D: 'dur', P: 'pluie' })[x] ?? x).join(' → ')} (${r.explication.strategie.split('-').length - 1} arrêt${r.explication.strategie.split('-').length > 2 ? 's' : ''})` : ''}</p>
           ))}
           <button class="btn" disabled={occupe || !gp} onClick={() => lancer('grand_prix')}>Jusqu’au Grand Prix ▸</button>

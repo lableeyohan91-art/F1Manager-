@@ -161,7 +161,8 @@ export const QUALIFS = { partFormeWeekend: 1, q3: 10, tentatives: 2, sigma: 0.12
 export const PISTE = {
   ecartGrilleS: 0.25, departParPoint: 0.05, departReference: 12, departSigmaS: 0.35,
   aleaTourPct: 0.08, seuilAirS: 1, airPerturbeS: 0.25, ecartMinS: 0.3,
-  probaBase: 0.05, probaParSeconde: 0.5, parPointCompetence: 0.01, bonusAspiration: 0.1, bonusBatterie: 0.12, bonusAgressif: 0.08, probaMax: 0.85,
+  probaBase: 0.05, probaParSeconde: 0.5, parPointCompetence: 0.02, bonusAspiration: 0.1, bonusBatterie: 0.12, bonusAgressif: 0.08, probaMax: 0.85,
   accrochage: 0.03, perteAccrochageS: 3, rechargeParTour: 0.5, facileBase: 0.15, facileParPoint: 0.2,
   faciliteParDifficulte: [1, 0.75, 0.5, 0.3, 0.12] as readonly number[],
+  tenterCollee: 1,
 };
