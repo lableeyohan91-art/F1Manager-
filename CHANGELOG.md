@@ -823,3 +823,8 @@ Aucun code à ce stade.
 - Écran « course en direct » : classement tour par tour, écarts, pneus, arrêts ; lecture, pause, avance rapide ; pause aux moments clés ; journal des gains et pertes.
 - Ordres en direct (commande commune `course.ordre`) : arrêt avec choix des pneus, conduite, pneus, batterie ; rejoués par la vraie course.
 - La partie s'arrête la semaine d'un Grand Prix pour proposer de le regarder ou de le simuler.
+
+## [Phase 13f — vue 2D] — 28/11/2026
+
+### Ajouté
+- Vue 2D de la course en direct : vrai tracé du circuit, un point par voiture (couleur par écurie, vos pilotes nommés), glissement d'un tour au suivant, piste mouillée et neutralisations visibles.

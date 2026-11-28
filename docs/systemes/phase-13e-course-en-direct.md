@@ -33,3 +33,12 @@ neutralisations et leur cause, météo, arrêts des adversaires directs.
   et la course se rejoue avec eux. (Format 37 inchangé : le champ `direct` du Grand Prix est facultatif.)
 - Pas encore de vue de la piste : la vue 2D est la phase 13f.
 - Les ordres d'arrêt remplacent toute la fin de la stratégie (un seul relais) ; pas de plan à plusieurs arrêts saisi en direct.
+
+## 5. Phase 13f — vue 2D (28/11, porteur : « lance la 13f »)
+
+Au-dessus du classement, le **vrai tracé** du circuit (fiche 11b, `A.carte`) et un point par voiture : couleur par écurie (palette neutre,
+pas de couleurs de marques réelles), vos pilotes plus gros et nommés. La place d'une voiture sur le tracé vient de son **retard sur le
+leader en tours** au moment où il boucle le tour affiché ; entre deux tours, les points glissent le long du tracé. Piste bleutée quand elle
+est mouillée, filet jaune pendant une neutralisation. La vue ne fait qu'afficher l'aperçu du moteur : ce qui est vu est ce qui est calculé.
+Limites : pas de voie des stands dessinée (une voiture qui s'arrête recule simplement sur le tracé) ; la position dans le tour est
+reconstituée à partir des écarts, pas simulée mètre par mètre.

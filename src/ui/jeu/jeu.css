@@ -154,3 +154,7 @@ button.lien:hover { text-decoration: underline; }
 /* Phase 13e : course en direct */
 .course-direct tr.nous td { color: var(--accent); font-weight: 600; }
 .course-direct td { white-space: nowrap; }
+.course-haut { display: flex; gap: 12px; align-items: center; }
+.course-commandes { flex: 1 1 55%; min-width: 0; }
+.piste-carte { flex: 1 1 45%; min-width: 0; }
+.piste-direct { width: 100%; max-height: 60vh; display: block; }

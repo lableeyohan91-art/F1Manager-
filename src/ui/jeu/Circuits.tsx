@@ -9,7 +9,7 @@ import { grandsPrix, nom, nomCircuit, nomEcurie, personne, type Partie } from '.
 
 /* Forme des fiches générées (seuls les champs affichés). */
 interface Virage { numero: number; nom: string; x: number; y: number; sens: string; vMinKmh: number; classe: string }
-interface Fiche {
+export interface Fiche {
   permanent: boolean;
   A: { longueurM: number; virages: number; sens: string; nature: string; nuit: boolean; tourReelS: number | null; anneeReleve: number | null; source: string; carte: [number, number][]; virages_: Virage[]; statutVirages: string; lignesDroites: { longueurM: number; vMaxKmh: number }[]; freinages: unknown[]; denivele: { ecartM: number; penteMaxPct: number; statut: string }; statuts: Record<string, string> };
   B: { provisoire: boolean; essentiels: { id: string; nom: string; pourquoi: string; gainS: number }[]; moinsImportant: { nom: string; gainS: number }; limites: string };
@@ -28,7 +28,7 @@ const pct = (x: number | null) => (x === null ? '—' : `${Math.round(x * 100)} 
 const niveau = (x: number) => '●'.repeat(x) + '○'.repeat(Math.max(0, 5 - x));
 
 let cache: Promise<Record<string, Fiche>> | null = null;
-const chargerFiches = () => (cache ??= import('../../../data/grille-2026/circuits-fiches.json').then((d) => (d as unknown as { default: { circuits: Record<string, Fiche> } }).default.circuits));
+export const chargerFiches = () => (cache ??= import('../../../data/grille-2026/circuits-fiches.json').then((d) => (d as unknown as { default: { circuits: Record<string, Fiche> } }).default.circuits));
 
 function Barre({ libelle, v }: { libelle: string; v: number }) {
   return (

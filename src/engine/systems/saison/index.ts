@@ -120,7 +120,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
 
 /** Phase 13e : la course vue en direct, arrêtée à la fin du tour `tour`. */
 export interface ApercuCourse {
-  gp: string; tour: number; tours: number; tempsS: number; grille: string[]; etat: EtatCourse;
+  gp: string; circuit: string; tour: number; tours: number; tempsS: number; grille: string[]; etat: EtatCourse;
   ecuries: Record<string, string>; pluie: boolean; changementsMeteo: number[];
 }
 
@@ -281,7 +281,7 @@ function deroulerGrandPrix(monde: Monde, idGp: string, apercuTour?: number): Gra
       : PISTE.facileBase + PISTE.facileParPoint * ((circuit.exigences.lignesDroites ?? 3) - 1);
     const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie, risque: circuit.exigences.risqueAccident, departPluie: gp.pluie, changementsMeteo, exigencePhysique: circuit.exigences.exigencePhysique },
       circuit.sensibilites?.d1['masseKg'] ?? 0, (cle) => tirageLocal(monde, 'course.piste', gp.id, cle), apercuTour);
-    if (apercu) return { gp: gp.id, tour: etat.tour, tours, tempsS, grille, etat, ecuries: Object.fromEntries(calcul.map((c) => [c.p.id, c.e.id])), pluie: gp.pluie, changementsMeteo };
+    if (apercu) return { gp: gp.id, circuit: gp.circuit, tour: etat.tour, tours, tempsS, grille, etat, ecuries: Object.fromEntries(calcul.map((c) => [c.p.id, c.e.id])), pluie: gp.pluie, changementsMeteo };
     const parId = new Map(calcul.map((c) => [c.p.id, c]));
     arrives = etat.ordre.filter((id) => etat.voitures[id]!.enCourse).map((id) => parId.get(id)!);
     const t0 = etat.voitures[arrives[0]?.p.id ?? '']?.temps ?? 0;

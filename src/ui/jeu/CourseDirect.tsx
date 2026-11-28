@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { apercuGrandPrix, table, TABLES, type ApercuCourse, type Ecurie, type GrandPrix } from '../../engine';
 import { commander, ecurieJoueur, nom, nomCircuit, personne, type Partie } from './partie';
+import { PisteDirect } from './PisteDirect';
 
 const PNEU: Record<string, string> = { tendre: 'T', moyen: 'M', dur: 'D', pluie: 'P' };
 const TYPE_NZ: Record<string, string> = { sc: 'Voiture de sécurité', vsc: 'VSC', rouge: 'Drapeau rouge' };
@@ -90,7 +91,8 @@ export function CourseDirect({ partie, gpId, terminer }: { partie: Partie; gpId:
 
   return (
     <div class="course-direct">
-      <div class="carte">
+      <div class="carte course-haut">
+        <div class="course-commandes">
         <h3>{nomCircuit(m, gp.circuit)} — tour {a.tour} / {a.tours}</h3>
         <p class="muted petit">
           {a.tour === 0 ? `Grille de départ. ` : ''}{a.pluie ? 'Départ sous la pluie. ' : ''}{nz ? `${TYPE_NZ[nz.type]} en piste. ` : ''}
@@ -105,6 +107,8 @@ export function CourseDirect({ partie, gpId, terminer }: { partie: Partie; gpId:
           <label class="champ"><input type="checkbox" checked={pauseAlertes} onChange={(v) => setPauseAlertes((v.target as HTMLInputElement).checked)} /> pause aux moments clés</label>
           {fini && <button class="btn principal" onClick={terminer}>Terminer le Grand Prix ▸</button>}
         </div>
+        </div>
+        <div class="piste-carte"><PisteDirect a={a} dureeMs={Math.min(900, 1000 / vitesse)} nous={nosPilotes} court={court} /></div>
       </div>
       <div class="grille">
         <div class="carte">
