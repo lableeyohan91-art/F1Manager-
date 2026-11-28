@@ -61,6 +61,7 @@ add(h1('5. Marché des pilotes ouvert toute l’année (D-193)'));
 add(p('Offres possibles toute l’année pour la saison suivante ; réponses tous les 2 semaines ; l’IA reste surtout active de fin juin à fin novembre ; une offre sans accord expire au bout de 8 semaines. Pas encore fait : remplacement d’un titulaire en cours de saison.'));
 const fm = path.join(R, 'nuit-2026-11-28', 'mercato-comparaison.md');
 if (fs.existsSync(fm)) add(complet(fm));
+add(p([gras('Lecture : '), n('aucun changement mesurable sur la grille (l\u2019IA garde son pic d\u2019activité de l\u2019été et de l\u2019automne) : le changement sert surtout au joueur, qui peut négocier quand il veut. C\u2019est attendu ; le levier sur les dynasties viendra de la fiche « marché des pilotes ».')]));
 
 add(h1('6. Les défavorables, sans détour'));
 add(puce('Dominations entre écuries 12 → 17 % et dernière écurie qui marque 83 → 73 % avec la 13a : les pneus et les arrêts creusent un peu le haut de grille.'));
