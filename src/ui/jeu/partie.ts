@@ -67,7 +67,10 @@ export function faitsVisibles(m: Monde, portee: 'ecurie' | 'paddock', limite = 8
   return res;
 }
 
-export type ArretAvance = 'bloquante' | 'decision' | 'urgence' | 'derniere_chance' | 'marche' | 'grand_prix' | 'fin_de_saison' | 'fin_de_partie' | 'limite' | 'semaine';
+/** Phase 13e : Grands Prix pour lesquels le joueur a choisi (regarder ou simuler) ; la partie ne s'y arrête plus. */
+export const coursesDecidees = new Set<string>();
+
+export type ArretAvance = 'course' | 'bloquante' | 'decision' | 'urgence' | 'derniere_chance' | 'marche' | 'grand_prix' | 'fin_de_saison' | 'fin_de_partie' | 'limite' | 'semaine';
 
 /**
  * Avance le temps semaine par semaine, en rendant la main à l'écran entre deux semaines (calcul par tranches, D-147).
@@ -89,6 +92,9 @@ export async function avancer(p: Partie, mode: 'semaine' | 'grand_prix' | 'decis
   let n = 0;
   let total = 0;
   while (n < max) {
+    // Phase 13e : la semaine d'un Grand Prix, on s'arrête avant la course pour proposer de la regarder en direct (une fois par Grand Prix).
+    const g = prochainGP(m);
+    if (g && g.semaine === m.date.semaine && !coursesDecidees.has(g.id)) return { arret: 'course', semaines: n, msParSemaine: n ? total / n : 0 };
     const t0 = performance.now();
     const annee = m.date.annee;
     p.moteur.avancerUneSemaine(m);

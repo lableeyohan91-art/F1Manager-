@@ -263,3 +263,5 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Undercut** | S'arrêter avant la voiture qu'on suit pour la passer grâce aux pneus neufs pendant qu'elle reste dehors (phase 13d). |
 | **Couverture** | S'arrêter juste après la voiture qui suivait, pour garder la place face à son undercut (phase 13d). |
 | **Style de stratégie** | Prudent (couvre), équilibré (couvre et tente l'undercut), offensif (tente l'undercut, s'arrête plus tôt sous neutralisation) ; choisi par le joueur, ou selon la propension au risque du directeur sportif (phase 13d). |
+| **Course en direct** | Le Grand Prix regardé tour par tour par le joueur ; ce qu'il voit est la vraie course, ses ordres comptent pour le résultat (phase 13e). |
+| **Ordre en course** | Consigne ou arrêt demandé par le joueur pendant la course en direct, appliqué au tour suivant (phase 13e). |

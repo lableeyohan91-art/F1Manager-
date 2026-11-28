@@ -6,11 +6,12 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { creerScenarioGrille2026, decisionsEnAttente, ecuriesActives, financesDe, formaterDate, plafond, type DecisionEnAttente, type Scenario } from '../../engine';
 import { fichiersGrille2026 } from '../donnees';
 import { chargerAvecSecours, copier, demanderStockagePersistant, enregistrer, existe } from '../../platform/navigateur/stockage';
-import { avancer, commander, mesurerAppareil, ecurieJoueur, faitsVisibles, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, prochainGP, saisonCourante, type ArretAvance, type Partie } from './partie';
+import { avancer, commander, coursesDecidees, mesurerAppareil, ecurieJoueur, faitsVisibles, grandsPrix, meur, nom, nomCircuit, nomEcurie, personne, prochainGP, saisonCourante, type ArretAvance, type Partie } from './partie';
 import { EcranEquipe, EcranMarche, FichePersonne } from './Equipe';
 import { EcranActualites, EcranArchives, Image } from './Medias';
 import { EcranChampionnat, EcranDirection, EcranFinances, EcranReglages, EcranTechnique } from './Gestion';
 import { EcranCircuits } from './Circuits';
+import { CourseDirect } from './CourseDirect';
 import './jeu.css';
 
 export type Ecran = 'tableau' | 'actualites' | 'equipe' | 'marche' | 'technique' | 'finances' | 'championnat' | 'circuits' | 'archives' | 'direction' | 'reglages';
@@ -41,6 +42,7 @@ export function Jeu() {
   const [calcul, setCalcul] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [plus, setPlus] = useState(false);
+  const [courseDirect, setCourseDirect] = useState<string | null>(null);
   const rafraichir = () => setVersion((v) => v + 1);
   const nav: Navigation = {
     aller: (e) => { setFiche(null); setEcran(e); setPlus(false); window.scrollTo(0, 0); },
@@ -59,6 +61,7 @@ export function Jeu() {
     const r = await avancer(p, mode, (n) => setCalcul(`Simulation… ${n} semaine(s)`));
     setCalcul(null);
     const textes: Record<ArretAvance, string> = {
+      course: '🏁 C’est la semaine du Grand Prix : regardez la course en direct ou laissez-la se simuler (tableau de bord).',
       bloquante: '❗ Une demande attend votre réponse : répondez-y (ou choisissez « ne pas répondre ») pour continuer.', decision: 'Arrêt : une décision vous attend.', urgence: 'Arrêt : l’échéance d’une décision approche.', derniere_chance: 'Arrêt : dernière semaine pour répondre à une décision.', marche: 'Le marché des transferts est ouvert.',
       grand_prix: 'Grand Prix couru.', fin_de_saison: 'Fin de saison.',
       fin_de_partie: 'Le conseil vous a remplacé.', limite: 'Une saison s’est écoulée.', semaine: '',
@@ -100,17 +103,18 @@ export function Jeu() {
       <main class="jeu-page">
         {fiche ? <FichePersonne partie={p} id={fiche} nav={nav} retour={() => setFiche(null)} /> : (
           <>
-            {ecran === 'tableau' && <TableauDeBord partie={p} nav={nav} lancer={lancer} occupe={!!calcul} />}
-            {ecran === 'actualites' && <EcranActualites partie={p} nav={nav} />}
-            {ecran === 'archives' && <EcranArchives partie={p} />}
-            {ecran === 'equipe' && <EcranEquipe partie={p} nav={nav} />}
-            {ecran === 'marche' && <EcranMarche partie={p} nav={nav} />}
-            {ecran === 'technique' && <EcranTechnique partie={p} nav={nav} />}
-            {ecran === 'finances' && <EcranFinances partie={p} nav={nav} />}
-            {ecran === 'championnat' && <EcranChampionnat partie={p} />}
-            {ecran === 'circuits' && <EcranCircuits partie={p} />}
-            {ecran === 'direction' && <EcranDirection partie={p} nav={nav} />}
-            {ecran === 'reglages' && <EcranReglages partie={p} nav={nav} quitter={() => { partie.current = null; rafraichir(); }} remplacer={(m) => { partie.current = { monde: m, moteur: sc().creerMoteur() }; setMessage('Partie importée. Sauvegardez-la dans Réglages pour la garder.'); nav.aller('tableau'); }} />}
+            {courseDirect && <CourseDirect partie={p} gpId={courseDirect} terminer={() => { coursesDecidees.add(courseDirect); setCourseDirect(null); void lancer('grand_prix'); }} />}
+            {!courseDirect && ecran === 'tableau' && <TableauDeBord partie={p} nav={nav} lancer={lancer} occupe={!!calcul} regarder={(id) => { setCourseDirect(id); window.scrollTo(0, 0); }} />}
+            {!courseDirect && ecran === 'actualites' && <EcranActualites partie={p} nav={nav} />}
+            {!courseDirect && ecran === 'archives' && <EcranArchives partie={p} />}
+            {!courseDirect && ecran === 'equipe' && <EcranEquipe partie={p} nav={nav} />}
+            {!courseDirect && ecran === 'marche' && <EcranMarche partie={p} nav={nav} />}
+            {!courseDirect && ecran === 'technique' && <EcranTechnique partie={p} nav={nav} />}
+            {!courseDirect && ecran === 'finances' && <EcranFinances partie={p} nav={nav} />}
+            {!courseDirect && ecran === 'championnat' && <EcranChampionnat partie={p} />}
+            {!courseDirect && ecran === 'circuits' && <EcranCircuits partie={p} />}
+            {!courseDirect && ecran === 'direction' && <EcranDirection partie={p} nav={nav} />}
+            {!courseDirect && ecran === 'reglages' && <EcranReglages partie={p} nav={nav} quitter={() => { partie.current = null; rafraichir(); }} remplacer={(m) => { partie.current = { monde: m, moteur: sc().creerMoteur() }; setMessage('Partie importée. Sauvegardez-la dans Réglages pour la garder.'); nav.aller('tableau'); }} />}
           </>
         )}
       </main>
@@ -302,7 +306,7 @@ function cibleDecision(d: DecisionEnAttente, nav: Navigation) {
   return () => nav.aller('direction');
 }
 
-function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: Navigation; lancer: (m: 'semaine' | 'grand_prix' | 'decision') => void; occupe: boolean }) {
+function TableauDeBord({ partie, nav, lancer, occupe, regarder }: { partie: Partie; nav: Navigation; lancer: (m: 'semaine' | 'grand_prix' | 'decision') => void; occupe: boolean; regarder: (gp: string) => void }) {
   const m = partie.monde;
   const e = ecurieJoueur(m)!;
   const decisions = decisionsEnAttente(m);
@@ -326,6 +330,12 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
         </div>
         <div class="carte">
           <h3>Prochain Grand Prix</h3>
+          {gp && gp.semaine === m.date.semaine && !coursesDecidees.has(gp.id) && (
+            <div class="actions">
+              <button class="btn principal" disabled={occupe} onClick={() => regarder(gp.id)}>🏁 Regarder la course en direct</button>
+              <button class="btn" disabled={occupe} onClick={() => { coursesDecidees.add(gp.id); lancer('decision'); }}>Simuler (l’ingénieur gère)</button>
+            </div>
+          )}
           {gp ? <p>{nomCircuit(m, gp.circuit)} <span class="muted">· manche {gp.manche}, semaine {gp.semaine}</span></p> : <p class="muted">{grandsPrix(m).length ? 'Aucun d’ici la fin de saison.' : 'Le calendrier de la saison sera publié la semaine prochaine.'}</p>}
           {derniers && <p class="muted">Dernier : {nomCircuit(m, derniers.circuit)}, vainqueur {nom(personne(m, derniers.resultats.find((r) => r.position === 1)?.pilote ?? ''))}</p>}
           {derniers?.changementsMeteo?.length ? <p class="muted petit">Météo : départ {derniers.pluie ? 'sous la pluie' : 'au sec'}, puis {derniers.changementsMeteo.map((t, i) => `${(derniers.pluie ? i % 2 === 0 : i % 2 === 1) ? 'piste qui sèche' : 'pluie'} au tour ${t}`).join(', ')}.</p> : null}

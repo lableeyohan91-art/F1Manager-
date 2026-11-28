@@ -39,9 +39,10 @@ import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 import { CONSIGNES_NEUTRES, arretEquipe, commandeConsignes, courirTours, facteurUsure, meilleureStrategie, tempsTourS, toursCourse, type EquipeArret } from './course-tours';
 import { ARRETS, CONSIGNES, HUMAIN_COURSE, METEO, NEUTRALISATIONS, PISTE, QUALIFS } from '../../balance/course';
-import { courirSurPiste, qualifier, type Partant } from './course-piste';
+import { courirSurPiste, qualifier, type EtatCourse, type Partant } from './course-piste';
 import { commandeProgrammesEssais, essaisLibres, type EffetsEssais } from './essais';
 import { commandeStyleStrategie, stratege } from './stratege';
+import { commandeOrdreCourse } from './direct';
 import { fiabiliteVoiture } from '../monoplaces/physique';
 import { ADUO, MOTORISTE_PUISSANCE } from '../../balance/monoplaces';
 
@@ -114,10 +115,32 @@ const r3 = (x: number) => Math.round(x * 1000) / 1000;
 /* ---------------------------------------------------------------- Grand Prix */
 
 export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
-  const gp = grandPrix(monde, idGp);
+  return deroulerGrandPrix(monde, idGp) as GrandPrix;
+}
+
+/** Phase 13e : la course vue en direct, arrêtée à la fin du tour `tour`. */
+export interface ApercuCourse {
+  gp: string; tour: number; tours: number; tempsS: number; grille: string[]; etat: EtatCourse;
+  ecuries: Record<string, string>; pluie: boolean; changementsMeteo: number[];
+}
+
+/**
+ * Phase 13e : aperçu de la course du Grand Prix (qualifications, puis course jusqu'à la fin du tour `tour`), SANS rien modifier du monde.
+ * Même calcul que la vraie course (mêmes tirages, mêmes ordres du joueur) : ce que le joueur regarde est ce qui comptera.
+ * Renvoie null si le Grand Prix est déjà couru ou si la course n'est pas simulée sur la piste.
+ */
+export function apercuGrandPrix(monde: Monde, idGp: string, tour: number): ApercuCourse | null {
+  const r = deroulerGrandPrix(monde, idGp, Math.max(0, tour));
+  return r && 'etat' in r ? r : null;
+}
+
+function deroulerGrandPrix(monde: Monde, idGp: string, apercuTour?: number): GrandPrix | ApercuCourse | null {
+  const apercu = apercuTour !== undefined;
+  // En aperçu, on travaille sur une copie du Grand Prix : rien n'est écrit dans le monde.
+  const gp = apercu ? { ...grandPrix(monde, idGp) } : grandPrix(monde, idGp);
   // Audit n°5 : idempotence. Un Grand Prix déjà couru (reprise, rendez-vous en double) ne redistribue ni points,
   // ni victoires, ni expérience, ni événements.
-  if (gp.termine) return gp;
+  if (gp.termine) return apercu ? null : gp;
   const saison = saisonDe(monde, gp.saison) as Saison;
   const circuit = table(monde, TABLES.circuits)[gp.circuit] as unknown as Circuit;
   const ecuries = new Map(ecuriesActives(monde).map((e) => [e.id, e]));
@@ -143,8 +166,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const sigma = parametre(monde, 'course.aleaSigma', ALEA_SIGMA) * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1);
   const partants = pilotesTitulaires(monde).filter((p) => ecuries.has(p.ecurie));
   // Audit n°4 : relevé du niveau contemporain de chaque pilote, à sa première course de la saison.
-  saison.niveauxPilotes ??= {};
-  for (const p of partants) saison.niveauxPilotes[p.id] ??= Math.round(niveauPilote(p, false) * 100) / 100;
+  if (!apercu) saison.niveauxPilotes ??= {};
+  if (!apercu) for (const p of partants) saison.niveauxPilotes![p.id] ??= Math.round(niveauPilote(p, false) * 100) / 100;
   // Phase 13a (D-192) : la course tour par tour (pneus, carburant, batterie, consignes, stratégie, arrêts). Paramètre `course.tours`
   // (1 par défaut, 0 = ancien modèle sans ressources).
   const parTours = parametre(monde, 'course.tours', 1) > 0;
@@ -164,7 +187,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const perteVoie = circuit.course ? circuit.course.perteVoieS + ARRETS.perteEntreeSortieS : ARRETS.perteVoieS;
   // Phase 13b+ : essais libres (programmes de chaque titulaire, pièce fragile trouvée, jeune pilote). Paramètre `course.essais` (1 par
   // défaut ; 0 = sans essais libres, aucun effet).
-  const essais = parTours && parametre(monde, 'course.essais', 1) > 0 ? essaisLibres(monde, gp, circuit, partants) : new Map<string, EffetsEssais>();
+  const essais = parTours && parametre(monde, 'course.essais', 1) > 0 ? essaisLibres(monde, gp, circuit, partants, !apercu) : new Map<string, EffetsEssais>();
   // Phase 13d : stratège de chaque écurie (style, qualité).
   const strateges = new Map([...ecuries.values()].map((e) => [e.id, stratege(monde, e)]));
   const calcul = partants.map((p) => {
@@ -230,6 +253,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   // `course.piste` (1 par défaut ; 0 = classement au temps total de la 13a).
   let grille: string[] | undefined;
   const surPiste = parTours && parametre(monde, 'course.piste', 1) > 0;
+  if (apercu && !surPiste) return null;
   const ecartReel = new Map<string, number>();
   const detailPiste = new Map<string, { grille: number; depassements?: number; erreurs?: number; decisions?: number; strategie: string }>();
   if (surPiste) {
@@ -247,6 +271,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null, ...(c.abandon ? { abandonCause: c.abandon } : {}),
       // 13c-1 : petite erreur possible à chaque tour (régularité, consigne de conduite, pluie, circuit).
       ecurie: c.e.id, style: c.st.style, lecture: c.st.lecture, delaiMeteo: c.st.delaiMeteo,
+      // Phase 13e : ordres donnés en direct par le joueur (arrêt, consignes), au tour où ils s'appliquent.
+      ...(gp.direct?.ordres.some((o) => o.pilote === c.p.id) ? { ordres: gp.direct.ordres.filter((o) => o.pilote === c.p.id) } : {}),
       ecartMeteo: c.ecartMeteo, intelligence: c.p.competences['intelligenceCourse'] ?? 10, condition: c.p.competences['condition'] ?? 10, sangFroid: c.p.traits['sangFroid'] ?? 10,
       pErreur: (NEUTRALISATIONS.erreurBase + NEUTRALISATIONS.erreurParPoint * (20 - (c.p.competences['regularite'] ?? 10))) * CONSIGNES.conduite[c.consignes.conduite].incident
         * (gp.pluie ? NEUTRALISATIONS.erreurPluie : 1) * (circuit.exigences.risqueAccident / NEUTRALISATIONS.risqueReference),
@@ -254,7 +280,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const facilite = circuit.course ? PISTE.faciliteParDifficulte[circuit.course.difficulteDepassement - 1]!
       : PISTE.facileBase + PISTE.facileParPoint * ((circuit.exigences.lignesDroites ?? 3) - 1);
     const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie, risque: circuit.exigences.risqueAccident, departPluie: gp.pluie, changementsMeteo, exigencePhysique: circuit.exigences.exigencePhysique },
-      circuit.sensibilites?.d1['masseKg'] ?? 0, (cle) => tirageLocal(monde, 'course.piste', gp.id, cle));
+      circuit.sensibilites?.d1['masseKg'] ?? 0, (cle) => tirageLocal(monde, 'course.piste', gp.id, cle), apercuTour);
+    if (apercu) return { gp: gp.id, tour: etat.tour, tours, tempsS, grille, etat, ecuries: Object.fromEntries(calcul.map((c) => [c.p.id, c.e.id])), pluie: gp.pluie, changementsMeteo };
     const parId = new Map(calcul.map((c) => [c.p.id, c]));
     arrives = etat.ordre.filter((id) => etat.voitures[id]!.enCourse).map((id) => parId.get(id)!);
     const t0 = etat.voitures[arrives[0]?.p.id ?? '']?.temps ?? 0;
@@ -581,6 +608,7 @@ export function installerSaison(moteur: Moteur): Moteur {
   moteur.commandes.enregistrer(commandeConsignes);
   moteur.commandes.enregistrer(commandeProgrammesEssais);
   moteur.commandes.enregistrer(commandeStyleStrategie);
+  moteur.commandes.enregistrer(commandeOrdreCourse);
   return moteur.ajouterSysteme(systemeIntersaison).ajouterSysteme(systemeGrandsPrix).ajouterSysteme(systemeDeveloppement).ajouterSysteme(systemeFinDeSaison);
 }
 

@@ -151,3 +151,6 @@ button.lien:hover { text-decoration: underline; }
     align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 24px; }
   .tourner-icone { font-size: 3rem; line-height: 1; }
 }
+/* Phase 13e : course en direct */
+.course-direct tr.nous td { color: var(--accent); font-weight: 600; }
+.course-direct td { white-space: nowrap; }

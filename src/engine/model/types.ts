@@ -641,6 +641,12 @@ export type CauseAbandon = 'mecanique' | 'incident' | 'carburant';
 /** Phase 13c-1 : neutralisation d'une course (voiture de sécurité, VSC, drapeau rouge), avec sa cause. */
 export interface Neutralisation { type: 'sc' | 'vsc' | 'rouge'; tour: number; tours: number; cause: 'incident' | 'mecanique' | 'debris'; pilote?: string }
 
+/**
+ * Phase 13e : ordre donné en direct pour un pilote, appliqué au début du tour `tour` : rentrer au stand à la fin de ce tour pour chausser
+ * `arret`, ou changer des consignes.
+ */
+export interface OrdreCourse { tour: number; pilote: string; arret?: 'tendre' | 'moyen' | 'dur' | 'pluie'; consignes?: Partial<Pick<ConsignesCourse, 'conduite' | 'pneus' | 'batterie' | 'carburant'>> }
+
 /** Phase 13d : style du stratège en course. */
 export type StyleStrategie = 'prudent' | 'equilibre' | 'offensif';
 
@@ -705,6 +711,8 @@ export interface GrandPrix {
   neutralisations?: Neutralisation[];
   /** Phase 13c-2 : tours où la piste change (mouillée ↔ sèche) ; `pluie` donne l'état au départ. */
   changementsMeteo?: number[];
+  /** Phase 13e : ordres donnés par le joueur pendant la course regardée en direct (commande `course.ordre`). */
+  direct?: { ordres: OrdreCourse[] };
 }
 
 export interface LigneClassementPilote {

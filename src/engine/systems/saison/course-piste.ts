@@ -7,7 +7,7 @@
 import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, HUMAIN_COURSE, METEO, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES, STYLES_STRATEGIE, UNDERCUT } from '../../balance/course';
 import { CONDITIONS_COURSE, VOITURE_REFERENCE } from '../../balance/profil';
 import type { Flux } from '../../core/hasard';
-import type { CauseAbandon, ConsignesCourse, Neutralisation, StyleStrategie } from '../../model/types';
+import type { CauseAbandon, ConsignesCourse, Neutralisation, OrdreCourse, StyleStrategie } from '../../model/types';
 import { arretEquipe, type Compose, type EquipeArret, type Strategie } from './course-tours';
 
 /* ===================================================================== Qualifications */
@@ -71,6 +71,8 @@ export interface Partant {
   condition?: number; sangFroid?: number;
   /** 13d : écurie (pas d'undercut contre son coéquipier), style du stratège, chance par tour de voir une occasion, délai météo ajouté. */
   ecurie?: string; style?: StyleStrategie; lecture?: number; delaiMeteo?: number;
+  /** 13e : ordres du joueur donnés en direct (arrêt, consignes), appliqués au début du tour indiqué. */
+  ordres?: OrdreCourse[];
 }
 
 export interface EtatVoiture {
@@ -166,6 +168,7 @@ function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number
  * qui s'arrête aux stands se fait doubler sans combat. Air perturbé et aspiration selon l'écart du tour précédent.
  */
 export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux): void {
+  appliquerOrdres(e, partants, e.tour + 1);
   if (e.neutralisation) { tourNeutralise(e, partants, circuit, d1MasseS, tirage); return; }
   const t = e.tour + 1;
   const prevOrdre = e.ordre.filter((id) => e.voitures[id]!.enCourse);
@@ -249,6 +252,29 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   e.tour = t;
   e.ordre = [...nouvel.filter((id) => e.voitures[id]!.enCourse), ...e.ordre.filter((id) => !e.voitures[id]!.enCourse)];
   declencherNeutralisation(e, partants, circuit, t, tirage);
+}
+
+/* ===================================================================== 13e : ordres du joueur en direct */
+
+/**
+ * Ordres du joueur pour ce tour : consignes (l'usure des pneus suit le changement de consigne) ; arrêt à la fin du tour avec le composé
+ * choisi, puis un seul relais jusqu'à l'arrivée (le stratège peut encore proposer un arrêt plus tard).
+ */
+function appliquerOrdres(e: EtatCourse, partants: Map<string, Partant>, t: number): void {
+  for (const p of partants.values()) for (const o of p.ordres ?? []) {
+    if (o.tour !== t) continue;
+    const v = e.voitures[p.id];
+    if (!v || !v.enCourse) continue;
+    if (o.consignes) {
+      const avant = CONSIGNES.conduite[p.consignes.conduite].usure * CONSIGNES.pneus[p.consignes.pneus].usure;
+      p.consignes = { ...p.consignes, ...o.consignes };
+      p.fReel *= (CONSIGNES.conduite[p.consignes.conduite].usure * CONSIGNES.pneus[p.consignes.pneus].usure) / avant;
+    }
+    if (o.arret && e.tours - t > 0) {
+      v.composes = [...v.composes.slice(0, v.relais + 1), o.arret];
+      v.plan = [...v.plan.slice(0, v.relais), v.tourRelais + 1, e.tours - t];
+    }
+  }
 }
 
 /* ===================================================================== 13d : décisions du stratège */
@@ -410,13 +436,15 @@ function tourNeutralise(e: EtatCourse, partants: Map<string, Partant>, circuit: 
 }
 
 /** Course complète : départ puis tous les tours. Renvoie l'état final (ordre d'arrivée des voitures encore en course, puis abandons). */
-export function courirSurPiste(grille: string[], partants: Partant[], tours: number, tempsS: number, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux): EtatCourse {
+export function courirSurPiste(grille: string[], partants: Partant[], tours: number, tempsS: number, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux, jusquAuTour?: number): EtatCourse {
   const e = initialiserCourse(grille, partants, tours, tempsS, tirage);
   if (circuit.departPluie) e.departPluie = true;
   if (circuit.changementsMeteo?.length) e.changementsMeteo = [...circuit.changementsMeteo];
   if (circuit.exigencePhysique !== undefined) e.exigencePhysique = circuit.exigencePhysique;
   const parId = new Map(partants.map((p) => [p.id, p]));
-  while (e.tour < tours) avancerTour(e, parId, circuit, d1MasseS, tirage);
+  // 13e : `jusquAuTour` arrête la course à la fin de ce tour (aperçu de la course regardée en direct).
+  const fin = jusquAuTour === undefined ? tours : Math.min(tours, jusquAuTour);
+  while (e.tour < fin) avancerTour(e, parId, circuit, d1MasseS, tirage);
   for (const id of grille) { const pos = e.ordre.indexOf(id); if (pos >= 0) e.voitures[id]!.positionsGagnees = grille.indexOf(id) - pos; }
   return e;
 }

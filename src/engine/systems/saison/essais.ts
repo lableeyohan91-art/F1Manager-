@@ -51,9 +51,10 @@ export function planParDefaut(monde: Monde, e: Ecurie, p: Personne, circuit: Cir
 
 /**
  * Prépare le week-end : programmes de chaque titulaire, effets, et conséquences immédiates (pièce fragile trouvée, jeune pilote qui
- * apprend le circuit), avec leurs événements.
+ * apprend le circuit), avec leurs événements ; `appliquer` = false (aperçu de la course en direct, 13e) : mêmes effets calculés, rien
+ * n'est modifié.
  */
-export function essaisLibres(monde: Monde, gp: GrandPrix, circuit: Circuit, partants: Personne[]): Map<string, EffetsEssais> {
+export function essaisLibres(monde: Monde, gp: GrandPrix, circuit: Circuit, partants: Personne[], appliquer = true): Map<string, EffetsEssais> {
   const res = new Map<string, EffetsEssais>();
   for (const p of partants) {
     const e = table(monde, TABLES.ecuries)[p.ecurie] as unknown as Ecurie;
@@ -62,7 +63,8 @@ export function essaisLibres(monde: Monde, gp: GrandPrix, circuit: Circuit, part
     // Jeune pilote : seulement en EL1, seulement s'il existe ; sinon la séance revient aux réglages.
     if (programmes[0] === 'jeunePilote') {
       const j = jeunePilote(monde, e.id);
-      if (j?.carriere) {
+      if (j?.carriere && !appliquer) { /* aperçu : le jeune roule, rien n'est écrit */ }
+      else if (j?.carriere) {
         const ex = (j.carriere.experience ??= experienceVide(e.id));
         ex.circuits[circuit.id] = (ex.circuits[circuit.id] ?? 0) + ESSAIS.visiteJeune;
         ajouterEvenement(monde, { type: 'essais.jeune', acteurs: [{ id: e.id, role: 'ecurie' }, { id: j.id, role: 'pilote' }, { id: p.id, role: 'titulaire' }], importance: 1, visibilite: 'public', contexte: { grandPrix: gp.id, circuit: circuit.id, seance: 1 } });
@@ -73,7 +75,7 @@ export function essaisLibres(monde: Monde, gp: GrandPrix, circuit: Circuit, part
     // Essai de pièce : chaque séance a une chance de trouver une pièce montée fragile.
     for (let k = 0; k < n('essaiPiece'); k++) {
       const fragile = piecesInstallees(monde, e.id).filter((x: PieceVoiture) => x.fragile).sort((a, b) => (a.id < b.id ? -1 : 1))[0];
-      if (fragile && f.chance(ESSAIS.probaPiece)) {
+      if (fragile && f.chance(ESSAIS.probaPiece) && appliquer) {
         delete fragile.fragile;
         ajouterEvenement(monde, { type: 'essais.piece', acteurs: [{ id: e.id, role: 'ecurie' }, { id: p.id, role: 'pilote' }], importance: 2, visibilite: 'prive', contexte: { grandPrix: gp.id, piece: fragile.id, type: fragile.type, cause: 'essai d\'une pièce aux essais libres' } });
       }
