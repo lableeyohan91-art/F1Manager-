@@ -12,12 +12,36 @@ La même fonction sert :
 - aux autres courses et aux saisons simulées (finesse « par tour » : même physique, mêmes règles, sans détail d'affichage).
 Les deux finesses sont comparées par un test (même hiérarchie, écarts de points mesurés).
 
-## 2. Qualifications
+## 2. Le week-end : essais libres, qualifications, course (porteur, 28/11 : « il faudra penser aux essais libres et aux qualifs »)
 
-- Tour lancé de chaque pilote = voiture (sensibilités **de qualification**, `sensibilitesQualif`) + pilote (compétences de rythme selon le
-  circuit, sans gestion des pneus) + aléa de tour (plus petit qu'en course) + erreur possible (régularité, sang-froid) ; pluie : compétence pluie.
-- Format simple d'abord : une séance, meilleur tour = grille (Q1/Q2/Q3 plus tard si utile).
+Le moteur est construit pour un **week-end** : essais libres → qualifications → course, dans le même état de week-end.
+
+### 2.1 Qualifications : vrai format Q1, Q2, Q3 (porteur : « vrai format »)
+
+- Q1 (toutes les voitures, les 5 dernières éliminées), Q2 (les 5 suivantes), Q3 (les 10 meilleures) ; chaque tentative = un tour lancé.
+- Tour lancé = voiture (sensibilités **de qualification** : voiture légère, pneus neufs) + pilote (compétences de rythme selon le circuit)
+  + aléa de tour (plus petit qu'en course) + erreur possible (régularité, sang-froid) ; pluie : compétence pluie ; évolution de la piste
+  (plus rapide au fil de la séance) ; une erreur peut éliminer.
 - Le temps de qualification donne aussi un **indicateur de rythme** à l'ingénieur (13d).
+
+### 2.2 Essais libres (sous-phase « 13b+ », juste après la 13b ; programmes validés par le porteur le 28/11)
+
+Le temps de piste est limité : l'écurie répartit ses séances entre des programmes (choix rapide sur mobile, même règle pour l'IA selon sa
+personnalité) :
+| Programme | Effet |
+| --- | --- |
+| Réglages | réglage mieux trouvé → un peu plus de rythme tout le week-end (D-161 : réglages à découvrir) |
+| Longs relais | l'ingénieur estime mieux l'usure → meilleure stratégie |
+| Simulation de qualification | meilleure préparation du tour lancé |
+| Apprentissage du circuit | moins de pénalité de nouveauté |
+| Essai d'une pièce | découverte plus tôt d'un défaut caché (12b) |
+| Jeune pilote | expérience pour lui, moins de temps pour le titulaire |
+
+### 2.3 Temps au tour réels
+
+En course, chaque tour a sa **vraie masse** (≈ 100 kg de carburant au départ, presque rien à la fin) et ses pneus : les premiers tours sont
+nettement plus lents que la qualification, les derniers s'en rapprochent (mesuré en 13a bis : tour de course moyen ≈ 4 % plus lent).
+Les temps sont affichés en secondes.
 
 ## 3. Départ et premier tour
 
