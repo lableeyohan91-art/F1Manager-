@@ -143,9 +143,11 @@ export const ARRETS = { perteVoieS: 21, perteEntreeSortieS: 6, immobilisationMin
  * `tentatives` tours lancés par séance ; aléa de tour `sigma` (% du tour) ; erreur de probabilité erreurBase + (20 − régularité) × erreurParPoint,
  * qui coûte `perteErreur` (%) ; la piste gagne `evolutionPiste` (%) à chaque séance. `partFormeWeekend` (sans unité) : part de l'aléa
  * du week-end de la course (réglages trouvés ou non, sensations ; ALEA_SIGMA) qui compte aussi en qualification — sans elle, le favori
- * prenait la pole même les jours sans, puis la gardait (mesure du 28/11 : 30 poles sur 60 pour le même pilote). Valeurs PROVISOIRES (D-120).
+ * prenait la pole même les jours sans, puis la gardait (mesure du 28/11 : 30 poles sur 60 pour le même pilote). `aleaQualifPct` (% du tour) :
+ * part propre à la qualification (tour lancé réussi ou non), indépendante de la course. 13c-1 : avec 1 et 0, la pole gagnait 71 % des
+ * courses ; avec 0,6 et 0,2 : 51 % (F1 réelle : environ 40 à 50 %), victoires du meilleur pilote inchangées. Valeurs PROVISOIRES (D-120).
  */
-export const QUALIFS = { partFormeWeekend: 1, q3: 10, tentatives: 2, sigma: 0.12, erreurBase: 0.02, erreurParPoint: 0.004, perteErreur: 1.5, evolutionPiste: 0.05 };
+export const QUALIFS = { partFormeWeekend: 0.6, aleaQualifPct: 0.2, q3: 10, tentatives: 2, sigma: 0.12, erreurBase: 0.02, erreurParPoint: 0.004, perteErreur: 1.5, evolutionPiste: 0.05 };
 
 /**
  * Course sur la piste (fiche 13b §3 à §6). Départ : `ecartGrilleS` s par place de grille, ± departParPoint s par point de la compétence
@@ -184,4 +186,24 @@ export const ESSAIS = {
   reglageSigmaPct: 0.2, parSeanceReglages: 0.65, retourParPoint: 0.02, retourReference: 12, retourMin: 0.7, retourMax: 1.3,
   parSeanceRelais: 0.7, parSeanceSimulation: 0.7, bonusSimulationPct: 0.02, parSeanceApprentissage: 0.6,
   probaPiece: 0.25, visiteJeune: 0.5, visitesConnu: 2,
+};
+
+/**
+ * Phase 13c-1 — neutralisations et erreurs graduées (fiche docs/systemes/phase-13c-aleas-de-course.md). Probabilités sans unité.
+ * Abandon sur accident : voiture de sécurité avec scAccidentBase + scAccidentParRisque × (risque − 1), dont `rougeParmiSc` deviennent un
+ * drapeau rouge si risque ≥ `rougeRisqueMin` ; sinon VSC avec `vscAccident`. Panne : VSC `vscPanne`, voiture de sécurité `scPanne`.
+ * Débris : voiture de sécurité `scDebris` par course. Durées (tours) : [min, max]. Rythme : tour × `facteur`. Voiture de sécurité :
+ * écarts ramenés vers `ecartS` (s), à `resserrement` de l'écart restant par tour ; drapeau rouge : regroupement complet et changement de
+ * pneus gratuit. Arrêt sous neutralisation : perte de la voie × `facteurStand` ; une voiture s'arrête si elle a fait au moins
+ * `partRelaisArret` de son relais prévu. Petite erreur par tour : erreurBase + erreurParPoint × (20 − régularité), × consigne de
+ * conduite, × `erreurPluie`, × risque / `risqueReference` ; coût uniforme entre erreurPerteMinS et erreurPerteMaxS (s).
+ */
+export const NEUTRALISATIONS = {
+  scAccidentBase: 0.25, scAccidentParRisque: 0.12, rougeParmiSc: 0.12, rougeRisqueMin: 4, vscAccident: 0.6,
+  vscPanne: 0.35, scPanne: 0.1, scDebris: 0.08,
+  sc: { tours: [3, 5] as const, facteur: 1.35, ecartS: 0.8, resserrement: 0.4, facteurStand: 0.45 },
+  vsc: { tours: [1, 3] as const, facteur: 1.3, facteurStand: 0.6 },
+  rouge: { tours: [2, 2] as const, facteur: 1.35 },
+  partRelaisArret: 0.6,
+  erreurBase: 0.002, erreurParPoint: 0.0004, erreurPluie: 2, risqueReference: 3, erreurPerteMinS: 1, erreurPerteMaxS: 3,
 };

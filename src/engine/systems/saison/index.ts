@@ -38,7 +38,7 @@ import { avecVivier, circuitsDeLaSaison, moisDeSemaine } from './calendrier';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 import { CONSIGNES_NEUTRES, arretEquipe, commandeConsignes, courirTours, facteurUsure, meilleureStrategie, tempsTourS, toursCourse, type EquipeArret } from './course-tours';
-import { ARRETS, CONSIGNES, PISTE, QUALIFS } from '../../balance/course';
+import { ARRETS, CONSIGNES, NEUTRALISATIONS, PISTE, QUALIFS } from '../../balance/course';
 import { courirSurPiste, qualifier, type Partant } from './course-piste';
 import { commandeProgrammesEssais, essaisLibres, type EffetsEssais } from './essais';
 import { fiabiliteVoiture } from '../monoplaces/physique';
@@ -208,29 +208,42 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   let grille: string[] | undefined;
   const surPiste = parTours && parametre(monde, 'course.piste', 1) > 0;
   const ecartReel = new Map<string, number>();
-  const detailPiste = new Map<string, { grille: number; depassements?: number }>();
+  const detailPiste = new Map<string, { grille: number; depassements?: number; erreurs?: number }>();
   if (surPiste) {
     const cq = { ...circuit, sensibilites: circuit.sensibilitesQualif ?? circuit.sensibilites };
     const indQ = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, cq, mois)]));
-    const q = qualifier(calcul.map((c) => ({ id: c.p.id, rythme: (indQ.get(c.e.id) as number) * ECART_VOITURE_PAR_POINT + c.pilote + c.forme - QUALIFS.partFormeWeekend * c.alea - c.reglage + (c.el?.bonusQualifPct ?? 0), regularite: c.p.competences['regularite'] ?? 10, facteurErreur: c.el?.facteurErreurQualif })),
+    // 13c-1 : part du rythme propre à la qualification (tour lancé réussi ou non, pneus tendres bien chauffés), indépendante de la course.
+    const fq = tirageLocal(monde, 'qualifs.forme', gp.id);
+    const q = qualifier(calcul.map((c) => ({ id: c.p.id, rythme: (indQ.get(c.e.id) as number) * ECART_VOITURE_PAR_POINT + c.pilote + c.forme - QUALIFS.partFormeWeekend * c.alea - c.reglage + (c.el?.bonusQualifPct ?? 0) + fq.normale(0, QUALIFS.aleaQualifPct * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1)), regularite: c.p.competences['regularite'] ?? 10, facteurErreur: c.el?.facteurErreurQualif })),
       QUALIFS.sigma * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1), (cle) => tirageLocal(monde, 'qualifs', gp.id, cle));
     grille = q.grille;
     const fab = tirageLocal(monde, 'course.abandonTour', gp.id);
     const partantsPiste: Partant[] = calcul.map((c) => ({
       id: c.p.id, base: -(c.voiture + c.pilote + c.forme) + c.alea + c.pression + c.reglage, strategie: c.piste!.strategie, fReel: c.piste!.fReel, consignes: c.consignes, equipe: c.piste!.eq,
       depart: c.p.competences['departs'] ?? 10, depassement: c.p.competences['depassement'] ?? 10, defense: c.p.competences['defense'] ?? 10,
-      abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null,
+      abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null, ...(c.abandon ? { abandonCause: c.abandon } : {}),
+      // 13c-1 : petite erreur possible à chaque tour (régularité, consigne de conduite, pluie, circuit).
+      pErreur: (NEUTRALISATIONS.erreurBase + NEUTRALISATIONS.erreurParPoint * (20 - (c.p.competences['regularite'] ?? 10))) * CONSIGNES.conduite[c.consignes.conduite].incident
+        * (gp.pluie ? NEUTRALISATIONS.erreurPluie : 1) * (circuit.exigences.risqueAccident / NEUTRALISATIONS.risqueReference),
     }));
     const facilite = circuit.course ? PISTE.faciliteParDifficulte[circuit.course.difficulteDepassement - 1]!
       : PISTE.facileBase + PISTE.facileParPoint * ((circuit.exigences.lignesDroites ?? 3) - 1);
-    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie },
+    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie, risque: circuit.exigences.risqueAccident },
       circuit.sensibilites?.d1['masseKg'] ?? 0, (cle) => tirageLocal(monde, 'course.piste', gp.id, cle));
     const parId = new Map(calcul.map((c) => [c.p.id, c]));
     arrives = etat.ordre.filter((id) => etat.voitures[id]!.enCourse).map((id) => parId.get(id)!);
     const t0 = etat.voitures[arrives[0]?.p.id ?? '']?.temps ?? 0;
     for (const id of etat.ordre) ecartReel.set(id, Math.round(((etat.voitures[id]!.temps - t0) / (tours * tempsS)) * 100 * 1000) / 1000);
     // Grille et dépassements gardés dans l'explication du résultat (dépassements omis quand nuls, pour borner la sauvegarde).
-    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, ...(etat.voitures[id]!.depassements ? { depassements: etat.voitures[id]!.depassements } : {}) });
+    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, ...(etat.voitures[id]!.depassements ? { depassements: etat.voitures[id]!.depassements } : {}), ...(etat.voitures[id]!.erreurs ? { erreurs: etat.voitures[id]!.erreurs } : {}) });
+    // 13c-1 : neutralisations gardées dans le Grand Prix, chacune avec son événement (cause : pilote et type d'abandon, ou débris).
+    if (etat.neutralisations.length) {
+      gp.neutralisations = etat.neutralisations;
+      for (const nz of etat.neutralisations) ajouterEvenement(monde, {
+        type: 'course.neutralisation', acteurs: nz.pilote ? [{ id: nz.pilote, role: 'pilote' }] : [], importance: nz.type === 'rouge' ? 2 : 1, visibilite: 'public',
+        contexte: { grandPrix: gp.id, type: nz.type, tour: nz.tour, tours: nz.tours, cause: nz.cause },
+      });
+    }
     tempsVainqueur = 0;
   }
   const resultats: ResultatPilote[] = [

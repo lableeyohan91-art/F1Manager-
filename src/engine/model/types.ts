@@ -636,6 +636,9 @@ export interface ProjetConception {
 
 export type CauseAbandon = 'mecanique' | 'incident' | 'carburant';
 
+/** Phase 13c-1 : neutralisation d'une course (voiture de sécurité, VSC, drapeau rouge), avec sa cause. */
+export interface Neutralisation { type: 'sc' | 'vsc' | 'rouge'; tour: number; tours: number; cause: 'incident' | 'mecanique' | 'debris'; pilote?: string }
+
 /** Phase 13b+ : programme d'une séance d'essais libres. */
 export type ProgrammeEssais = 'reglages' | 'longsRelais' | 'simulationQualif' | 'apprentissage' | 'essaiPiece' | 'jeunePilote';
 export const PROGRAMMES_ESSAIS: readonly ProgrammeEssais[] = ['reglages', 'longsRelais', 'simulationQualif', 'apprentissage', 'essaiPiece', 'jeunePilote'];
@@ -677,6 +680,8 @@ export interface ResultatPilote {
     grille?: number; depassements?: number;
     /** Phase 13b+ : perte due au réglage trouvé aux essais libres (% du tour ; omise quand nulle). */
     reglage?: number;
+    /** Phase 13c-1 : petites erreurs commises pendant la course (omis quand aucune). */
+    erreurs?: number;
   };
 }
 
@@ -689,6 +694,8 @@ export interface GrandPrix {
   pluie: boolean;
   termine: boolean;
   resultats: ResultatPilote[];
+  /** Phase 13c-1 : neutralisations de la course (lues par la fiche du Grand Prix et la chronique). */
+  neutralisations?: Neutralisation[];
 }
 
 export interface LigneClassementPilote {

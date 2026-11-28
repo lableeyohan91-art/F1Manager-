@@ -5,8 +5,8 @@
 import { describe, expect, it } from 'vitest';
 import { creerScenarioGrille2026, table, TABLES, type Circuit, type GrandPrix } from '../src/engine';
 import { Flux, etatInitialFlux } from '../src/engine/core/hasard';
-import { PISTE } from '../src/engine/balance/course';
-import { courirSurPiste, qualifier, type Partant } from '../src/engine/systems/saison/course-piste';
+import { NEUTRALISATIONS, PISTE } from '../src/engine/balance/course';
+import { avancerTour, courirSurPiste, initialiserCourse, qualifier, type Partant } from '../src/engine/systems/saison/course-piste';
 import { CONSIGNES_NEUTRES, meilleureStrategie } from '../src/engine/systems/saison/course-tours';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 
@@ -79,4 +79,45 @@ describe('Phase 13b — données des fiches et saison', () => {
       expect(places.filter((x) => x === 1).length).toBe(1);
     }
   }, 120_000);
+});
+
+describe('Phase 13c-1 — neutralisations', () => {
+  const circuitPiste = { facilite: 0.5, airPerturbe: 0.2, perteVoieS: 20, risque: 3 };
+  const lancer = (type: 'sc' | 'vsc' | 'rouge', tours: number) => {
+    const ps = partants(8, 0.4);
+    const parId = new Map(ps.map((p) => [p.id, p]));
+    const e = initialiserCourse(ps.map((p) => p.id), ps, 50, 90, tirage(4));
+    e.debrisTour = null;
+    for (let t = 0; t < 10; t++) avancerTour(e, parId, circuitPiste, 0, tirage(4));
+    const avant = e.ordre.map((id) => e.voitures[id]!.temps);
+    e.neutralisation = { type, toursRestants: tours };
+    e.neutralisations.push({ type, tour: e.tour + 1, tours, cause: 'debris' });
+    const dep = Object.values(e.voitures).reduce((a, v) => a + v.depassements, 0);
+    for (let t = 0; t < tours; t++) avancerTour(e, parId, circuitPiste, 0, tirage(4));
+    return { e, avant, apres: e.ordre.map((id) => e.voitures[id]!.temps), dep, dep2: Object.values(e.voitures).reduce((a, v) => a + v.depassements, 0) };
+  };
+  it('voiture de sécurité : le peloton se regroupe, aucun dépassement, puis la course reprend', () => {
+    const { e, avant, apres, dep, dep2 } = lancer('sc', 4);
+    expect(dep2).toBe(dep);
+    expect(apres[apres.length - 1]! - apres[0]!).toBeLessThan((avant[avant.length - 1]! - avant[0]!) / 2);
+    expect(e.neutralisation).toBeUndefined();
+  });
+  it('VSC : les écarts sont conservés (hors arrêts)', () => {
+    const { avant, apres } = lancer('vsc', 1);
+    expect(apres[1]! - apres[0]!).toBeCloseTo(avant[1]! - avant[0]!, 6);
+  });
+  it('drapeau rouge : pneus neufs pour tous', () => {
+    const { e } = lancer('rouge', 2);
+    for (const v of Object.values(e.voitures)) expect(v.tourRelais).toBeLessThanOrEqual(2);
+  });
+  it('un accident sur un circuit à risque déclenche souvent une neutralisation', () => {
+    let n = 0;
+    for (let g = 1; g <= 20; g++) {
+      const ps = partants(10, 0.2).map((p, i) => (i === 5 ? { ...p, abandonTour: 20, abandonCause: 'incident' as const } : p));
+      const e = courirSurPiste(ps.map((p) => p.id), ps, 50, 90, { ...circuitPiste, risque: 5 }, 0, tirage(g));
+      if (e.neutralisations.some((x) => x.cause === 'incident' && x.tour === 21)) n++;
+    }
+    const p = NEUTRALISATIONS.scAccidentBase + 4 * NEUTRALISATIONS.scAccidentParRisque;
+    expect(n / 20).toBeGreaterThan((p + (1 - p) * NEUTRALISATIONS.vscAccident) * 0.6);
+  });
 });

@@ -4,10 +4,10 @@
  * ressortir à sa vraie place, abandons au tour où ils arrivent). Fonctions pures : l'état d'une course est un objet sérialisable, avancé
  * tour par tour (`avancerTour`), ce qui permettra de l'arrêter et de la reprendre (13e). Unités : secondes et % du tour de référence.
  */
-import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES } from '../../balance/course';
+import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES } from '../../balance/course';
 import { CONDITIONS_COURSE, VOITURE_REFERENCE } from '../../balance/profil';
 import type { Flux } from '../../core/hasard';
-import type { ConsignesCourse } from '../../model/types';
+import type { CauseAbandon, ConsignesCourse, Neutralisation } from '../../model/types';
 import { arretEquipe, type Compose, type EquipeArret, type Strategie } from './course-tours';
 
 /* ===================================================================== Qualifications */
@@ -61,13 +61,24 @@ export interface Partant {
   depart: number; depassement: number; defense: number;
   /** Tour où la voiture abandonne (null : aucun abandon), et cause. */
   abandonTour: number | null;
+  abandonCause?: CauseAbandon;
+  /** 13c-1 : probabilité d'une petite erreur à chaque tour (régularité, consigne, pluie, circuit). */
+  pErreur?: number;
 }
 
 export interface EtatVoiture {
   id: string; temps: number; tour: number; relais: number; tourRelais: number; reserve: number; enCourse: boolean;
   depassements: number; positionsGagnees: number; erreursArret: number;
+  /** 13c-1 : longueurs des relais (copie de la stratégie, recalculée après un arrêt sous neutralisation) ; petites erreurs commises. */
+  plan: number[]; erreurs: number;
 }
-export interface EtatCourse { tour: number; tours: number; tempsS: number; ordre: string[]; voitures: Record<string, EtatVoiture> }
+export interface EtatCourse {
+  tour: number; tours: number; tempsS: number; ordre: string[]; voitures: Record<string, EtatVoiture>;
+  /** 13c-1 : neutralisation en cours, neutralisations de la course, tour d'une voiture de sécurité pour débris (null : aucune). */
+  neutralisation?: { type: Neutralisation['type']; toursRestants: number };
+  neutralisations: Neutralisation[];
+  debrisTour: number | null;
+}
 
 /** Perte de masse : % du tour pour un écart de masse (kg) à la masse moyenne de course, selon la sensibilité du circuit (s par % de masse). */
 function effetMasse(deltaKg: number, d1MasseS: number, tempsS: number): number {
@@ -82,20 +93,22 @@ export function initialiserCourse(grille: string[], partants: Partant[], tours: 
     const p = parId.get(id)!;
     const f = tirage(`${id}|depart`);
     const depart = i * PISTE.ecartGrilleS - PISTE.departParPoint * (p.depart - PISTE.departReference) + f.normale(0, PISTE.departSigmaS);
-    voitures[id] = { id, temps: Math.max(0, depart), tour: 0, relais: 0, tourRelais: 0, reserve: RESSOURCES.reserveBatterie, enCourse: true, depassements: 0, positionsGagnees: 0, erreursArret: 0 };
+    voitures[id] = { id, temps: Math.max(0, depart), tour: 0, relais: 0, tourRelais: 0, reserve: RESSOURCES.reserveBatterie, enCourse: true, depassements: 0, positionsGagnees: 0, erreursArret: 0, plan: [...p.strategie.relais], erreurs: 0 };
   });
   const ordre = [...grille].sort((a, b) => voitures[a]!.temps - voitures[b]!.temps || grille.indexOf(a) - grille.indexOf(b));
-  return { tour: 0, tours, tempsS, ordre, voitures };
+  const fd = tirage('debris');
+  const debrisTour = fd.chance(NEUTRALISATIONS.scDebris) ? 1 + Math.floor(fd.suivant() * Math.max(1, tours - 2)) : null;
+  return { tour: 0, tours, tempsS, ordre, voitures, neutralisations: [], debrisTour };
 }
 
 /**
  * Données du circuit lues sur la piste : facilité de dépassement (multiplicateur de la probabilité), perte dans l'air perturbé (s par tour)
- * et perte d'un passage par la voie des stands hors immobilisation (s, fiche du circuit).
+ * perte d'un passage par la voie des stands hors immobilisation (s, fiche du circuit) ; risque d'accident (neutralisations, erreurs).
  */
-export interface CircuitPiste { facilite: number; airPerturbe: number; perteVoieS: number }
+export interface CircuitPiste { facilite: number; airPerturbe: number; perteVoieS: number; /** 13c-1 : risque d'accident (1–5). */ risque?: number }
 
 /** Temps (s) du prochain tour d'une voiture, hors effets de position ; et si elle s'arrête aux stands à la fin de ce tour. */
-function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number, perteVoieS: number, chance: (x: number) => boolean): { s: number; arret: boolean } {
+function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number, perteVoieS: number, chance: (x: number) => boolean, facteurStand = 1): { s: number; arret: boolean; perteArretS: number } {
   const t = e.tour + 1;
   const compose = p.strategie.composes[v.relais] as Compose;
   const k = COMPOSES[compose];
@@ -113,13 +126,15 @@ function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number
   carburant += (manque * RESSOURCES.economieParTourManquant) / e.tours;
   const rythme = CONSIGNES.conduite[p.consignes.conduite].rythme + CONSIGNES.pneus[p.consignes.pneus].rythme + CONSIGNES.carburant[p.consignes.carburant].rythme;
   let s = e.tempsS * (1 + (p.base + pneus + carburant + rythme) / 100);
-  const arret = v.relais < p.strategie.relais.length - 1 && n >= p.strategie.relais[v.relais]!;
+  const arret = v.relais < v.plan.length - 1 && n >= v.plan[v.relais]!;
+  let perteArretS = 0;
   if (arret) {
     const { immobilisationS, pErreur } = arretEquipe(p.equipe);
-    s += perteVoieS + immobilisationS;
-    if (chance(pErreur)) { s += ARRETS.perteErreurS; v.erreursArret++; }
+    perteArretS = perteVoieS * facteurStand + immobilisationS;
+    if (chance(pErreur)) { perteArretS += ARRETS.perteErreurS; v.erreursArret++; }
+    s += perteArretS;
   }
-  return { s, arret };
+  return { s, arret, perteArretS };
 }
 
 /**
@@ -128,6 +143,7 @@ function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number
  * qui s'arrête aux stands se fait doubler sans combat. Air perturbé et aspiration selon l'écart du tour précédent.
  */
 export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux): void {
+  if (e.neutralisation) { tourNeutralise(e, partants, circuit, d1MasseS, tirage); return; }
   const t = e.tour + 1;
   const prevOrdre = e.ordre.filter((id) => e.voitures[id]!.enCourse);
   const ecartDevant = new Map<string, number>();
@@ -138,6 +154,8 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
     const f = tirage(`${id}|t${t}`);
     const { s, arret } = tempsDuTour(e, v, p, d1MasseS, circuit.perteVoieS, (x) => f.chance(x));
     let tourS = s + e.tempsS * (f.normale(0, PISTE.aleaTourPct) / 100);
+    // 13c-1 : petite erreur (sortie large, blocage de roue).
+    if (!arret && p.pErreur && f.chance(p.pErreur)) { tourS += NEUTRALISATIONS.erreurPerteMinS + f.suivant() * (NEUTRALISATIONS.erreurPerteMaxS - NEUTRALISATIONS.erreurPerteMinS); v.erreurs++; }
     // Air perturbé : derrière une voiture à moins de `seuilAirS`, perte proportionnelle à la dépendance du circuit à l'appui.
     if ((ecartDevant.get(id) ?? Infinity) < PISTE.seuilAirS) tourS += circuit.airPerturbe;
     propre.set(id, { fin: v.temps + tourS, arret, tourS });
@@ -194,6 +212,96 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   }
   e.tour = t;
   e.ordre = [...nouvel.filter((id) => e.voitures[id]!.enCourse), ...e.ordre.filter((id) => !e.voitures[id]!.enCourse)];
+  declencherNeutralisation(e, partants, circuit, t, tirage);
+}
+
+/* ===================================================================== 13c-1 : neutralisations */
+
+/** Le relais en cours s'arrête après `fin` tours ; les tours restants sont répartis entre les relais suivants, dans les mêmes proportions. */
+function replanifier(v: EtatVoiture, fin: number, toursRestants: number): void {
+  v.plan[v.relais] = fin;
+  const suite = v.plan.slice(v.relais + 1);
+  const somme = suite.reduce((a, b) => a + b, 0);
+  if (!suite.length || somme <= 0) return;
+  let cumul = 0;
+  suite.forEach((l, i) => {
+    const x = i === suite.length - 1 ? Math.max(1, toursRestants - cumul) : Math.max(1, Math.round((l * toursRestants) / somme));
+    v.plan[v.relais + 1 + i] = x; cumul += x;
+  });
+}
+
+/** Neutralisation déclenchée par un abandon de ce tour (accident, panne) ou par des débris ; elle commence au tour suivant. */
+function declencherNeutralisation(e: EtatCourse, partants: Map<string, Partant>, circuit: CircuitPiste, t: number, tirage: (cle: string) => Flux): void {
+  if (e.neutralisation || t >= e.tours - 1) return;
+  const N = NEUTRALISATIONS, risque = circuit.risque ?? N.risqueReference;
+  const f = tirage(`neutralisation|t${t}`);
+  const commencer = (type: Neutralisation['type'], cause: Neutralisation['cause'], pilote?: string) => {
+    const [a, b] = N[type].tours;
+    const tours = Math.min(e.tours - t - 1, a + Math.floor(f.suivant() * (b - a + 1)));
+    if (tours < 1) return;
+    e.neutralisation = { type, toursRestants: tours };
+    e.neutralisations.push({ type, tour: t + 1, tours, cause, ...(pilote ? { pilote } : {}) });
+  };
+  const abandons = [...partants.values()].filter((p) => p.abandonTour === t).sort((a, b) => (a.id < b.id ? -1 : 1));
+  for (const p of abandons) {
+    if (p.abandonCause === 'incident') {
+      if (f.chance(N.scAccidentBase + N.scAccidentParRisque * (risque - 1))) commencer(risque >= N.rougeRisqueMin && f.chance(N.rougeParmiSc) ? 'rouge' : 'sc', 'incident', p.id);
+      else if (f.chance(N.vscAccident)) commencer('vsc', 'incident', p.id);
+    } else if (p.abandonCause === 'mecanique') {
+      const r = f.suivant();
+      if (r < N.scPanne) commencer('sc', 'mecanique', p.id);
+      else if (r < N.scPanne + N.vscPanne) commencer('vsc', 'mecanique', p.id);
+    }
+    if (e.neutralisation) return;
+  }
+  if (e.debrisTour === t) commencer('sc', 'debris');
+}
+
+/**
+ * Un tour neutralisé : rythme imposé, aucun dépassement ; voiture de sécurité et drapeau rouge regroupent le peloton (VSC : écarts
+ * conservés) ; les voitures qui ont fait assez de leur relais s'arrêtent (perte réduite ; drapeau rouge : changement de pneus gratuit).
+ */
+function tourNeutralise(e: EtatCourse, partants: Map<string, Partant>, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux): void {
+  const N = NEUTRALISATIONS, n = e.neutralisation!, t = e.tour + 1;
+  const premier = e.neutralisations[e.neutralisations.length - 1]!.tour === t;
+  const facteurStand = n.type === 'vsc' ? N.vsc.facteurStand : N.sc.facteurStand;
+  const ordre = e.ordre.filter((id) => e.voitures[id]!.enCourse);
+  const anciens = ordre.map((id) => e.voitures[id]!.temps);
+  const arrets = new Map<string, number>();
+  for (const id of ordre) {
+    const v = e.voitures[id]!, p = partants.get(id)!;
+    const restants = v.plan.length - 1 - v.relais;
+    if (n.type === 'rouge') {
+      // Drapeau rouge : pneus neufs pour tous au premier tour, sans perte (le relais suivant commence si un arrêt restait à faire).
+      if (premier) { if (restants > 0) { replanifier(v, v.tourRelais, e.tours - e.tour); v.relais++; } v.tourRelais = 0; }
+    } else if (restants > 0 && v.tourRelais + 1 >= N.partRelaisArret * v.plan[v.relais]!) replanifier(v, v.tourRelais + 1, e.tours - t);
+    const f = tirage(`${id}|t${t}`);
+    const { arret, perteArretS } = tempsDuTour(e, v, p, d1MasseS, circuit.perteVoieS, (x) => f.chance(x), facteurStand);
+    arrets.set(id, arret ? perteArretS : 0);
+    if (arret) { v.relais++; v.tourRelais = 0; } else v.tourRelais++;
+    v.reserve = Math.min(RESSOURCES.reserveBatterie, v.reserve + PISTE.rechargeParTour);
+    v.tour = t;
+  }
+  // Nouveaux temps : rythme imposé, regroupement (voiture de sécurité, drapeau rouge), puis perte des arrêts.
+  const K = n.type === 'vsc' ? N.vsc : n.type === 'sc' ? N.sc : N.rouge;
+  let precedent = 0;
+  ordre.forEach((id, i) => {
+    let tps: number;
+    if (n.type === 'vsc' || i === 0) tps = anciens[i]! + e.tempsS * K.facteur;
+    else {
+      const ecart = anciens[i]! - anciens[i - 1]!;
+      const k = n.type === 'rouge' ? 0 : N.sc.resserrement;
+      tps = precedent + (ecart > N.sc.ecartS ? N.sc.ecartS + (ecart - N.sc.ecartS) * k : Math.max(PISTE.ecartMinS, ecart));
+    }
+    precedent = tps;
+    e.voitures[id]!.temps = tps + arrets.get(id)!;
+  });
+  for (const id of ordre) { const p = partants.get(id)!; if (p.abandonTour !== null && t >= p.abandonTour) e.voitures[id]!.enCourse = false; }
+  e.tour = t;
+  const encore = ordre.filter((id) => e.voitures[id]!.enCourse).sort((a, b) => e.voitures[a]!.temps - e.voitures[b]!.temps);
+  e.ordre = [...encore, ...e.ordre.filter((id) => !e.voitures[id]!.enCourse)];
+  if (--n.toursRestants <= 0) delete e.neutralisation;
+  declencherNeutralisation(e, partants, circuit, t, tirage);
 }
 
 /** Course complète : départ puis tous les tours. Renvoie l'état final (ordre d'arrivée des voitures encore en course, puis abandons). */

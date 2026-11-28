@@ -328,9 +328,11 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
           <h3>Prochain Grand Prix</h3>
           {gp ? <p>{nomCircuit(m, gp.circuit)} <span class="muted">· manche {gp.manche}, semaine {gp.semaine}</span></p> : <p class="muted">{grandsPrix(m).length ? 'Aucun d’ici la fin de saison.' : 'Le calendrier de la saison sera publié la semaine prochaine.'}</p>}
           {derniers && <p class="muted">Dernier : {nomCircuit(m, derniers.circuit)}, vainqueur {nom(personne(m, derniers.resultats.find((r) => r.position === 1)?.pilote ?? ''))}</p>}
+          {derniers?.neutralisations?.length ? <p class="muted petit">Neutralisations : {derniers.neutralisations.map((n) => `${({ sc: 'voiture de sécurité', vsc: 'VSC', rouge: 'drapeau rouge' })[n.type]} au tour ${n.tour} (${n.cause === 'debris' ? 'débris' : `${n.cause === 'incident' ? 'accident' : 'panne'} de ${nom(personne(m, n.pilote ?? ''))}`})`).join(' ; ')}</p> : null}
           {/* Phase 13a : la course de vos pilotes (place, stratégie, arrêts). */}
           {derniers && derniers.resultats.filter((r) => r.ecurie === e.id).map((r) => (
             <p key={r.pilote} class="muted petit">{nom(personne(m, r.pilote))} : {r.position ? `${r.position}e` : `abandon (${r.abandon === 'mecanique' ? 'panne' : r.abandon === 'carburant' ? 'panne sèche' : 'incident'})`}
+              {r.explication?.erreurs ? ` · ${r.explication.erreurs} petite${r.explication.erreurs > 1 ? 's' : ''} erreur${r.explication.erreurs > 1 ? 's' : ''}` : ''}
               {r.explication?.grille ? ` · parti ${r.explication.grille}e${r.explication.depassements ? `, ${r.explication.depassements} dépassement${r.explication.depassements > 1 ? 's' : ''}` : ''}` : ''}
               {r.explication?.strategie ? ` · ${r.explication.strategie.split('-').map((x) => ({ T: 'tendre', M: 'moyen', D: 'dur', P: 'pluie' })[x] ?? x).join(' → ')} (${r.explication.strategie.split('-').length - 1} arrêt${r.explication.strategie.split('-').length > 2 ? 's' : ''})` : ''}</p>
           ))}
