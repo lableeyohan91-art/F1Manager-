@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { creerScenarioGrille2026, table, TABLES, type Circuit, type GrandPrix } from '../src/engine';
 import { Flux, etatInitialFlux } from '../src/engine/core/hasard';
 import { METEO, NEUTRALISATIONS, PISTE } from '../src/engine/balance/course';
-import { avancerTour, courirSurPiste, initialiserCourse, qualifier, type Partant } from '../src/engine/systems/saison/course-piste';
+import { avancerTour, courirSurPiste, fatigue, initialiserCourse, qualifier, type Partant } from '../src/engine/systems/saison/course-piste';
 import { CONSIGNES_NEUTRES, meilleureStrategie } from '../src/engine/systems/saison/course-tours';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 
@@ -143,5 +143,16 @@ describe('Phase 13c-2 — la pluie arrive pendant la course', () => {
     };
     expect(tourPluie(18)).toBeLessThan(tourPluie(4));
     expect(tourPluie(4)).toBeLessThanOrEqual(20 + METEO.delaiMax);
+  });
+});
+
+describe('Phase 13c-3 — fatigue', () => {
+  it('aucune fatigue avant la mi-course ; elle grandit ensuite, moins pour un pilote en grande condition, plus sur un circuit exigeant', () => {
+    const p = partants(1, 0)[0]!;
+    const e = { tours: 60, exigencePhysique: 5 } as never;
+    expect(fatigue(e, { ...p, condition: 12 }, 20)).toBe(0);
+    expect(fatigue(e, { ...p, condition: 12 }, 60)).toBeGreaterThan(fatigue(e, { ...p, condition: 12 }, 45));
+    expect(fatigue(e, { ...p, condition: 18 }, 60)).toBeLessThan(fatigue(e, { ...p, condition: 8 }, 60));
+    expect(fatigue({ tours: 60, exigencePhysique: 2 } as never, p, 60)).toBe(0);
   });
 });

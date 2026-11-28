@@ -221,3 +221,17 @@ export const METEO = {
   lentPluiePct: 8, slickMouillePct: 15, pluieSecPct: 4,
   delaiBase: 2, delaiParPoint: 0.25, delaiSigma: 1, delaiMax: 4,
 };
+
+/**
+ * Phase 13c-3 — chaleur, fatigue, sang-froid (fiche phase-13c-aleas-de-course.md §3). Pannes × 1 + `pannesParDegre` × (T − `seuilC`)
+ * au-delà de `seuilC` (°C). Fatigue (% du tour) : `fatigueParPoint` × (exigence physique − `exigenceNeutre`) × avancement après
+ * `debutFatigue` (part de la course), × (1 − `conditionParPoint` × (condition − `conditionReference`)) borné à [`conditionMin`,
+ * `conditionMax`] ; petites erreurs × (1 + `erreurFatigue` × part de la fatigue maximale). Sang-froid : dans la dernière part
+ * `finPression` de la course, sur le podium avec une voiture à moins de `ecartPressionS` derrière : erreurs × max(`pressionMin`,
+ * 1 + `pressionParPoint` × (`sangFroidReference` − sang-froid)).
+ */
+export const HUMAIN_COURSE = {
+  pannesParDegre: 0.03, seuilC: 28,
+  fatigueParPoint: 0.02, exigenceNeutre: 2, debutFatigue: 0.5, conditionParPoint: 0.07, conditionReference: 12, conditionMin: 0.3, conditionMax: 1.5, erreurFatigue: 2,
+  finPression: 0.15, ecartPressionS: 1, pressionParPoint: 0.1, sangFroidReference: 12, pressionMin: 0.5, podium: 3,
+};

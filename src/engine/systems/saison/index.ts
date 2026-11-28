@@ -38,7 +38,7 @@ import { avecVivier, circuitsDeLaSaison, moisDeSemaine } from './calendrier';
 import { partRecherche } from '../technique/acces';
 import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTitulaires, voitureDe } from './performance';
 import { CONSIGNES_NEUTRES, arretEquipe, commandeConsignes, courirTours, facteurUsure, meilleureStrategie, tempsTourS, toursCourse, type EquipeArret } from './course-tours';
-import { ARRETS, CONSIGNES, METEO, NEUTRALISATIONS, PISTE, QUALIFS } from '../../balance/course';
+import { ARRETS, CONSIGNES, HUMAIN_COURSE, METEO, NEUTRALISATIONS, PISTE, QUALIFS } from '../../balance/course';
 import { courirSurPiste, qualifier, type Partant } from './course-piste';
 import { commandeProgrammesEssais, essaisLibres, type EffetsEssais } from './essais';
 import { fiabiliteVoiture } from '../monoplaces/physique';
@@ -200,7 +200,9 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const reglage = el ? r3(el.reglagePct) : 0;
     // Audit (1.5) : la fiabilité peut dépasser 20 (bornes du développement) ; la probabilité ne descend pas sous le plancher.
     // D-181 : le département fiabilité réduit (ou augmente) les pannes.
-    const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - fiabiliteVoiture(monde, e, voitureDe(monde, e.id).fiabilite)) * ABANDON_MECANIQUE.parPoint) * facteurAbandon(monde, e.id);
+    // 13c-3 : la chaleur du mois augmente les pannes (course tour par tour).
+    const chaleur = parTours && circuit.temperatureMensuelle ? 1 + HUMAIN_COURSE.pannesParDegre * Math.max(0, circuit.temperatureMensuelle[mois - 1]! - HUMAIN_COURSE.seuilC) : 1;
+    const pMeca = chaleur * Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - fiabiliteVoiture(monde, e, voitureDe(monde, e.id).fiabilite)) * ABANDON_MECANIQUE.parPoint) * facteurAbandon(monde, e.id);
     const pInc = CONSIGNES.conduite[consignes.conduite].incident * (INCIDENT.base + (20 - (p.competences['regularite'] ?? 10)) * INCIDENT.parPoint)
       * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.exigences.risqueAccident / INCIDENT.risqueReference);
     // Banc d'essai : `course.abandons` = 0 neutralise pannes et incidents (les tirages de rythme restent identiques).
@@ -240,13 +242,13 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       depart: c.p.competences['departs'] ?? 10, depassement: c.p.competences['depassement'] ?? 10, defense: c.p.competences['defense'] ?? 10,
       abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null, ...(c.abandon ? { abandonCause: c.abandon } : {}),
       // 13c-1 : petite erreur possible à chaque tour (régularité, consigne de conduite, pluie, circuit).
-      ecartMeteo: c.ecartMeteo, intelligence: c.p.competences['intelligenceCourse'] ?? 10,
+      ecartMeteo: c.ecartMeteo, intelligence: c.p.competences['intelligenceCourse'] ?? 10, condition: c.p.competences['condition'] ?? 10, sangFroid: c.p.traits['sangFroid'] ?? 10,
       pErreur: (NEUTRALISATIONS.erreurBase + NEUTRALISATIONS.erreurParPoint * (20 - (c.p.competences['regularite'] ?? 10))) * CONSIGNES.conduite[c.consignes.conduite].incident
         * (gp.pluie ? NEUTRALISATIONS.erreurPluie : 1) * (circuit.exigences.risqueAccident / NEUTRALISATIONS.risqueReference),
     }));
     const facilite = circuit.course ? PISTE.faciliteParDifficulte[circuit.course.difficulteDepassement - 1]!
       : PISTE.facileBase + PISTE.facileParPoint * ((circuit.exigences.lignesDroites ?? 3) - 1);
-    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie, risque: circuit.exigences.risqueAccident, departPluie: gp.pluie, changementsMeteo },
+    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie, risque: circuit.exigences.risqueAccident, departPluie: gp.pluie, changementsMeteo, exigencePhysique: circuit.exigences.exigencePhysique },
       circuit.sensibilites?.d1['masseKg'] ?? 0, (cle) => tirageLocal(monde, 'course.piste', gp.id, cle));
     const parId = new Map(calcul.map((c) => [c.p.id, c]));
     arrives = etat.ordre.filter((id) => etat.voitures[id]!.enCourse).map((id) => parId.get(id)!);

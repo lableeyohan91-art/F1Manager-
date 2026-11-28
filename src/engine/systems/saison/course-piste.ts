@@ -4,7 +4,7 @@
  * ressortir à sa vraie place, abandons au tour où ils arrivent). Fonctions pures : l'état d'une course est un objet sérialisable, avancé
  * tour par tour (`avancerTour`), ce qui permettra de l'arrêter et de la reprendre (13e). Unités : secondes et % du tour de référence.
  */
-import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, METEO, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES } from '../../balance/course';
+import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, HUMAIN_COURSE, METEO, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES } from '../../balance/course';
 import { CONDITIONS_COURSE, VOITURE_REFERENCE } from '../../balance/profil';
 import type { Flux } from '../../core/hasard';
 import type { CauseAbandon, ConsignesCourse, Neutralisation } from '../../model/types';
@@ -67,6 +67,8 @@ export interface Partant {
   /** 13c-2 : écart de rythme du pilote sous la pluie par rapport au sec (% du tour, positif = plus lent ; compétence pluie, hors
    * ralentissement commun) ; intelligence de course (délai avant de changer de pneus). */
   ecartMeteo?: number; intelligence?: number;
+  /** 13c-3 : compétence condition (fatigue) et trait sang-froid (erreurs sous pression en fin de course). */
+  condition?: number; sangFroid?: number;
 }
 
 export interface EtatVoiture {
@@ -85,6 +87,8 @@ export interface EtatCourse {
   debrisTour: number | null;
   /** 13c-2 : piste mouillée au départ ; tours où elle change. */
   departPluie?: boolean; changementsMeteo?: number[];
+  /** 13c-3 : exigence physique du circuit (1–5). */
+  exigencePhysique?: number;
 }
 
 /** Perte de masse : % du tour pour un écart de masse (kg) à la masse moyenne de course, selon la sensibilité du circuit (s par % de masse). */
@@ -112,7 +116,7 @@ export function initialiserCourse(grille: string[], partants: Partant[], tours: 
  * Données du circuit lues sur la piste : facilité de dépassement (multiplicateur de la probabilité), perte dans l'air perturbé (s par tour)
  * perte d'un passage par la voie des stands hors immobilisation (s, fiche du circuit) ; risque d'accident (neutralisations, erreurs).
  */
-export interface CircuitPiste { facilite: number; airPerturbe: number; perteVoieS: number; /** 13c-1 : risque d'accident (1–5). */ risque?: number; /** 13c-2 : météo. */ departPluie?: boolean; changementsMeteo?: number[] }
+export interface CircuitPiste { facilite: number; airPerturbe: number; perteVoieS: number; /** 13c-1 : risque d'accident (1–5). */ risque?: number; /** 13c-2 : météo. */ departPluie?: boolean; changementsMeteo?: number[]; /** 13c-3 */ exigencePhysique?: number }
 
 /** Temps (s) du prochain tour d'une voiture, hors effets de position ; et si elle s'arrête aux stands à la fin de ce tour. */
 function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number, perteVoieS: number, chance: (x: number) => boolean, facteurStand = 1): { s: number; arret: boolean; perteArretS: number } {
@@ -138,7 +142,7 @@ function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number
   if (mouille !== !!e.departPluie) meteo += (mouille ? 1 : -1) * (p.ecartMeteo ?? 0);
   if (mouille && compose !== 'pluie') meteo += METEO.slickMouillePct;
   if (!mouille && compose === 'pluie' && e.changementsMeteo?.length) meteo += METEO.pluieSecPct;
-  let s = e.tempsS * (1 + (p.base + pneus + carburant + rythme + meteo) / 100);
+  let s = e.tempsS * (1 + (p.base + pneus + carburant + rythme + meteo + fatigue(e, p, t)) / 100);
   const arret = v.relais < v.plan.length - 1 && n >= v.plan[v.relais]!;
   let perteArretS = 0;
   if (arret) {
@@ -169,7 +173,14 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
     const { s, arret } = tempsDuTour(e, v, p, d1MasseS, circuit.perteVoieS, (x) => f.chance(x));
     let tourS = s + e.tempsS * (f.normale(0, PISTE.aleaTourPct) / 100);
     // 13c-1 : petite erreur (sortie large, blocage de roue).
-    if (!arret && p.pErreur && f.chance(p.pErreur)) { tourS += NEUTRALISATIONS.erreurPerteMinS + f.suivant() * (NEUTRALISATIONS.erreurPerteMaxS - NEUTRALISATIONS.erreurPerteMinS); v.erreurs++; }
+    // 13c-3 : la fatigue et la pression de fin de course (podium, voiture juste derrière) rendent les erreurs plus probables.
+    let pErr = p.pErreur ?? 0;
+    const H = HUMAIN_COURSE, fMax = H.fatigueParPoint * 3 * H.conditionMax;
+    pErr *= 1 + H.erreurFatigue * (fatigue(e, p, t) / fMax);
+    const rang = prevOrdre.indexOf(id), derriere = prevOrdre[rang + 1];
+    if (t > e.tours * (1 - H.finPression) && rang < H.podium && derriere && e.voitures[derriere]!.temps - v.temps < H.ecartPressionS)
+      pErr *= Math.max(H.pressionMin, 1 + H.pressionParPoint * (H.sangFroidReference - (p.sangFroid ?? H.sangFroidReference)));
+    if (!arret && pErr && f.chance(pErr)) { tourS += NEUTRALISATIONS.erreurPerteMinS + f.suivant() * (NEUTRALISATIONS.erreurPerteMaxS - NEUTRALISATIONS.erreurPerteMinS); v.erreurs++; }
     // Air perturbé : derrière une voiture à moins de `seuilAirS`, perte proportionnelle à la dépendance du circuit à l'appui.
     if ((ecartDevant.get(id) ?? Infinity) < PISTE.seuilAirS) tourS += circuit.airPerturbe;
     propre.set(id, { fin: v.temps + tourS, arret, tourS });
@@ -227,6 +238,17 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   e.tour = t;
   e.ordre = [...nouvel.filter((id) => e.voitures[id]!.enCourse), ...e.ordre.filter((id) => !e.voitures[id]!.enCourse)];
   declencherNeutralisation(e, partants, circuit, t, tirage);
+}
+
+/* ===================================================================== 13c-3 : fatigue */
+
+/** Perte due à la fatigue physique au tour `t` (% du tour) : après la mi-course, selon l'exigence du circuit et la condition du pilote. */
+export function fatigue(e: EtatCourse, p: Partant, t: number): number {
+  const H = HUMAIN_COURSE;
+  const ex = Math.max(0, (e.exigencePhysique ?? H.exigenceNeutre) - H.exigenceNeutre);
+  const avance = Math.max(0, (t / e.tours - H.debutFatigue) / (1 - H.debutFatigue));
+  const k = Math.min(H.conditionMax, Math.max(H.conditionMin, 1 - H.conditionParPoint * ((p.condition ?? H.conditionReference) - H.conditionReference)));
+  return H.fatigueParPoint * ex * avance * k;
 }
 
 /* ===================================================================== 13c-2 : météo */
@@ -349,6 +371,7 @@ export function courirSurPiste(grille: string[], partants: Partant[], tours: num
   const e = initialiserCourse(grille, partants, tours, tempsS, tirage);
   if (circuit.departPluie) e.departPluie = true;
   if (circuit.changementsMeteo?.length) e.changementsMeteo = [...circuit.changementsMeteo];
+  if (circuit.exigencePhysique !== undefined) e.exigencePhysique = circuit.exigencePhysique;
   const parId = new Map(partants.map((p) => [p.id, p]));
   while (e.tour < tours) avancerTour(e, parId, circuit, d1MasseS, tirage);
   for (const id of grille) { const pos = e.ordre.indexOf(id); if (pos >= 0) e.voitures[id]!.positionsGagnees = grille.indexOf(id) - pos; }

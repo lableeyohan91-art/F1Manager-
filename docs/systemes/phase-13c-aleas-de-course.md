@@ -89,6 +89,14 @@ Le choix volontaire (anticiper, tenter le coup) viendra avec les décisions en c
 
 Grand Prix : départ sous la pluie ou non, tours où la piste change (fiche du Grand Prix, chronique).
 
-## 3. 13c-3
+## 3. 13c-3 — chaleur, fatigue, sang-froid
 
-Conception détaillée écrite avant son code, sur le même modèle.
+- **Fiabilité et chaleur** : la probabilité de panne est multipliée par 1 + 0,03 × (température du mois − 28 °C) au-delà de 28 °C
+  (≈ × 1,2 à 35 °C). L'usure des composants sur la saison (moteurs, boîtes) n'est pas modélisée à ce stade.
+- **Fatigue physique** (situation de la compétence **condition**) : à partir de la mi-course, perte de rythme qui grandit jusqu'à
+  l'arrivée : 0,02 % × (exigence physique du circuit − 2) × avancement, × (1 − 0,07 × (condition − 12)), bornée à [0,3 ; 1,5] ; la
+  fatigue augmente aussi la probabilité de petite erreur (× 1 + 2 × part de la fatigue maximale).
+- **Sang-froid en course** (trait caché) : dans les 15 derniers % de la course, un pilote du podium avec une voiture à moins d'1 s derrière
+  voit sa probabilité de petite erreur multipliée par 1 + 0,1 × (12 − sang-froid), au moins 0,5.
+Ces effets sont petits et mesurés : ils doivent créer des histoires (une fin de course craquée, un pilote endurant qui revient), pas
+changer la hiérarchie.
