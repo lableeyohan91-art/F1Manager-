@@ -383,20 +383,24 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
   }
   verifierIdsUniques('circuits.csv', lcir.map((l, i) => ({ id: circuits[i]!.id, numero: l.numero })), problemes);
   // Phase 12a : sensibilités du temps au tour (tools/circuits/sensibilites-voiture.mts) ; obligatoires pour chaque circuit.
-  {
-    const lse = lireCsv('sensibilites-circuits.csv', fichier(f, 'sensibilites-circuits.csv'), ['id', 'tempsS', 'niveauAileron', ...PARAMETRES_SENSIBILITE.flatMap((k) => [`d1_${k}`, `d2_${k}`])]);
-    const rse = new Lecteur('sensibilites-circuits.csv');
+  // 28/11 (13a bis, remarque du porteur) : si `sensibilites-course.csv` existe (voiture de course : carburant, pneus usés, recharge),
+  // c'est lui que lisent les Grands Prix (`sensibilites`) ; celles de qualification sont gardées à part (`sensibilitesQualif`, phase 13b).
+  for (const nomFichier of ['sensibilites-circuits.csv', 'sensibilites-course.csv'] as const) {
+    if (nomFichier === 'sensibilites-course.csv' && f[nomFichier] === undefined) continue;
+    const lse = lireCsv(nomFichier, fichier(f, nomFichier), ['id', 'tempsS', 'niveauAileron', ...PARAMETRES_SENSIBILITE.flatMap((k) => [`d1_${k}`, `d2_${k}`])]);
+    const rse = new Lecteur(nomFichier);
     const parId = new Map(circuits.map((c) => [c.id, c]));
     for (const l of lse) {
       const c = parId.get(rse.texte(l, 'id'));
-      if (!c) { problemes.push(`sensibilites-circuits.csv ligne ${l.numero} : circuit inconnu`); continue; }
+      if (!c) { problemes.push(`${nomFichier} ligne ${l.numero} : circuit inconnu`); continue; }
+      if (nomFichier === 'sensibilites-course.csv') c.sensibilitesQualif = c.sensibilites;
       c.sensibilites = {
         tempsS: rse.decimal(l, 'tempsS', 30, 200), niveauAileron: rse.decimal(l, 'niveauAileron', -2, 3),
         d1: Object.fromEntries(PARAMETRES_SENSIBILITE.map((k) => [k, rse.decimal(l, `d1_${k}`, -5, 5)])),
         d2: Object.fromEntries(PARAMETRES_SENSIBILITE.map((k) => [k, rse.decimal(l, `d2_${k}`, -5, 5)])),
       };
     }
-    for (const c of circuits) if (!c.sensibilites) problemes.push(`sensibilites-circuits.csv : aucune sensibilité pour ${c.id} (relancer tools/circuits/sensibilites-voiture.mts)`);
+    for (const c of circuits) if (!c.sensibilites) problemes.push(`${nomFichier} : aucune sensibilité pour ${c.id} (relancer tools/circuits/sensibilites-voiture.mts)`);
     problemes.push(...rse.problemes);
   }
 

@@ -152,6 +152,9 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
                 <option value="agressive">agressive</option><option value="neutre">neutre</option><option value="conservatrice">conservatrice</option>
               </select></label>
             ))}
+            <label class="champ">Carburant au départ <select value={consignes.charge ?? 'neutre'} onChange={(v) => agir('course.consignes', { ecurie: ecurieJoueur(m)!.id, pilote: x.id, charge: (v.target as HTMLSelectElement).value }, 'Charge enregistrée.')}>
+              <option value="reduite">réduite (plus léger, risque d’économie ou de panne)</option><option value="neutre">neutre</option><option value="reserve">réserve (plus lourd, marge)</option>
+            </select></label>
           </div>
         </div>
       )}

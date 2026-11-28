@@ -11,7 +11,10 @@
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { appuiNaturel, avecAilerons, courbures, profilVitesse, type Trace, type VoiturePhysique } from '../../src/engine/circuits/profil';
-import { VOITURE_REFERENCE } from '../../src/engine/balance/profil';
+import { VOITURE_REFERENCE as VOITURE_QUALIF, voitureDeCourse } from '../../src/engine/balance/profil';
+// 28/11 : COURSE=1 → voiture de course (CONDITIONS_COURSE) et fichier sensibilites-course.csv ; sinon, voiture de qualification.
+const MODE_COURSE = process.env.COURSE === '1';
+const VOITURE_REFERENCE = MODE_COURSE ? voitureDeCourse(VOITURE_QUALIF) : VOITURE_QUALIF;
 import { PARAMETRES_SENSIBILITE } from '../../src/engine/balance/monoplaces';
 
 /**
@@ -54,5 +57,6 @@ for (const t of traces.sort((a, b) => (a.circuit < b.circuit ? -1 : 1))) {
 // Fichier lu par le moteur (chargement des données), une ligne par circuit.
 const entete = ['id', 'tempsS', 'niveauAileron', ...PARAMETRES_SENSIBILITE.map((k) => `d1_${k}`), ...PARAMETRES_SENSIBILITE.map((k) => `d2_${k}`)];
 const lignes = Object.entries(res).map(([id, r]) => [id, r.tempsS, r.niveauAileron, ...PARAMETRES_SENSIBILITE.map((k) => r.d1[k]), ...PARAMETRES_SENSIBILITE.map((k) => r.d2[k])].join(';'));
-writeFileSync('data/grille-2026/sensibilites-circuits.csv', [entete.join(';'), ...lignes].join('\n') + '\n');
-console.log(`${lignes.length} circuits écrits dans data/grille-2026/sensibilites-circuits.csv (ajustement sur ${ECARTS.join(', ')} %)`);
+const fichier = MODE_COURSE ? 'data/grille-2026/sensibilites-course.csv' : 'data/grille-2026/sensibilites-circuits.csv';
+writeFileSync(fichier, [entete.join(';'), ...lignes].join('\n') + '\n');
+console.log(`${lignes.length} circuits écrits dans ${fichier} (ajustement sur ${ECARTS.join(', ')} %)`);

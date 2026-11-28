@@ -6,7 +6,7 @@ import {
   arretEquipe, CONSIGNES_NEUTRES, courirTours, coutRelais, creerScenarioGrille2026, deserialiser, facteurUsure, meilleureStrategie, serialiser, table,
   TABLES, teamPrincipal, toursCourse, VERSION_FORMAT, type Circuit, type Ecurie, type GrandPrix, type Personne,
 } from '../src/engine';
-import { ARRETS, COMPOSES, RESSOURCES } from '../src/engine/balance/course';
+import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, RESSOURCES } from '../src/engine/balance/course';
 import { lireDonneesGrille2026 } from '../src/platform/node/donnees';
 
 const sc = creerScenarioGrille2026(lireDonneesGrille2026());
@@ -87,4 +87,34 @@ describe('Phase 13a — dans le jeu', () => {
     expect(migre.versionFormat).toBe(VERSION_FORMAT);
     sc.creerMoteur().avancer(migre, 2);
   }, 120_000);
+});
+
+describe('13a bis — pneus, carburant, sensibilités de course', () => {
+  it('mise en température : un relais coûte aussi ses tours de chauffe ; un circuit chaud use plus', () => {
+    const k = COMPOSES.dur;
+    expect(coutRelais('dur', 10, 0) - k.ecart * 10).toBeCloseTo((k.chauffe as readonly number[]).reduce((a, b) => a + b, 0), 6);
+    const chaud = { exigences: { degradationPneus: 3 }, temperatureMensuelle: Array(12).fill(35), sensibilites: { tempsS: 90 } } as unknown as Circuit;
+    const doux = { exigences: { degradationPneus: 3 }, temperatureMensuelle: Array(12).fill(18), sensibilites: { tempsS: 90 } } as unknown as Circuit;
+    expect(facteurUsure(chaud, 12, 16, CONSIGNES_NEUTRES, 6)).toBeGreaterThan(facteurUsure(doux, 12, 16, CONSIGNES_NEUTRES, 6));
+  });
+  it('circuit très dégradant : deux arrêts ou plus ; peu dégradant : un seul', () => {
+    expect(meilleureStrategie(57, facteurUsure(circuit(5), 12, 16, CONSIGNES_NEUTRES), 26, false).relais.length).toBeGreaterThanOrEqual(3);
+    expect(meilleureStrategie(57, facteurUsure(circuit(1), 12, 16, CONSIGNES_NEUTRES), 26, false).relais.length).toBe(2);
+  });
+  it('charge réduite : plus rapide grâce à la masse, mais l’économie forcée coûte ; réduite + carburant agressif : panne sèche', () => {
+    const s = meilleureStrategie(55, 1, 25, false);
+    const n = courirTours(55, s, 1, CONSIGNES_NEUTRES, 90, undefined, () => false, 0.25);
+    const r = courirTours(55, s, 1, { ...CONSIGNES_NEUTRES, charge: 'reduite', carburant: 'conservatrice' }, 90, undefined, () => false, 0.25);
+    expect(n.panneSeche).toBe(false);
+    expect(r.panneSeche).toBe(false);
+    expect(r.carburant).toBeLessThan(n.carburant); // plus léger, et la consigne conservatrice couvre presque le manque
+    const p = courirTours(55, s, 1, { ...CONSIGNES_NEUTRES, charge: 'reduite', carburant: 'agressive' }, 90, undefined, () => false, 0.25);
+    expect(p.panneSeche).toBe(CARBURANT.charge.reduite * -1 + (CONSIGNES.carburant.agressive.conso - 1) - RESSOURCES.margeCarburant > CARBURANT.panneSeuil);
+  });
+  it('les Grands Prix lisent les sensibilités de course ; celles de qualification sont gardées', () => {
+    const m = sc.creerMonde(1);
+    const c = Object.values(table(m, TABLES.circuits))[0] as unknown as Circuit;
+    expect(c.sensibilitesQualif).toBeDefined();
+    expect(c.sensibilites!.tempsS).toBeGreaterThan(c.sensibilitesQualif!.tempsS); // la voiture de course est plus lente
+  });
 });

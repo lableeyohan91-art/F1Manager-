@@ -330,7 +330,7 @@ function TableauDeBord({ partie, nav, lancer, occupe }: { partie: Partie; nav: N
           {derniers && <p class="muted">Dernier : {nomCircuit(m, derniers.circuit)}, vainqueur {nom(personne(m, derniers.resultats.find((r) => r.position === 1)?.pilote ?? ''))}</p>}
           {/* Phase 13a : la course de vos pilotes (place, stratégie, arrêts). */}
           {derniers && derniers.resultats.filter((r) => r.ecurie === e.id).map((r) => (
-            <p key={r.pilote} class="muted petit">{nom(personne(m, r.pilote))} : {r.position ? `${r.position}e` : `abandon (${r.abandon === 'mecanique' ? 'panne' : 'incident'})`}
+            <p key={r.pilote} class="muted petit">{nom(personne(m, r.pilote))} : {r.position ? `${r.position}e` : `abandon (${r.abandon === 'mecanique' ? 'panne' : r.abandon === 'carburant' ? 'panne sèche' : 'incident'})`}
               {r.explication?.strategie ? ` · ${r.explication.strategie.join(' → ')} (${r.explication.strategie.length - 1} arrêt${r.explication.strategie.length > 2 ? 's' : ''})` : ''}</p>
           ))}
           <button class="btn" disabled={occupe || !gp} onClick={() => lancer('grand_prix')}>Jusqu’au Grand Prix ▸</button>

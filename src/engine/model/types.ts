@@ -430,6 +430,8 @@ export interface Circuit {
    * Le niveau d'ailerons interne n'est jamais montré au joueur (D-161).
    */
   sensibilites?: { tempsS: number; niveauAileron: number; d1: Record<string, number>; d2: Record<string, number> };
+  /** 13a bis (28/11) : sensibilités de la voiture de qualification, quand `sensibilites` est celle de course (lues en phase 13b). */
+  sensibilitesQualif?: { tempsS: number; niveauAileron: number; d1: Record<string, number>; d2: Record<string, number> };
 }
 
 export interface VivierCircuit {
@@ -624,12 +626,17 @@ export interface ProjetConception {
   evenement?: string;
 }
 
-export type CauseAbandon = 'mecanique' | 'incident';
+export type CauseAbandon = 'mecanique' | 'incident' | 'carburant';
 
 /** Phase 13a : niveau d'une consigne de course. */
 export type NiveauConsigne = 'agressive' | 'neutre' | 'conservatrice';
 /** Phase 13a : les quatre consignes d'un pilote (fiche d'intention §4). */
-export interface ConsignesCourse { conduite: NiveauConsigne; batterie: NiveauConsigne; carburant: NiveauConsigne; pneus: NiveauConsigne }
+export interface ConsignesCourse {
+  conduite: NiveauConsigne; batterie: NiveauConsigne; carburant: NiveauConsigne; pneus: NiveauConsigne;
+  /** 13a bis : charge de carburant au départ (absente = neutre). */
+  charge?: ChargeCarburant;
+}
+export type ChargeCarburant = 'reduite' | 'neutre' | 'reserve';
 
 export interface ResultatPilote {
   pilote: string;

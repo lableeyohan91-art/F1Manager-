@@ -77,14 +77,21 @@ export const COURSE_TOURS = { dureeCibleS: 5000, toursMin: 40, toursMax: 80, tem
  * avant la falaise ; `falaise` = perte supplémentaire par tour au-delà. L'usure est multipliée par degradationPneus / `degradationReference`.
  * Le composé « pluie » sert sur piste mouillée (pas d'arrêt obligatoire).
  */
+// 13a bis (audit du 28/11 : 0 % de stratégies à deux arrêts, 67 % de « moyen → dur ») : usures plus fortes et plus contrastées,
+// vies plus courtes, mise en température (`chauffe` : perte des premiers tours d'un train neuf, en % du tour, tour 1, 2, 3).
 export const COMPOSES = {
-  tendre: { ecart: 0, usure: 0.09, vie: 18 },
-  moyen: { ecart: 0.35, usure: 0.055, vie: 28 },
-  dur: { ecart: 0.65, usure: 0.035, vie: 40 },
-  pluie: { ecart: 0, usure: 0.04, vie: 60 },
+  tendre: { ecart: 0, usure: 0.14, vie: 14, chauffe: [0.35, 0.1] },
+  moyen: { ecart: 0.6, usure: 0.08, vie: 24, chauffe: [0.6, 0.2] },
+  dur: { ecart: 1.1, usure: 0.045, vie: 36, chauffe: [0.9, 0.35, 0.1] },
+  pluie: { ecart: 0, usure: 0.04, vie: 60, chauffe: [0.5, 0.15] },
 } as const;
+/**
+ * `exposantDegradation` : l'usure suit (dégradation du circuit / référence) ^ exposant (circuits peu et très dégradants plus contrastés) ;
+ * `chaleur` : usure × (1 + parDegre × (température de l'air du mois − seuilC)) au-dessus du seuil (°C).
+ */
 export const PNEUS_COURSE = {
-  falaise: 0.3, degradationReference: 3,
+  /** `facteurVieMin` : plancher du facteur d'usure pour allonger la vie d'un pneu (vie ÷ √facteur). */
+  falaise: 0.4, degradationReference: 3, exposantDegradation: 1.5, facteurVieMin: 0.3, chaleur: { seuilC: 25, parDegre: 0.015 },
   /** Gestion des pneus : usure × (1 − parPoint × (note − référence)), pour le pilote (compétence /20) et la voiture (caractéristique). */
   parPointPilote: 0.03, referencePilote: 12, parPointVoiture: 0.03, referenceVoiture: 16, facteurMin: 0.6,
 };
@@ -108,6 +115,13 @@ export const CONSIGNES = {
  * % du tour · tour) ; réserve de batterie (unités) et perte par tour quand elle est vide (recharge forcée, % du tour).
  */
 export const RESSOURCES = { margeCarburant: 0.01, economieParTourManquant: 5, reserveBatterie: 4, rechargeForcee: 0.12 };
+/**
+ * 13a bis — charge de carburant au départ (décision de préparation, fiche d'intention §10) : part de la charge « neutre » en plus ou en moins
+ * (`charge`), masse de la charge neutre (`masseNeutreKg`, kg : la masse moyenne en course est déjà dans les sensibilités de course) ; une
+ * voiture plus légère gagne selon la sensibilité du circuit à la masse ; si le carburant manque de plus de `panneSeuil` (part de la course)
+ * malgré l'économie, c'est la panne sèche.
+ */
+export const CARBURANT = { charge: { reduite: -0.05, neutre: 0, reserve: 0.03 }, masseNeutreKg: 100, panneSeuil: 0.06 };
 
 /**
  * Arrêts (fiche §6) : perte dans la voie des stands (s) ; immobilisation = `immobilisationMinS` + (100 − rapidité) × `parPointRapidite`

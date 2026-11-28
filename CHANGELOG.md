@@ -767,3 +767,11 @@ Aucun code à ce stade.
 ### Ajouté
 - Course tour par tour (D-192) : composés, usure, falaise, carburant, batterie, quatre consignes par pilote (commande `course.consignes`, fiche pilote), stratégie choisie par l'ingénieur sur une estimation, arrêts selon l'équipe des stands. Format 36. Outil `tools/banc-consignes.mts`.
 - Marché des pilotes ouvert toute l'année (D-193), offres qui expirent après 8 semaines.
+
+## [Phase 13a bis] — 28/11/2026
+
+### Ajouté
+- Sensibilités de course (voiture chargée, pneus usés, recharge électrique) lues par les Grands Prix ; celles de qualification gardées pour la 13b (`data/grille-2026/sensibilites-course.csv`, `COURSE=1 npx tsx tools/circuits/sensibilites-voiture.mts`).
+- Pneus : mise en température, écarts et usures plus contrastés, chaleur du mois, vie qui dépend de l'usure ; stratégies à 1 ou 2 arrêts selon le circuit.
+- Carburant : charge de départ (réduite, neutre, réserve) avec gain de masse, économie forcée et panne sèche ; cause d'abandon « carburant ».
+- Outils : `tools/banc-philosophies.mts`, `tools/banc-pilotes.mts`, `tools/sensibilites-course.mts`, `tools/md-vers-docx.cjs` ; audit du moteur de course.

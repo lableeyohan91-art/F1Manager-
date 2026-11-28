@@ -149,14 +149,14 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     let course: ReturnType<typeof courirTours> | undefined;
     if (parTours) {
       const eq = table(monde, TABLES.equipesStands)[`stands_${e.id}`] as unknown as EquipeArret | undefined;
-      const fReel = facteurUsure(circuit, p.competences['gestionPneus'] ?? 10, voitureDe(monde, e.id).gestionPneus, consignes);
+      const fReel = facteurUsure(circuit, p.competences['gestionPneus'] ?? 10, voitureDe(monde, e.id).gestionPneus, consignes, mois);
       // L'ingénieur estime l'usure avec une erreur (même règle pour toutes les écuries) ; la stratégie se choisit sur cette estimation.
       const ft = tirageLocal(monde, 'course.strategie', gp.id, p.id);
       const fEstime = fReel * Math.max(0.5, 1 + ft.normale(0, ARRETS.erreurEstimation));
       const { immobilisationS } = arretEquipe(eq);
       const strategie = meilleureStrategie(tours, fEstime, ((ARRETS.perteVoieS + immobilisationS) / tempsS) * 100, gp.pluie);
       const fa = tirageLocal(monde, 'course.arrets', gp.id, p.id);
-      course = courirTours(tours, strategie, fReel, consignes, tempsS, eq, (x) => fa.chance(x));
+      course = courirTours(tours, strategie, fReel, consignes, tempsS, eq, (x) => fa.chance(x), circuit.sensibilites?.d1['masseKg'] ?? 0);
     }
     const voiture = (indices.get(e.id) as number) * ECART_VOITURE_PAR_POINT;
     // D-104 à D-108 : niveau du pilote sur CE circuit, affinité, handicaps de nouveauté ; la difficulté technique amplifie l'influence du pilote.
@@ -176,7 +176,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       * (gp.pluie ? INCIDENT.multiplicateurPluie : 1) * (circuit.exigences.risqueAccident / INCIDENT.risqueReference);
     // Banc d'essai : `course.abandons` = 0 neutralise pannes et incidents (les tirages de rythme restent identiques).
     const abandonsActifs = parametre(monde, 'course.abandons', 1) > 0;
-    const abandon = !abandonsActifs ? null : f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : null;
+    const abandon = !abandonsActifs ? null : f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : course?.panneSeche ? ('carburant' as const) : null;
     return {
       p, e, temps: -(voiture + pilote + forme) + alea + pression + (course?.total ?? 0), abandon,
       explication: {

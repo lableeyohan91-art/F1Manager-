@@ -3,7 +3,8 @@
  * stratégie et arrêts. Fonctions pures (aucun état modifié) : la simulation du Grand Prix les appelle et garde la base de rythme
  * (voiture, pilote, forme, aléa) déjà existante. Unités : % du temps au tour de référence du circuit.
  */
-import { ARRETS, COMPOSES, CONSIGNES, COURSE_TOURS, PNEUS_COURSE, RESSOURCES } from '../../balance/course';
+import { VOITURE_REFERENCE } from '../../balance/profil';
+import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, COURSE_TOURS, PNEUS_COURSE, RESSOURCES } from '../../balance/course';
 import type { Circuit, ConsignesCourse } from '../../model/types';
 import type { DefinitionCommande } from '../../core/commandes';
 import { ajouterEvenement } from '../../core/evenements';
@@ -22,18 +23,25 @@ export function toursCourse(circuit: Circuit): number {
 }
 
 /** Multiplicateur d'usure des pneus d'un pilote : circuit, gestion du pilote et de la voiture, consignes de conduite et de pneus. */
-export function facteurUsure(circuit: Circuit, gestionPilote: number, gestionVoiture: number, c: ConsignesCourse): number {
+export function facteurUsure(circuit: Circuit, gestionPilote: number, gestionVoiture: number, c: ConsignesCourse, mois?: number): number {
   const g = Math.max(PNEUS_COURSE.facteurMin, 1 - PNEUS_COURSE.parPointPilote * (gestionPilote - PNEUS_COURSE.referencePilote))
     * Math.max(PNEUS_COURSE.facteurMin, 1 - PNEUS_COURSE.parPointVoiture * (gestionVoiture - PNEUS_COURSE.referenceVoiture));
-  return (circuit.exigences.degradationPneus / PNEUS_COURSE.degradationReference) * g * CONSIGNES.conduite[c.conduite].usure * CONSIGNES.pneus[c.pneus].usure;
+  // 13a bis : contraste selon la dégradation du circuit et chaleur du mois du Grand Prix.
+  const t = mois && circuit.temperatureMensuelle ? circuit.temperatureMensuelle[mois - 1]! : PNEUS_COURSE.chaleur.seuilC;
+  const chaleur = 1 + PNEUS_COURSE.chaleur.parDegre * Math.max(0, t - PNEUS_COURSE.chaleur.seuilC);
+  return Math.pow(circuit.exigences.degradationPneus / PNEUS_COURSE.degradationReference, PNEUS_COURSE.exposantDegradation) * chaleur * g
+    * CONSIGNES.conduite[c.conduite].usure * CONSIGNES.pneus[c.pneus].usure;
 }
 
 /** Perte cumulée (% du tour · tour) d'un relais de `l` tours sur un composé, avec le facteur d'usure `f`. */
 export function coutRelais(compose: Compose, l: number, f: number): number {
   const k = COMPOSES[compose];
   const usure = k.usure * f * (l * (l - 1)) / 2; // tour 1 : pneus neufs
-  const au = Math.max(0, l - k.vie);
-  return k.ecart * l + usure + PNEUS_COURSE.falaise * (au * (au + 1)) / 2;
+  // 13a bis : la falaise arrive plus tard quand l'usure est faible (vie ÷ √facteur, borné).
+  const au = Math.max(0, l - k.vie / Math.sqrt(Math.max(PNEUS_COURSE.facteurVieMin, f)));
+  // 13a bis : mise en température d'un train neuf (les premiers tours du relais).
+  const chauffe = (k.chauffe as readonly number[]).slice(0, l).reduce((a, b) => a + b, 0);
+  return k.ecart * l + usure + PNEUS_COURSE.falaise * (au * (au + 1)) / 2 + chauffe;
 }
 
 export interface Strategie { composes: Compose[]; relais: number[]; cout: number }
@@ -72,13 +80,15 @@ export interface ResultatTours {
   /** Moyenne par tour (en % du tour) de chaque composante. */
   pneus: number; carburant: number; batterie: number; consignes: number; arrets: number;
   total: number; tours: number; composes: Compose[]; erreursArret: number;
+  /** 13a bis : panne sèche (le carburant manque au-delà de ce que l'économie peut rattraper). */
+  panneSeche: boolean;
 }
 
 /**
  * Course d'un pilote, tour par tour : suit la stratégie de son écurie (`strategie`), ses consignes, sa vraie usure (`fReel`), son carburant
  * et sa batterie ; `chances` fournit les tirages (erreurs aux arrêts), dans l'ordre des arrêts.
  */
-export function courirTours(tours: number, strategie: Strategie, fReel: number, c: ConsignesCourse, tempsS: number, eq: EquipeArret | undefined, chance: (p: number) => boolean): ResultatTours {
+export function courirTours(tours: number, strategie: Strategie, fReel: number, c: ConsignesCourse, tempsS: number, eq: EquipeArret | undefined, chance: (p: number) => boolean, d1MasseS = 0): ResultatTours {
   let pneus = 0, carburant = 0, batterie = 0, consignes = 0, arrets = 0, erreurs = 0;
   const rythme = CONSIGNES.conduite[c.conduite].rythme + CONSIGNES.pneus[c.pneus].rythme + CONSIGNES.carburant[c.carburant].rythme;
   // Pneus : relais de la stratégie avec la vraie usure.
@@ -91,9 +101,13 @@ export function courirTours(tours: number, strategie: Strategie, fReel: number, 
     arrets += (s / tempsS) * 100;
   }
   // Carburant : consommation selon la consigne, charge prévue au rythme neutre + marge ; le manque se paie par une économie forcée.
+  // 13a bis : charge de départ (plus légère = plus rapide sur toute la course, selon la sensibilité du circuit à la masse, s par % de masse).
+  const charge = CARBURANT.charge[c.charge ?? 'neutre'];
   const conso = tours * CONSIGNES.carburant[c.carburant].conso;
-  const manque = Math.max(0, conso - tours * (1 + RESSOURCES.margeCarburant));
-  carburant = manque * RESSOURCES.economieParTourManquant;
+  const manque = Math.max(0, conso - tours * (1 + RESSOURCES.margeCarburant + charge));
+  const deltaKg = charge * CARBURANT.masseNeutreKg;
+  carburant = manque * RESSOURCES.economieParTourManquant + tours * ((d1MasseS * (deltaKg / (VOITURE_REFERENCE.masseKg / 100))) / tempsS) * 100;
+  const panneSeche = manque / tours > CARBURANT.panneSeuil;
   // Batterie : réserve dépensée (ou rechargée) tour par tour ; à vide, recharge forcée.
   let reserve = RESSOURCES.reserveBatterie;
   const b = CONSIGNES.batterie[c.batterie];
@@ -104,7 +118,7 @@ export function courirTours(tours: number, strategie: Strategie, fReel: number, 
   }
   consignes = rythme * tours;
   const total = pneus + carburant + batterie + consignes + arrets;
-  return { pneus: pneus / tours, carburant: carburant / tours, batterie: batterie / tours, consignes: consignes / tours, arrets: arrets / tours, total: total / tours, tours, composes: strategie.composes, erreursArret: erreurs };
+  return { pneus: pneus / tours, carburant: carburant / tours, batterie: batterie / tours, consignes: consignes / tours, arrets: arrets / tours, total: total / tours, tours, composes: strategie.composes, erreursArret: erreurs, panneSeche };
 }
 
 /* ===================================================================== Commande commune */
@@ -121,6 +135,7 @@ export function motifRefusConsignes(monde: Monde, auteur: string, prm: Record<st
   const p = table(monde, TABLES.personnes)[String(prm['pilote'] ?? '')] as unknown as Personne | undefined;
   if (!p || p.ecurie !== e.id || p.poste !== 'pilote_titulaire') return 'Pilote titulaire inconnu dans cette écurie.';
   for (const l of LEVIERS) if (prm[l] !== undefined && !NIVEAUX.includes(prm[l] as NiveauConsigne)) return `Consigne ${l} : agressive, neutre ou conservatrice.`;
+  if (prm['charge'] !== undefined && !['reduite', 'neutre', 'reserve'].includes(String(prm['charge']))) return 'Charge de carburant : réduite, neutre ou réserve.';
   return null;
 }
 
@@ -134,6 +149,7 @@ export const commandeConsignes: DefinitionCommande = {
     const avant = e.consignesCourse?.[pilote] ?? CONSIGNES_NEUTRES;
     const apres = { ...avant };
     for (const l of LEVIERS) if (c.parametres[l] !== undefined) apres[l] = c.parametres[l] as NiveauConsigne;
+    if (c.parametres['charge'] !== undefined) apres.charge = c.parametres['charge'] as ConsignesCourse['charge'];
     (e.consignesCourse ??= {})[pilote] = apres;
     ajouterEvenement(monde, {
       type: 'course.consignes', acteurs: [{ id: e.id, role: 'ecurie' }, { id: pilote, role: 'pilote' }, { id: c.auteur, role: 'decideur' }], importance: 1, visibilite: 'prive',

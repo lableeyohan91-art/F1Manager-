@@ -12,7 +12,8 @@ const [ecurie, ng] = [process.argv[2] ?? 'eq_alpine', Number(process.argv[3] ?? 
 const variantes: Record<string, Record<string, string>> = {
   neutre: {}, conduiteAgressive: { conduite: 'agressive' }, conduiteConservatrice: { conduite: 'conservatrice' }, pneusAgressifs: { pneus: 'agressive' },
   pneusConservateurs: { pneus: 'conservatrice' }, carburantAgressif: { carburant: 'agressive' }, carburantConservateur: { carburant: 'conservatrice' },
-  batterieAgressive: { batterie: 'agressive' }, toutAgressif: { conduite: 'agressive', pneus: 'agressive', carburant: 'agressive', batterie: 'agressive' },
+  batterieAgressive: { batterie: 'agressive' }, chargeReduite: { charge: 'reduite' }, chargeReserve: { charge: 'reserve' },
+  chargeReduiteCarburantConservateur: { charge: 'reduite', carburant: 'conservatrice' }, toutAgressif: { conduite: 'agressive', pneus: 'agressive', carburant: 'agressive', batterie: 'agressive' },
   toutConservateur: { conduite: 'conservatrice', pneus: 'conservatrice', carburant: 'conservatrice', batterie: 'conservatrice' },
 };
 const res: Record<string, { pts: number[]; pos: number[]; ab: number[] }> = {};

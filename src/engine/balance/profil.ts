@@ -107,3 +107,19 @@ export const PERTURBATION_SENSIBILITE = 0.02;
  *   (motricité à 40 % à Monaco pour 0,07 s, essai du 24/11/2026).
  */
 export const POINTS_ESSENTIELS = { gainNegligeableS: 0.05, partNegligeable: 0.2 };
+
+/**
+ * Remarque du porteur (28/11 : « tu n'avais pris que les temps en qualification, en course ce n'est pas pareil ») : la voiture « de
+ * course » du profil de vitesse, qui sert à calculer les sensibilités lues par les Grands Prix (data/grille-2026/sensibilites-course.csv).
+ * `carburantMoyenKg` : charge moyenne sur la course (kg, environ la moitié de la charge de départ) ; `adherence` : adhérence moyenne des
+ * pneus usés (part de l'adhérence neuve) ; `energie` : part de l'énergie électrique de qualification déployable par tour en course (la
+ * recharge limite). Valeurs PROVISOIRES (H, ordres de grandeur).
+ */
+export const CONDITIONS_COURSE = { carburantMoyenKg: 50, adherence: 0.96, energie: 0.8 };
+
+/** Voiture de course déduite de la voiture de qualification (CONDITIONS_COURSE). */
+export function voitureDeCourse<T extends typeof VOITURE_REFERENCE>(v: T): T {
+  const a = CONDITIONS_COURSE.adherence;
+  return { ...v, masseKg: v.masseKg + CONDITIONS_COURSE.carburantMoyenKg, muMeca: v.muMeca * a, muAero: v.muAero * a, muMotricite: v.muMotricite * a,
+    muFreinage: v.muFreinage * a, energieElectriqueTourJ: v.energieElectriqueTourJ * CONDITIONS_COURSE.energie };
+}
