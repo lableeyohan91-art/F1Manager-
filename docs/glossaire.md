@@ -255,3 +255,7 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Essais libres (EL1, EL2, EL3)** | Les trois séances avant les qualifications ; chaque pilote titulaire y suit un programme par séance (phase 13b+). |
 | **Programme d'essais** | Travail d'une séance d'essais libres : réglages, longs relais, simulation de qualification, apprentissage du circuit, essai d'une pièce, jeune pilote (phase 13b+). |
 | **Perte de réglage** | Rythme perdu (% du tour) sur tout le week-end parce que le réglage n'a pas été bien trouvé ; réduite par les séances de réglages et le retour technique du pilote (phase 13b+). |
+| **Neutralisation** | Moment où la course est ralentie pour tous : voiture de sécurité (peloton regroupé), VSC (voiture de sécurité virtuelle, écarts conservés) ou drapeau rouge (course arrêtée, pneus neufs pour tous) (phase 13c). |
+| **Petite erreur** | Faute légère d'un pilote pendant un tour (sortie large, blocage de roue), qui coûte 1 à 3 s sans abandon ; dépend de la régularité, de la fatigue et de la pression (phase 13c). |
+| **Changement de météo** | Tour où la piste passe de sèche à mouillée ou l'inverse pendant la course ; chaque voiture rentre changer de pneus après un délai qui dépend de l'intelligence de course (phase 13c). |
+| **Fatigue physique (en course)** | Perte de rythme en seconde moitié de course, selon l'exigence physique du circuit et la condition du pilote (phase 13c). |

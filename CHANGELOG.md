@@ -798,3 +798,15 @@ Aucun code à ce stade.
 
 ### Modifié
 - Détail des résultats arrondi au millième de % du tour (sauvegarde bornée).
+
+## [Phase 13c — aléas de course] — 28/11/2026
+
+### Ajouté
+- Voiture de sécurité, VSC et drapeau rouge (causes : accidents, pannes, débris), arrêts sous neutralisation, relance groupée.
+- Petites erreurs à chaque tour (régularité, consigne de conduite, pluie, circuit, fatigue, pression).
+- Pluie qui arrive ou s'arrête pendant la course, changement de pneus selon l'intelligence de course.
+- Pannes plus fréquentes par forte chaleur ; fatigue physique en fin de course (condition) ; sang-froid sous pression en fin de course.
+- Fiche du Grand Prix : neutralisations, météo, petites erreurs, pneus réellement utilisés.
+
+### Modifié
+- Qualification : part propre au tour lancé et forme du week-end comptée à 60 % (la pole gagnait trop souvent).
