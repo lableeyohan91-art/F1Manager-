@@ -69,13 +69,14 @@ function faireEvoluerAffinite(monde: Monde, p: Personne, circuit: Circuit, sens:
 
 /* ---------------------------------------------------------------- Performance effective */
 
-/** Modificateur de niveau effectif (points) : affinité, circuit découvert, nouvelle écurie. Réduit par l'adaptabilité. */
-export function modificateurNiveau(monde: Monde, p: Personne, circuit: Circuit): { affinite: number; nouveaute: number } {
+/** Modificateur de niveau effectif (points) : affinité, circuit découvert, nouvelle écurie. Réduit par l'adaptabilité ; `facteurCircuit` :
+ * part du handicap « circuit découvert » restant après l'apprentissage aux essais libres (13b+). */
+export function modificateurNiveau(monde: Monde, p: Personne, circuit: Circuit, facteurCircuit = 1): { affinite: number; nouveaute: number } {
   const ex = experienceDe(p);
   const adapt = ADAPTABILITE_REFERENCE - (p.competences['adaptabilite'] ?? 10) / 20;
   const visites = ex?.circuits[circuit.id] ?? 0;
   const gpEcurie = ex && ex.ecurie === p.ecurie ? ex.gpEcurie : 0;
-  const nouveaute = -(NOUVEAU_CIRCUIT.handicap * Math.exp(-visites / NOUVEAU_CIRCUIT.echelle) + NOUVELLE_ECURIE.handicap * Math.exp(-gpEcurie / NOUVELLE_ECURIE.echelle)) * adapt;
+  const nouveaute = -(facteurCircuit * NOUVEAU_CIRCUIT.handicap * Math.exp(-visites / NOUVEAU_CIRCUIT.echelle) + NOUVELLE_ECURIE.handicap * Math.exp(-gpEcurie / NOUVELLE_ECURIE.echelle)) * adapt;
   return { affinite: AFFINITE.parCran * affinite(monde, p, circuit), nouveaute };
 }
 

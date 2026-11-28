@@ -12,7 +12,8 @@ import { arretEquipe, type Compose, type EquipeArret, type Strategie } from './c
 
 /* ===================================================================== Qualifications */
 
-export interface Qualifiable { id: string; rythme: number; regularite: number }
+/** `facteurErreur` : multiplicateur de la probabilité d'erreur (simulation de qualification aux essais libres, 13b+). */
+export interface Qualifiable { id: string; rythme: number; regularite: number; facteurErreur?: number }
 /**
  * Q1, Q2, Q3 (porteur : « vrai format ») : `rythme` = avance du pilote et de sa voiture en conditions de qualification (% du tour,
  * positif = plus rapide). Chaque séance : `tentatives` tours lancés, aléa de tour, erreur possible (régularité), piste qui s'améliore.
@@ -31,7 +32,7 @@ export function qualifier(pilotes: Qualifiable[], sigma: number, tirage: (cle: s
       const f = tirage(`${p.id}|q${s + 1}`);
       let best = Infinity;
       for (let k = 0; k < QUALIFS.tentatives; k++) {
-        const erreur = f.chance(Math.max(0, QUALIFS.erreurBase + (20 - p.regularite) * QUALIFS.erreurParPoint)) ? QUALIFS.perteErreur : 0;
+        const erreur = f.chance(Math.max(0, QUALIFS.erreurBase + (20 - p.regularite) * QUALIFS.erreurParPoint) * (p.facteurErreur ?? 1)) ? QUALIFS.perteErreur : 0;
         best = Math.min(best, -p.rythme + f.normale(0, sigma) + erreur - QUALIFS.evolutionPiste * s);
       }
       meilleur[p.id] = best;

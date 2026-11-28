@@ -140,6 +140,10 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
   // Phase 13a : consignes de course (commande commune `course.consignes`), pour les pilotes titulaires.
   const consignes = ecurieJoueur(m)?.consignesCourse?.[x.id] ?? { conduite: 'neutre', batterie: 'neutre', carburant: 'neutre', pneus: 'neutre' };
   const LEVIERS: [keyof typeof consignes, string][] = [['conduite', 'Conduite'], ['pneus', 'Pneus'], ['carburant', 'Carburant'], ['batterie', 'Batterie']];
+  // Phase 13b+ : programmes d'essais libres (commande commune `essais.programmes`) ; sans choix, plan proposé par l'équipe.
+  const programmes = ecurieJoueur(m)?.programmesEssais?.[x.id];
+  const seances: string[] = programmes ?? ['reglages', 'reglages', 'simulationQualif'];
+  const PROGRAMMES: [string, string][] = [['reglages', 'réglages'], ['longsRelais', 'longs relais'], ['simulationQualif', 'simulation de qualification'], ['apprentissage', 'apprentissage du circuit'], ['essaiPiece', 'essai d’une pièce'], ['jeunePilote', 'jeune pilote']];
   return (
     <>
       {x.poste === 'pilote_titulaire' && (
@@ -155,6 +159,19 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
             <label class="champ">Carburant au départ <select value={consignes.charge ?? 'neutre'} onChange={(v) => agir('course.consignes', { ecurie: ecurieJoueur(m)!.id, pilote: x.id, charge: (v.target as HTMLSelectElement).value }, 'Charge enregistrée.')}>
               <option value="reduite">réduite (plus léger, risque d’économie ou de panne)</option><option value="neutre">neutre</option><option value="reserve">réserve (plus lourd, marge)</option>
             </select></label>
+          </div>
+        </div>
+      )}
+      {x.poste === 'pilote_titulaire' && (
+        <div class="carte">
+          <h3>Essais libres</h3>
+          <p class="muted petit">Trois séances par Grand Prix, un programme par séance{programmes ? '' : ' (pour l’instant : plan proposé par l’équipe)'}. Réglages : plus de rythme tout le week-end (les deux premières séances rapportent le plus) ; longs relais : meilleure stratégie ; simulation de qualification : meilleur tour lancé ; apprentissage : utile sur un circuit inconnu ; essai d’une pièce : peut révéler une pièce fragile ; jeune pilote (EL1) : le jeune apprend le circuit, le titulaire perd la séance.</p>
+          <div class="ligne-champs">
+            {[0, 1, 2].map((i) => (
+              <label key={i} class="champ">EL{i + 1} <select value={seances[i]} onChange={(v) => { const n = [...seances]; n[i] = (v.target as HTMLSelectElement).value; agir('essais.programmes', { ecurie: ecurieJoueur(m)!.id, pilote: x.id, el1: n[0], el2: n[1], el3: n[2] }, 'Programme enregistré.'); }}>
+                {PROGRAMMES.filter(([k]) => i === 0 || k !== 'jeunePilote').map(([k, lib]) => <option key={k} value={k}>{lib}</option>)}
+              </select></label>
+            ))}
           </div>
         </div>
       )}

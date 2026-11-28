@@ -40,6 +40,7 @@ import { ecuriesActives, indiceMoyen, indiceSurCircuit, niveauPilote, pilotesTit
 import { CONSIGNES_NEUTRES, arretEquipe, commandeConsignes, courirTours, facteurUsure, meilleureStrategie, tempsTourS, toursCourse, type EquipeArret } from './course-tours';
 import { ARRETS, CONSIGNES, PISTE, QUALIFS } from '../../balance/course';
 import { courirSurPiste, qualifier, type Partant } from './course-piste';
+import { commandeProgrammesEssais, essaisLibres, type EffetsEssais } from './essais';
 import { fiabiliteVoiture } from '../monoplaces/physique';
 import { ADUO, MOTORISTE_PUISSANCE } from '../../balance/monoplaces';
 
@@ -145,8 +146,12 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   const tours = toursCourse(circuit), tempsS = tempsTourS(circuit);
   // Phase 13b : perte réelle de la voie des stands du circuit (fiche), sinon valeur par défaut.
   const perteVoie = circuit.course ? circuit.course.perteVoieS + ARRETS.perteEntreeSortieS : ARRETS.perteVoieS;
+  // Phase 13b+ : essais libres (programmes de chaque titulaire, pièce fragile trouvée, jeune pilote). Paramètre `course.essais` (1 par
+  // défaut ; 0 = sans essais libres, aucun effet).
+  const essais = parTours && parametre(monde, 'course.essais', 1) > 0 ? essaisLibres(monde, gp, circuit, partants) : new Map<string, EffetsEssais>();
   const calcul = partants.map((p) => {
     const e = ecuries.get(p.ecurie) as Ecurie;
+    const el = essais.get(p.id);
     const f = tirageLocal(monde, 'course', gp.id, p.id);
     const consignes = e.consignesCourse?.[p.id] ?? CONSIGNES_NEUTRES;
     let course: ReturnType<typeof courirTours> | undefined;
@@ -156,7 +161,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       const fReel = facteurUsure(circuit, p.competences['gestionPneus'] ?? 10, voitureDe(monde, e.id).gestionPneus, consignes, mois);
       // L'ingénieur estime l'usure avec une erreur (même règle pour toutes les écuries) ; la stratégie se choisit sur cette estimation.
       const ft = tirageLocal(monde, 'course.strategie', gp.id, p.id);
-      const fEstime = fReel * Math.max(0.5, 1 + ft.normale(0, ARRETS.erreurEstimation));
+      const fEstime = fReel * Math.max(0.5, 1 + ft.normale(0, ARRETS.erreurEstimation * (el?.facteurEstimation ?? 1)));
       const { immobilisationS } = arretEquipe(eq);
       const strategie = meilleureStrategie(tours, fEstime, ((perteVoie + immobilisationS) / tempsS) * 100, gp.pluie);
       const fa = tirageLocal(monde, 'course.arrets', gp.id, p.id);
@@ -166,7 +171,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const voiture = (indices.get(e.id) as number) * ECART_VOITURE_PAR_POINT;
     // D-104 à D-108 : niveau du pilote sur CE circuit, affinité, handicaps de nouveauté ; la difficulté technique amplifie l'influence du pilote.
     const ecartPilote = parametre(monde, 'course.ecartPiloteParPoint', ECART_PILOTE_PAR_POINT) * (DIFFICULTE_CIRCUIT.min + DIFFICULTE_CIRCUIT.parPoint * circuit.exigences.difficulte);
-    const mod = modificateurNiveau(monde, p, circuit);
+    const mod = modificateurNiveau(monde, p, circuit, el?.facteurNouveaute ?? 1);
     const pilote = (niveauPilote(p, gp.pluie, circuit.exigences) + mod.affinite + mod.nouveaute) * ecartPilote;
     // Banc d'essai : `course.pression` = 0 neutralise l'erreur sous pression (1 par défaut).
     const pression = erreurPression(monde, p, saison, gp.manche, gp.id) * parametre(monde, 'course.pression', 1);
@@ -174,6 +179,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const forme = EFFET_FORME_MAX * borner((p.etat.confiance - CONFIANCE_REFERENCE) / (100 - CONFIANCE_REFERENCE), -1, 1)
       + USURE_SUCCES.effetCourse * borner((p.etat.motivation - USURE_SUCCES.motivationReference) / USURE_SUCCES.motivationReference, -1, 0);
     const alea = f.normale(0, sigma);
+    // Phase 13b+ : réglage trouvé (ou non) aux essais libres, % du tour.
+    const reglage = el ? r3(el.reglagePct) : 0;
     // Audit (1.5) : la fiabilité peut dépasser 20 (bornes du développement) ; la probabilité ne descend pas sous le plancher.
     // D-181 : le département fiabilité réduit (ou augmente) les pannes.
     const pMeca = Math.max(ABANDON_MECANIQUE.plancher, ABANDON_MECANIQUE.base + (20 - fiabiliteVoiture(monde, e, voitureDe(monde, e.id).fiabilite)) * ABANDON_MECANIQUE.parPoint) * facteurAbandon(monde, e.id);
@@ -183,9 +190,11 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const abandonsActifs = parametre(monde, 'course.abandons', 1) > 0;
     const abandon = !abandonsActifs ? null : f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : course?.panneSeche ? ('carburant' as const) : null;
     return {
-      p, e, temps: -(voiture + pilote + forme) + alea + pression + (course?.total ?? 0), abandon, consignes, piste, voiture, pilote, forme, alea, pression,
+      p, e, temps: -(voiture + pilote + forme) + alea + pression + reglage + (course?.total ?? 0), abandon, consignes, piste, voiture, pilote, forme, alea, pression, reglage, el,
       explication: {
-        voiture, pilote, forme, alea, affinite: mod.affinite * ecartPilote, nouveaute: mod.nouveaute * ecartPilote, pression,
+        // Sauvegarde bornée : composantes arrondies au millième de % du tour (bien en dessous de toute différence visible).
+        voiture: r3(voiture), pilote: r3(pilote), forme: r3(forme), alea: r3(alea), affinite: r3(mod.affinite * ecartPilote), nouveaute: r3(mod.nouveaute * ecartPilote), pression: r3(pression),
+        ...(reglage ? { reglage } : {}),
         // Sauvegarde bornée : les composantes nulles (consignes neutres) ne sont pas écrites.
         ...(course ? { pneus: r3(course.pneus), arrets: r3(course.arrets), ...(course.carburant ? { carburant: r3(course.carburant) } : {}), ...(course.batterie ? { batterie: r3(course.batterie) } : {}), ...(course.consignes ? { consignes: r3(course.consignes) } : {}), strategie: course.composes.map((x) => ({ tendre: 'T', moyen: 'M', dur: 'D', pluie: 'P' })[x]).join('-'), tours: course.tours } : {}),
       },
@@ -203,12 +212,12 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   if (surPiste) {
     const cq = { ...circuit, sensibilites: circuit.sensibilitesQualif ?? circuit.sensibilites };
     const indQ = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, cq, mois)]));
-    const q = qualifier(calcul.map((c) => ({ id: c.p.id, rythme: (indQ.get(c.e.id) as number) * ECART_VOITURE_PAR_POINT + c.pilote + c.forme - QUALIFS.partFormeWeekend * c.alea, regularite: c.p.competences['regularite'] ?? 10 })),
+    const q = qualifier(calcul.map((c) => ({ id: c.p.id, rythme: (indQ.get(c.e.id) as number) * ECART_VOITURE_PAR_POINT + c.pilote + c.forme - QUALIFS.partFormeWeekend * c.alea - c.reglage + (c.el?.bonusQualifPct ?? 0), regularite: c.p.competences['regularite'] ?? 10, facteurErreur: c.el?.facteurErreurQualif })),
       QUALIFS.sigma * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1), (cle) => tirageLocal(monde, 'qualifs', gp.id, cle));
     grille = q.grille;
     const fab = tirageLocal(monde, 'course.abandonTour', gp.id);
     const partantsPiste: Partant[] = calcul.map((c) => ({
-      id: c.p.id, base: -(c.voiture + c.pilote + c.forme) + c.alea + c.pression, strategie: c.piste!.strategie, fReel: c.piste!.fReel, consignes: c.consignes, equipe: c.piste!.eq,
+      id: c.p.id, base: -(c.voiture + c.pilote + c.forme) + c.alea + c.pression + c.reglage, strategie: c.piste!.strategie, fReel: c.piste!.fReel, consignes: c.consignes, equipe: c.piste!.eq,
       depart: c.p.competences['departs'] ?? 10, depassement: c.p.competences['depassement'] ?? 10, defense: c.p.competences['defense'] ?? 10,
       abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null,
     }));
@@ -530,6 +539,7 @@ export const systemeFinDeSaison: Systeme = {
 
 export function installerSaison(moteur: Moteur): Moteur {
   moteur.commandes.enregistrer(commandeConsignes);
+  moteur.commandes.enregistrer(commandeProgrammesEssais);
   return moteur.ajouterSysteme(systemeIntersaison).ajouterSysteme(systemeGrandsPrix).ajouterSysteme(systemeDeveloppement).ajouterSysteme(systemeFinDeSaison);
 }
 

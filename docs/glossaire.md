@@ -249,3 +249,9 @@ Un mot = un sens, pour le porteur du projet, ChatGPT et Claude Code. Tout terme 
 | **Réduction (d'une installation)** | Retrait d'un niveau d'une installation, sans frais, pour économiser son entretien sous le plafond ; une fois par saison et par installation (D-186). |
 | **Écurie dominante (de l'ère)** | Écurie qui a au moins 3 titres constructeurs depuis le début du règlement en vigueur, ou les 2 derniers titres ; visée par l'anti-domination aux réformes (D-190). |
 | **Entretien hors plafond** | Depuis D-191, l'entretien des installations se paie avec l'argent de l'écurie, en dehors du plafond budgétaire. |
+| **Qualifications (Q1, Q2, Q3)** | Séances qui fixent la grille de départ : toutes les voitures en Q1, les moins rapides éliminées en Q1 puis en Q2, les 10 meilleures se disputent la pole en Q3 (phase 13b). |
+| **Facilité de dépassement** | Multiplicateur de la probabilité de dépassement propre au circuit, tiré de sa difficulté de dépassement (1 facile → 5 très difficile) ; Monaco très faible, Monza forte (phase 13b). |
+| **Forme du week-end** | Part aléatoire du rythme d'un pilote sur un Grand Prix (réglages, sensations), commune aux qualifications et à la course. |
+| **Essais libres (EL1, EL2, EL3)** | Les trois séances avant les qualifications ; chaque pilote titulaire y suit un programme par séance (phase 13b+). |
+| **Programme d'essais** | Travail d'une séance d'essais libres : réglages, longs relais, simulation de qualification, apprentissage du circuit, essai d'une pièce, jeune pilote (phase 13b+). |
+| **Perte de réglage** | Rythme perdu (% du tour) sur tout le week-end parce que le réglage n'a pas été bien trouvé ; réduite par les séances de réglages et le retour technique du pilote (phase 13b+). |

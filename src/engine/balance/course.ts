@@ -166,3 +166,22 @@ export const PISTE = {
   faciliteParDifficulte: [1, 0.75, 0.5, 0.3, 0.12] as readonly number[],
   tenterCollee: 1,
 };
+
+/**
+ * Phase 13b+ — essais libres (fiche docs/systemes/phase-13b-plus-essais-libres.md). `seances` séances par Grand Prix. Effets PAR SÉANCE :
+ * - réglages : erreur de réglage du week-end |N(0 ; reglageSigmaPct)| (% du tour) × `parSeanceReglages`, × (1 − `retourParPoint` ×
+ *   (retour technique − `retourReference`)), facteur borné à [`retourMin`, `retourMax`] ;
+ * - longs relais : erreur d'estimation de l'usure × `parSeanceRelais` ;
+ * - simulation de qualification : probabilité d'erreur en qualification × `parSeanceSimulation`, + `bonusSimulationPct` (% du tour) ;
+ * - apprentissage du circuit : handicap « circuit découvert » × `parSeanceApprentissage` ;
+ * - essai d'une pièce : probabilité `probaPiece` de trouver une pièce montée fragile (12b), alors renforcée ;
+ * - jeune pilote (EL1 seulement) : le jeune apprend le circuit (+`visiteJeune` visite), le titulaire perd la séance.
+ * Plan par défaut : pilote avec moins de `visitesConnu` visites du circuit → apprentissage ; panne au dernier Grand Prix → essai d'une pièce.
+ * Valeurs PROVISOIRES (D-120).
+ */
+export const ESSAIS = {
+  seances: 3,
+  reglageSigmaPct: 0.2, parSeanceReglages: 0.65, retourParPoint: 0.02, retourReference: 12, retourMin: 0.7, retourMax: 1.3,
+  parSeanceRelais: 0.7, parSeanceSimulation: 0.7, bonusSimulationPct: 0.02, parSeanceApprentissage: 0.6,
+  probaPiece: 0.25, visiteJeune: 0.5, visitesConnu: 2,
+};

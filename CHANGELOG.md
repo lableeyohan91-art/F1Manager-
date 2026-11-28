@@ -788,3 +788,13 @@ Aucun code à ce stade.
 ### Modifié
 - Dépassement, défense et départs ne comptent plus dans le rythme moyen du pilote : ils jouent en situation (D-194).
 - McLaren : virages lents 18 → 17 au départ (avance trop forte avec les sensibilités de course).
+
+## [Phase 13b+ — essais libres] — 28/11/2026
+
+### Ajouté
+- Trois séances d'essais libres par Grand Prix, six programmes (réglages, longs relais, simulation de qualification, apprentissage du circuit, essai d'une pièce, jeune pilote), commande commune `essais.programmes`, plan par défaut pour l'IA.
+- Carte « Essais libres » dans la fiche d'un pilote titulaire ; perte de réglage dans le détail des résultats.
+- Événements `essais.programmes`, `essais.piece`, `essais.jeune`. Format de sauvegarde 37 (migration et test). Tests `tests/essais-libres.test.ts`.
+
+### Modifié
+- Détail des résultats arrondi au millième de % du tour (sauvegarde bornée).

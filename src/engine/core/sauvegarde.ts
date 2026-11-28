@@ -366,6 +366,9 @@ const MIGRATIONS: Record<number, Migration> = {
   // v35 → v36 (phase 13a, D-192) : consignes de course facultatives (absentes = neutres), détail des résultats facultatif. Rien à
   // transformer : les courses à venir sont simulées tour par tour.
   35: (m) => ({ ...m, versionFormat: 36 }),
+  // v36 → v37 (phases 13b et 13b+) : programmes d'essais libres facultatifs (absents = plan par défaut), place de grille, dépassements
+  // et réglage facultatifs dans le détail des résultats. Rien à transformer.
+  36: (m) => ({ ...m, versionFormat: 37 }),
 };
 
 export function serialiser(monde: Monde): string {

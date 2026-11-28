@@ -123,6 +123,8 @@ export interface Ecurie {
   delegationRecherche?: boolean;
   /** Phase 13a (D-192) : consignes de course par pilote (absentes = neutres). Commande commune `course.consignes`. */
   consignesCourse?: Record<string, ConsignesCourse>;
+  /** Phase 13b+ : programmes d'essais libres par pilote titulaire (un par séance ; absents = plan par défaut). Commande `essais.programmes`. */
+  programmesEssais?: Record<string, ProgrammeEssais[]>;
   /** Phase 10 : domaines que le joueur confie à son équipe (règles de l'IA). Absent = le joueur décide (défauts inscrits à la prise de fonction). */
   delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands' | 'communication' | 'commercial', boolean>>;
   /** Phase 11 : image publique de l'écurie (−100 à 100, absente = 0). Lue par les sponsors, le conseil et les candidats. */
@@ -634,6 +636,10 @@ export interface ProjetConception {
 
 export type CauseAbandon = 'mecanique' | 'incident' | 'carburant';
 
+/** Phase 13b+ : programme d'une séance d'essais libres. */
+export type ProgrammeEssais = 'reglages' | 'longsRelais' | 'simulationQualif' | 'apprentissage' | 'essaiPiece' | 'jeunePilote';
+export const PROGRAMMES_ESSAIS: readonly ProgrammeEssais[] = ['reglages', 'longsRelais', 'simulationQualif', 'apprentissage', 'essaiPiece', 'jeunePilote'];
+
 /** Phase 13a : niveau d'une consigne de course. */
 export type NiveauConsigne = 'agressive' | 'neutre' | 'conservatrice';
 /** Phase 13a : les quatre consignes d'un pilote (fiche d'intention §4). */
@@ -669,6 +675,8 @@ export interface ResultatPilote {
     strategie?: string; tours?: number;
     /** Phase 13b : place sur la grille de départ et dépassements réussis en course. */
     grille?: number; depassements?: number;
+    /** Phase 13b+ : perte due au réglage trouvé aux essais libres (% du tour ; omise quand nulle). */
+    reglage?: number;
   };
 }
 
