@@ -432,6 +432,12 @@ export interface Circuit {
   sensibilites?: { tempsS: number; niveauAileron: number; d1: Record<string, number>; d2: Record<string, number> };
   /** 13a bis (28/11) : sensibilités de la voiture de qualification, quand `sensibilites` est celle de course (lues en phase 13b). */
   sensibilitesQualif?: { tempsS: number; niveauAileron: number; d1: Record<string, number>; d2: Record<string, number> };
+  /**
+   * Phase 13b (28/11) : données de course tirées de la fiche du circuit (data/grille-2026/course-circuits.csv) : difficulté de dépassement
+   * (1 facile → 5 très difficile ; lue par la probabilité de dépassement) et perte d'un passage par la voie des stands hors immobilisation
+   * (s ; lue par la stratégie et par les arrêts).
+   */
+  course?: { difficulteDepassement: number; perteVoieS: number };
 }
 
 export interface VivierCircuit {
@@ -675,8 +681,6 @@ export interface GrandPrix {
   pluie: boolean;
   termine: boolean;
   resultats: ResultatPilote[];
-  /** Phase 13b : grille de départ issue des qualifications Q1/Q2/Q3 (premier = pole). */
-  grille?: string[];
 }
 
 export interface LigneClassementPilote {

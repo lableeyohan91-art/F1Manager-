@@ -28,10 +28,12 @@ describe('Phase 6a complémentaire — compétences, circuits, mental, expérien
     expect(niveauPilote(rapide, false, suzuka)).toBeGreaterThan(niveauPilote(freineur, false, suzuka));
   });
 
-  it('chaque compétence de pilote a une influence mesurable sur le niveau', () => {
+  it('chaque compétence de pilote a une influence mesurable sur le niveau (sauf celles jouées en situation, phase 13b)', () => {
     const m = sc.creerMonde(1);
     const base = p(m, 'per_okon');
-    for (const c of COMPETENCES_PILOTE) {
+    // D-194 (3) : dépassement, défense et départs ne comptent plus dans le rythme moyen ; ils sont lus sur la piste (course-piste.ts).
+    const enSituation = new Set(['depassement', 'defense', 'departs']);
+    for (const c of COMPETENCES_PILOTE.filter((x) => !enSituation.has(x))) {
       const x = structuredClone(base);
       x.competences[c] = (x.competences[c] ?? 10) + 2;
       expect(niveauPilote(x, true), c).toBeGreaterThan(niveauPilote(base, true));

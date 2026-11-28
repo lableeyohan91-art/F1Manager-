@@ -88,7 +88,7 @@ export interface ResultatTours {
  * Course d'un pilote, tour par tour : suit la stratégie de son écurie (`strategie`), ses consignes, sa vraie usure (`fReel`), son carburant
  * et sa batterie ; `chances` fournit les tirages (erreurs aux arrêts), dans l'ordre des arrêts.
  */
-export function courirTours(tours: number, strategie: Strategie, fReel: number, c: ConsignesCourse, tempsS: number, eq: EquipeArret | undefined, chance: (p: number) => boolean, d1MasseS = 0): ResultatTours {
+export function courirTours(tours: number, strategie: Strategie, fReel: number, c: ConsignesCourse, tempsS: number, eq: EquipeArret | undefined, chance: (p: number) => boolean, d1MasseS = 0, perteVoieS: number = ARRETS.perteVoieS): ResultatTours {
   let pneus = 0, carburant = 0, batterie = 0, consignes = 0, arrets = 0, erreurs = 0;
   const rythme = CONSIGNES.conduite[c.conduite].rythme + CONSIGNES.pneus[c.pneus].rythme + CONSIGNES.carburant[c.carburant].rythme;
   // Pneus : relais de la stratégie avec la vraie usure.
@@ -96,7 +96,7 @@ export function courirTours(tours: number, strategie: Strategie, fReel: number, 
   // Arrêts.
   const { immobilisationS, pErreur } = arretEquipe(eq);
   for (let k = 1; k < strategie.relais.length; k++) {
-    let s = ARRETS.perteVoieS + immobilisationS;
+    let s = perteVoieS + immobilisationS;
     if (chance(pErreur)) { s += ARRETS.perteErreurS; erreurs++; }
     arrets += (s / tempsS) * 100;
   }

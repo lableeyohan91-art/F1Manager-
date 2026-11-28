@@ -381,6 +381,18 @@ export function chargerDonnees(f: FichiersDonnees): DonneesInitiales {
     for (const c of circuits) if (c.pluieMensuelle && c.pluieMensuelle.some((x) => !Number.isFinite(x))) problemes.push(`climat-circuits.csv : ${c.id} n'a pas ses 12 mois`);
     problemes.push(...rcl.problemes);
   }
+  // Phase 13b : difficulté de dépassement et perte de la voie des stands (fichier facultatif, tools/circuits/course-circuits.mts).
+  if (f['course-circuits.csv'] !== undefined) {
+    const lcc = lireCsv('course-circuits.csv', f['course-circuits.csv'], ['id', 'difficulteDepassement', 'perteVoieS']);
+    const rcc = new Lecteur('course-circuits.csv');
+    const parId = new Map(circuits.map((c) => [c.id, c]));
+    for (const l of lcc) {
+      const c = parId.get(rcc.texte(l, 'id'));
+      if (!c) { problemes.push(`course-circuits.csv ligne ${l.numero} : circuit inconnu`); continue; }
+      c.course = { difficulteDepassement: rcc.entier(l, 'difficulteDepassement', 1, 5), perteVoieS: rcc.decimal(l, 'perteVoieS', 5, 40) };
+    }
+    problemes.push(...rcc.problemes);
+  }
   verifierIdsUniques('circuits.csv', lcir.map((l, i) => ({ id: circuits[i]!.id, numero: l.numero })), problemes);
   // Phase 12a : sensibilités du temps au tour (tools/circuits/sensibilites-voiture.mts) ; obligatoires pour chaque circuit.
   // 28/11 (13a bis, remarque du porteur) : si `sensibilites-course.csv` existe (voiture de course : carburant, pneus usés, recharge),

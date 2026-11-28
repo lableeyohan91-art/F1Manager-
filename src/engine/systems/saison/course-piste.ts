@@ -87,8 +87,14 @@ export function initialiserCourse(grille: string[], partants: Partant[], tours: 
   return { tour: 0, tours, tempsS, ordre, voitures };
 }
 
+/**
+ * Données du circuit lues sur la piste : facilité de dépassement (multiplicateur de la probabilité), perte dans l'air perturbé (s par tour)
+ * et perte d'un passage par la voie des stands hors immobilisation (s, fiche du circuit).
+ */
+export interface CircuitPiste { facilite: number; airPerturbe: number; perteVoieS: number }
+
 /** Temps (s) du prochain tour d'une voiture, hors effets de position ; et si elle s'arrête aux stands à la fin de ce tour. */
-function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number, chance: (x: number) => boolean): { s: number; arret: boolean } {
+function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number, perteVoieS: number, chance: (x: number) => boolean): { s: number; arret: boolean } {
   const t = e.tour + 1;
   const compose = p.strategie.composes[v.relais] as Compose;
   const k = COMPOSES[compose];
@@ -109,7 +115,7 @@ function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number
   const arret = v.relais < p.strategie.relais.length - 1 && n >= p.strategie.relais[v.relais]!;
   if (arret) {
     const { immobilisationS, pErreur } = arretEquipe(p.equipe);
-    s += ARRETS.perteVoieS + immobilisationS;
+    s += perteVoieS + immobilisationS;
     if (chance(pErreur)) { s += ARRETS.perteErreurS; v.erreursArret++; }
   }
   return { s, arret };
@@ -120,7 +126,7 @@ function tempsDuTour(e: EtatCourse, v: EtatVoiture, p: Partant, d1MasseS: number
  * rattrape celle de devant tente de la dépasser (au plus une fois par tour) ; ratée, elle reste derrière, à l'écart minimal ; une voiture
  * qui s'arrête aux stands se fait doubler sans combat. Air perturbé et aspiration selon l'écart du tour précédent.
  */
-export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circuit: { facilite: number; airPerturbe: number }, d1MasseS: number, tirage: (cle: string) => Flux): void {
+export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux): void {
   const t = e.tour + 1;
   const prevOrdre = e.ordre.filter((id) => e.voitures[id]!.enCourse);
   const ecartDevant = new Map<string, number>();
@@ -129,7 +135,7 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   for (const id of prevOrdre) {
     const v = e.voitures[id]!, p = partants.get(id)!;
     const f = tirage(`${id}|t${t}`);
-    const { s, arret } = tempsDuTour(e, v, p, d1MasseS, (x) => f.chance(x));
+    const { s, arret } = tempsDuTour(e, v, p, d1MasseS, circuit.perteVoieS, (x) => f.chance(x));
     let tourS = s + e.tempsS * (f.normale(0, PISTE.aleaTourPct) / 100);
     // Air perturbé : derrière une voiture à moins de `seuilAirS`, perte proportionnelle à la dépendance du circuit à l'appui.
     if ((ecartDevant.get(id) ?? Infinity) < PISTE.seuilAirS) tourS += circuit.airPerturbe;
@@ -154,8 +160,9 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
           const batterie = p.consignes.batterie === 'agressive' && v.reserve >= 1 ? PISTE.bonusBatterie : 0;
           const defenseBatterie = pd.consignes.batterie === 'agressive' && e.voitures[devant]!.reserve >= 1 ? PISTE.bonusBatterie : 0;
           const agressif = p.consignes.conduite === 'agressive' ? PISTE.bonusAgressif : 0;
-          const proba = Math.max(0, Math.min(PISTE.probaMax, circuit.facilite * (PISTE.probaBase + PISTE.probaParSeconde * avance)
-            + PISTE.parPointCompetence * (p.depassement - pd.defense) + aspiration + batterie - defenseBatterie + agressif));
+          // La facilité du circuit multiplie toute la probabilité (Monaco ≪ Monza, même pour un très bon dépasseur).
+          const proba = Math.max(0, Math.min(PISTE.probaMax, circuit.facilite * (PISTE.probaBase + PISTE.probaParSeconde * avance
+            + PISTE.parPointCompetence * (p.depassement - pd.defense) + aspiration + batterie - defenseBatterie + agressif)));
           const f = tirage(`${id}|d${t}`);
           passe = f.chance(proba);
           if (batterie) v.reserve -= 1;
@@ -187,7 +194,7 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
 }
 
 /** Course complète : départ puis tous les tours. Renvoie l'état final (ordre d'arrivée des voitures encore en course, puis abandons). */
-export function courirSurPiste(grille: string[], partants: Partant[], tours: number, tempsS: number, circuit: { facilite: number; airPerturbe: number }, d1MasseS: number, tirage: (cle: string) => Flux): EtatCourse {
+export function courirSurPiste(grille: string[], partants: Partant[], tours: number, tempsS: number, circuit: CircuitPiste, d1MasseS: number, tirage: (cle: string) => Flux): EtatCourse {
   const e = initialiserCourse(grille, partants, tours, tempsS, tirage);
   const parId = new Map(partants.map((p) => [p.id, p]));
   while (e.tour < tours) avancerTour(e, parId, circuit, d1MasseS, tirage);

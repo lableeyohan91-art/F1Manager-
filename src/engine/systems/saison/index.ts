@@ -143,6 +143,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   // (1 par défaut, 0 = ancien modèle sans ressources).
   const parTours = parametre(monde, 'course.tours', 1) > 0;
   const tours = toursCourse(circuit), tempsS = tempsTourS(circuit);
+  // Phase 13b : perte réelle de la voie des stands du circuit (fiche), sinon valeur par défaut.
+  const perteVoie = circuit.course ? circuit.course.perteVoieS + ARRETS.perteEntreeSortieS : ARRETS.perteVoieS;
   const calcul = partants.map((p) => {
     const e = ecuries.get(p.ecurie) as Ecurie;
     const f = tirageLocal(monde, 'course', gp.id, p.id);
@@ -156,9 +158,9 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       const ft = tirageLocal(monde, 'course.strategie', gp.id, p.id);
       const fEstime = fReel * Math.max(0.5, 1 + ft.normale(0, ARRETS.erreurEstimation));
       const { immobilisationS } = arretEquipe(eq);
-      const strategie = meilleureStrategie(tours, fEstime, ((ARRETS.perteVoieS + immobilisationS) / tempsS) * 100, gp.pluie);
+      const strategie = meilleureStrategie(tours, fEstime, ((perteVoie + immobilisationS) / tempsS) * 100, gp.pluie);
       const fa = tirageLocal(monde, 'course.arrets', gp.id, p.id);
-      course = courirTours(tours, strategie, fReel, consignes, tempsS, eq, (x) => fa.chance(x), circuit.sensibilites?.d1['masseKg'] ?? 0);
+      course = courirTours(tours, strategie, fReel, consignes, tempsS, eq, (x) => fa.chance(x), circuit.sensibilites?.d1['masseKg'] ?? 0, perteVoie);
       piste = { strategie, fReel, eq };
     }
     const voiture = (indices.get(e.id) as number) * ECART_VOITURE_PAR_POINT;
@@ -197,11 +199,11 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   let grille: string[] | undefined;
   const surPiste = parTours && parametre(monde, 'course.piste', 1) > 0;
   const ecartReel = new Map<string, number>();
-  const detailPiste = new Map<string, { grille: number; depassements: number }>();
+  const detailPiste = new Map<string, { grille: number; depassements?: number }>();
   if (surPiste) {
     const cq = { ...circuit, sensibilites: circuit.sensibilitesQualif ?? circuit.sensibilites };
     const indQ = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, cq, mois)]));
-    const q = qualifier(calcul.map((c) => ({ id: c.p.id, rythme: (indQ.get(c.e.id) as number) * ECART_VOITURE_PAR_POINT + c.pilote + c.forme, regularite: c.p.competences['regularite'] ?? 10 })),
+    const q = qualifier(calcul.map((c) => ({ id: c.p.id, rythme: (indQ.get(c.e.id) as number) * ECART_VOITURE_PAR_POINT + c.pilote + c.forme - QUALIFS.partFormeWeekend * c.alea, regularite: c.p.competences['regularite'] ?? 10 })),
       QUALIFS.sigma * (gp.pluie ? MULTIPLICATEUR_ALEA_PLUIE : 1), (cle) => tirageLocal(monde, 'qualifs', gp.id, cle));
     grille = q.grille;
     const fab = tirageLocal(monde, 'course.abandonTour', gp.id);
@@ -210,14 +212,16 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       depart: c.p.competences['departs'] ?? 10, depassement: c.p.competences['depassement'] ?? 10, defense: c.p.competences['defense'] ?? 10,
       abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null,
     }));
-    const facilite = PISTE.facileBase + PISTE.facileParPoint * ((circuit.exigences.lignesDroites ?? 3) - 1);
-    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3 },
+    const facilite = circuit.course ? PISTE.faciliteParDifficulte[circuit.course.difficulteDepassement - 1]!
+      : PISTE.facileBase + PISTE.facileParPoint * ((circuit.exigences.lignesDroites ?? 3) - 1);
+    const etat = courirSurPiste(grille, partantsPiste, tours, tempsS, { facilite, airPerturbe: PISTE.airPerturbeS * (circuit.exigences.rapides ?? 3) / 3, perteVoieS: perteVoie },
       circuit.sensibilites?.d1['masseKg'] ?? 0, (cle) => tirageLocal(monde, 'course.piste', gp.id, cle));
     const parId = new Map(calcul.map((c) => [c.p.id, c]));
     arrives = etat.ordre.filter((id) => etat.voitures[id]!.enCourse).map((id) => parId.get(id)!);
     const t0 = etat.voitures[arrives[0]?.p.id ?? '']?.temps ?? 0;
     for (const id of etat.ordre) ecartReel.set(id, Math.round(((etat.voitures[id]!.temps - t0) / (tours * tempsS)) * 100 * 1000) / 1000);
-    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, depassements: etat.voitures[id]!.depassements });
+    // Grille et dépassements gardés dans l'explication du résultat (dépassements omis quand nuls, pour borner la sauvegarde).
+    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, ...(etat.voitures[id]!.depassements ? { depassements: etat.voitures[id]!.depassements } : {}) });
     tempsVainqueur = 0;
   }
   const resultats: ResultatPilote[] = [
@@ -232,7 +236,6 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     })),
   ];
   gp.resultats = resultats;
-  if (grille) gp.grille = grille;
   gp.termine = true;
   // Expérience, apprentissage de la pluie, affinités (D-106, D-108).
   apresGrandPrix(monde, circuit, gp.id, gp.pluie, calcul.map((c) => {
