@@ -659,8 +659,8 @@ export interface ResultatPilote {
     voiture: number; pilote: number; forme: number; alea: number; affinite?: number; nouveaute?: number; pression?: number;
     /** Phase 13a : part des pneus, du carburant, de la batterie, des consignes et des arrêts (en % du tour, moyenne de la course). */
     pneus?: number; carburant?: number; batterie?: number; consignes?: number; arrets?: number;
-    /** Phase 13a : stratégie suivie (composés dans l'ordre) et nombre de tours de la course. */
-    strategie?: string[]; tours?: number;
+    /** Phase 13a : stratégie suivie, composés dans l'ordre en initiales (T tendre, M moyen, D dur, P pluie ; « M-D »), et nombre de tours. */
+    strategie?: string; tours?: number;
   };
 }
 

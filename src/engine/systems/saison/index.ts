@@ -181,7 +181,8 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       p, e, temps: -(voiture + pilote + forme) + alea + pression + (course?.total ?? 0), abandon,
       explication: {
         voiture, pilote, forme, alea, affinite: mod.affinite * ecartPilote, nouveaute: mod.nouveaute * ecartPilote, pression,
-        ...(course ? { pneus: r3(course.pneus), carburant: r3(course.carburant), batterie: r3(course.batterie), consignes: r3(course.consignes), arrets: r3(course.arrets), strategie: course.composes, tours: course.tours } : {}),
+        // Sauvegarde bornée : les composantes nulles (consignes neutres) ne sont pas écrites.
+        ...(course ? { pneus: r3(course.pneus), arrets: r3(course.arrets), ...(course.carburant ? { carburant: r3(course.carburant) } : {}), ...(course.batterie ? { batterie: r3(course.batterie) } : {}), ...(course.consignes ? { consignes: r3(course.consignes) } : {}), strategie: course.composes.map((x) => ({ tendre: 'T', moyen: 'M', dur: 'D', pluie: 'P' })[x]).join('-'), tours: course.tours } : {}),
       },
     };
   });
