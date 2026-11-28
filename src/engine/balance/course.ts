@@ -235,3 +235,26 @@ export const HUMAIN_COURSE = {
   fatigueParPoint: 0.02, exigenceNeutre: 2, debutFatigue: 0.5, conditionParPoint: 0.07, conditionReference: 12, conditionMin: 0.3, conditionMax: 1.5, erreurFatigue: 2,
   finPression: 0.15, ecartPressionS: 1, pressionParPoint: 0.1, sangFroidReference: 12, pressionMin: 0.5, podium: 3,
 };
+
+/**
+ * Phase 13d — décisions du stratège en course (fiche docs/systemes/phase-13d-decisions-en-course.md). Par style : undercut (écart max
+ * `ecartUndercutS` s, part du relais faite `partUndercut`), couverture (écart avant l'arrêt de l'autre `ecartCouvertureS` s, part
+ * `partCouverture`), arrêt sous neutralisation (`partRelaisSc`), délai météo ajouté (`meteoDelai`, tours).
+ */
+export const STYLES_STRATEGIE = {
+  prudent: { undercut: false, ecartUndercutS: 0, partUndercut: 1, couvrir: true, ecartCouvertureS: 3, partCouverture: 0.6, partRelaisSc: 0.65, meteoDelai: 1 },
+  equilibre: { undercut: true, ecartUndercutS: 1.8, partUndercut: 0.85, couvrir: true, ecartCouvertureS: 2.5, partCouverture: 0.65, partRelaisSc: 0.6, meteoDelai: 0 },
+  offensif: { undercut: true, ecartUndercutS: 2.5, partUndercut: 0.8, couvrir: false, ecartCouvertureS: 0, partCouverture: 1, partRelaisSc: 0.55, meteoDelai: -1 },
+};
+/** Undercut seulement si le pilote est bloqué : au moins `toursBloque` tours de suite à moins de `ecartBloqueS` s de la voiture devant. */
+export const UNDERCUT = { toursBloque: 3, ecartBloqueS: 1.5 };
+/**
+ * Qualité du stratège (compétence « stratégie » du directeur sportif, 0–20) : chance par tour de voir une occasion = lectureBase +
+ * lectureParPoint × (stratégie − reference), bornée [lectureMin, lectureMax] ; erreur d'estimation de l'usure × (1 − estimationParPoint ×
+ * (stratégie − reference)), bornée [estimationMin, estimationMax] ; délai météo − meteoParPoint × (stratégie − reference) tours. Style de
+ * l'IA selon la propension au risque du directeur sportif : ≥ `offensifRisque` offensif, ≤ `prudentRisque` prudent.
+ */
+export const STRATEGE = {
+  reference: 12, lectureBase: 0.35, lectureParPoint: 0.04, lectureMin: 0.1, lectureMax: 0.8,
+  estimationParPoint: 0.03, estimationMin: 0.5, estimationMax: 1.5, meteoParPoint: 0.1, offensifRisque: 13, prudentRisque: 8, defaut: 10,
+};

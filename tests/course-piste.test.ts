@@ -156,3 +156,20 @@ describe('Phase 13c-3 — fatigue', () => {
     expect(fatigue({ tours: 60, exigencePhysique: 2 } as never, p, 60)).toBe(0);
   });
 });
+
+describe('Phase 13d — décisions du stratège', () => {
+  it('un stratège offensif tente l’undercut quand son pilote est bloqué ; sans style, aucune décision', () => {
+    const compter = (style?: 'offensif') => {
+      let n = 0;
+      for (let g = 1; g <= 10; g++) {
+        // Deux voitures presque égales, la plus rapide derrière : elle reste bloquée.
+        const ps = partants(2, 0).map((p, i) => ({ ...p, base: i === 0 ? 0.05 : 0, ecurie: `e${i}`, ...(style ? { style, lecture: 1 } : {}) }));
+        const e = courirSurPiste(ps.map((p) => p.id), ps, 50, 90, { facilite: 0.05, airPerturbe: 0, perteVoieS: 20 }, 0, tirage(g));
+        n += Object.values(e.voitures).reduce((a, v) => a + v.decisions, 0);
+      }
+      return n;
+    };
+    expect(compter()).toBe(0);
+    expect(compter('offensif')).toBeGreaterThan(0);
+  });
+});

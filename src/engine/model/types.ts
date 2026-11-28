@@ -125,6 +125,8 @@ export interface Ecurie {
   consignesCourse?: Record<string, ConsignesCourse>;
   /** Phase 13b+ : programmes d'essais libres par pilote titulaire (un par séance ; absents = plan par défaut). Commande `essais.programmes`. */
   programmesEssais?: Record<string, ProgrammeEssais[]>;
+  /** Phase 13d : style de stratégie en course choisi par le joueur (absent = selon la personnalité du directeur sportif). */
+  styleStrategie?: StyleStrategie;
   /** Phase 10 : domaines que le joueur confie à son équipe (règles de l'IA). Absent = le joueur décide (défauts inscrits à la prise de fonction). */
   delegations?: Partial<Record<'pilotes' | 'personnel' | 'academie' | 'politique' | 'stands' | 'communication' | 'commercial', boolean>>;
   /** Phase 11 : image publique de l'écurie (−100 à 100, absente = 0). Lue par les sponsors, le conseil et les candidats. */
@@ -639,6 +641,9 @@ export type CauseAbandon = 'mecanique' | 'incident' | 'carburant';
 /** Phase 13c-1 : neutralisation d'une course (voiture de sécurité, VSC, drapeau rouge), avec sa cause. */
 export interface Neutralisation { type: 'sc' | 'vsc' | 'rouge'; tour: number; tours: number; cause: 'incident' | 'mecanique' | 'debris'; pilote?: string }
 
+/** Phase 13d : style du stratège en course. */
+export type StyleStrategie = 'prudent' | 'equilibre' | 'offensif';
+
 /** Phase 13b+ : programme d'une séance d'essais libres. */
 export type ProgrammeEssais = 'reglages' | 'longsRelais' | 'simulationQualif' | 'apprentissage' | 'essaiPiece' | 'jeunePilote';
 export const PROGRAMMES_ESSAIS: readonly ProgrammeEssais[] = ['reglages', 'longsRelais', 'simulationQualif', 'apprentissage', 'essaiPiece', 'jeunePilote'];
@@ -682,6 +687,8 @@ export interface ResultatPilote {
     reglage?: number;
     /** Phase 13c-1 : petites erreurs commises pendant la course (omis quand aucune). */
     erreurs?: number;
+    /** Phase 13d : arrêts décidés en course par le stratège (undercut, couverture ; omis quand aucun). */
+    decisions?: number;
   };
 }
 

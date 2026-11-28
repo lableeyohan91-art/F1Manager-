@@ -149,6 +149,10 @@ function ActionsEmploye({ partie, x, agir }: { partie: Partie; x: Personne; agir
       {x.poste === 'pilote_titulaire' && (
         <div class="carte">
           <h3>Consignes de course</h3>
+          <label class="champ">Style de stratégie de l’écurie <select value={ecurieJoueur(m)?.styleStrategie ?? ''} onChange={(v) => agir('course.style', { ecurie: ecurieJoueur(m)!.id, style: (v.target as HTMLSelectElement).value }, 'Style de stratégie enregistré.')}>
+            {!ecurieJoueur(m)?.styleStrategie && <option value="">selon votre directeur sportif</option>}
+            <option value="prudent">prudent (répond aux arrêts des autres)</option><option value="equilibre">équilibré</option><option value="offensif">offensif (tente l’undercut)</option>
+          </select></label>
           <p class="muted petit">Valables jusqu’à nouvel ordre. Agressive : plus rapide, mais pneus, carburant ou batterie s’épuisent plus vite (et plus d’incidents en conduite) ; conservatrice : l’inverse.</p>
           <div class="ligne-champs">
             {LEVIERS.map(([k, lib]) => (

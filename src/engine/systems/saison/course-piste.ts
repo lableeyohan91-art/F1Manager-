@@ -4,10 +4,10 @@
  * ressortir à sa vraie place, abandons au tour où ils arrivent). Fonctions pures : l'état d'une course est un objet sérialisable, avancé
  * tour par tour (`avancerTour`), ce qui permettra de l'arrêter et de la reprendre (13e). Unités : secondes et % du tour de référence.
  */
-import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, HUMAIN_COURSE, METEO, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES } from '../../balance/course';
+import { ARRETS, CARBURANT, COMPOSES, CONSIGNES, HUMAIN_COURSE, METEO, NEUTRALISATIONS, PISTE, PNEUS_COURSE, QUALIFS, RESSOURCES, STYLES_STRATEGIE, UNDERCUT } from '../../balance/course';
 import { CONDITIONS_COURSE, VOITURE_REFERENCE } from '../../balance/profil';
 import type { Flux } from '../../core/hasard';
-import type { CauseAbandon, ConsignesCourse, Neutralisation } from '../../model/types';
+import type { CauseAbandon, ConsignesCourse, Neutralisation, StyleStrategie } from '../../model/types';
 import { arretEquipe, type Compose, type EquipeArret, type Strategie } from './course-tours';
 
 /* ===================================================================== Qualifications */
@@ -69,6 +69,8 @@ export interface Partant {
   ecartMeteo?: number; intelligence?: number;
   /** 13c-3 : compétence condition (fatigue) et trait sang-froid (erreurs sous pression en fin de course). */
   condition?: number; sangFroid?: number;
+  /** 13d : écurie (pas d'undercut contre son coéquipier), style du stratège, chance par tour de voir une occasion, délai météo ajouté. */
+  ecurie?: string; style?: StyleStrategie; lecture?: number; delaiMeteo?: number;
 }
 
 export interface EtatVoiture {
@@ -78,6 +80,10 @@ export interface EtatVoiture {
   plan: number[]; erreurs: number;
   /** 13c-2 : composés des relais (copie de la stratégie, changée quand la météo change) ; tour où la voiture rentrera changer de pneus. */
   composes: Compose[]; changementPrevu?: number;
+  /** 13d : dernier arrêt (tour), voiture devant et écart à ce moment ; arrêts décidés en course. */
+  dernierArret?: number; devantAuArret?: string; ecartAuArret?: number; decisions: number;
+  /** 13d : tours de suite passés bloqué derrière la voiture devant. */
+  toursBloque?: number;
 }
 export interface EtatCourse {
   tour: number; tours: number; tempsS: number; ordre: string[]; voitures: Record<string, EtatVoiture>;
@@ -104,7 +110,7 @@ export function initialiserCourse(grille: string[], partants: Partant[], tours: 
     const p = parId.get(id)!;
     const f = tirage(`${id}|depart`);
     const depart = i * PISTE.ecartGrilleS - PISTE.departParPoint * (p.depart - PISTE.departReference) + f.normale(0, PISTE.departSigmaS);
-    voitures[id] = { id, temps: Math.max(0, depart), tour: 0, relais: 0, tourRelais: 0, reserve: RESSOURCES.reserveBatterie, enCourse: true, depassements: 0, positionsGagnees: 0, erreursArret: 0, plan: [...p.strategie.relais], erreurs: 0, composes: [...p.strategie.composes] };
+    voitures[id] = { id, temps: Math.max(0, depart), tour: 0, relais: 0, tourRelais: 0, reserve: RESSOURCES.reserveBatterie, enCourse: true, depassements: 0, positionsGagnees: 0, erreursArret: 0, plan: [...p.strategie.relais], erreurs: 0, composes: [...p.strategie.composes], decisions: 0 };
   });
   const ordre = [...grille].sort((a, b) => voitures[a]!.temps - voitures[b]!.temps || grille.indexOf(a) - grille.indexOf(b));
   const fd = tirage('debris');
@@ -165,6 +171,7 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   const prevOrdre = e.ordre.filter((id) => e.voitures[id]!.enCourse);
   const ecartDevant = new Map<string, number>();
   prevOrdre.forEach((id, i) => { if (i > 0) ecartDevant.set(id, e.voitures[id]!.temps - e.voitures[prevOrdre[i - 1]!]!.temps); });
+  decisionsStrategie(e, partants, t, prevOrdre, ecartDevant, tirage);
   const propre = new Map<string, { fin: number; arret: boolean; tourS: number }>();
   for (const id of prevOrdre) {
     const v = e.voitures[id]!, p = partants.get(id)!;
@@ -230,7 +237,11 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
       } else { v.temps = fin; nouvel.push(id); }
     } else { v.temps = fin; nouvel.push(id); }
     // Relais et batterie.
-    if (propre.get(id)!.arret) { v.relais++; v.tourRelais = 0; } else v.tourRelais++;
+    if (propre.get(id)!.arret) {
+      v.relais++; v.tourRelais = 0; v.dernierArret = t;
+      const k = prevOrdre.indexOf(id);
+      if (k > 0) { v.devantAuArret = prevOrdre[k - 1]; v.ecartAuArret = ecartDevant.get(id); } else delete v.devantAuArret;
+    } else v.tourRelais++;
     v.reserve = Math.min(RESSOURCES.reserveBatterie, v.reserve + PISTE.rechargeParTour);
     v.tour = t;
     if (p.abandonTour !== null && t >= p.abandonTour) v.enCourse = false;
@@ -238,6 +249,38 @@ export function avancerTour(e: EtatCourse, partants: Map<string, Partant>, circu
   e.tour = t;
   e.ordre = [...nouvel.filter((id) => e.voitures[id]!.enCourse), ...e.ordre.filter((id) => !e.voitures[id]!.enCourse)];
   declencherNeutralisation(e, partants, circuit, t, tirage);
+}
+
+/* ===================================================================== 13d : décisions du stratège */
+
+/**
+ * Le stratège de chaque voiture regarde la course (positions, écarts, arrêts des autres) et peut avancer l'arrêt de son pilote :
+ * undercut sur la voiture devant, ou couverture quand la voiture derrière vient de s'arrêter. Il ne voit une occasion qu'avec la
+ * probabilité `lecture` (compétence stratégie du directeur sportif).
+ */
+function decisionsStrategie(e: EtatCourse, partants: Map<string, Partant>, t: number, ordre: string[], ecartDevant: Map<string, number>, tirage: (cle: string) => Flux): void {
+  if (t <= 1) return;
+  ordre.forEach((id, i) => {
+    const v = e.voitures[id]!, p = partants.get(id)!;
+    v.toursBloque = (ecartDevant.get(id) ?? Infinity) < UNDERCUT.ecartBloqueS ? (v.toursBloque ?? 0) + 1 : 0;
+    if (!p.style || v.relais >= v.plan.length - 1) return;
+    if (v.composes[v.relais] === 'pluie' || v.changementPrevu !== undefined) return; // la météo décide
+    const S = STYLES_STRATEGIE[p.style];
+    const fait = (v.tourRelais + 1) / v.plan[v.relais]!;
+    const devant = ordre[i - 1];
+    const autreEcurie = (x: string) => partants.get(x)!.ecurie !== p.ecurie;
+    const doitArreter = (x: string) => e.voitures[x]!.relais < e.voitures[x]!.plan.length - 1;
+    let decide = false;
+    if (S.undercut && devant && autreEcurie(devant) && doitArreter(devant) && (ecartDevant.get(id) ?? Infinity) <= S.ecartUndercutS && (v.toursBloque ?? 0) >= UNDERCUT.toursBloque && fait >= S.partUndercut
+      // Pneus de la voiture devant au moins aussi usés (tours faits, information publique) : elle ne pourra pas rester longtemps dehors.
+      && e.voitures[devant]!.tourRelais >= v.tourRelais) decide = true;
+    if (!decide && S.couvrir && fait >= S.partCouverture) {
+      decide = ordre.some((x) => x !== id && autreEcurie(x) && e.voitures[x]!.dernierArret === t - 1 && e.voitures[x]!.devantAuArret === id && (e.voitures[x]!.ecartAuArret ?? Infinity) <= S.ecartCouvertureS);
+    }
+    if (!decide || !tirage(`${id}|s${t}`).chance(p.lecture ?? 0)) return;
+    replanifier(v, v.tourRelais + 1, e.tours - t);
+    v.decisions++;
+  });
 }
 
 /* ===================================================================== 13c-3 : fatigue */
@@ -266,7 +309,7 @@ function reagirMeteo(e: EtatCourse, v: EtatVoiture, p: Partant, t: number, tirag
   if (mouille === pneuPluie) { delete v.changementPrevu; return; }
   if (v.changementPrevu === undefined) {
     const f = tirage(`${v.id}|m${t}`);
-    v.changementPrevu = t + Math.max(0, Math.min(METEO.delaiMax, Math.round(METEO.delaiBase - METEO.delaiParPoint * ((p.intelligence ?? 10) - 10) + f.normale(0, METEO.delaiSigma))));
+    v.changementPrevu = t + Math.max(0, Math.min(METEO.delaiMax, Math.round(METEO.delaiBase - METEO.delaiParPoint * ((p.intelligence ?? 10) - 10) + (p.delaiMeteo ?? 0) + f.normale(0, METEO.delaiSigma))));
   }
   const reste = e.tours - t;
   if (t < v.changementPrevu || reste <= 0) return;
@@ -335,12 +378,12 @@ function tourNeutralise(e: EtatCourse, partants: Map<string, Partant>, circuit: 
     if (n.type === 'rouge') {
       // Drapeau rouge : pneus neufs pour tous au premier tour, sans perte (le relais suivant commence si un arrêt restait à faire).
       if (premier) { if (restants > 0) { replanifier(v, v.tourRelais, e.tours - e.tour); v.relais++; } v.tourRelais = 0; }
-    } else if (restants > 0 && v.tourRelais + 1 >= N.partRelaisArret * v.plan[v.relais]!) replanifier(v, v.tourRelais + 1, e.tours - t);
+    } else if (restants > 0 && v.tourRelais + 1 >= (p.style ? STYLES_STRATEGIE[p.style].partRelaisSc : N.partRelaisArret) * v.plan[v.relais]!) replanifier(v, v.tourRelais + 1, e.tours - t);
     reagirMeteo(e, v, p, t, tirage);
     const f = tirage(`${id}|t${t}`);
     const { arret, perteArretS } = tempsDuTour(e, v, p, d1MasseS, circuit.perteVoieS, (x) => f.chance(x), facteurStand);
     arrets.set(id, arret ? perteArretS : 0);
-    if (arret) { v.relais++; v.tourRelais = 0; } else v.tourRelais++;
+    if (arret) { v.relais++; v.tourRelais = 0; v.dernierArret = t; delete v.devantAuArret; } else v.tourRelais++;
     v.reserve = Math.min(RESSOURCES.reserveBatterie, v.reserve + PISTE.rechargeParTour);
     v.tour = t;
   }

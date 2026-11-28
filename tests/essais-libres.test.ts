@@ -59,3 +59,17 @@ describe('Phase 13b+ — essais libres', () => {
     sc.creerMoteur().avancer(migre, 2);
   }, 120_000);
 });
+
+describe('Phase 13d — style de stratégie', () => {
+  it('commande commune : style refusé s’il est inconnu, gardé sinon ; le stratège en tient compte', async () => {
+    const { stratege } = await import('../src/engine/systems/saison/stratege');
+    const m = sc.creerMonde(2), mo = sc.creerMoteur();
+    mo.avancer(m, 1);
+    const e = table(m, TABLES.ecuries)['eq_alpine'] as unknown as Ecurie, tp = teamPrincipal(m, e.id)!;
+    const cmd = (style: string) => mo.commandes.executer(m, { type: 'course.style', auteur: tp.id, source: 'exterieur', parametres: { ecurie: e.id, style } });
+    expect(cmd('kamikaze').ok).toBe(false);
+    expect(cmd('offensif').ok).toBe(true);
+    expect(stratege(m, e).style).toBe('offensif');
+    expect(stratege(m, e).lecture).toBeGreaterThan(0);
+  });
+});

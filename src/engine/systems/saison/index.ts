@@ -41,6 +41,7 @@ import { CONSIGNES_NEUTRES, arretEquipe, commandeConsignes, courirTours, facteur
 import { ARRETS, CONSIGNES, HUMAIN_COURSE, METEO, NEUTRALISATIONS, PISTE, QUALIFS } from '../../balance/course';
 import { courirSurPiste, qualifier, type Partant } from './course-piste';
 import { commandeProgrammesEssais, essaisLibres, type EffetsEssais } from './essais';
+import { commandeStyleStrategie, stratege } from './stratege';
 import { fiabiliteVoiture } from '../monoplaces/physique';
 import { ADUO, MOTORISTE_PUISSANCE } from '../../balance/monoplaces';
 
@@ -164,9 +165,12 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   // Phase 13b+ : essais libres (programmes de chaque titulaire, pièce fragile trouvée, jeune pilote). Paramètre `course.essais` (1 par
   // défaut ; 0 = sans essais libres, aucun effet).
   const essais = parTours && parametre(monde, 'course.essais', 1) > 0 ? essaisLibres(monde, gp, circuit, partants) : new Map<string, EffetsEssais>();
+  // Phase 13d : stratège de chaque écurie (style, qualité).
+  const strateges = new Map([...ecuries.values()].map((e) => [e.id, stratege(monde, e)]));
   const calcul = partants.map((p) => {
     const e = ecuries.get(p.ecurie) as Ecurie;
     const el = essais.get(p.id);
+    const st = strateges.get(e.id)!;
     const f = tirageLocal(monde, 'course', gp.id, p.id);
     const consignes = e.consignesCourse?.[p.id] ?? CONSIGNES_NEUTRES;
     let course: ReturnType<typeof courirTours> | undefined;
@@ -176,7 +180,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       const fReel = facteurUsure(circuit, p.competences['gestionPneus'] ?? 10, voitureDe(monde, e.id).gestionPneus, consignes, mois);
       // L'ingénieur estime l'usure avec une erreur (même règle pour toutes les écuries) ; la stratégie se choisit sur cette estimation.
       const ft = tirageLocal(monde, 'course.strategie', gp.id, p.id);
-      const fEstime = fReel * Math.max(0.5, 1 + ft.normale(0, ARRETS.erreurEstimation * (el?.facteurEstimation ?? 1)));
+      const fEstime = fReel * Math.max(0.5, 1 + ft.normale(0, ARRETS.erreurEstimation * (el?.facteurEstimation ?? 1) * st.facteurEstimation));
       const { immobilisationS } = arretEquipe(eq);
       const strategie = meilleureStrategie(tours, fEstime, ((perteVoie + immobilisationS) / tempsS) * 100, gp.pluie);
       const fa = tirageLocal(monde, 'course.arrets', gp.id, p.id);
@@ -209,7 +213,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const abandonsActifs = parametre(monde, 'course.abandons', 1) > 0;
     const abandon = !abandonsActifs ? null : f.chance(pMeca) ? ('mecanique' as const) : f.chance(pInc) ? ('incident' as const) : course?.panneSeche ? ('carburant' as const) : null;
     return {
-      p, e, temps: -(voiture + pilote + forme) + alea + pression + reglage + (course?.total ?? 0), abandon, consignes, piste, voiture, pilote, forme, alea, pression, reglage, el, ecartMeteo,
+      p, e, temps: -(voiture + pilote + forme) + alea + pression + reglage + (course?.total ?? 0), abandon, consignes, piste, voiture, pilote, forme, alea, pression, reglage, el, ecartMeteo, st,
       explication: {
         // Sauvegarde bornée : composantes arrondies au millième de % du tour (bien en dessous de toute différence visible).
         voiture: r3(voiture), pilote: r3(pilote), forme: r3(forme), alea: r3(alea), affinite: r3(mod.affinite * ecartPilote), nouveaute: r3(mod.nouveaute * ecartPilote), pression: r3(pression),
@@ -227,7 +231,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
   let grille: string[] | undefined;
   const surPiste = parTours && parametre(monde, 'course.piste', 1) > 0;
   const ecartReel = new Map<string, number>();
-  const detailPiste = new Map<string, { grille: number; depassements?: number; erreurs?: number; strategie: string }>();
+  const detailPiste = new Map<string, { grille: number; depassements?: number; erreurs?: number; decisions?: number; strategie: string }>();
   if (surPiste) {
     const cq = { ...circuit, sensibilites: circuit.sensibilitesQualif ?? circuit.sensibilites };
     const indQ = new Map([...ecuries.values()].map((e) => [e.id, indiceSurCircuit(monde, e, cq, mois)]));
@@ -242,6 +246,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
       depart: c.p.competences['departs'] ?? 10, depassement: c.p.competences['depassement'] ?? 10, defense: c.p.competences['defense'] ?? 10,
       abandonTour: c.abandon ? 1 + Math.floor(fab.suivant() * tours) : null, ...(c.abandon ? { abandonCause: c.abandon } : {}),
       // 13c-1 : petite erreur possible à chaque tour (régularité, consigne de conduite, pluie, circuit).
+      ecurie: c.e.id, style: c.st.style, lecture: c.st.lecture, delaiMeteo: c.st.delaiMeteo,
       ecartMeteo: c.ecartMeteo, intelligence: c.p.competences['intelligenceCourse'] ?? 10, condition: c.p.competences['condition'] ?? 10, sangFroid: c.p.traits['sangFroid'] ?? 10,
       pErreur: (NEUTRALISATIONS.erreurBase + NEUTRALISATIONS.erreurParPoint * (20 - (c.p.competences['regularite'] ?? 10))) * CONSIGNES.conduite[c.consignes.conduite].incident
         * (gp.pluie ? NEUTRALISATIONS.erreurPluie : 1) * (circuit.exigences.risqueAccident / NEUTRALISATIONS.risqueReference),
@@ -255,7 +260,7 @@ export function simulerGrandPrix(monde: Monde, idGp: string): GrandPrix {
     const t0 = etat.voitures[arrives[0]?.p.id ?? '']?.temps ?? 0;
     for (const id of etat.ordre) ecartReel.set(id, Math.round(((etat.voitures[id]!.temps - t0) / (tours * tempsS)) * 100 * 1000) / 1000);
     // Grille et dépassements gardés dans l'explication du résultat (dépassements omis quand nuls, pour borner la sauvegarde).
-    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, ...(etat.voitures[id]!.depassements ? { depassements: etat.voitures[id]!.depassements } : {}), ...(etat.voitures[id]!.erreurs ? { erreurs: etat.voitures[id]!.erreurs } : {}),
+    for (const id of grille) detailPiste.set(id, { grille: grille.indexOf(id) + 1, ...(etat.voitures[id]!.depassements ? { depassements: etat.voitures[id]!.depassements } : {}), ...(etat.voitures[id]!.erreurs ? { erreurs: etat.voitures[id]!.erreurs } : {}), ...(etat.voitures[id]!.decisions ? { decisions: etat.voitures[id]!.decisions } : {}),
       // Pneus réellement utilisés (arrêts sous neutralisation, changements de météo).
       strategie: etat.voitures[id]!.composes.slice(0, etat.voitures[id]!.relais + 1).map((x) => ({ tendre: 'T', moyen: 'M', dur: 'D', pluie: 'P' })[x]).join('-') });
     // 13c-1 : neutralisations gardées dans le Grand Prix, chacune avec son événement (cause : pilote et type d'abandon, ou débris).
@@ -575,6 +580,7 @@ export const systemeFinDeSaison: Systeme = {
 export function installerSaison(moteur: Moteur): Moteur {
   moteur.commandes.enregistrer(commandeConsignes);
   moteur.commandes.enregistrer(commandeProgrammesEssais);
+  moteur.commandes.enregistrer(commandeStyleStrategie);
   return moteur.ajouterSysteme(systemeIntersaison).ajouterSysteme(systemeGrandsPrix).ajouterSysteme(systemeDeveloppement).ajouterSysteme(systemeFinDeSaison);
 }
 
