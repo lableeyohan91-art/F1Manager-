@@ -661,6 +661,8 @@ export interface ResultatPilote {
     pneus?: number; carburant?: number; batterie?: number; consignes?: number; arrets?: number;
     /** Phase 13a : stratégie suivie, composés dans l'ordre en initiales (T tendre, M moyen, D dur, P pluie ; « M-D »), et nombre de tours. */
     strategie?: string; tours?: number;
+    /** Phase 13b : place sur la grille de départ et dépassements réussis en course. */
+    grille?: number; depassements?: number;
   };
 }
 
@@ -673,6 +675,8 @@ export interface GrandPrix {
   pluie: boolean;
   termine: boolean;
   resultats: ResultatPilote[];
+  /** Phase 13b : grille de départ issue des qualifications Q1/Q2/Q3 (premier = pole). */
+  grille?: string[];
 }
 
 export interface LigneClassementPilote {

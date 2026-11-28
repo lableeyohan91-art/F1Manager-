@@ -25,10 +25,11 @@ export const POIDS_PILOTE: Record<string, number> = {
   rythme: 0.4,
   intelligenceCourse: 0.12,
   regularite: 0.12,
-  depassement: 0.08,
-  defense: 0.05,
+  // D-194 (3), phase 13b : dépassement, défense et départs agissent en situation (course-piste.ts) ; leur poids dans la moyenne passe à 0.
+  depassement: 0,
+  defense: 0,
   gestionPneus: 0.08,
-  departs: 0.05,
+  departs: 0,
   retourTechnique: 0.05,
   condition: 0.05,
 };
@@ -131,3 +132,28 @@ export const CARBURANT = { charge: { reduite: -0.05, neutre: 0, reserve: 0.03 },
  * l'ingénieur estime l'usure avec une erreur relative d'écart type `erreurEstimation`.
  */
 export const ARRETS = { perteVoieS: 21, immobilisationMinS: 2, parPointRapidite: 0.015, parPointFatigue: 0.005, erreurParPoint: 0.002, perteErreurS: 4, defaut: 70, arretsMax: 3, erreurEstimation: 0.1 };
+
+/* ===================================================================== Phase 13b — la piste (D-194, D-195) */
+
+/**
+ * Qualifications Q1/Q2/Q3 (porteur : « vrai format ») : `q3` voitures en Q3, les autres éliminées à parts égales en Q1 et Q2 ;
+ * `tentatives` tours lancés par séance ; aléa de tour `sigma` (% du tour) ; erreur de probabilité erreurBase + (20 − régularité) × erreurParPoint,
+ * qui coûte `perteErreur` (%) ; la piste gagne `evolutionPiste` (%) à chaque séance. Valeurs PROVISOIRES (D-120).
+ */
+export const QUALIFS = { q3: 10, tentatives: 2, sigma: 0.12, erreurBase: 0.02, erreurParPoint: 0.004, perteErreur: 1.5, evolutionPiste: 0.05 };
+
+/**
+ * Course sur la piste (fiche 13b §3 à §6). Départ : `ecartGrilleS` s par place de grille, ± departParPoint s par point de la compétence
+ * « départs » autour de `departReference`, aléa `departSigmaS` (s). Tour : aléa `aleaTourPct` (%) ; air perturbé à moins de `seuilAirS` s :
+ * perte `airPerturbeS` × virages rapides du circuit / 3 (s). Dépassement : probabilité = facilité du circuit × (probaBase + probaParSeconde ×
+ * avance du tour en s) + parPointCompetence × (dépassement − défense) + aspiration + batterie (attaque, ou défense en sens inverse) + conduite
+ * agressive, bornée à `probaMax` ; tentative ratée en conduite agressive : accrochage avec la probabilité `accrochage`, `perteAccrochageS` s.
+ * Écart minimal entre deux voitures `ecartMinS` (s). Batterie : une unité par attaque ou défense, recharge `rechargeParTour` unité par tour.
+ * Facilité du circuit = facileBase + facileParPoint × (lignes droites − 1), lignes droites de 1 à 5 (exigences du circuit).
+ */
+export const PISTE = {
+  ecartGrilleS: 0.25, departParPoint: 0.05, departReference: 12, departSigmaS: 0.35,
+  aleaTourPct: 0.08, seuilAirS: 1, airPerturbeS: 0.25, ecartMinS: 0.3,
+  probaBase: 0.05, probaParSeconde: 0.5, parPointCompetence: 0.01, bonusAspiration: 0.1, bonusBatterie: 0.12, bonusAgressif: 0.08, probaMax: 0.85,
+  accrochage: 0.03, perteAccrochageS: 3, rechargeParTour: 0.5, facileBase: 0.15, facileParPoint: 0.2,
+};
